@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Backend/">
+    <Project Path="sources\core\tests/BackendTests/BackendTests.csproj" />
+    <Project Path="sources\core\Ggio.BikeSherpa.Backend.Domain\Ggio.BikeSherpa.Backend.Domain.csproj" />
+    <Project Path="sources\core\Ggio.BikeSherpa.Backend.Infrastructure\Ggio.BikeSherpa.Backend.Infrastructure.csproj" />
+    <Project Path="sources\core\Ggio.BikeSherpa.Backend\Ggio.BikeSherpa.Backend.csproj" />
+  </Folder>
+  <Folder Name="/BackOffice/" />
+</Solution>
