@@ -7,12 +7,12 @@ assignees: ''
 
 ---
 
-# En tant que  : 
+# En tant que  : 
 
-# Je veux : 
+# Je veux : 
 
-# A fin de : 
+# Afin de : 
 
 -------
 
-# Critères d'acceptation - détails technique  - comportements attendus :
+# Critères d'acceptation - détails technique  - comportements attendus :
