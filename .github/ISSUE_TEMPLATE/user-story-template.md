@@ -1,7 +1,7 @@
 ---
 name: User Story template
-about: Describe this issue template's purpose here.
-title: Discribe user story
+about: Description d'une user story du projet
+title: User Story : 
 labels: ''
 assignees: ''
 
