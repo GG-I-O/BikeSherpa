@@ -1,7 +1,7 @@
 ---
 name: User Story template
 about: Description d'une user story du projet
-title: User Story : 
+title: 'User Story :' 
 labels: ''
 assignees: ''
 
