@@ -6,4 +6,9 @@
     <Project Path="sources\core\Ggio.BikeSherpa.Backend\Ggio.BikeSherpa.Backend.csproj" />
   </Folder>
   <Folder Name="/BackOffice/" />
+  <Folder Name="/DddCore/">
+    <Project Path="sources/core/Ggio.DddCore.Infrastructure/Ggio.DddCore.Infrastructure.csproj" />
+    <Project Path="sources/core/Ggio.DddCore/Ggio.DddCore.csproj" />
+    <Project Path="sources/core/tests/DddCore.Tests/DddCore.Tests.csproj" />
+  </Folder>
 </Solution>
