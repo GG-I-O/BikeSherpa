@@ -59,7 +59,7 @@ public class ApplicationTransactionTest
                It.Is<IEnumerable<HasDomainEventsBase>>(e => e.Contains(entity))), Times.Once);
      }
 
-     private ApplicationTransaction<TestDbContext> MakeSut(
+     private static ApplicationTransaction<TestDbContext> MakeSut(
           out Mock<IApplicationTransactionContext> applicationTransactionContextMock,
           out Mock<IDomainEventDispatcher> domainEventDispatcherMock,
           out TestDbContext dbContext)
