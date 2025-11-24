@@ -1,20 +1,20 @@
 import { Stack } from "expo-router";
 import { Platform } from "react-native";
-import { Auth0Provider, useAuth0 } from "react-native-auth0";
+// import { Auth0Provider, useAuth0 } from "react-native-auth0";
 
 function AppStack() {
-    const { user } = useAuth0();
+    // const { user } = useAuth0();
 
-    const loggedIn = user !== undefined && user !== null;
+    // const loggedIn = user !== undefined && user !== null;
 
     return (
         <Stack>
-            <Stack.Protected guard={loggedIn}>
+            {/* <Stack.Protected guard={loggedIn}> */}
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            </Stack.Protected>
-            <Stack.Protected guard={!loggedIn}>
+            {/* </Stack.Protected> */}
+            {/* <Stack.Protected guard={!loggedIn}>
                 <Stack.Screen name='login' options={{ headerShown: false }} />
-            </Stack.Protected>
+            </Stack.Protected> */}
         </Stack>
     );
 }
@@ -26,9 +26,9 @@ export default function RootLayout() {
     console.log(Platform.OS);
 
     return (
-        <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
+        // <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
             <AppStack />
-        </Auth0Provider>
+        // </Auth0Provider>
     );
 
 }

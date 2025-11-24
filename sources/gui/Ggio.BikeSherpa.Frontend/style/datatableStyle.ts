@@ -7,47 +7,47 @@ const datatableStyle = StyleSheet.create({
     headerColumn: {
         textAlign: 'center'
     },
-    courseColumn: {
-        minWidth: 100,
-        maxWidth: 100
-    },
-    typeColumn: {
+    width40: {
         minWidth: 40,
         maxWidth: 40
     },
-    inputTypeColumn: {
+    width50: {
+        minWidth: 50,
+        maxWidth: 50
+    },
+    width60: {
+        minWidth: 60,
+        maxWidth: 60
+    },
+    width70: {
+        minWidth: 70,
+        maxWidth: 70
+    },
+    width80: {
         minWidth: 80,
         maxWidth: 80
     },
-    dateColumn: {
+    width90: {
         minWidth: 90,
         maxWidth: 90
     },
-    inputDateColumn: {
-        minWidth: 160,
-        maxWidth: 160
-    },
-    timeColumn: {
-        minWidth: 60,
-        maxWidth: 60
-    },
-    inputTimeColumn: {
+    width100: {
         minWidth: 100,
         maxWidth: 100
     },
-    descriptionColumn: {
-        minWidth: 100
-    },
-    adresseColumn: {
-        minWidth: 150
-    },
-    buttonColumn: {
-        minWidth: 60,
-        maxWidth: 60
-    },
-    timeIncrementColumn: {
+    width130: {
         minWidth: 130,
         maxWidth: 130
+    },
+    width160: {
+        minWidth: 160,
+        maxWidth: 160
+    },
+    minWidth100: {
+        minWidth: 100
+    },
+    minWidth150: {
+        minWidth: 150
     }
 });
 

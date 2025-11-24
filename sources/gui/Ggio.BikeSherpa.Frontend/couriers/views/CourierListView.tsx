@@ -13,7 +13,7 @@ export default function CourierListView() {
                     <DataTable.Title style={[style.column]}>Nom</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Prénom</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Code</DataTable.Title>
-                    <DataTable.Title style={[style.column, style.inputTypeColumn]}>Actions</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width80]}>Actions</DataTable.Title>
                 </DataTable.Header>
 
                 <DataTable.Row>
