@@ -1,61 +1,63 @@
 import { Address } from '@/data/Address';
 import { Identifiable } from '@/data/Identifiable';
-import DateToolbox from '@/services/DateToolbox';
 import * as Crypto from 'expo-crypto';
 import { StepType } from './StepType';
+import StepDetails from './StepDetails';
 
 export class Step implements Identifiable<string> {
     readonly id: string;
-    public deliveryCode: string;
-    public address: Address;
     public type: StepType;
+    public address: Address;
+    public distance: number;
+    public price: number;
     public contractDate: Date;
-    public comment?: string;
-    public description?: string;
-    public courier?: string;
     public estimatedDate?: Date;
     public realDate?: Date;
+    public details?: StepDetails;
+    public description?: string;
+    public courier?: string;
+    public nbToDo: number;
+    public nbDone: number;
+    public filesPath: string[];
 
     public constructor(
-        deliveryCode: string,
-        address: Address,
         type: StepType,
+        address: Address,
+        distance: number,
+        price: number,
         contractDate: Date,
         estimatedDate?: Date,
-        comment?: string,
-        description?: string
+        details?: StepDetails,
+        description?: string,
+        nbToDo: number = 0,
+        filesPath: string[] = []
     ) {
         this.id = Crypto.randomUUID();
-        this.deliveryCode = deliveryCode;
-        this.address = address;
         this.type = type;
+        this.address = address;
+        this.distance = distance;
+        this.price = price;
         this.contractDate = contractDate;
         this.estimatedDate = estimatedDate;
-        this.comment = comment;
+        this.details = details;
         this.description = description;
+
+        this.nbToDo = nbToDo;
+        this.nbDone = 0;
+
+        this.filesPath = filesPath;
     }
 
     public getContractDate(): string {
-        return DateToolbox.formatDate(this.contractDate);
+        return this.contractDate.toLocaleDateString();
     }
 
     public getContractTime(): string {
-        return DateToolbox.formatTime(this.contractDate);
+        return this.contractDate.toLocaleTimeString();
     }
 
     public getEstimatedTime(): string {
         if (!this.estimatedDate) return '';
-        return DateToolbox.formatTime(this.estimatedDate);
-    }
-
-    // Parse from Json
-    static fromPlainObject(obj: any): Step {
-        const step = Object.create(Step.prototype);
-        Object.assign(step, {
-            ...obj,
-            contractDate: new Date(obj.contractDate),
-            estmatedDate: obj.estmatedDate ? new Date(obj.estmatedDate) : undefined
-        });
-        return step;
+        return this.estimatedDate.toLocaleTimeString();
     }
 }
