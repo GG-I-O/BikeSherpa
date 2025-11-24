@@ -38,7 +38,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     {delivery.code}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.customer}
+                    {delivery.customer.name}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
                     {delivery.steps?.length}

@@ -14,16 +14,16 @@ export default function StepInputDataTable({ steps, deleteRow }: Props) {
     return (
         <DataTable style={{ backgroundColor: theme.colors.background }}>
             <DataTable.Header style={{ padding: 0 }}>
-                <DataTable.Title style={[datatableStyle.column, datatableStyle.buttonColumn]}>
+                <DataTable.Title style={[datatableStyle.column, datatableStyle.width60]}>
                     <Text>Actions</Text>
                 </DataTable.Title>
-                <DataTable.Title style={[datatableStyle.column, datatableStyle.buttonColumn]}>
+                <DataTable.Title style={[datatableStyle.column, datatableStyle.width60]}>
                     <Text>Type</Text>
                 </DataTable.Title>
                 <DataTable.Title style={[datatableStyle.column]}>
                     <Text>Date</Text>
                 </DataTable.Title>
-                <DataTable.Title style={[datatableStyle.column, datatableStyle.buttonColumn]}>
+                <DataTable.Title style={[datatableStyle.column, datatableStyle.width60]}>
                     <Text>Heure</Text>
                 </DataTable.Title>
                 <DataTable.Title style={[datatableStyle.column]}>

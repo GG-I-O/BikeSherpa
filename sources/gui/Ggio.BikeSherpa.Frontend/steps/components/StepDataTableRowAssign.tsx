@@ -39,23 +39,23 @@ export default function StepDataTableRowAssign({ step, isSelected = false, onPre
             }}
             style={{ backgroundColor: isSelected ? theme.colors.primary : theme.colors.background }}
         >
-            <DataTable.Cell style={[style.column, style.typeColumn]}>
+            <DataTable.Cell style={[style.column, style.width40]}>
                 <View>
                     <IconButton style={{ margin: 0, borderRadius: 5, height: '35%' }} mode='outlined' icon='arrow-up-thick' />
                     <IconButton style={{ margin: 0, borderRadius: 5, height: '35%' }} mode='outlined' icon='arrow-down-thick' />
                 </View>
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.typeColumn]}>
+            <DataTable.Cell style={[style.column, style.width40]}>
                 <DeliveryTypeIcon type={step.type} />
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.courseColumn]}>{step.deliveryCode}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.dateColumn]}>{step.getContractDate()}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.timeColumn]}>{step.getContractTime()}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.descriptionColumn]}>
+            <DataTable.Cell style={[style.column, style.width100]}>{step.deliveryCode}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width90]}>{step.getContractDate()}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>{step.getContractTime()}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.minWidth100]}>
                 <Text numberOfLines={2}>{step.description}</Text>
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.descriptionColumn]}>{step.comment}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.adresseColumn]}>
+            <DataTable.Cell style={[style.column, style.minWidth100]}>{step.comment}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <Text numberOfLines={3}>{step.address.streetInfo}</Text>
                 <Text numberOfLines={3}>{`${step.address.postcode} ${step.address.city}`}</Text>
             </DataTable.Cell>

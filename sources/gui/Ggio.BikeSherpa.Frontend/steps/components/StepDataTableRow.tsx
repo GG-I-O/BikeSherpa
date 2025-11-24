@@ -32,21 +32,21 @@ export default function StepDataTableRow({ step, isSelected = false, onPress, ca
             }}
             style={{ backgroundColor: isSelected ? theme.colors.primary : theme.colors.background }}
         >
-            <DataTable.Cell style={[style.column, style.typeColumn]}>
+            <DataTable.Cell style={[style.column, style.width40]}>
                 <DeliveryTypeIcon type={step.type} />
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.dateColumn]}>{step.getContractDate()}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.timeColumn]}>{step.getContractTime()}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.descriptionColumn]}>
+            <DataTable.Cell style={[style.column, style.width90]}>{step.getContractDate()}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>{step.getContractTime()}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.minWidth100]}>
                 <Text numberOfLines={2}>{step.description}</Text>
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.descriptionColumn]}>{step.comment}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.adresseColumn]}>
+            <DataTable.Cell style={[style.column, style.minWidth100]}>{step.comment}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <Text numberOfLines={3}>{step.address.streetInfo}</Text>
                 <Text numberOfLines={3}>{`${step.address.postcode} ${step.address.city}`}</Text>
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.timeColumn]}>{step.courier}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.timeColumn]}>
+            <DataTable.Cell style={[style.column, style.width60]}>{step.courier}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>
                 {
                     !canChangeDate ? (
                         <Text>{step.getEstimatedTime()}</Text>

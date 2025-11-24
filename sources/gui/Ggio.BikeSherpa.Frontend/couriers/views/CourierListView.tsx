@@ -20,10 +20,10 @@ export default function CourierListView() {
                     <DataTable.Cell>MonNom</DataTable.Cell>
                     <DataTable.Cell>MonPrénom</DataTable.Cell>
                     <DataTable.Cell>MMM</DataTable.Cell>
-                    <DataTable.Cell style={[style.column, style.typeColumn]}>
+                    <DataTable.Cell style={[style.column, style.width40]}>
                         <IconButton icon="account-edit" />
                     </DataTable.Cell>
-                    <DataTable.Cell style={[style.column, style.typeColumn]}>
+                    <DataTable.Cell style={[style.column, style.width40]}>
                         <IconButton icon="trash-can-outline" />
                     </DataTable.Cell>
                 </DataTable.Row>

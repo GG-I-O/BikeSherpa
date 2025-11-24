@@ -18,13 +18,13 @@ export default function ReportDeliveryList({ deliveries, onRowPress }: Props) {
         <ScrollView>
             <DataTable style={{ backgroundColor: theme.colors.background }}>
                 <DataTable.Header>
-                    <DataTable.Title style={[style.column, style.courseColumn]}>
+                    <DataTable.Title style={[style.column, style.width100]}>
                         Date
                     </DataTable.Title>
-                    <DataTable.Title style={[style.column, style.descriptionColumn]}>
+                    <DataTable.Title style={[style.column, style.minWidth100]}>
                         Code
                     </DataTable.Title>
-                    <DataTable.Title style={[style.column, style.dateColumn]}>
+                    <DataTable.Title style={[style.column, style.width90]}>
                         Prix
                     </DataTable.Title>
                 </DataTable.Header>

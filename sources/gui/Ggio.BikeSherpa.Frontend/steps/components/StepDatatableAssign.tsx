@@ -21,14 +21,14 @@ export default function StepDataTableAssign({ steps, isStepSelected, onRowPress,
             <DataTable style={{ backgroundColor: theme.colors.background }}>
                 {showHeader ? (
                     <DataTable.Header>
-                        <DataTable.Title style={[style.column, style.typeColumn]}>Trier</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.typeColumn]}>Type</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.courseColumn]}>Code</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.dateColumn]}>Date</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.timeColumn]}>Heure contrat</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.descriptionColumn]}>Description</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.descriptionColumn]}>Commentaire</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.adresseColumn]}>Adresse</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width40]}>Trier</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width100]}>Code</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width90]}>Date</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width60]}>Heure contrat</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.minWidth100]}>Description</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.minWidth100]}>Commentaire</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.minWidth150]}>Adresse</DataTable.Title>
                         <DataTable.Title style={[style.column, style.timeIncrementColumn]}>Heure</DataTable.Title>
                     </DataTable.Header>
                 ) : (

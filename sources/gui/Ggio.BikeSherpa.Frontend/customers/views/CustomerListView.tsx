@@ -24,10 +24,10 @@ export default function CustomerListView() {
                     <DataTable.Cell style={[style.column]}>10 avenue de la république, 38100 Grenoble</DataTable.Cell>
                     <DataTable.Cell style={[style.column]}>362 521 879 00034</DataTable.Cell>
                     <DataTable.Cell style={[style.column]}>Commentaire élogieux.</DataTable.Cell>
-                    <DataTable.Cell style={[style.column, style.typeColumn]}>
+                    <DataTable.Cell style={[style.column, style.width40]}>
                         <IconButton icon="account-edit" />
                     </DataTable.Cell>
-                    <DataTable.Cell style={[style.column, style.typeColumn]}>
+                    <DataTable.Cell style={[style.column, style.width40]}>
                         <IconButton icon="trash-can-outline" />
                     </DataTable.Cell>
                 </DataTable.Row>

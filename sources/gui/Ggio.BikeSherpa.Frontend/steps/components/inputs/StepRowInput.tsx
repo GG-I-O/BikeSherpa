@@ -27,10 +27,10 @@ export default function StepRowInput({ step, deleteRow }: Props) {
 
     return (
         <DataTable.Row style={{ padding: 0 }}>
-            <DataTable.Cell style={[datatableStyle.column, datatableStyle.buttonColumn]}>
+            <DataTable.Cell style={[datatableStyle.column, datatableStyle.width60]}>
                 <IconButton icon="trash-can-outline" onPress={() => deleteRow(step)} />
             </DataTable.Cell>
-            <DataTable.Cell style={[datatableStyle.column, datatableStyle.buttonColumn]}>
+            <DataTable.Cell style={[datatableStyle.column, datatableStyle.width60]}>
                 <Button
                     mode='outlined'
                     onPress={() => setType(type == StepType.PickUp ? StepType.Drop : StepType.PickUp)}
@@ -57,7 +57,7 @@ export default function StepRowInput({ step, deleteRow }: Props) {
                     value={deliveryDate}
                 />
             </DataTable.Cell>
-            <DataTable.Cell style={[datatableStyle.column, datatableStyle.buttonColumn]}>
+            <DataTable.Cell style={[datatableStyle.column, datatableStyle.width60]}>
                 <TimePickerInput
                     hours={contractTime.hours}
                     minutes={contractTime.minutes}
