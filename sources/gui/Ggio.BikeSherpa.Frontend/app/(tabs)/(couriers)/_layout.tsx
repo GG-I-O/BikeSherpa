@@ -29,7 +29,7 @@ export default function CourierLayout() {
                 name="new"
                 options={{
                     headerShown: true,
-                    title: 'Nouveau livreur'
+                    title: "Nouveau livreur"
                 }}
             />
         </Stack>

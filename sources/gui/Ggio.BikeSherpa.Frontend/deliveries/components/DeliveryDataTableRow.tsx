@@ -59,8 +59,8 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
             {showSteps ? (
                 <View style={{ marginInline: 16, borderWidth: 1, borderColor: theme.colors.surfaceVariant }}>
                     <StepDataTable
-                        etapes={delivery.steps ?? []}
-                        isEtapeSelected={isStepSelected}
+                        steps={delivery.steps ?? []}
+                        isStepSelected={isStepSelected}
                         onRowPress={onStepPress ? (step: Step) => onStepPress(step, delivery) : undefined}
                         canChangeDate={true}
                     />

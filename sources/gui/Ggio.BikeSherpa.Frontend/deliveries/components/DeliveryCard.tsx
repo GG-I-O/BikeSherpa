@@ -23,7 +23,7 @@ export default function DeliveryCard({ delivery, isSelected = false, onPress }: 
                 <Divider />
                 <Text style={{ alignSelf: 'flex-start' }}>{delivery.steps ? delivery.steps[0].getContractDate() : ''}</Text>
                 <Text style={{ alignSelf: 'flex-start' }}>{delivery.steps ? delivery.steps[0].getContractTime() : ''}</Text>
-                <Text style={{ alignSelf: 'flex-end' }}>Étapes : {delivery.steps ? delivery.steps.length : ''}</Text>
+                <Text style={{ alignSelf: 'flex-end' }}>Éstape : {delivery.steps ? delivery.steps.length : ''}</Text>
             </Card.Content>
         </Card>
     );

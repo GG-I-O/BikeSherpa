@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 type Props = {
     step: Step,
-    onAssign: (step: Step, livreur: string) => void,
+    onAssign: (step: Step, courier: string) => void,
     onTimePicker: (step: Step, time: Date) => void,
     onDelete?: (step: Step) => void
 }

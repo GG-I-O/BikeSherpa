@@ -54,7 +54,7 @@ export default function DeliveryLayout() {
                 }}
             />
             <Stack.Screen
-                name="[courseId]"
+                name="[deliveryId]"
                 options={{
                     headerShown: true,
                     title: "Détails"

@@ -1,8 +1,10 @@
 # Initialisation
 
-## Prérequis 
+## Prérequis
+
 - npm  
-npm update :  
+  npm update :
+
 ```sh
 nvm install node --reinstall-packages-from=node
 nvm use node
@@ -13,6 +15,7 @@ npm install -g npm@latest
 ```
 
 ## Install
+
 ```sh
 npm install -g npm@latest
 npx create-expo-app@latest Ggio.BikeSherpa.Frontend
@@ -24,11 +27,13 @@ npm update
 ## Launch
 
 ### Web
+
 ```sh
 npx expo start --clear
 ```
 
 ### Mobile
+
 ```sh
 npx expo prebuild --clean
 npx expo start --clear
@@ -37,6 +42,7 @@ npx expo start --clear
 # Packages
 
 ## Expo
+
 React native framework and its library
 
 ```sh
@@ -46,6 +52,7 @@ npx expo install expo-secure-store
 ```
 
 ## React native paper
+
 graphic component with Material3 theme
 
 ```sh
@@ -53,6 +60,7 @@ npm install react-native-paper react-native-paper-dropdown react-native-paper-da
 ```
 
 ## Axios
+
 API calls with interceptors
 
 ```sh
@@ -60,6 +68,7 @@ npm install axios
 ```
 
 ## Inversify
+
 Dependency injection with @injectable / @inject
 
 ```sh
@@ -67,6 +76,7 @@ npm install inversify reflect-metadata
 ```
 
 ## Zod
+
 Create validator schema
 
 ```sh
@@ -74,6 +84,7 @@ npm install zod
 ```
 
 ## React hook form
+
 Prérequis : Zod
 Validate form from a Zod schema
 
@@ -82,6 +93,7 @@ npm install react-hook-form @hookform/resolvers
 ```
 
 ## Legend app & MMKV
+
 Store data locally and update local data with API/notification when possible
 
 ```sh
@@ -90,6 +102,7 @@ npx expo install react-native-mmkv react-native-nitro-modules
 ```
 
 ## SignalR
+
 Subscribe and receive notification
 
 ```sh
@@ -97,6 +110,7 @@ npm install @microsoft/signalr
 ```
 
 ## OpenAPI zod client
+
 Generate API url from back-end openAPI json
 
 ```sh
@@ -104,9 +118,11 @@ npm install --save-dev openapi-zod-client
 ```
 
 ## Jest
+
 Unit testing
 
 Warning : @testing-library/react-native need react-test-renderer, and react-test-renderer need to be at the EXACT same version as react
+
 ```sh
 npx expo install jest-expo jest @types/jest --dev
 npm install --save-dev react-test-renderer@19.1.0

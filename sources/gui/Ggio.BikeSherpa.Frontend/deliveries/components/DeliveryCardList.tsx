@@ -8,7 +8,7 @@ type Props = {
     onDeliveryPress?: (delivery: Delivery) => void
 }
 
-export default function CoursesCardList({ deliveries, isDeliverySelected, onDeliveryPress }: Props) {
+export default function DeliveryCardList({ deliveries, isDeliverySelected, onDeliveryPress }: Props) {
     return (
         <ThemedCardList
             data={deliveries}
