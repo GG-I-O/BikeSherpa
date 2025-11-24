@@ -51,6 +51,13 @@ npx expo install expo-network
 npx expo install expo-secure-store
 ```
 
+## React native Auth0
+Authentification with Auth0
+
+```sh
+npm install react-native-auth0 --save
+```
+
 ## React native paper
 
 graphic component with Material3 theme
