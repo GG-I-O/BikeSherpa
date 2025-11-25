@@ -1,6 +1,9 @@
+import AppBootstrapper from "@/bootstrapper/AppBootstrapper";
 import { Stack } from "expo-router";
 import { Platform } from "react-native";
 import { Auth0Provider, useAuth0 } from "react-native-auth0";
+
+AppBootstrapper.init();
 
 function AppStack() {
     const { user } = useAuth0();
@@ -26,7 +29,7 @@ export default function RootLayout() {
         authClient = process.env.EXPO_PUBLIC_AUTH_CLIENT_ANDROID;
     else
         authClient = process.env.EXPO_PUBLIC_AUTH_CLIENT_WEB;
-    
+
     return (
         <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
             <AppStack />

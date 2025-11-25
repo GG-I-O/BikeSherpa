@@ -1,5 +1,5 @@
-import { Address } from '@/data/Address';
-import { Identifiable } from '@/data/Identifiable';
+import { Address } from '@/models/Address';
+import { Identifiable } from '@/models/Identifiable';
 import * as Crypto from 'expo-crypto';
 import { StepType } from './StepType';
 

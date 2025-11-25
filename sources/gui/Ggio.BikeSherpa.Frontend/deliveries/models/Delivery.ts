@@ -1,4 +1,4 @@
-import { Identifiable } from "@/data/Identifiable";
+import { Identifiable } from "@/models/Identifiable";
 import * as Crypto from 'expo-crypto';
 import { Step } from "@/steps/models/Step";
 import Customer from "@/customers/models/Customer";

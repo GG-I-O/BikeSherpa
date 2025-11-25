@@ -1,52 +1,76 @@
 import formStyle from "@/style/formStyle";
 import { useState } from "react";
 import { ScrollView } from "react-native";
-import { Button, Text, TextInput, useTheme } from "react-native-paper";
+import { Button, Checkbox, Text, TextInput, useTheme } from "react-native-paper";
+import useCustomerViewModel from "../viewModel/CustomerViewModel";
+import ThemedInput from "@/components/themed/ThemedInput";
+import ThemedCheckbox from "@/components/themed/ThemedCheckbox";
 
 export default function NewCustomerView() {
     const theme = useTheme();
 
-    const [name, setName] = useState<string>();
-    const [code, setCode] = useState<string>();
-    const [address, setAddress] = useState<string>();
-    const [siret, setSiret] = useState<string>();
-    const [comment, setComment] = useState<string>();
+    const viewModel = useCustomerViewModel();
 
+    const { control, errors, handleSubmit } = viewModel.getNewCustomerForm();
 
     return (
         <ScrollView
             style={[formStyle.container, { backgroundColor: theme.colors.background }]}
             contentContainerStyle={formStyle.elements}
         >
-            <TextInput
-                style={formStyle.input}
-                label="Nom*"
-                value={name}
-                onChangeText={text => setName(text)}
+            <ThemedInput
+                control={control}
+                name="name"
+                error={errors.name}
+                placeholder="Nom"
             />
-            <TextInput
-                style={formStyle.input}
-                label="Code*"
-                value={code}
-                onChangeText={text => setCode(text)}
+            <ThemedInput
+                control={control}
+                name="code"
+                error={errors.code}
+                placeholder="Code"
             />
-            <TextInput
-                style={formStyle.input}
-                label="Adresse*"
-                value={address}
-                onChangeText={text => setAddress(text)}
+            <ThemedInput
+                control={control}
+                name="email"
+                error={errors.email}
+                placeholder="E-mail"
             />
-            <TextInput
-                style={formStyle.input}
-                label="SIRET"
-                value={siret}
-                onChangeText={text => setSiret(text)}
+            <ThemedInput
+                control={control}
+                name="phone"
+                error={errors.phone}
+                placeholder="Téléphone"
             />
-            <TextInput
-                style={formStyle.input}
-                label="Commentaire"
-                value={comment}
-                onChangeText={text => setComment(text)}
+            <ThemedInput
+                control={control}
+                name="address"
+                error={errors.address}
+                placeholder="Adresse"
+            />
+            <ThemedInput
+                control={control}
+                name="discount"
+                error={errors.options?.discount}
+                placeholder="Remise"
+            />
+            <ThemedCheckbox
+                control={control}
+                name="canValidateWithPhoto"
+                error={errors.options?.canValidateWithPhoto}
+                label="Valider avec photo"
+            />
+            <ThemedCheckbox
+                control={control}
+                name="canValidateWithSignature"
+                error={errors.options?.canValidateWithSignature}
+                label="Valider avec signature"
+            />
+            <ThemedCheckbox
+                control={control}
+                name="canValidateWithFile"
+                error={errors.options?.canValidateWithFile}
+                label="Valider avec fichier"
             />
             <Button
                 mode="outlined"

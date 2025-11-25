@@ -1,4 +1,4 @@
-import { Address } from "@/data/Address";
+import { Address } from "@/models/Address";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
