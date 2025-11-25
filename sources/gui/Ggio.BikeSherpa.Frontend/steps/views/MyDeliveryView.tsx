@@ -16,7 +16,7 @@ export function MyDeliveryView() {
     const [dateFilter, setDateFilter] = useState<string>('1');
 
     useEffect(() => {
-        setSteps(viewModel.getStepListFiltered(dateFilter, 'NONE'));
+        setSteps(viewModel.getFilteredStepList(dateFilter, 'NONE'));
     }, [viewModel, dateFilter]);
 
     return (

@@ -2,7 +2,6 @@ import { Address } from '@/data/Address';
 import { Identifiable } from '@/data/Identifiable';
 import * as Crypto from 'expo-crypto';
 import { StepType } from './StepType';
-import StepDetails from './StepDetails';
 
 export class Step implements Identifiable<string> {
     readonly id: string;
@@ -13,8 +12,7 @@ export class Step implements Identifiable<string> {
     public contractDate: Date;
     public estimatedDate?: Date;
     public realDate?: Date;
-    public details?: StepDetails;
-    public description?: string;
+    public comment?: string;
     public courier?: string;
     public nbToDo: number;
     public nbDone: number;
@@ -27,8 +25,7 @@ export class Step implements Identifiable<string> {
         price: number,
         contractDate: Date,
         estimatedDate?: Date,
-        details?: StepDetails,
-        description?: string,
+        comment?: string,
         nbToDo: number = 0,
         filesPath: string[] = []
     ) {
@@ -39,8 +36,7 @@ export class Step implements Identifiable<string> {
         this.price = price;
         this.contractDate = contractDate;
         this.estimatedDate = estimatedDate;
-        this.details = details;
-        this.description = description;
+        this.comment = comment;
 
         this.nbToDo = nbToDo;
         this.nbDone = 0;

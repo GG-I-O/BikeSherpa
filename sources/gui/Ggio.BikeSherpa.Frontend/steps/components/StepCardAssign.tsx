@@ -47,8 +47,7 @@ export default function StepCardAssign({ step, onAssign, onTimePicker, onDelete 
                     <Text>{step.address.streetInfo}</Text>
                     <Text>{`${step.address.postcode} ${step.address.city}`}</Text>
                     <Divider />
-                    <Text numberOfLines={2}>{step.description}</Text>
-                    <Text numberOfLines={2}>{step.details?.size}</Text>
+                    <Text numberOfLines={2}>{step.comment}</Text>
                 </View>
 
                 <Divider />

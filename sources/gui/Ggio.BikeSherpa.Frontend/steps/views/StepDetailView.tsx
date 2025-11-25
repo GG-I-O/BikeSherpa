@@ -98,9 +98,9 @@ export default function StepDetailView({ canEdit = false, canValidate = false }:
                             <Text>{step.type === StepType.PickUp ? 'Heure mini' : 'Heure max'} : {step.getContractTime()}</Text>
                             <Text style={AppStyle.textStyle.h3}>ETA : {step.getEstimatedTime()}</Text>
                         </View>
-                        <Text>Description : {step.description}</Text>
+                        <Text>Description : {step.comment}</Text>
                         <Text style={[AppStyle.textStyle.h3, { textAlign: 'center' }]}>Infos livreur :</Text>
-                        <Text style={{ textAlign: 'center', fontStyle: 'italic' }}>{step.details?.size}</Text>
+                        <Text style={{ textAlign: 'center', fontStyle: 'italic' }}>{step.comment}</Text>
                     </View>
                 </View>
             </View>

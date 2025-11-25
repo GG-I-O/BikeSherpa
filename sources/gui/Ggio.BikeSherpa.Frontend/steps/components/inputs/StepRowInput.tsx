@@ -21,7 +21,7 @@ export default function StepRowInput({ step, deleteRow }: Props) {
     const [type, setType] = useState<StepType>(step.type);
     const [deliveryDate, setDeliveryDate] = useState<Date>(step.contractDate);
     const [contractTime, setContractTime] = useState<{ hours: number, minutes: number }>({ hours: step.contractDate.getHours(), minutes: step.contractDate.getMinutes() })
-    const [description, setDescription] = useState<string>(step.description ?? '');
+    const [description, setDescription] = useState<string>(step.comment ?? '');
     const [comment, setComment] = useState<string>(step.comment ?? '');
     const [address, setAddress] = useState<string>(step.address.streetInfo ? `${step.address.streetInfo} ${step.address.postcode} ${step.address.city}` : '');
 
