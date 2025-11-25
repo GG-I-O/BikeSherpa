@@ -21,10 +21,12 @@ function AppStack() {
 
 export default function RootLayout() {
     const authDomain = process.env.EXPO_PUBLIC_AUTH_DOMAIN;
-    const authClient = process.env.EXPO_PUBLIC_AUTH_CLIENT;
-
-    console.log(Platform.OS);
-
+    let authClient;
+    if (Platform.OS == 'android')
+        authClient = process.env.EXPO_PUBLIC_AUTH_CLIENT_ANDROID;
+    else
+        authClient = process.env.EXPO_PUBLIC_AUTH_CLIENT_WEB;
+    
     return (
         <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
             <AppStack />

@@ -16,14 +16,14 @@ export default function Login() {
 
     if (isLoading) {
         return (
-            <View>
+            <View style={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <Text>Loading</Text>
             </View>
         );
     }
 
     return (
-        <View>
+        <View style={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
             <Button onPress={onLogin}>
                 <Text>Se Connecter</Text>
             </Button>

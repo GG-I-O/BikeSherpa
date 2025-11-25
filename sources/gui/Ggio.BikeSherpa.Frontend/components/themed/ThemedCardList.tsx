@@ -14,22 +14,42 @@ type Props = {
 export default function ThemedCardList({ data, searchBar, card, style, numColumns }: Props) {
     const safeInset = useSafeAreaInsets();
 
-    return (
-        <View style={{ margin: 8, gap: 8, flex: 1 }}>
 
-            {searchBar}
+    if (numColumns && numColumns > 1)
+        return (
+            <View style={{ margin: 8, gap: 8, flex: 1 }}>
 
-            <FlatList
-                ListFooterComponent={
-                    <View style={{ height: safeInset.bottom * 2 }} />
-                }
-                data={data}
-                contentContainerStyle={[style, { gap: 8 }]}
-                columnWrapperStyle={{ gap: 8 }}
-                keyExtractor={item => item.id.toString()}
-                renderItem={card}
-                numColumns={numColumns}
-            />
-        </View>
-    )
+                {searchBar}
+
+                <FlatList
+                    ListFooterComponent={
+                        <View style={{ height: safeInset.bottom * 2 }} />
+                    }
+                    data={data}
+                    contentContainerStyle={[style, { gap: 8 }]}
+                    columnWrapperStyle={{ gap: 8 }}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={card}
+                    numColumns={numColumns}
+                />
+            </View>
+        );
+    else
+        return (
+            <View style={{ margin: 8, gap: 8, flex: 1 }}>
+
+                {searchBar}
+
+                <FlatList
+                    ListFooterComponent={
+                        <View style={{ height: safeInset.bottom * 2 }} />
+                    }
+                    data={data}
+                    contentContainerStyle={[style, { gap: 8 }]}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={card}
+                    numColumns={numColumns}
+                />
+            </View>
+        );
 }
