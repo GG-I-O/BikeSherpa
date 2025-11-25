@@ -30,7 +30,7 @@ export default function StepDetailView({ canEdit = false, canValidate = false }:
         if (!step)
             setStep(viewModel.getStep(stepId));
         if (step)
-            setDelivery(viewModel.getDeliveryByCode(step.deliveryCode));
+            setDelivery(viewModel.getDeliveryByCode(step.id));
     }, [stepId, viewModel, step]);
 
     const screenWidth = Dimensions.get('window').width;
@@ -47,7 +47,7 @@ export default function StepDetailView({ canEdit = false, canValidate = false }:
             <Text style={[AppStyle.textStyle.h2, { marginBottom: 8 }]}>Course :</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 8 }}>
                 <Text style={AppStyle.textStyle.h3}>{delivery.code}</Text>
-                <Text style={AppStyle.textStyle.h3}>{delivery.customer}</Text>
+                <Text style={AppStyle.textStyle.h3}>{delivery.customer.name}</Text>
                 {canEdit ? (
                     <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8 }}>
                         <Button
@@ -100,7 +100,7 @@ export default function StepDetailView({ canEdit = false, canValidate = false }:
                         </View>
                         <Text>Description : {step.description}</Text>
                         <Text style={[AppStyle.textStyle.h3, { textAlign: 'center' }]}>Infos livreur :</Text>
-                        <Text style={{ textAlign: 'center', fontStyle: 'italic' }}>{step.comment}</Text>
+                        <Text style={{ textAlign: 'center', fontStyle: 'italic' }}>{step.details?.size}</Text>
                     </View>
                 </View>
             </View>

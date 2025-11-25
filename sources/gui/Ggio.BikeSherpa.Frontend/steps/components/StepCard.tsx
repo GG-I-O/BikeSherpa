@@ -32,7 +32,7 @@ export default function StepCard({ step, onPress, isSelected = false }: Props) {
                 <Card.Content>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
                         <DeliveryTypeIcon type={step.type} />
-                        <Text>{step.deliveryCode}</Text>
+                        <Text>{step.id}</Text>
                         <Text>{step.estimatedDate ? step.getEstimatedTime() : step.getContractTime()}</Text>
                     </View>
                     <Divider />

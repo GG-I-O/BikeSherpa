@@ -29,7 +29,7 @@ export default function StepDataTableAssign({ steps, isStepSelected, onRowPress,
                         <DataTable.Title style={[style.column, style.minWidth100]}>Description</DataTable.Title>
                         <DataTable.Title style={[style.column, style.minWidth100]}>Commentaire</DataTable.Title>
                         <DataTable.Title style={[style.column, style.minWidth150]}>Adresse</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.timeIncrementColumn]}>Heure</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width160]}>Heure</DataTable.Title>
                     </DataTable.Header>
                 ) : (
                     <></>

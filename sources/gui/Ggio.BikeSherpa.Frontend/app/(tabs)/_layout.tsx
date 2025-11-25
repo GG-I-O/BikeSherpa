@@ -23,15 +23,15 @@ export default function TabLayout() {
 
                 }}
             />
-            {/* <Tabs.Screen
-                name="(myCourses)"
+            <Tabs.Screen
+                name="(myDeliveries)"
                 options={{
-                    href: "/(tabs)/(myCourses)",
-                    title: 'Mes Courses',
+                    href: "/(tabs)/(myDeliveries)",
+                    title: 'Mes courses',
                     tabBarIcon: ({ color }) => <Icon source="bicycle-cargo" size={28} color={color} />
 
                 }}
-            /> */}
+            />
             <Tabs.Screen
                 name="(couriers)"
                 options={{
@@ -41,24 +41,24 @@ export default function TabLayout() {
 
                 }}
             />
-            {/* <Tabs.Screen
-                name="(clients)"
+            <Tabs.Screen
+                name="(customers)"
                 options={{
-                    href: "/(tabs)/(clients)",
+                    href: "/(tabs)/(customers)",
                     title: 'Clients',
                     tabBarIcon: ({ color }) => <Icon source="card-account-details" size={28} color={color} />
 
                 }}
             />
             <Tabs.Screen
-                name="(factures)"
+                name="(reports)"
                 options={{
-                    href: "/(tabs)/(factures)",
+                    href: "/(tabs)/(reports)",
                     title: 'Rapports',
                     tabBarIcon: ({ color }) => <Icon source="file-document" size={28} color={color} />
 
                 }}
-            /> */}
+            />
         </Tabs>
     );
 
