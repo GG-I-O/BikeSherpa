@@ -1,11 +1,18 @@
+using Facet.Extensions;
+using Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CourseAggregate.Specification;
+using Ggio.DddCore;
 using Mediator;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Ggio.BikeSherpa.BackendSaaS.Features.Courses.Get;
 
-public class GetCourseQuery(Guid Id) : IQuery<CourseDto>;
+public record GetCourseQuery(Guid Id) : IQuery<CourseCrud?>;
 
-public class GetHandler : IQueryHandler<GetCourseQuery, CourseDto>
+public class GetHandler(IReadRepository<Course> courseRepository) : IQueryHandler<GetCourseQuery, CourseCrud?>
 {
-     public ValueTask<CourseDto> Handle(GetCourseQuery query, CancellationToken cancellationToken) => throw new NotImplementedException();
+     public async ValueTask<CourseCrud?> Handle(GetCourseQuery query, CancellationToken cancellationToken)
+     {
+          var entity = await courseRepository.FirstOrDefaultAsync(new CourseByIdSpecification(query.Id), cancellationToken);
+          return entity?.ToFacet<CourseCrud>();
+     }
 }
