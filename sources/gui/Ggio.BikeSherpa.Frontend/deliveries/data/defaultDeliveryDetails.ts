@@ -1,6 +1,6 @@
-import DeliveryDetail from "../models/DeliveryDetail";
+import PriceDetail from "../../models/PriceDetail";
 
-const defaultDeliveryDetails: DeliveryDetail[] = [
+const defaultDeliveryDetails: PriceDetail[] = [
     {
         label: "Remise",
         price: 0

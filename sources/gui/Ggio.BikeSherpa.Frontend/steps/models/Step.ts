@@ -1,22 +1,14 @@
 import { Address } from '@/models/Address';
-import { Identifiable } from '@/models/Identifiable';
 import * as Crypto from 'expo-crypto';
 import { StepType } from './StepType';
+import { InputStep } from './InputStep';
+import Storable from '@/models/Storable';
 
-export class Step implements Identifiable<string> {
-    readonly id: string;
-    public type: StepType;
-    public address: Address;
-    public distance: number;
-    public price: number;
-    public contractDate: Date;
-    public estimatedDate?: Date;
-    public realDate?: Date;
-    public comment?: string;
-    public courier?: string;
-    public nbToDo: number;
-    public nbDone: number;
-    public filesPath: string[];
+export class Step extends InputStep implements Storable {
+    // Storable
+    public readonly id: string;
+    public createdAt?: string;
+    public updatedAt?: string;
 
     public constructor(
         type: StepType,
@@ -29,31 +21,7 @@ export class Step implements Identifiable<string> {
         nbToDo: number = 0,
         filesPath: string[] = []
     ) {
+        super(type, address, distance, price, contractDate, estimatedDate, comment, nbToDo, filesPath);
         this.id = Crypto.randomUUID();
-        this.type = type;
-        this.address = address;
-        this.distance = distance;
-        this.price = price;
-        this.contractDate = contractDate;
-        this.estimatedDate = estimatedDate;
-        this.comment = comment;
-
-        this.nbToDo = nbToDo;
-        this.nbDone = 0;
-
-        this.filesPath = filesPath;
-    }
-
-    public getContractDate(): string {
-        return this.contractDate.toLocaleDateString();
-    }
-
-    public getContractTime(): string {
-        return this.contractDate.toLocaleTimeString();
-    }
-
-    public getEstimatedTime(): string {
-        if (!this.estimatedDate) return '';
-        return this.estimatedDate.toLocaleTimeString();
     }
 }

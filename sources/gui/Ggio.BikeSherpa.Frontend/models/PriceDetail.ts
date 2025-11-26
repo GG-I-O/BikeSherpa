@@ -1,4 +1,4 @@
-export default class DeliveryDetail {
+export default class PriceDetail {
     public label: string;
     public price: number;
 
