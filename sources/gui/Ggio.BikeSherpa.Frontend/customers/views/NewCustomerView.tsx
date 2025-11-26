@@ -4,11 +4,22 @@ import { Button, Text, useTheme } from "react-native-paper";
 import ThemedInput from "@/components/themed/ThemedInput";
 import ThemedCheckbox from "@/components/themed/ThemedCheckbox";
 import { useNewCustomerForm } from "../hooks/useNewCustomerForm";
+import { useState } from "react";
 
 export default function NewCustomerView() {
     const theme = useTheme();
 
     const { control, errors, handleSubmit } = useNewCustomerForm();
+
+    const [query, setQuery] = useState("");
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [formData, setFormData] = useState({
+        streetInfo: "",
+        postcode: "",
+        city: "",
+    });
+
+
 
     return (
         <ScrollView
@@ -19,38 +30,50 @@ export default function NewCustomerView() {
                 control={control}
                 name="name"
                 error={errors.name}
-                placeholder="Nom"
+                label="Nom"
+                placeholder="Ma Petite Société"
+                required
             />
             <ThemedInput
                 control={control}
                 name="code"
                 error={errors.code}
-                placeholder="Code"
+                label="Code"
+                placeholder="MPS"
+                required
             />
             <ThemedInput
                 control={control}
                 name="email"
                 error={errors.email}
-                placeholder="E-mail"
+                label="E-mail"
+                placeholder="votre-nom@societe.fr"
+                required
             />
             <ThemedInput
                 control={control}
                 name="phone"
                 error={errors.phone}
-                placeholder="Téléphone"
+                label="Téléphone"
+                placeholder="06 10 11 12 13"
+                required
             />
             <ThemedInput
                 control={control}
                 name="address"
-                error={errors.address}
-                placeholder="Adresse"
+                error={errors.address?.name}
+                label="Adresse"
+                placeholder="10 rue de la République 38100 Grenoble"
+                required
             />
             <ThemedInput
                 control={control}
-                name="discount"
-                error={errors.options?.discount}
-                placeholder="Remise"
+                name="complement"
+                error={errors.address?.complement}
+                label="Complément d’adresse"
+                placeholder="Bâtiment B"
             />
+
             <ThemedCheckbox
                 control={control}
                 name="canValidateWithPhoto"

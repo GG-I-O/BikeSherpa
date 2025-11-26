@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
 import useCustomerViewModel from '../viewModel/CustomerViewModel';
 import InputCustomer from '../models/InputCustomer';
+import { addressSchema } from '@/models/Address';
 
 const customerOptionSchema = zod.object({
     canValidateWithPhoto: zod
@@ -19,18 +20,18 @@ const newCustomerSchema = zod.object({
     name: zod
         .string()
         .trim()
-        .min(1, 'Nom requis'),
-    address: zod
+        .min(1, "Nom requis"),
+    address: addressSchema,
+    complement: zod
         .string()
-        .trim()
-        .min(1, 'Adresse requise'),
+        .trim(),
     code: zod
         .string()
         .trim()
-        .min(1, 'Code requis')
-        .max(3, 'Code trop long'),
+        .min(1, "Code requis")
+        .max(3, "Code trop long"),
     email: zod
-        .email(),
+        .email("Adresse e-mail non valide"),
     siret: zod
         .number()
         .min(14)
@@ -41,13 +42,13 @@ const newCustomerSchema = zod.object({
     phone: zod
         .string()
         .trim()
-        .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, 'Numéro de téléphone invalide'),
+        .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide"),
     options: customerOptionSchema
-}).partial({ siret: true, comment: true });
+}).partial({ complement: true, siret: true, comment: true });
 
 export function useNewCustomerForm() {
     const viewModel = useCustomerViewModel();
-    
+
     const {
         control,
         handleSubmit,
@@ -59,7 +60,7 @@ export function useNewCustomerForm() {
             code: '',
             phone: '',
             email: '',
-            address: '',
+            address: {},
             options: {
                 canValidateWithPhoto: false,
                 canValidateWithSignature: false,
@@ -75,9 +76,9 @@ export function useNewCustomerForm() {
         reset(); // Clear form after submission
     };
 
-    return { 
-        control, 
-        handleSubmit: handleSubmit(onSubmit), 
-        errors 
+    return {
+        control,
+        handleSubmit: handleSubmit(onSubmit),
+        errors
     };
 }

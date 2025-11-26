@@ -2,6 +2,8 @@ import React from 'react';
 import { Control, FieldError, useController } from 'react-hook-form';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { Checkbox, Provider, Text, TextInput } from 'react-native-paper';
+import formStyle from '@/style/formStyle';
+import { View } from 'react-native';
 
 interface CustomCheckboxProps {
     name: string;
@@ -23,14 +25,14 @@ const ThemedCheckbox: React.FC<CustomCheckboxProps> = ({
     });
 
     return (
-        <Provider>
-            <Text style={{ textAlign: 'center' }}>{label}</Text>
+        <View style={formStyle.checkboxContainer}>
             <Checkbox
-                status={field.value == true ? 'checked' : 'unchecked'}
-                onPress={field.onChange}
+                status={field.value ? 'checked' : 'unchecked'}
+                onPress={() => field.onChange(!field.value)}
             />
+            <Text>{label}</Text>
             {error && (<Text style={{ color: colors.error }}>{error.message}</Text>)}
-        </Provider>
+        </View>
     );
 };
 

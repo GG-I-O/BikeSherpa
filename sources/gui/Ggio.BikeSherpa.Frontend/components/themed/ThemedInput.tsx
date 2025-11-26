@@ -1,25 +1,33 @@
 import React from 'react';
 import { Control, FieldError, useController } from 'react-hook-form';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { Provider, Text, TextInput } from 'react-native-paper';
+import { Provider, Text, TextInput, useTheme } from 'react-native-paper';
+import formStyle from '@/style/formStyle';
+import { View } from 'react-native';
 
 interface CustomTextInputProps {
     name: string;
     control: Control<any>;
+    label: string;
     placeholder: string;
     error?: FieldError | undefined
     secureTextEntry?: boolean;
     placeholderTextColor?: string;
+    required?: boolean;
+    onChange?: (text: string) => void;
 }
 const ThemedInput: React.FC<CustomTextInputProps> = ({
     name,
     control,
+    label,
     placeholder,
     error,
     secureTextEntry,
     placeholderTextColor,
+    required = false,
+    onChange
 }) => {
-    const colors = useThemeColors();
+    const theme = useTheme();
 
     const { field } = useController({
         control,
@@ -27,8 +35,9 @@ const ThemedInput: React.FC<CustomTextInputProps> = ({
     });
 
     return (
-        <Provider>
-            <Text style={{ textAlign: 'center' }}>{placeholder}</Text>
+        <View style={{ width: '80%' }}>
+            <Text style={[formStyle.label, { color: theme.colors.onBackground }, theme.fonts.labelLarge]}>{label}{required && <Text style={{ color: theme.colors.error }}> *</Text>}
+            </Text>
             <TextInput
                 value={field.value}
                 onChangeText={field.onChange}
@@ -36,20 +45,17 @@ const ThemedInput: React.FC<CustomTextInputProps> = ({
                 placeholderTextColor={placeholderTextColor || '#3636367e'}
                 secureTextEntry={secureTextEntry}
                 mode='outlined'
-                style={[
-                    error && { borderColor: colors.error },
-                    {
-                        padding: 8,
-                        borderRadius: 10,
-                        borderWidth: 1,
-                        borderColor: colors.tint,
-                        backgroundColor: 'white',
-                        color: 'black',
-                    }
+                style={[formStyle.input,
+                error && { borderColor: theme.colors.error },
+                {
+                    backgroundColor: theme.colors.background,
+                    color: theme.colors.onBackground,
+                }
                 ]}
+                contentStyle={{ color: theme.colors.onBackground }}
             />
-            {error && (<Text style={{ color: colors.error }}>{error.message}</Text>)}
-        </Provider>
+            {error && (<Text style={{ color: theme.colors.error }}>{error.message}</Text>)}
+        </View>
     );
 };
 

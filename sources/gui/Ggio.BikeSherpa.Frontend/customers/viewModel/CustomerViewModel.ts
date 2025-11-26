@@ -1,6 +1,3 @@
-import * as zod from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import CustomerStorageContext from '../services/CustomerStorageContext';
 import { Observable } from '@legendapp/state';
 import * as Crypto from 'expo-crypto';

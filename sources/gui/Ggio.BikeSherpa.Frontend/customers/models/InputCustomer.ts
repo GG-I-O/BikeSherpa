@@ -1,8 +1,9 @@
+import { Address } from "@/models/Address";
 import CustomerOptions from "./CustomerOptions";
 
 export default class InputCustomer {
     public name: string;
-    public address: string;
+    public address: Address;
     public code: string;
     public phone: string;
     public email: string;
@@ -11,7 +12,7 @@ export default class InputCustomer {
     public options: CustomerOptions;
 
     public constructor(
-        name: string, address: string, code: string, phone: string, email: string, options: CustomerOptions, siret?: number, comment?: string
+        name: string, address: Address, code: string, phone: string, email: string, options: CustomerOptions, siret?: number, comment?: string
     ) {
         this.name = name;
         this.address = address;

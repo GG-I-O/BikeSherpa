@@ -7,10 +7,24 @@ const formStyle = StyleSheet.create({
     },
     elements: {
         alignItems: 'center',
-        gap: 8
+        gap: 8,
+        minWidth: '50%',
+        maxWidth: 1000,
+        marginInline: 'auto'
     },
     input: {
-        minWidth: '50%'
+        width: '100%',
+        height: 25
+    },
+    label: {
+        textAlign: 'left',
+    },
+    checkboxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        gap: 8,
+        width: '80%',
     }
 });
 
