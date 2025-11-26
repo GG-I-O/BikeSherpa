@@ -1,17 +1,14 @@
 import formStyle from "@/style/formStyle";
-import { useState } from "react";
 import { ScrollView } from "react-native";
-import { Button, Checkbox, Text, TextInput, useTheme } from "react-native-paper";
-import useCustomerViewModel from "../viewModel/CustomerViewModel";
+import { Button, Text, useTheme } from "react-native-paper";
 import ThemedInput from "@/components/themed/ThemedInput";
 import ThemedCheckbox from "@/components/themed/ThemedCheckbox";
+import { useNewCustomerForm } from "../hooks/useNewCustomerForm";
 
 export default function NewCustomerView() {
     const theme = useTheme();
 
-    const viewModel = useCustomerViewModel();
-
-    const { control, errors, handleSubmit } = viewModel.getNewCustomerForm();
+    const { control, errors, handleSubmit } = useNewCustomerForm();
 
     return (
         <ScrollView
@@ -74,7 +71,7 @@ export default function NewCustomerView() {
             />
             <Button
                 mode="outlined"
-                onPress={() => { }}
+                onPress={() => handleSubmit()}
             >
                 <Text>Créer le client</Text>
             </Button>

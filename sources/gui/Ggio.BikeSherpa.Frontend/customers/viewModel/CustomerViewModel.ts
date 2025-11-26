@@ -10,46 +10,7 @@ import { ILogger } from '@/spi/LogsSPI';
 import Customer from '../models/Customer';
 import InputCustomer from '../models/InputCustomer';
 
-const customerOptionSchema = zod.object({
-    canValidateWithPhoto: zod
-        .boolean(),
-    canValidateWithSignature: zod
-        .boolean(),
-    canValidateWithFile: zod
-        .boolean(),
-    discount: zod
-        .number(),
-}).required();
 
-const newCustomerSchema = zod.object({
-    name: zod
-        .string()
-        .trim()
-        .min(1, 'Nom requis'),
-    address: zod
-        .string()
-        .trim()
-        .min(1, 'Adresse requise'),
-    code: zod
-        .string()
-        .trim()
-        .min(1, 'Code requis')
-        .max(3, 'Code trop long'),
-    email: zod
-        .email(),
-    siret: zod
-        .number()
-        .min(14)
-        .max(14),
-    comment: zod
-        .string()
-        .trim(),
-    phone: zod
-        .string()
-        .trim()
-        .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, 'Numéro de téléphone invalide'),
-    options: customerOptionSchema
-}).partial({ siret: true, comment: true });
 
 class CustomerViewModel {
     private static instance: CustomerViewModel;
@@ -104,7 +65,7 @@ class CustomerViewModel {
     }
 
     // Wrapper for NewCustomerForm
-    private createCustomer(customer: InputCustomer) {
+    public createCustomer(customer: InputCustomer) {
         try {
             const newCustomer: Customer = {
                 id: Crypto.randomUUID(),
@@ -124,33 +85,6 @@ class CustomerViewModel {
             this.logger.error("updateCustomer Error :", e);
         }
     };
-
-    /**
-     * @returns react-hook-form for creating a new customer
-     */
-    public getNewCustomerForm() {
-        const {
-            control,
-            handleSubmit,
-            formState: { errors },
-            reset
-        } = useForm<InputCustomer>({
-            defaultValues: {
-                name: '',
-                code: '',
-                phone: '',
-                email: '',
-            },
-            resolver: zodResolver(newCustomerSchema)
-        });
-
-        const onSubmit = (customer: InputCustomer) => {
-            this.createCustomer(customer);
-            reset(); // Clear form after submission
-        };
-
-        return { control, handleSubmit: handleSubmit(onSubmit), errors }
-    }
 
     /**
      * @returns react-hook-form for updating an existing customer
