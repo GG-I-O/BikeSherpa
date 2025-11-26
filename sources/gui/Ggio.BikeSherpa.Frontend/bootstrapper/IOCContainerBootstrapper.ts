@@ -7,35 +7,45 @@ import { INotificationService, IStorageContext } from "@/spi/StorageSPI";
 import { Platform } from "react-native";
 import { IOCContainer } from "./constants/IOCContainer";
 import { ServicesIndentifiers } from "./constants/ServicesIdentifiers";
+import { IUserService } from "@/spi/AuthSPI";
+import { UserService } from "@/infra/auth/UserService";
+import AppLogger from "@/infra/logger/services/AppLogger";
 
 export default class IOCContainerBootstrapper {
     public static init() {
-        // IOCContainerBootstrapper.bindLogger();
+
+        IOCContainerBootstrapper.bindUserService();
+
+        IOCContainerBootstrapper.bindLogger();
 
         // IOCContainerBootstrapper.bindNotificationHub();
 
         IOCContainerBootstrapper.bindCustomerStorageContext();
     }
 
-    // private static bindLogger() {
-    //     const LOKI_HOST = process.env.EXPO_PUBLIC_LOKI_URL;
-    //     if (!LOKI_HOST) {
-    //         throw new Error('Missing Logger environment variable');
-    //     }
+    private static bindUserService() {
+        IOCContainer.bind<IUserService>(ServicesIndentifiers.UserService).to(UserService).inSingletonScope();
+    }
 
-    //     IOCContainer
-    //         .bind<ILoggerConfig>(ServicesIndentifiers.LoggerConfig)
-    //         .toConstantValue({
-    //             host: LOKI_HOST,
-    //             app: 'citysherpaPOC',
-    //             platform: `${Platform.OS} - ${Platform.Version}`,
-    //         });
+    private static bindLogger() {
+        const LOKI_HOST = process.env.EXPO_PUBLIC_LOKI_URL;
+        if (!LOKI_HOST) {
+            throw new Error('Missing Logger environment variable');
+        }
 
-    //     IOCContainer
-    //         .bind<ILogger>(ServicesIndentifiers.Logger)
-    //         .to(AppLogger)
-    //         .inSingletonScope();
-    // }
+        IOCContainer
+            .bind<ILoggerConfig>(ServicesIndentifiers.LoggerConfig)
+            .toConstantValue({
+                host: LOKI_HOST,
+                app: 'bike-sherpa',
+                platform: `${Platform.OS} - ${Platform.Version}`,
+            });
+
+        IOCContainer
+            .bind<ILogger>(ServicesIndentifiers.Logger)
+            .to(AppLogger)
+            .inSingletonScope();
+    }
 
     // private static bindNotificationHub() {
     //     IOCContainer.bind<INotificationService>(ServicesIndentifiers.NotificationService).to(NotificationService);

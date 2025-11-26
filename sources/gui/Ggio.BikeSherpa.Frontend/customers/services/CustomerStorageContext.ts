@@ -13,20 +13,17 @@ import AbstractStorageContext from "@/infra/storage/AbstractStorageContext";
 export default class CustomerStorageContext extends AbstractStorageContext<Customer> {
     // private apiClient;
 
-    // public constructor(
-    //     @inject(ServicesIndentifiers.Logger) logger: ILogger,
-    //     @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
-    // ) {
-    //     super("Customers", logger, notificationService);
+    public constructor(
+        @inject(ServicesIndentifiers.Logger) logger: ILogger,
+        // @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
+    ) {
+        // super("Customers", logger, notificationService);
+        super("Customers", logger);
 
-    //     this.apiClient = createApiClient(axios.defaults.baseURL || '', {
-    //         axiosInstance: axios
-    //     });
-    // }
-    public constructor() {
-        super("Customers");
+        // this.apiClient = createApiClient(axios.defaults.baseURL || '', {
+        //     axiosInstance: axios
+        // });
     }
-
 
     protected async getList(lastSync?: string): Promise<Customer[]> {
         try {

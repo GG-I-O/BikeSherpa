@@ -1,7 +1,7 @@
 import axios from 'axios';
-import AuthInterceptor from '../../auth/services/AuthInterceptor';
+// import AuthInterceptor from '../../auth/services/AuthInterceptor';
 import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
-import { IAuthExtension } from '@/auth/services/AuthExtension';
+// import { IAuthExtension } from '@/auth/services/AuthExtension';
 import { ServicesIndentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
 import { ILogger } from '@/spi/LogsSPI';
 
@@ -30,8 +30,8 @@ export default class Interceptors {
         );
 
         // Authentification interceptor
-        const authExtension = IOCContainer.get<IAuthExtension>(ServicesIndentifiers.AuthService);
-        const authInterceptor = new AuthInterceptor(authExtension, this.logger);
-        authInterceptor.intercept();
+    //     const authExtension = IOCContainer.get<IAuthExtension>(ServicesIndentifiers.AuthService);
+    //     const authInterceptor = new AuthInterceptor(authExtension, this.logger);
+    //     authInterceptor.intercept();
     }
 }

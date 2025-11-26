@@ -10,7 +10,7 @@ import * as Network from 'expo-network';
 import { inject } from "inversify";
 
 export default abstract class AbstractStorageContext<T extends { id: string }> implements IStorageContext<T> {
-    protected logger: any;
+    protected logger: ILogger;
     protected store: Observable<Record<T extends {
         id: number;
     } ? number : string, T>>;
@@ -22,10 +22,10 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
 
     protected constructor(
         storeName: string,
-        // @inject(ServicesIndentifiers.Logger) logger: ILogger,
+        @inject(ServicesIndentifiers.Logger) logger: ILogger,
         // @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
     ) {
-        // this.logger = logger.extend(storeName);
+        this.logger = logger.extend(storeName);
         this.store = this.initStore(storeName);
 
         this.canSync$ = observable(false);
@@ -55,7 +55,6 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
         // Subscribe to network state changes
         Network.addNetworkStateListener(async ({ isInternetReachable }) => {
             this.logger.debug("Is Internet Reachable?", isInternetReachable);
-            console.debug("Internet console :", isInternetReachable);
             if (isInternetReachable !== undefined) {
                 this.canSync$.set(isInternetReachable);
             }

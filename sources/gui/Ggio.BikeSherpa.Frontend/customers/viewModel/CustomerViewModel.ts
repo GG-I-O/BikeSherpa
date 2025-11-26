@@ -9,6 +9,7 @@ import { ServicesIndentifiers } from '@/bootstrapper/constants/ServicesIdentifie
 import { ILogger } from '@/spi/LogsSPI';
 import Customer from '../models/Customer';
 import InputCustomer from '../models/InputCustomer';
+import { IStorageContext } from '@/spi/StorageSPI';
 
 
 
@@ -19,15 +20,8 @@ class CustomerViewModel {
     private customerStore$: Observable<Record<string, Customer>>;
 
     private constructor() {
-        // this.logger = IOCContainer.get(ServicesIndentifiers.Logger);
-        // this.logger = this.logger.extend("Customer");
-        this.logger = {
-            info: (...args: unknown[]) => console.info(args),
-            error: (...args: unknown[]) => console.error(args),
-            warn: (...args: unknown[]) => console.warn(args),
-            debug: (...args: unknown[]) => console.debug(args),
-            extend: (extension: string) => this.logger
-        }
+        this.logger = IOCContainer.get<ILogger>(ServicesIndentifiers.Logger);
+        this.logger = this.logger.extend("Customer");
         this.storageContext = IOCContainer.get(ServicesIndentifiers.CustomerStorage);
         this.customerStore$ = this.storageContext.getStore();
     }

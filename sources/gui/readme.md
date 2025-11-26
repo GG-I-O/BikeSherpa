@@ -36,7 +36,7 @@ npx expo start --clear
 
 ```sh
 npx expo prebuild --clean
-npx expo start --clear
+npx expo run:android
 ```
 
 # Packages
@@ -58,14 +58,33 @@ Authentification with Auth0
 npm install react-native-auth0 --save
 ```
 
-### Usage
-in file .env.local :  
+### Config
+Add and complete in .env.local ->
 ```sh
 # Authentification
 EXPO_PUBLIC_AUTH_DOMAIN=
 EXPO_PUBLIC_AUTH_CLIENT_WEB=
 EXPO_PUBLIC_AUTH_CLIENT_ANDROID=
 EXPO_PUBLIC_AUTH_SCOPE=openid profile email offline_access
+```
+
+## React native logs
+Log services interface
+
+```sh
+npm install react-native-logs
+```
+
+### Config
+Docker compose [compose.yml](/infrastructure/logger/compose.yml)
+```sh
+docker compose up
+```
+
+Add and complete in .env.local ->
+```sh
+# Logger
+EXPO_PUBLIC_LOKI_URL=
 ```
 
 ## React native paper
@@ -87,9 +106,21 @@ npm install axios
 ## Inversify
 
 Dependency injection with @injectable / @inject
+Babel is needed to use decorator in typescript and expo project
 
 ```sh
 npm install inversify reflect-metadata
+npm install --save-dev @babel/plugin-proposal-decorators babel-plugin-transform-typescript-metadata
+```
+
+### Config
+Add in tsconfig.json ->
+
+```json
+"compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+}
 ```
 
 ## Zod

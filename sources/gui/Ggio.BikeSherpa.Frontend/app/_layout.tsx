@@ -1,4 +1,7 @@
 import AppBootstrapper from "@/bootstrapper/AppBootstrapper";
+import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
+import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { IUserService } from "@/spi/AuthSPI";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { Platform } from "react-native";
@@ -11,6 +14,11 @@ function AppStack() {
 
     // const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const loggedIn = user != null && user != undefined;
+
+    const userService = IOCContainer.get<IUserService>(ServicesIndentifiers.UserService);
+    useEffect(() => {
+        userService.setCurrentUser(user);
+    }, [user]);
 
     // useEffect(() => {
     //     const checkCredentials = async () => {
@@ -37,7 +45,6 @@ function AppStack() {
 
 export default function RootLayout() {
     const authDomain = process.env.EXPO_PUBLIC_AUTH_DOMAIN;
-    const authScope = process.env.EXPO_PUBLIC_AUTH_SCOPE || "openid profile email offline_access";
 
     let authClient;
     if (Platform.OS == 'android')
