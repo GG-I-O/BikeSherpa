@@ -58,6 +58,16 @@ Authentification with Auth0
 npm install react-native-auth0 --save
 ```
 
+### Usage
+in file .env.local :  
+```sh
+# Authentification
+EXPO_PUBLIC_AUTH_DOMAIN=
+EXPO_PUBLIC_AUTH_CLIENT_WEB=
+EXPO_PUBLIC_AUTH_CLIENT_ANDROID=
+EXPO_PUBLIC_AUTH_SCOPE=openid profile email offline_access
+```
+
 ## React native paper
 
 graphic component with Material3 theme
