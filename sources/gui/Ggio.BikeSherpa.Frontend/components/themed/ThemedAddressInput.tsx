@@ -90,12 +90,15 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
 
     return (
         <View style={{ width: '80%' }}>
-            <Text style={[formStyle.label, { color: theme.colors.onBackground }, theme.fonts.labelLarge]}>
+            <Text
+                testID='themedAddressInputLabel'
+                style={[formStyle.label, { color: theme.colors.onBackground }, theme.fonts.labelLarge]}>
                 {label}
                 {required && <Text style={{ color: theme.colors.error }}> *</Text>}
             </Text>
             <View onLayout={(event) => setInputWidth(event.nativeEvent.layout.width)}>
                 <TextInput
+                    testID='themedAddressInputTextInput'
                     value={field.value.name ?? ''}
                     onChangeText={(text: string) => {
                         field.onChange({ name: text });
