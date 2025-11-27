@@ -14,7 +14,6 @@ interface CustomTextInputProps {
     secureTextEntry?: boolean;
     placeholderTextColor?: string;
     required?: boolean;
-    onChange?: (text: string) => void;
 }
 const ThemedInput: React.FC<CustomTextInputProps> = ({
     name,
@@ -24,8 +23,7 @@ const ThemedInput: React.FC<CustomTextInputProps> = ({
     error,
     secureTextEntry,
     placeholderTextColor,
-    required = false,
-    onChange
+    required = false
 }) => {
     const theme = useTheme();
 
@@ -35,7 +33,7 @@ const ThemedInput: React.FC<CustomTextInputProps> = ({
     });
 
     return (
-        <View style={{ width: '80%' }}>
+        <View style={formStyle.intputContainer}>
             <Text style={[formStyle.label, { color: theme.colors.onBackground }, theme.fonts.labelLarge]}>{label}{required && <Text style={{ color: theme.colors.error }}> *</Text>}
             </Text>
             <TextInput

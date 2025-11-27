@@ -2,8 +2,10 @@ import { Dimensions, Pressable, View } from "react-native";
 import { Button, Card, Divider, Modal, Portal, Text, useTheme } from "react-native-paper";
 import { Step } from "../models/Step";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
-import AddressToolbox from "@/services/AddressToolbox";
 import { useState } from "react";
+import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
+import { IAddressService } from "@/spi/AddressSPI";
+import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 
 type Props = {
     step: Step,
@@ -15,6 +17,8 @@ export default function StepCard({ step, onPress, isSelected = false }: Props) {
     const theme = useTheme();
 
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
+    const addressService = IOCContainer.get<IAddressService>(ServicesIndentifiers.AddressService);
 
     const screenWidth = Dimensions.get('window').width;
 
@@ -63,7 +67,7 @@ export default function StepCard({ step, onPress, isSelected = false }: Props) {
                         <Button
                             mode="outlined"
                             onPress={() => {
-                                AddressToolbox.openAdressInMaps(`${step.address.streetInfo}, ${step.address.postcode} ${step.address.city}`);
+                                addressService.openAdressInMaps(`${step.address.streetInfo}, ${step.address.postcode} ${step.address.city}`);
                                 setIsModalVisible(false);
                             }}
                             style={{}}

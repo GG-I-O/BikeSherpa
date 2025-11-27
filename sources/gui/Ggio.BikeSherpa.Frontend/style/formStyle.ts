@@ -19,12 +19,35 @@ const formStyle = StyleSheet.create({
     label: {
         textAlign: 'left',
     },
+    button: {
+        zIndex: -1
+    },
+    intputContainer: {
+        width: '80%',
+        zIndex: -1
+    },
     checkboxContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
         gap: 8,
         width: '80%',
+        zIndex: -1
+    },
+    addressOptionList: {
+        position: 'fixed',
+        marginTop: 45,
+        zIndex: 99,
+        borderWidth: 2,
+        borderTopWidth: 0,
+    },
+    addressOptionContainer: {
+        alignItems: 'flex-start',
+        width: '100%'
+    },
+    addressOptionElement: {
+        width: '100%',
+        borderRadius: 0
     }
 });
 

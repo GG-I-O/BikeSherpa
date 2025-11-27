@@ -10,6 +10,8 @@ import { ServicesIndentifiers } from "./constants/ServicesIdentifiers";
 import { IUserService } from "@/spi/AuthSPI";
 import { UserService } from "@/infra/auth/UserService";
 import AppLogger from "@/infra/logger/services/AppLogger";
+import { IAddressService } from "@/spi/AddressSPI";
+import AddressService from "@/services/AddressService";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -21,6 +23,8 @@ export default class IOCContainerBootstrapper {
         // IOCContainerBootstrapper.bindNotificationHub();
 
         IOCContainerBootstrapper.bindCustomerStorageContext();
+
+        IOCContainerBootstrapper.bindAddressService();
     }
 
     private static bindUserService() {
@@ -53,5 +57,9 @@ export default class IOCContainerBootstrapper {
 
     private static bindCustomerStorageContext() {
         IOCContainer.bind<IStorageContext<Customer>>(ServicesIndentifiers.CustomerStorage).to(CustomerStorageContext).inSingletonScope();
+    }
+
+    private static bindAddressService() {
+        IOCContainer.bind<IAddressService>(ServicesIndentifiers.AddressService).to(AddressService).inSingletonScope();
     }
 }

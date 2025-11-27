@@ -72,6 +72,7 @@ export function useNewCustomerForm() {
     });
 
     const onSubmit = (customer: InputCustomer) => {
+        customer.address.name = customer.name;
         viewModel.createCustomer(customer);
         reset(); // Clear form after submission
     };

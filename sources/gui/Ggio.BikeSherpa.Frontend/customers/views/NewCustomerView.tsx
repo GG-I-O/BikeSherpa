@@ -5,6 +5,7 @@ import ThemedInput from "@/components/themed/ThemedInput";
 import ThemedCheckbox from "@/components/themed/ThemedCheckbox";
 import { useNewCustomerForm } from "../hooks/useNewCustomerForm";
 import { useState } from "react";
+import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 
 export default function NewCustomerView() {
     const theme = useTheme();
@@ -58,7 +59,7 @@ export default function NewCustomerView() {
                 placeholder="06 10 11 12 13"
                 required
             />
-            <ThemedInput
+            <ThemedAddressInput
                 control={control}
                 name="address"
                 error={errors.address?.name}
@@ -95,6 +96,7 @@ export default function NewCustomerView() {
             <Button
                 mode="outlined"
                 onPress={() => handleSubmit()}
+                style={formStyle.button}
             >
                 <Text>Créer le client</Text>
             </Button>

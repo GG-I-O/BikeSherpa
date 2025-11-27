@@ -3,5 +3,6 @@ export const ServicesIndentifiers = {
     LoggerConfig: Symbol.for('LoggerConfig'),
     UserService: Symbol.for('UserService'),
     NotificationService: Symbol.for('NotificationService'),
-    CustomerStorage: Symbol.for('CustomerStorageContext')
+    CustomerStorage: Symbol.for('CustomerStorageContext'),
+    AddressService: Symbol.for('AddressService')
 };
