@@ -23,7 +23,6 @@ public static class ServiceExtension
                services.AddScoped(typeof(IReadRepository<>), typeof(EfCoreReadRepository<>))
                     .AddScoped<IApplicationTransactionContext, ApplicationTransactionContext>()
                     .AddScoped<IDomainEventDispatcher, MediatorDomainEventDispatcher>();
-
                return services;
           }
      }

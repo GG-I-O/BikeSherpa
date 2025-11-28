@@ -10,12 +10,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="..\.dockerignore">
-            <Link>.dockerignore</Link>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\Ggio.BikeSherpa.Backend.Domain\Ggio.BikeSherpa.Backend.Domain.csproj"/>
         <ProjectReference Include="..\Ggio.BikeSherpa.Backend.Infrastructure\Ggio.BikeSherpa.Backend.Infrastructure.csproj"/>
         <ProjectReference Include="..\Ggio.DddCore.Infrastructure\Ggio.DddCore.Infrastructure.csproj"/>
@@ -23,6 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Ardalis.Result" Version="10.1.0" />
         <PackageReference Include="Facet" Version="5.0.1"/>
         <PackageReference Include="Facet.Extensions" Version="5.0.1"/>
         <PackageReference Include="FastEndpoints" Version="7.1.1"/>
@@ -31,6 +26,12 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

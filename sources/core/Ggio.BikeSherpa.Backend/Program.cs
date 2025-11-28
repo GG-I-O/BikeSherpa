@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using Ggio.BikeSherpa.BackendSaaS.Features.Courses;
 using Ggio.BikeSherpa.BackendSaaS.Features.Courses.Get;
 using Ggio.DddCore.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +14,8 @@ builder.Services.AddFastEndpoints();
 
 // Add DDD infrastructure services
 builder.Services.AddInfrastructureServices();
+//TODO add connection to database
+
 
 // Add Mediator for domain event dispatching
 builder.Services.AddMediator(options =>
@@ -21,6 +24,9 @@ builder.Services.AddMediator(options =>
      options.ServiceLifetime = ServiceLifetime.Scoped;
 });
 
+builder.Services.ConfigureCourseFeature();
+
+
 var app = builder.Build();
 
 
@@ -28,4 +34,4 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseFastEndpoints();
 
-app.Run();
+await app.RunAsync();
