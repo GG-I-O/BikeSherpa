@@ -123,6 +123,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
 
             {(suggestedAddresses != null && suggestedAddresses.length > 0) &&
                 <FlatList
+                    testID='themedAddressInputAddressList'
                     ListFooterComponent={
                         <View style={{ height: safeInset.bottom * 2 }} />
                     }
