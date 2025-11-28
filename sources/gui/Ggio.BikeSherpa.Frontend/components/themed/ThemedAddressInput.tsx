@@ -159,6 +159,7 @@ type AddressOptionProps = {
 function AddressOption({ address, onPress }: AddressOptionProps) {
     return (
         <Button
+            testID={`themedAddressInputAddressButton`}
             onPress={() => onPress(address)}
             style={formStyle.addressOptionElement}
         >

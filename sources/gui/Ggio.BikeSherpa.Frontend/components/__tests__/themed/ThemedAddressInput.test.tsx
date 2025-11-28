@@ -3,6 +3,7 @@ import { act, render, screen, userEvent, waitFor } from '@testing-library/react-
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer"
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import { Address } from "@/models/Address";
+import { UserEventInstance } from '@testing-library/react-native/build/user-event/setup';
 
 const mockAddress1: Address = {
     name: "Société 1",
@@ -23,16 +24,10 @@ const mockAddress3: Address = {
     city: "Échirolles"
 }
 
-const mockOnChange = jest.fn((newValue) => {
-    mockField.value = newValue;
-});
-const mockFieldValue = { name: '' };
-const mockFieldName = 'name';
-
 const mockField = {
-    name: mockFieldName,
-    value: mockFieldValue,
-    onChange: mockOnChange,
+    name: 'address',
+    value: { name: '', streetInfo: '', postCode: '', city: '' },
+    onChange: jest.fn((newValue) => { mockField.value = newValue; }),
     onBlur: jest.fn(),
     ref: jest.fn()
 };
@@ -54,11 +49,15 @@ jest.mock("@/bootstrapper/constants/IOCContainer");
 
 
 describe("ThemedAddressInput", () => {
+    let userAction: UserEventInstance;
 
     beforeEach(() => {
         jest.clearAllMocks();
         jest.useFakeTimers();
 
+        userAction = userEvent.setup();
+
+        mockField.value = { name: '', streetInfo: '', postCode: '', city: '' };
         (ReactHookForm.useController as jest.Mock).mockReturnValue({
             field: mockField,
             fieldState: {} as any,
@@ -96,7 +95,6 @@ describe("ThemedAddressInput", () => {
 
     it("does not render a list of addresse on invalid input", async () => {
         // Arrange
-        const user = userEvent.setup();
 
         // Act
         render(
@@ -108,7 +106,7 @@ describe("ThemedAddressInput", () => {
                 required
             />
         );
-        await user.type(screen.getByTestId("themedAddressInputTextInput"), 'R u');
+        await userAction.type(screen.getByTestId("themedAddressInputTextInput"), 'R u');
         act(() => jest.advanceTimersByTime(1000));
 
         // Assert
@@ -119,7 +117,6 @@ describe("ThemedAddressInput", () => {
 
     it("renders a list of addresses on text input", async () => {
         // Arrange
-        const user = userEvent.setup();
         const mockAddresses = [mockAddress1, mockAddress2, mockAddress3];
         (mockAddressService.fetchAddress as
             jest.MockedFunction<(text: string) => Promise<Address[]>>)
@@ -135,7 +132,7 @@ describe("ThemedAddressInput", () => {
                 required
             />
         );
-        await user.type(screen.getByTestId("themedAddressInputTextInput"), 'Rue de la paix');
+        await userAction.type(screen.getByTestId("themedAddressInputTextInput"), 'Rue de la paix');
         act(() => jest.advanceTimersByTime(1000));
 
         // Assert
@@ -147,11 +144,77 @@ describe("ThemedAddressInput", () => {
         expect(addressList).toBeOnTheScreen();
     });
 
-    // it("fills the input field when an address suggestion is clicked", () => {
+    it("fills the input field when an address suggestion is clicked", async () => {
+        // Arrange
+        const mockAddresses = [mockAddress1, mockAddress2, mockAddress3];
+        (mockAddressService.fetchAddress as
+            jest.MockedFunction<(text: string) => Promise<Address[]>>)
+            .mockResolvedValue(mockAddresses as Address[]);
 
-    // });
+        // Act
+        render(
+            <ThemedAddressInput
+                name="address"
+                control={{} as any}
+                label="Adresse"
+                placeholder="10 avenue de la Gare"
+                required
+            />
+        );
+        await userAction.type(screen.getByTestId("themedAddressInputTextInput"), 'Rue de la joie');
+        act(() => jest.advanceTimersByTime(1000));
 
-    // it("hides suggestions when an address suggestion is clicked", () => {
+        // Assert
+        await waitFor(() => {
+            expect(mockAddressService.fetchAddress).toHaveBeenCalledWith('Rue de la joie');
+        });
 
-    // });
-})
+        const addressList = screen.getByTestId("themedAddressInputAddressList");
+        expect(addressList).toBeOnTheScreen();
+
+        const addressButton = screen.getAllByTestId("themedAddressInputAddressButton");
+        expect(addressButton).toHaveLength(3);
+
+        const address3Text = screen.getByText('Société 3');
+        expect(address3Text).toBeOnTheScreen();
+
+        await userAction.press(address3Text);
+        expect(mockField.onChange).toHaveBeenLastCalledWith(mockAddress3);
+        expect(mockField.value.name).toBe('Société 3');
+        expect(mockField.value.streetInfo).toBe('10 rue de la Société 3');
+    });
+
+    it("hides suggestions when an address suggestion is clicked", async () => {
+        // Arrange
+        const mockAddresses = [mockAddress1, mockAddress2, mockAddress3];
+        (mockAddressService.fetchAddress as
+            jest.MockedFunction<(text: string) => Promise<Address[]>>)
+            .mockResolvedValue(mockAddresses as Address[]);
+
+        // Act
+        render(
+            <ThemedAddressInput
+                name="address"
+                control={{} as any}
+                label="Adresse"
+                placeholder="10 avenue de la Gare"
+                required
+            />
+        );
+        await userAction.type(screen.getByTestId("themedAddressInputTextInput"), 'Avenue de la négoce');
+        act(() => jest.advanceTimersByTime(1000));
+        await waitFor(() => {
+            expect(mockAddressService.fetchAddress).toHaveBeenCalledWith('Avenue de la négoce');
+        });
+
+        const address2Text = screen.getByText('Société 2');
+        await userAction.press(address2Text);
+
+        // Assert
+        const addressList = screen.queryByTestId("themedAddressInputAddressList");
+        expect(addressList).toBeNull();
+
+        const address1Text = screen.queryByText('Société 1');
+        expect(address1Text).toBeNull();
+    });
+});
