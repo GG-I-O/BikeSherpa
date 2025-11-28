@@ -96,10 +96,13 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
                 {label}
                 {required && <Text style={{ color: theme.colors.error }}> *</Text>}
             </Text>
-            <View onLayout={(event) => setInputWidth(event.nativeEvent.layout.width)}>
+            <View
+                testID='themedAddressInputContainer'
+                onLayout={(event) => setInputWidth(event.nativeEvent.layout.width)}
+            >
                 <TextInput
                     testID='themedAddressInputTextInput'
-                    value={field.value.name ?? ''}
+                    value={field.value.name}
                     onChangeText={(text: string) => {
                         field.onChange({ name: text });
                         onChange(text);
@@ -108,8 +111,9 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
                     placeholderTextColor={placeholderTextColor || '#3636367e'}
                     secureTextEntry={secureTextEntry}
                     mode='outlined'
+                    outlineColor={error ? theme.colors.error : undefined}
+                    activeOutlineColor={error ? theme.colors.error : undefined}
                     style={[formStyle.input,
-                    error && { borderColor: theme.colors.error },
                     {
                         backgroundColor: theme.colors.background,
                         color: theme.colors.onBackground

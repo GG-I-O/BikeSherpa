@@ -4,6 +4,7 @@ import { IOCContainer } from "@/bootstrapper/constants/IOCContainer"
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import { Address } from "@/models/Address";
 import { UserEventInstance } from '@testing-library/react-native/build/user-event/setup';
+import { useTheme, TextInput as PaperTextInput } from 'react-native-paper';
 
 const mockAddress1: Address = {
     name: "Société 1",
@@ -45,17 +46,30 @@ jest.mock('react-hook-form', () => ({
     useController: jest.fn()
 }));
 
+jest.mock('react-native-paper', () => {
+    return {
+        ...jest.requireActual('react-native-paper'),
+        useTheme: jest.fn()
+    };
+});
+
 jest.mock("@/bootstrapper/constants/IOCContainer");
 
 
 describe("ThemedAddressInput", () => {
     let userAction: UserEventInstance;
+    const mockUseTheme = useTheme as jest.Mock;
 
     beforeEach(() => {
         jest.clearAllMocks();
         jest.useFakeTimers();
 
         userAction = userEvent.setup();
+
+        mockUseTheme.mockReturnValue({
+            fonts: {},
+            colors: {}
+        });
 
         mockField.value = { name: '', streetInfo: '', postCode: '', city: '' };
         (ReactHookForm.useController as jest.Mock).mockReturnValue({
@@ -74,7 +88,6 @@ describe("ThemedAddressInput", () => {
     });
 
     it("renders a required component correctly", () => {
-
         // Arrange
 
         // Act
@@ -82,15 +95,69 @@ describe("ThemedAddressInput", () => {
             <ThemedAddressInput
                 name="address"
                 control={{} as any}
-                label="Adresse"
+                label="LabelAddress"
                 placeholder="10 avenue de la Gare"
                 required
             />
         );
 
         // Assert
-        expect(screen.getByTestId('themedAddressInputLabel').children).toContain('Adresse');
+        const label = screen.getByTestId('themedAddressInputLabel');
+        expect(label.children).toContain('LabelAddress');
+        const requiredText = screen.getByText('*');
+        expect(requiredText).toBeOnTheScreen();
+
         expect(screen.getByTestId('themedAddressInputTextInput').props.placeholder).toBe("10 avenue de la Gare");
+    });
+
+    it("renders a non required component correctly", () => {
+        // Arrange
+
+        // Act
+        render(
+            <ThemedAddressInput
+                name="address"
+                control={{} as any}
+                label="LabelAddress"
+                placeholder="10 avenue de la Gare"
+            />
+        );
+
+        // Assert
+        const label = screen.getByTestId('themedAddressInputLabel');
+        expect(label.children).toContain('LabelAddress');
+        const requiredText = screen.queryByText('*');
+        expect(requiredText).toBeNull();
+
+        expect(screen.getByTestId('themedAddressInputTextInput').props.placeholder).toBe("10 avenue de la Gare");
+    });
+
+    it("renders an error in component correctly", () => {
+        // Arrange
+        mockUseTheme.mockReturnValueOnce({
+            colors: { error: 'rgba(216, 133, 133, 1)' },
+            fonts: {}
+        });
+
+        // Act
+        render(
+            <ThemedAddressInput
+                name="address"
+                control={{} as any}
+                label="LabelAddress"
+                placeholder="10 avenue de la Gare"
+                error={{ type: 'required', message: 'Erreur Adresse' }}
+            />
+        );
+
+        // Assert
+        const errorText = screen.queryByText('Erreur Adresse');
+        expect(errorText).toBeOnTheScreen();
+
+        const textInput = screen.UNSAFE_getByType(PaperTextInput);
+        console.debug(textInput.props);
+        expect(textInput.props.outlineColor).toBe('rgba(216, 133, 133, 1)');
+        expect(textInput.props.activeOutlineColor).toBe('rgba(216, 133, 133, 1)');
     });
 
     it("does not render a list of addresse on invalid input", async () => {
@@ -216,5 +283,48 @@ describe("ThemedAddressInput", () => {
 
         const address1Text = screen.queryByText('Société 1');
         expect(address1Text).toBeNull();
+    });
+
+    it("adjust list size to have the same as the textInput", async () => {
+        // Arrange
+        const mockAddresses = [mockAddress1, mockAddress2, mockAddress3];
+        (mockAddressService.fetchAddress as
+            jest.MockedFunction<(text: string) => Promise<Address[]>>)
+            .mockResolvedValue(mockAddresses as Address[]);
+
+        // Act
+        render(
+            <ThemedAddressInput
+                name="address"
+                control={{} as any}
+                label="Adresse"
+                placeholder="10 avenue de la Gare"
+                required
+            />
+        );
+        const inputContainer = screen.getByTestId("themedAddressInputContainer");
+        act(() => {
+            inputContainer.props.onLayout({
+                nativeEvent: {
+                    layout: { width: 250 }
+                }
+            });
+        });
+
+        await userAction.type(screen.getByTestId("themedAddressInputTextInput"), 'Avenue de la négoce');
+        act(() => jest.advanceTimersByTime(1000));
+        await waitFor(() => {
+            expect(mockAddressService.fetchAddress).toHaveBeenCalledWith('Avenue de la négoce');
+        });
+
+        const addressList = screen.getByTestId('themedAddressInputAddressList');
+        const addressListStyle = addressList.props.style;
+
+        expect(addressListStyle).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({ width: 250 })
+            ])
+        );
+
     });
 });
