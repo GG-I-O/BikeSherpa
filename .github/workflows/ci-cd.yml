@@ -2,7 +2,7 @@ name: CI-Front
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, feature/front-cicd]
   pull_request:
     branches: [main]
 
