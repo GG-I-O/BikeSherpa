@@ -1,4 +1,5 @@
 using FastEndpoints;
+using Ggio.BikeSherpa.BackendSaaS.Features.Courses.Get;
 using Ggio.BikeSherpa.BackendSaaS.Model;
 using Mediator;
 
@@ -8,13 +9,13 @@ public class AddCourseEndpoint(IMediator mediator) : Endpoint<CourseCrud, AddRes
 {
      public override void Configure() => Post("/api/course");
 
-     public async override Task HandleAsync(CourseCrud req, CancellationToken ct)
+     public override async Task HandleAsync(CourseCrud req, CancellationToken ct)
      {
           var command = new AddCourseCommand(req.StartDate);
           var result = await mediator.Send(command, ct);
           if (result.IsSuccess)
           {
-               await Send.CreatedAtAsync(new AddResult<Guid>(result.Value), cancellation: ct);
+               await Send.CreatedAtAsync<GetEndpoint>(new AddResult<Guid>(result.Value), cancellation: ct);
           }
          
      }
