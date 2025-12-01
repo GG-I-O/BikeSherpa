@@ -134,7 +134,7 @@ describe("ThemedAddressInput", () => {
 
     it("renders an error in component correctly", () => {
         // Arrange
-        mockUseTheme.mockReturnValueOnce({
+        mockUseTheme.mockReturnValue({
             colors: { error: 'rgba(216, 133, 133, 1)' },
             fonts: {}
         });
@@ -155,7 +155,6 @@ describe("ThemedAddressInput", () => {
         expect(errorText).toBeOnTheScreen();
 
         const textInput = screen.UNSAFE_getByType(PaperTextInput);
-        console.debug(textInput.props);
         expect(textInput.props.outlineColor).toBe('rgba(216, 133, 133, 1)');
         expect(textInput.props.activeOutlineColor).toBe('rgba(216, 133, 133, 1)');
     });
