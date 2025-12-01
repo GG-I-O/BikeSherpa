@@ -49,7 +49,6 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
 
     const addressService = IOCContainer.get<IAddressService>(ServicesIndentifiers.AddressService);
 
-    const [query, setQuery] = useState<string | null>(null);
     const [debouncedQuery, setDebouncedQuery] = useState<string | null>(null);
 
     // Debounced function
@@ -61,7 +60,6 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
     );
 
     const onChange = (query: string | null) => {
-        setQuery(query);
         updateQuery(query);
     }
 
