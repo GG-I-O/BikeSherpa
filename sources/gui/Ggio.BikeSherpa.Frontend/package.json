@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
+    "build:apk:linux": "bash scripts/buildapk.sh",
+    "build:apk:windows": "powershell -ExecutionPolicy Bypass -File .\\scripts\\buildapk.ps1",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
