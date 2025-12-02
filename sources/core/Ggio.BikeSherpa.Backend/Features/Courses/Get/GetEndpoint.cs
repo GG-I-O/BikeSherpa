@@ -5,7 +5,11 @@ namespace Ggio.BikeSherpa.BackendSaaS.Features.Courses.Get;
 
 public class GetEndpoint(IMediator mediator) : EndpointWithoutRequest<CourseCrud>
 {
-     public override void Configure() => Get("/api/course/{Id:guid}");
+     public override void Configure()
+     {
+          Get("/api/course/{Id:guid}");
+          Permissions("read:customers");
+     }
 
      public override async Task HandleAsync(CancellationToken ct)
      {

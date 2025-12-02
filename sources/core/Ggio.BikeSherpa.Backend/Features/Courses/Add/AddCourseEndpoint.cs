@@ -7,7 +7,11 @@ namespace Ggio.BikeSherpa.BackendSaaS.Features.Courses.Add;
 
 public class AddCourseEndpoint(IMediator mediator) : Endpoint<CourseCrud, AddResult<Guid>>
 {
-     public override void Configure() => Post("/api/course");
+     public override void Configure()
+     {
+          Post("/api/course");
+          Permissions("write:customers");
+     }
 
      public override async Task HandleAsync(CourseCrud req, CancellationToken ct)
      {

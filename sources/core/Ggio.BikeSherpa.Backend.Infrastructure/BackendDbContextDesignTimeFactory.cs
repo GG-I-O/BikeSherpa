@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure;
 
@@ -13,7 +14,13 @@ public class BackendDbContextDesignTimeFactory : IDesignTimeDbContextFactory<Bac
                .AddUserSecrets<BackendDbContextDesignTimeFactory>();
 
           var configuration = configurationRoot.Build();
-          var connectionString = configuration["DesignConnectionString"];
+          // DbPassword & DesignConnectionString in user secrets
+          var conStrBuilder = new NpgsqlConnectionStringBuilder(
+               configuration["DesignConnectionString"])
+          {
+               Password = configuration["DbPassword"]
+          };
+          var connectionString = conStrBuilder.ConnectionString;
           Guard.Against.NullOrEmpty(connectionString);
 
           var options = new DbContextOptionsBuilder<BackendDbContext>()

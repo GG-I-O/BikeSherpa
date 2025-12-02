@@ -7,6 +7,7 @@
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <RootNamespace>Ggio.BikeSherpa.BackendSaaS</RootNamespace>
+        <UserSecretsId>b769ad05-8473-47a0-810f-c9aeeb471bcd</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,6 +19,8 @@
 
     <ItemGroup>
         <PackageReference Include="Ardalis.Result" Version="10.1.0" />
+        <PackageReference Include="Auth0.AspNetCore.Authentication" Version="1.5.1" />
+        <PackageReference Include="Auth0.AspNetCore.Authentication.Api" Version="1.0.0-beta.2" />
         <PackageReference Include="Facet" Version="5.0.1"/>
         <PackageReference Include="Facet.Extensions" Version="5.0.1"/>
         <PackageReference Include="FastEndpoints" Version="7.1.1"/>
@@ -26,11 +29,20 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Include="..\..\..\.dockerignore">
         <Link>.dockerignore</Link>
+      </Content>
+      <None Remove="appsettings.json" />
+      <Content Include="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="appsettings.Development.json" />
+      <Content Include="appsettings.Development.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
 
