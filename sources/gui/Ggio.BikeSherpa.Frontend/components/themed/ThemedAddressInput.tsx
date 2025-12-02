@@ -49,7 +49,10 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
 
     const addressService = IOCContainer.get<IAddressService>(ServicesIndentifiers.AddressService);
 
+    const [query, setQuery] = useState<string | null>(null);
     const [debouncedQuery, setDebouncedQuery] = useState<string | null>(null);
+    const [suggestedAddresses, setSuggestedAddresses] = useState<Address[] | null>([]);
+    const [inputWidth, setInputWidth] = useState<number>(0);
 
     // Debounced function
     const updateQuery = useCallback(
@@ -60,12 +63,10 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
     );
 
     const onChange = (query: string | null) => {
+        setQuery(query); // Help the reactivity of the component, do not delete
         updateQuery(query);
     }
 
-    const [suggestedAddresses, setSuggestedAddresses] = useState<Address[] | null>([]);
-
-    const [inputWidth, setInputWidth] = useState<number>(0);
 
     const onAddressSelect = (address: Address) => {
         onChange(null);
