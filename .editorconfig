@@ -3,4 +3,4 @@ root = true
 # All C# files
 [*.cs]
 # Inspection: Arrange method or operator body
-resharper_arrange_method_or_operator_body_highlighting = warning
+resharper_arrange_method_or_operator_body_highlighting = None
