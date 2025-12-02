@@ -12,16 +12,6 @@ export default function NewCustomerView() {
 
     const { control, errors, handleSubmit } = useNewCustomerForm();
 
-    const [query, setQuery] = useState("");
-    const [suggestions, setSuggestions] = useState<any[]>([]);
-    const [formData, setFormData] = useState({
-        streetInfo: "",
-        postcode: "",
-        city: "",
-    });
-
-
-
     return (
         <ScrollView
             style={[formStyle.container, { backgroundColor: theme.colors.background }]}

@@ -1,4 +1,4 @@
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers as ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { HateoasLinks, Link } from "@/models/HateoasLink";
 // import { ResourceNotification, ResourceOperation } from "@/infra/storage/notification/Notification";
 import { ILogger } from "@/spi/LogsSPI";
@@ -22,8 +22,8 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
 
     protected constructor(
         storeName: string,
-        @inject(ServicesIndentifiers.Logger) logger: ILogger,
-        // @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
+        @inject(ServicesIdentifiers.Logger) logger: ILogger,
+        // @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService
     ) {
         this.logger = logger.extend(storeName);
         this.store = this.initStore(storeName);

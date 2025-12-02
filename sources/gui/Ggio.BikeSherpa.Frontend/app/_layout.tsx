@@ -1,6 +1,6 @@
 import AppBootstrapper from "@/bootstrapper/AppBootstrapper";
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { IUserService } from "@/spi/AuthSPI";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,9 +13,9 @@ function AppStack() {
     const { hasValidCredentials, getCredentials, isLoading, user } = useAuth0();
 
     // const [loggedIn, setLoggedIn] = useState<boolean>(false);
-    const loggedIn = user != null && user != undefined;
+    const loggedIn = user !== null && user !== undefined;
 
-    const userService = IOCContainer.get<IUserService>(ServicesIndentifiers.UserService);
+    const userService = IOCContainer.get<IUserService>(ServicesIdentifiers.UserService);
     useEffect(() => {
         userService.setCurrentUser(user);
     }, [user]);
@@ -47,7 +47,7 @@ export default function RootLayout() {
     const authDomain = process.env.EXPO_PUBLIC_AUTH_DOMAIN;
 
     let authClient;
-    if (Platform.OS == 'android')
+    if (Platform.OS === 'android')
         authClient = process.env.EXPO_PUBLIC_AUTH_CLIENT_ANDROID;
     else
         authClient = process.env.EXPO_PUBLIC_AUTH_CLIENT_WEB;

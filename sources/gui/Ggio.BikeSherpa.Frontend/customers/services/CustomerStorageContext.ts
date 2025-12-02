@@ -2,7 +2,7 @@
 import Customer from "../models/Customer";
 import axios from "axios";
 import { inject, injectable } from "inversify";
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { ILogger } from "@/spi/LogsSPI";
 import { INotificationService } from "@/spi/StorageSPI";
 import { Link } from "@/models/HateoasLink";
@@ -14,8 +14,8 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     // private apiClient;
 
     public constructor(
-        @inject(ServicesIndentifiers.Logger) logger: ILogger,
-        // @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
+        @inject(ServicesIdentifiers.Logger) logger: ILogger,
+        // @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService
     ) {
         // super("Customers", logger, notificationService);
         super("Customers", logger);
