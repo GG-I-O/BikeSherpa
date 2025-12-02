@@ -2,7 +2,6 @@
 
 # dependencies
 node_modules/
-package-lock.json
 
 # VSCode
 .vscode/
@@ -45,3 +44,6 @@ app-example
 # generated native folders
 /ios
 /android
+
+# tests
+coverage/

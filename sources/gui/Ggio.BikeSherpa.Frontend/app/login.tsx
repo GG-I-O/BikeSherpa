@@ -8,7 +8,9 @@ export default function Login() {
 
     const onLogin = async () => {
         try {
-            await authorize();
+            await authorize({
+                scope: 'openid profile email offline_access'
+            });
         } catch (e) {
             console.error(e);
         }

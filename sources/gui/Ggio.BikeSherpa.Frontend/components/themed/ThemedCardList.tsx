@@ -1,4 +1,4 @@
-import { Identifiable } from '@/data/Identifiable'
+import { Identifiable } from '@/models/Identifiable'
 import React, { ReactElement } from 'react'
 import { FlatList, ListRenderItem, StyleProp, View, ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'

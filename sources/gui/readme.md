@@ -36,7 +36,85 @@ npx expo start --clear
 
 ```sh
 npx expo prebuild --clean
-npx expo start --clear
+npx expo run:android
+```
+
+## Release
+Follow the steps or run the command :  
+```sh
+npm run build:apk:windows
+or
+npm run build:apk:linux
+```
+
+### Android
+
+#### Prérequis
+JDK 17  
+Android Studio  
+Variables d'environnement ANDROID_HOME  
+
+#### Prebuild
+```sh
+npx expo prebuild --platform android --clean
+```
+
+#### Generate key
+```sh
+cd android/app
+keytool -genkeypair -v -storetype PKCS12 -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000
+```
+
+#### Config
+android/gradle.properties
+```sh
+MYAPP_RELEASE_STORE_FILE=my-release-key.keystore
+MYAPP_RELEASE_KEY_ALIAS=my-key-alias
+MYAPP_RELEASE_STORE_PASSWORD=your_keystore_password
+MYAPP_RELEASE_KEY_PASSWORD=your_key_password
+```  
+
+android/app/build.gradle
+```java
+android {
+    // All config remain the same except those lines
+    signingConfigs {
+	    // No changes there
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+	    // Add this here
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(project.property('MYAPP_RELEASE_STORE_FILE'))
+                storePassword project.property('MYAPP_RELEASE_STORE_PASSWORD')
+                keyAlias project.property('MYAPP_RELEASE_KEY_ALIAS')
+                keyPassword project.property('MYAPP_RELEASE_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        // Modify only this line, keep the rest
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+```
+
+#### Build APK
+```sh
+cd android
+./gradlew assembleRelease
+```
+
+#### Enjoy
+APK file is in
+```sh
+android/app/build/outputs/apk/release/app-release.apk
 ```
 
 # Packages
@@ -58,6 +136,35 @@ Authentification with Auth0
 npm install react-native-auth0 --save
 ```
 
+### Config
+Add and complete in .env.local ->
+```sh
+# Authentification
+EXPO_PUBLIC_AUTH_DOMAIN=
+EXPO_PUBLIC_AUTH_CLIENT_WEB=
+EXPO_PUBLIC_AUTH_CLIENT_ANDROID=
+EXPO_PUBLIC_AUTH_SCOPE=openid profile email offline_access
+```
+
+## React native logs
+Log services interface
+
+```sh
+npm install react-native-logs
+```
+
+### Config
+Docker compose [compose.yml](/infrastructure/logger/compose.yml)
+```sh
+docker compose up
+```
+
+Add and complete in .env.local ->
+```sh
+# Logger
+EXPO_PUBLIC_LOKI_URL=
+```
+
 ## React native paper
 
 graphic component with Material3 theme
@@ -77,9 +184,21 @@ npm install axios
 ## Inversify
 
 Dependency injection with @injectable / @inject
+Babel is needed to use decorator in typescript and expo project
 
 ```sh
 npm install inversify reflect-metadata
+npm install --save-dev @babel/plugin-proposal-decorators babel-plugin-transform-typescript-metadata
+```
+
+### Config
+Add in tsconfig.json ->
+
+```json
+"compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+}
 ```
 
 ## Zod
