@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Serilog.Sinks.Grafana.Loki;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,7 @@ builder.Host.UseSerilog((context, configuration) =>
 {
      configuration.ReadFrom.Configuration(context.Configuration);
      configuration.WriteTo.Console();
+     configuration.WriteTo.GrafanaLoki("http://localhost:3100");
 });
 
 builder.Services.AddHttpLogging(o => { });
