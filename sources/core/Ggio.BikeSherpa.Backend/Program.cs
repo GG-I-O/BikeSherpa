@@ -10,6 +10,8 @@ using Ggio.BikeSherpa.Backend.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,10 +20,7 @@ builder.Services.AddFastEndpoints();
 
 // Add OpenAPI & Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi(options =>
-{
-     options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0;
-});
+builder.Services.AddOpenApi(options => { options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0; });
 builder.Services.AddOpenApiDocument();
 
 // Add connection to the database
@@ -29,6 +28,7 @@ var connectionString = builder.Configuration["ConnectionString"];
 builder.Services.AddDddDbContext<BackendDbContext>((_, options) =>
      options.UseNpgsql(connectionString)
 );
+
 builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<BackendDbContext>());
 
 // Injection
@@ -52,9 +52,29 @@ builder.Services.AddAuth0ApiAuthentication(options =>
      options.Domain = builder.Configuration["Auth0Domain"];
      options.JwtBearerOptions = new JwtBearerOptions
      {
-          Audience = builder.Configuration["Auth0Identifier"]
+          Audience = builder.Configuration["Auth0Identifier"],
+          RequireHttpsMetadata = true,
+          MetadataAddress = $"{builder.Configuration["Auth0Metadata"]}",
+          TokenValidationParameters = new TokenValidationParameters()
+          {
+               ValidateIssuer = true,
+               ValidateAudience = true,
+               ValidateLifetime = true,
+               ValidateIssuerSigningKey = true,
+               ValidIssuer = builder.Configuration["Auth0Issuer"],
+               ValidAudience = builder.Configuration["Auth0Identifier"]
+          }
      };
 });
+
+// Logger
+builder.Host.UseSerilog((context, configuration) =>
+{
+     configuration.ReadFrom.Configuration(context.Configuration);
+     configuration.WriteTo.Console();
+});
+
+builder.Services.AddHttpLogging(o => { });
 
 var app = builder.Build();
 
@@ -66,11 +86,11 @@ app.UseFastEndpoints();
 if (app.Environment.IsDevelopment())
 {
      app.MapOpenApi();
-     app.UseOpenApi((options =>
-     {
-          options.Path = "/swagger/v1/swagger.json";
-     }));
+     app.UseOpenApi((options => { options.Path = "/swagger/v1/swagger.json"; }));
      app.UseSwaggerUi();
 }
+
+app.UseSerilogRequestLogging();
+app.UseHttpLogging();
 
 await app.RunAsync();

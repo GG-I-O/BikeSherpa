@@ -8,7 +8,7 @@ public class GetAllEndpoint(IMediator mediator) : EndpointWithoutRequest<List<Co
      public override void Configure()
      {
           Get("/api/courses");
-          Permissions("read:customers");
+          Claims("scope", "read:customers");
      } 
 
      public override async Task HandleAsync(CancellationToken ct)
