@@ -14,18 +14,11 @@ public class BackendDbContextDesignTimeFactory : IDesignTimeDbContextFactory<Bac
                .AddUserSecrets<BackendDbContextDesignTimeFactory>();
 
           var configuration = configurationRoot.Build();
-          // DbPassword & DesignConnectionString in user secrets
-          var conStrBuilder = new NpgsqlConnectionStringBuilder(
-               configuration["DesignConnectionString"])
-          {
-               Password = configuration["DbPassword"]
-          };
-          var connectionString = conStrBuilder.ConnectionString;
+          var connectionString = configuration["DesignConnectionString"];
           Guard.Against.NullOrEmpty(connectionString);
 
           var options = new DbContextOptionsBuilder<BackendDbContext>()
                .UseNpgsql(connectionString);
-
 
           return new BackendDbContext(options.Options);
      }
