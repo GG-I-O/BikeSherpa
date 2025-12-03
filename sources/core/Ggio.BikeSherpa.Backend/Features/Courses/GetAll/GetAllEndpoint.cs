@@ -1,7 +1,7 @@
 using FastEndpoints;
 using Mediator;
 
-namespace Ggio.BikeSherpa.BackendSaaS.Features.Courses.GetAll;
+namespace Ggio.BikeSherpa.Backend.Features.Courses.GetAll;
 
 public class GetAllEndpoint(IMediator mediator) : EndpointWithoutRequest<List<CourseCrud>>
 {

@@ -3,7 +3,7 @@ using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
 using Mediator;
 
-namespace Ggio.BikeSherpa.BackendSaaS.Features.Courses.Add;
+namespace Ggio.BikeSherpa.Backend.Features.Courses.Add;
 
 public record AddCourseCommand(DateTimeOffset StartDate) : ICommand<Result<Guid>>;
 

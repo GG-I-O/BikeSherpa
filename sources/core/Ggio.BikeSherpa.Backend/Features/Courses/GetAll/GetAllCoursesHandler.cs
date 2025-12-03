@@ -3,7 +3,7 @@ using Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
 using Ggio.DddCore;
 using Mediator;
 
-namespace Ggio.BikeSherpa.BackendSaaS.Features.Courses.GetAll;
+namespace Ggio.BikeSherpa.Backend.Features.Courses.GetAll;
 
 public class GetAllCoursesHandler(IReadRepository<Course> repository) : IQueryHandler<GetAllCoursesQuery, List<CourseCrud>>
 {

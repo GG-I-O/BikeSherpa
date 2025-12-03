@@ -6,7 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <RootNamespace>Ggio.BikeSherpa.BackendSaaS</RootNamespace>
         <UserSecretsId>b769ad05-8473-47a0-810f-c9aeeb471bcd</UserSecretsId>
     </PropertyGroup>
 

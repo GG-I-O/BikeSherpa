@@ -1,3 +1,3 @@
-namespace Ggio.BikeSherpa.BackendSaaS.Model;
+namespace Ggio.BikeSherpa.Backend.Model;
 
 public record AddResult<TId>(TId Id);

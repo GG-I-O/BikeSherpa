@@ -1,9 +1,9 @@
 using FastEndpoints;
-using Ggio.BikeSherpa.BackendSaaS.Features.Courses.Get;
-using Ggio.BikeSherpa.BackendSaaS.Model;
+using Ggio.BikeSherpa.Backend.Features.Courses.Get;
+using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
 
-namespace Ggio.BikeSherpa.BackendSaaS.Features.Courses.Add;
+namespace Ggio.BikeSherpa.Backend.Features.Courses.Add;
 
 public class AddCourseEndpoint(IMediator mediator) : Endpoint<CourseCrud, AddResult<Guid>>
 {

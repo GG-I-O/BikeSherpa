@@ -1,8 +1,8 @@
 using FluentValidation;
-using Ggio.BikeSherpa.BackendSaaS.Features.Courses.Add;
+using Ggio.BikeSherpa.Backend.Features.Courses.Add;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Ggio.BikeSherpa.BackendSaaS.Features.Courses;
+namespace Ggio.BikeSherpa.Backend.Features.Courses;
 
 public static class Bootstrap
 {
