@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
 using Ggio.BikeSherpa.Backend.Features.Courses.Get;
 using Ggio.BikeSherpa.Backend.Infrastructure;
+using Ggio.DddCore;
+using Ggio.DddCore.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
@@ -42,7 +44,7 @@ builder.Services.AddInfrastructureServices();
 // Add Mediator for domain event dispatching
 builder.Services.AddMediator(options =>
 {
-     options.Assemblies = [typeof(GetCourseQuery).Assembly];
+     options.Assemblies = [typeof(GetCourseQuery).Assembly, typeof(EntityBase).Assembly, typeof(EfCoreDomainEntityAddedEventHandler)];
      options.ServiceLifetime = ServiceLifetime.Scoped;
 });
 
@@ -73,7 +75,7 @@ builder.Host.UseSerilog((context, configuration) =>
 {
      configuration.ReadFrom.Configuration(context.Configuration);
      configuration.WriteTo.Console();
-     configuration.WriteTo.GrafanaLoki("http://localhost:3100");
+     configuration.WriteTo.GrafanaLoki("http://localhost:3100"); //TODO : créer un setting dans appsettings.Developpement.json et le lire depuis la configuration
 });
 
 builder.Services.AddHttpLogging(o => { });
