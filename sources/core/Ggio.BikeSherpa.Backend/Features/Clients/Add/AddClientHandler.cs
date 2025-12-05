@@ -30,13 +30,13 @@ public class AddClientCommandValidator : AbstractValidator<AddClientCommand>
 public class AddClientHandler(
      IClientFactory factory,
      IValidator<AddClientCommand> validator,
-     IApplicationTransaction transatcion)  : ICommandHandler<AddClientCommand, Result<Guid>>
+     IApplicationTransaction transaction)  : ICommandHandler<AddClientCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddClientCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           var client = await factory.CreateClientAsync(command.Name, command.Code, command.Siret, command.Email, command.PhoneNumber, command.Address);
-          await transatcion.CommitAsync(cancellationToken);
+          await transaction.CommitAsync(cancellationToken);
           return Result.Created(client.Id);
      }
 }
