@@ -15,7 +15,10 @@ public class GetEndpoint(IMediator mediator): EndpointWithoutRequest<ClientCrud>
      {
           var entity = await mediator.Send(new GetClientQuery(Query<Guid>("Id")), ct);
           if (entity is null)
+          {
                await Send.NotFoundAsync(ct);
+               return;
+          }
           await Send.OkAsync(entity!, ct);
      }
 }
