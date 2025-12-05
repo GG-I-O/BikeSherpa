@@ -11,6 +11,15 @@ Then add user secrets name `DesignTimeConnectionString` with value expected valu
 }
 ```
 
+## Authentication
+To enable authentication with Auth0, use user secrets on Backend project.
+```json
+"Auth0Domain": "<domain>",
+"Auth0Identifier": "<identifier>",
+"Auth0Issuer": "<issuer>",
+"Auth0Metadata": "<issuer>/.well-known/openid-configuration"
+```
+
 ## Design concept
 
 We use Ardalis library but not complete template. 

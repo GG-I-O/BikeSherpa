@@ -6,21 +6,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DddCore.Tests.Integration;
 
-public class DomainEventDispatchingTests
+public class DomainEventDispatchingTests(MediatorTestFixture fixture) : IClassFixture<MediatorTestFixture>
 {
      [Fact]
      public async Task GivenAggregateRootWithEventsAndTransactionIsComplete_WhenApplicationTransactionIsCommites_ThenTransactionalDomainEventHandlersAreCalled()
      {
           // Arrange
-          var serviceCollection = new ServiceCollection();
+          var serviceCollection = fixture.GetServiceCollection();
+          
           serviceCollection.AddDddDbContext<TestDbContext>((_, option) => option.UseInMemoryDatabase("test"));
           serviceCollection.AddInfrastructureServices();
-          serviceCollection.AddMediator(options =>
-          {
-               options.Assemblies = [typeof(MyAggregateRoot).Assembly, typeof(IDomainEvent)];
-               options.ServiceLifetime = ServiceLifetime.Scoped;
-          });
-
+          
           serviceCollection.AddLogging();
 
 
@@ -30,13 +26,13 @@ public class DomainEventDispatchingTests
           var applicationTransaction = serviceScope.ServiceProvider.GetRequiredService<IApplicationTransaction>();
 
 
-          await dbContext.MyAggregateRoots.AddAsync(new MyAggregateRoot { Name = "test" });
-          await dbContext.SaveChangesAsync();
+          await dbContext.MyAggregateRoots.AddAsync(new MyAggregateRoot { Name = "test" }, TestContext.Current.CancellationToken);
+          await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
           // Act
-          var testEntity = dbContext.MyAggregateRoots.First();
+          var testEntity = await dbContext.MyAggregateRoots.FirstAsync(TestContext.Current.CancellationToken);
           testEntity.MakeWonderful();
-          await applicationTransaction.CommitAsync();
+          await applicationTransaction.CommitAsync(TestContext.Current.CancellationToken);
 
           // Assert
           var testPostTransactionHandler = serviceScope.ServiceProvider.GetRequiredService<TestPostTransactionHandlers>();
@@ -45,7 +41,7 @@ public class DomainEventDispatchingTests
           var testTransactionalDispatcher = serviceScope.ServiceProvider.GetRequiredService<TestTransactionalHandlers>();
           testTransactionalDispatcher.WasCalled.Should().BeTrue();
           testTransactionalDispatcher.HandleCount.Should().Be(1);
-          var entity = dbContext.MyAggregateRoots.First();
+          var entity = await dbContext.MyAggregateRoots.FirstAsync(TestContext.Current.CancellationToken);
           entity.Name.Should().Be("Wonderful");
      }
 }

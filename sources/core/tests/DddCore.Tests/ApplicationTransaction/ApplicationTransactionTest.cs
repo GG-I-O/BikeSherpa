@@ -82,7 +82,7 @@ public class ApplicationTransactionTest
 
      public class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
      {
-          public DbSet<TestEntity> TestEntities { get; set; }
+          public virtual DbSet<TestEntity> TestEntities { get; set; }
      }
 
      public class TestEntity : EntityBase
