@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using FastEndpoints.Swagger;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Features.Courses;
 using Ggio.DddCore.Infrastructure;
@@ -9,7 +10,6 @@ using Ggio.BikeSherpa.Backend.Features.Courses.Get;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
@@ -17,12 +17,15 @@ using Serilog.Sinks.Grafana.Loki;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add API services
-builder.Services.AddFastEndpoints();
-
-// Add OpenAPI & Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddOpenApi(options => { options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_0; });
-builder.Services.AddOpenApiDocument();
+builder.Services.AddFastEndpoints()
+     .SwaggerDocument(options =>
+     {
+          options.DocumentSettings = settings =>
+          {
+               settings.Title = "Bike Sherpa API";
+               settings.Version = "v1";
+          };
+     });
 
 // Add connection to the database
 var connectionString = builder.Configuration["ConnectionString"];
@@ -83,14 +86,8 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseFastEndpoints();
-
-if (app.Environment.IsDevelopment())
-{
-     app.MapOpenApi();
-     app.UseOpenApi((options => { options.Path = "/swagger/v1/swagger.json"; }));
-     app.UseSwaggerUi();
-}
+app.UseFastEndpoints()
+     .UseSwaggerGen();
 
 app.UseSerilogRequestLogging();
 app.UseHttpLogging();
