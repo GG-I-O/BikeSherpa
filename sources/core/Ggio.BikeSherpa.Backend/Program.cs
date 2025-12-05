@@ -6,6 +6,7 @@ using Ggio.DddCore.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
+using Ggio.BikeSherpa.Backend.Features.Clients;
 using Ggio.BikeSherpa.Backend.Features.Courses.Get;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.DddCore;
@@ -39,6 +40,7 @@ builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<Ba
 
 // Injection
 builder.Services.ConfigureCourseFeature();
+builder.Services.ConfigureClientFeature();
 builder.Services.AddBackendDomain();
 
 // Add DDD infrastructure services
