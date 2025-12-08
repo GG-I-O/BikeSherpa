@@ -31,6 +31,7 @@ const newCustomerSchema = zod.object({
         .min(1, "Code requis")
         .max(3, "Code trop long"),
     email: zod
+        .string()
         .email("Adresse e-mail non valide"),
     siret: zod
         .number()
@@ -60,7 +61,13 @@ export function useNewCustomerForm() {
             code: '',
             phone: '',
             email: '',
-            address: {},
+            address: {
+                name: '',
+                streetInfo: '',
+                complement: '',
+                postcode: '',
+                city: ''
+            },
             options: {
                 canValidateWithPhoto: false,
                 canValidateWithSignature: false,
