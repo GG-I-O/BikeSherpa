@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
 using Ggio.BikeSherpa.Backend.Features.Courses.Get;
+using Ggio.BikeSherpa.Backend.Features.Notification;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.DddCore;
 using Ggio.DddCore.Infrastructure.Persistence;
@@ -40,6 +41,9 @@ builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<Ba
 // Injection
 builder.Services.ConfigureCourseFeature();
 builder.Services.AddBackendDomain();
+
+// Notification
+builder.Services.AddScoped<IResourceNotificationService, ResourceNotificationService>();
 
 // Add DDD infrastructure services
 builder.Services.AddInfrastructureServices();
@@ -80,16 +84,19 @@ builder.Host.UseSerilog((context, configuration) =>
      configuration.WriteTo.Console();
      configuration.WriteTo.GrafanaLoki("http://localhost:3100"); //TODO : créer un setting dans appsettings.Developpement.json et le lire depuis la configuration
 });
-
 builder.Services.AddHttpLogging(o => { });
 
 var app = builder.Build();
+
+app.MapHub<ResourceNotificationHub>("/hubs/notifications");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints()
      .UseSwaggerGen();
+
+app.UseResourceNotifications();
 
 app.UseSerilogRequestLogging();
 app.UseHttpLogging();
