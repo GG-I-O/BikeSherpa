@@ -1,6 +1,5 @@
 import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
-import { HateoasLinks, Link } from "@/models/HateoasLink";
-// import { ResourceNotification, ResourceOperation } from "@/infra/storage/notification/Notification";
+// import { HateoasLinks, Link } from "@/models/HateoasLink";
 import { ILogger } from "@/spi/LogsSPI";
 import { INotificationService, IStorageContext } from "@/spi/StorageSPI";
 import { Observable, observable } from "@legendapp/state";
@@ -8,6 +7,7 @@ import { ObservablePersistMMKV } from "@legendapp/state/persist-plugins/mmkv";
 import { syncedCrud } from "@legendapp/state/sync-plugins/crud";
 import * as Network from 'expo-network';
 import { inject } from "inversify";
+import { ResourceNotification, ResourceOperation } from "../notification/Notification";
 
 export default abstract class AbstractStorageContext<T extends { id: string }> implements IStorageContext<T> {
     protected logger: ILogger;
@@ -17,13 +17,13 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
     private initialLoad: boolean = true;
     private canSync$: Observable<boolean>;
 
-    // protected notificationService: INotificationService;
+    private notificationService: INotificationService;
     private resourceName: string;
 
     protected constructor(
         storeName: string,
         @inject(ServicesIndentifiers.Logger) logger: ILogger,
-        // @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
+        @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
     ) {
         this.logger = logger.extend(storeName);
         this.store = this.initStore(storeName);
@@ -31,7 +31,7 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
         this.canSync$ = observable(false);
 
         this.resourceName = storeName.toLocaleLowerCase();
-        // this.notificationService = notificationService;
+        this.notificationService = notificationService;
 
         // Init canSync observable + connect to notification service if canSync
         this.initNetworkState();
@@ -40,14 +40,14 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
     private async initNetworkState() {
         const networkState = await Network.getNetworkStateAsync();
         if (networkState.isInternetReachable) {
-            // if (this.notificationService) {
-            //     try {
-            //         await this.notificationService.start(this.resourceName);
-            //         this.logger.info('NotificationService started, enabling sync');
-            //     } catch (error) {
-            //         this.logger.error('Failed to start NotificationService', error);
-            //     }
-            // }
+            if (this.notificationService) {
+                try {
+                    await this.notificationService.start(this.resourceName);
+                    this.logger.info('NotificationService started, enabling sync');
+                } catch (error) {
+                    this.logger.error('Failed to start NotificationService', error);
+                }
+            }
             this.canSync$.set(true);
             this.initialLoad = false;
         }
@@ -139,62 +139,62 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
             waitForSet: () => this.canSync$,
 
             // Subscribe to NotificationService
-            // subscribe: ({ lastSync, refresh, update }) => {
-            //     this.logger.info(`Setting up NotificationService subscription for ${storeName}`);
+            subscribe: ({ update }) => {
+                this.logger.info(`Setting up NotificationService subscription for ${storeName}`);
 
-            //     const connection = this.notificationService.getConnection();
+                const connection = this.notificationService.getConnection();
 
-            //     if (!connection) {
-            //         this.logger.warn('NotificationService connection not available yet');
-            //         return () => { };
-            //     }
+                if (!connection) {
+                    this.logger.warn('NotificationService connection not available yet');
+                    return () => { };
+                }
 
-            //                     const onNotification = async (notification: ResourceNotification) => {
-            //                         switch (notification.operation) {
-            //                             case ResourceOperation.POST:
-            //                                 this.logger.debug(`${this.resourceName} created via NotificationService`, notification.id);
-            //                                 const postItem = await this.getItem(notification.id);
-            //                                 if (postItem)
-            //                                     update({ value: [postItem] });
-            //                                 break;
-            //                             case ResourceOperation.PUT:
-            //                                 this.logger.debug(`${this.resourceName} updated via NotificationService`, notification.id);
-            //                                 const putItem = await this.getItem(notification.id);
-            //                                 if (putItem)
-            //                                     update({ value: [putItem] });
-            //                                 break;
-            //                             case ResourceOperation.DELETE:
-            //                                 this.logger.debug(`${this.resourceName} deleted via NotificationService`, notification.id);
-            //                                 // Filter the deleted item out of the local data
-            //                                 const localRecord: Record<string, T> = this.store.peek();
-            //                                 let localArray = Object.values(localRecord);
-            //                                 localArray = localArray.filter((item: T) => item.id != notification.id);
-            //                                 // Use mode: 'set' to replace instead of merge
-            //                                 update({ value: localArray, mode: 'set' })
-            //                                 break;
-            //                             default:
-            //                                 this.logger.error("Received a notification with unknown operation :", notification)
-            //                                 throw new Error("Subscribe error");
-            //                         }
-            //                     }
+                const onNotification = async (notification: ResourceNotification) => {
+                    switch (notification.operation) {
+                        case ResourceOperation.POST:
+                            this.logger.debug(`${this.resourceName} created via NotificationService`, notification.id);
+                            const postItem = await this.getItem(notification.id);
+                            if (postItem)
+                                update({ value: [postItem] });
+                            break;
+                        case ResourceOperation.PUT:
+                            this.logger.debug(`${this.resourceName} updated via NotificationService`, notification.id);
+                            const putItem = await this.getItem(notification.id);
+                            if (putItem)
+                                update({ value: [putItem] });
+                            break;
+                        case ResourceOperation.DELETE:
+                            this.logger.debug(`${this.resourceName} deleted via NotificationService`, notification.id);
+                            
+                            // Filter the deleted item out of the local data
+                            const localRecord: Record<string, T> = this.store.peek();
+                            let localArray = Object.values(localRecord);
+                            localArray = localArray.filter((item: T) => item.id !== notification.id);
+                            update({ value: localArray, mode: 'set' })// Use mode: 'set' to replace instead of merge
+                            
+                            break;
+                        default:
+                            this.logger.error("Received a notification with unknown operation :", notification)
+                            throw new Error("Subscribe error");
+                    }
+                }
 
+                // Register event handlers
+                connection.on("notification", onNotification);
 
-            //     // Register event handlers
-            //     connection.on("notification", onNotification);
+                // Refresh on reconnection to catch any missed updates
+                this.notificationService.onReconnected(async () => {
+                    this.logger.info(`NotificationService reconnected, refreshing ${storeName}`);
+                    const updatedStore = await this.getList();
+                    update({ value: updatedStore, mode: 'set' });
+                });
 
-            //     // Refresh on reconnection to catch any missed updates
-            //     this.notificationService.onReconnected(async () => {
-            //         this.logger.info(`NotificationService reconnected, refreshing ${storeName}`);
-            //         const updatedStore = await this.getList();
-            //         update({ value: updatedStore, mode: 'set' });
-            //     });
-
-            //     // Return cleanup function
-            //     return () => {
-            //         this.logger.info(`Cleaning up NotificationService subscription for ${storeName}`);
-            //         // connection.off("notification", onNotification);
-            //     };
-            // },
+                // Return cleanup function
+                return () => {
+                    this.logger.info(`Cleaning up NotificationService subscription for ${storeName}`);
+                    // connection.off("notification", onNotification);
+                };
+            },
 
             // Error handling
             onError: (error, params) => {
@@ -203,7 +203,7 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
         }));
     }
 
-    protected abstract getList(lastSync?: string): Promise<Array<T>>;
+    protected abstract getList(lastSync?: string): Promise<T[]>;
     protected abstract getItem(id: string): Promise<T | null>;
     protected abstract create(item: T): Promise<T>;
     protected abstract update(item: T): Promise<T>;
