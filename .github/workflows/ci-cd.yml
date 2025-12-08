@@ -2,13 +2,13 @@ name: CI-Front
 
 on:
   push:
-    branches: [main, feature/front-cicd]
+    branches: [main, feature/**]
     paths:
-      - 'sources/gui/Ggio.BikeSherpa.Frontend/**'
+      - 'sources/gui/**'
   pull_request:
     branches: [main]
     paths:
-      - 'sources/gui/Ggio.BikeSherpa.Frontend/**'
+      - 'sources/gui/**'
 
 jobs:
   build:
