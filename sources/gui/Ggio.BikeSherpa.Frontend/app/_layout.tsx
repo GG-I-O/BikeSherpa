@@ -17,7 +17,7 @@ function AppStack() {
     const userService = IOCContainer.get<IUserService>(ServicesIndentifiers.UserService);
     useEffect(() => {
         userService.setCurrentUser(user);
-    }, [user]);
+    }, [userService, user]);
 
     return (
         <Stack>

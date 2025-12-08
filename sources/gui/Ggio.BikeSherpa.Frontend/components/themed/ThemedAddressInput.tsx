@@ -37,40 +37,29 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
         name,
     });
 
-    function debounce(func: any, delay: number) {
-        let timer: number;
-        return function (...args: any[]) {
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                func(...args);
-            }, delay);
-        };
-    }
-
     const addressService = IOCContainer.get<IAddressService>(ServicesIndentifiers.AddressService);
 
     const [query, setQuery] = useState<string | null>(null);
     const [debouncedQuery, setDebouncedQuery] = useState<string | null>(null);
+    const [suggestedAddresses, setSuggestedAddresses] = useState<Address[] | null>([]);
+    const [inputWidth, setInputWidth] = useState<number>(0);
+    const [timer, setTimer] = useState<number>();
 
-    // Debounced function
-    const updateQuery = useCallback(
-        debounce((input: string) => {
-            setDebouncedQuery(input);
-        }, 500),
-        [debounce]
-    );
+    const updateQueryWithDebounce = useCallback((query: string | null) => {
+        clearTimeout(timer);
+        const timeout = setTimeout(() => {
+            setDebouncedQuery(query);
+        }, 500);
+        setTimer(timeout);
+    }, [setDebouncedQuery, timer, setTimer]);
 
-    const onChange = (query: string | null) => {
+    const onTextInputChange = (query: string | null) => {
         setQuery(query);
-        updateQuery(query);
+        updateQueryWithDebounce(query);
     }
 
-    const [suggestedAddresses, setSuggestedAddresses] = useState<Address[] | null>([]);
-
-    const [inputWidth, setInputWidth] = useState<number>(0);
-
     const onAddressSelect = (address: Address) => {
-        onChange(null);
+        onTextInputChange(null);
         setSuggestedAddresses(null);
         field.onChange(address);
     }
@@ -105,7 +94,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
                     value={field.value.name}
                     onChangeText={(text: string) => {
                         field.onChange({ name: text });
-                        onChange(text);
+                        onTextInputChange(text);
                     }}
                     placeholder={placeholder}
                     placeholderTextColor={placeholderTextColor || '#3636367e'}
