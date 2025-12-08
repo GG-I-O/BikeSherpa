@@ -57,7 +57,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
         debounce((input: string) => {
             setDebouncedQuery(input);
         }, 500),
-        []
+        [debounce]
     );
 
     const onChange = (query: string | null) => {
@@ -76,7 +76,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
     }
 
     useEffect(() => {
-        if (!debouncedQuery || debouncedQuery.length < 4) {
+        if (!debouncedQuery || !query || debouncedQuery.length < 4) {
             setSuggestedAddresses(null);
             return;
         }
@@ -86,7 +86,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
             setSuggestedAddresses(addresses);
         }
         fetchAddresses(debouncedQuery);
-    }, [debouncedQuery]);
+    }, [debouncedQuery, query, addressService]);
 
     return (
         <View style={{ width: '80%' }}>
