@@ -7,8 +7,6 @@ namespace Ggio.BikeSherpa.Backend.Features.Notification;
 
 public class ResourceNotificationMiddleware(RequestDelegate next)
 {
-     private readonly RequestDelegate _next;
-
      public async Task InvokeAsync(HttpContext context, IResourceNotificationService notificationService)
      {
           var originalBodyStream = context.Response.Body;
@@ -19,7 +17,7 @@ public class ResourceNotificationMiddleware(RequestDelegate next)
           var method = context.Request.Method;
           var path = context.Request.Path.Value ?? "";
 
-          await _next(context);
+          await next(context);
 
           var statusCode = context.Response.StatusCode;
           if (statusCode is >= 200 and < 300)

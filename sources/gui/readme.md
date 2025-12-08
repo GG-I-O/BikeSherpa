@@ -235,12 +235,25 @@ Subscribe and receive notification
 npm install @microsoft/signalr
 ```
 
-## OpenAPI zod client
+## OpenAPI zod client & Zodios
 
 Generate API url from back-end openAPI json
 
 ```sh
 npm install --save-dev openapi-zod-client
+npm install @zodios/core
+```
+
+If zodios have dependency errors  
+```sh
+npm uninstall axios
+npm uninstall zod
+npm install @zodios/core zod axios
+```
+
+Usage  
+```sh
+npm run openAPI
 ```
 
 ## Jest

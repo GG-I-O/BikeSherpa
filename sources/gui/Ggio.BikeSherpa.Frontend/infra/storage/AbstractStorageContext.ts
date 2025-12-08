@@ -1,5 +1,4 @@
 import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
-// import { HateoasLinks, Link } from "@/models/HateoasLink";
 import { ILogger } from "@/spi/LogsSPI";
 import { INotificationService, IStorageContext } from "@/spi/StorageSPI";
 import { Observable, observable } from "@legendapp/state";
@@ -8,8 +7,9 @@ import { syncedCrud } from "@legendapp/state/sync-plugins/crud";
 import * as Network from 'expo-network';
 import { inject } from "inversify";
 import { ResourceNotification, ResourceOperation } from "../notification/Notification";
+import { HateoasLinks, Link } from "@/models/HateoasLink";
 
-export default abstract class AbstractStorageContext<T extends { id: string }> implements IStorageContext<T> {
+export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks> implements IStorageContext<T> {
     protected logger: ILogger;
     protected store: Observable<Record<T extends {
         id: number;
@@ -65,6 +65,14 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
         return this.store;
     }
 
+    protected getLinkHref(id: string, rel: string): string | undefined {
+        const item = this.store.peek()[id];
+        if (!item) return undefined;
+
+        const link = item.links?.find((link: Link) => link.rel === rel);
+        return link?.href;
+    }
+
     private initStore(storeName: string) {
         return observable(syncedCrud<T>({
             list: async (listParams) => {
@@ -84,14 +92,14 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
             },
             update: async (item: T) => {
                 // Check if we have the rights to update
-                // if (!item.links?.some((link: Link) => link.rel == "update")) return;
+                if (!item.links?.some((link: Link) => link.rel === "update")) return;
 
                 const result = await this.update(item);
                 return result; // return server version
             },
             delete: async (item: T) => {
                 // Check if we have the rights to delete
-                // if (!item.links?.some((link: Link) => link.rel == "delete")) return;
+                if (!item.links?.some((link: Link) => link.rel === "delete")) return;
 
                 await this.delete(item);
             },
@@ -198,7 +206,7 @@ export default abstract class AbstractStorageContext<T extends { id: string }> i
 
             // Error handling
             onError: (error, params) => {
-                this.logger.error("Customer sync error :", error, params);
+                this.logger.error(`${this.resourceName} storage error :`, error, params);
             }
         }));
     }

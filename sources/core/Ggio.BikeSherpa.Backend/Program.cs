@@ -44,6 +44,7 @@ builder.Services.ConfigureCourseFeature();
 builder.Services.AddBackendDomain();
 
 // Notification
+builder.Services.AddSignalR();
 builder.Services.AddScoped<IResourceNotificationService, ResourceNotificationService>();
 
 // Hateoas
