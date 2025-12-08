@@ -4,11 +4,11 @@ on:
   push:
     branches: [main, feature/front-cicd]
     paths:
-        - 'sources/gui/Ggio.BikeSherpa.Frontend/**'
+      - 'sources/gui/Ggio.BikeSherpa.Frontend/**'
   pull_request:
     branches: [main]
     paths:
-        - 'sources/gui/Ggio.BikeSherpa.Frontend/**'
+      - 'sources/gui/Ggio.BikeSherpa.Frontend/**'
 
 jobs:
   build:
