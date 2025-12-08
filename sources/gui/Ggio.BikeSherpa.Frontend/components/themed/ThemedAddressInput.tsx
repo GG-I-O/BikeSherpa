@@ -74,7 +74,8 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
             const addresses: Address[] | null = await addressService.fetchAddress(address);
             setSuggestedAddresses(addresses);
         }
-        fetchAddresses(debouncedQuery);
+        fetchAddresses(debouncedQuery)
+        .then();
     }, [debouncedQuery, query, addressService]);
 
     return (
