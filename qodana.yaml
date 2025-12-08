@@ -19,8 +19,6 @@ profile:
 #Enable inspections
 #include:
 #  - name: <SomeEnabledInspectionId>
-include:
-  - name: Eslint
 
 #Disable inspections
 #exclude:
