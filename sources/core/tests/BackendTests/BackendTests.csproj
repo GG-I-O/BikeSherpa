@@ -20,4 +20,10 @@
         <Using Include="Xunit"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Ggio.BikeSherpa.Backend.Domain\Ggio.BikeSherpa.Backend.Domain.csproj" />
+      <ProjectReference Include="..\..\Ggio.BikeSherpa.Backend\Ggio.BikeSherpa.Backend.csproj" />
+      <ProjectReference Include="..\..\Ggio.DddCore\Ggio.DddCore.csproj" />
+    </ItemGroup>
+
 </Project>
