@@ -1,10 +1,10 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain.ClientAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.DddCore;
 using Mediator;
 
-namespace Ggio.BikeSherpa.Backend.Features.Clients.Add;
+namespace Ggio.BikeSherpa.Backend.Features.Customers.Add;
 
 public record AddClientCommand(
      string Name,

@@ -59,7 +59,7 @@ export function useNewCustomerForm() {
         defaultValues: {
             name: '',
             code: '',
-            phone: '',
+            phoneNumber: '',
             email: '',
             address: {
                 name: '',

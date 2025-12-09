@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Features.Clients;
-using Ggio.BikeSherpa.Backend.Features.Clients.Get;
-using Ggio.BikeSherpa.Backend.Features.Clients.GetAll;
+using Ggio.BikeSherpa.Backend.Features.Customers;
+using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -43,7 +42,7 @@ public class GetEndpointTests
           Assert.Equal(StatusCodes.Status404NotFound, sut.HttpContext.Response.StatusCode);
      }
           
-     private GetEndpoint CreateSut(ClientCrud? existingClient)
+     private GetEndpoint CreateSut(CustomerCrud? existingClient)
      {
           var id = existingClient?.Id ?? Guid.NewGuid();
           _mockMediator
@@ -77,7 +76,7 @@ public class GetEndpointTests
           );
      }
           
-     private ClientCrud CreateClientCrud(
+     private CustomerCrud CreateClientCrud(
           Guid id,
           string name,
           string code,
@@ -87,7 +86,7 @@ public class GetEndpointTests
           string address
      )
      {
-          return new ClientCrud
+          return new CustomerCrud
           {
                Id = id,
                Name = name,

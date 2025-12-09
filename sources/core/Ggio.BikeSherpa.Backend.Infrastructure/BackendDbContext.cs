@@ -1,5 +1,5 @@
-using Ggio.BikeSherpa.Backend.Domain.ClientAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure;
@@ -7,7 +7,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure;
 public class BackendDbContext(DbContextOptions<BackendDbContext> options) : DbContext(options)
 {
      public virtual DbSet<Course> Courses { get; set; }
-     public virtual DbSet<Client> Clients { get; set; }
+     public virtual DbSet<Customer> Clients { get; set; }
 
      override protected void OnModelCreating(ModelBuilder modelBuilder)
      {

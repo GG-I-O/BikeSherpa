@@ -1,5 +1,5 @@
-using Ggio.BikeSherpa.Backend.Domain.ClientAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Ggio.BikeSherpa.Backend.Domain;

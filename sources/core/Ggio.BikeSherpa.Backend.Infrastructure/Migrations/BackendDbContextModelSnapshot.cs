@@ -36,6 +36,9 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -50,6 +53,9 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.Property<string>("Siret")
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 

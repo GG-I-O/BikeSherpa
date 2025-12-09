@@ -1,11 +1,11 @@
 ﻿using Ggio.DddCore;
 using Mediator;
 
-namespace Ggio.BikeSherpa.Backend.Domain.ClientAggregate;
+namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 
 public interface IClientFactory
 {
-     Task<Client> CreateClientAsync(
+     Task<Customer> CreateClientAsync(
           string name,
           string code,
           string? siret,
@@ -17,9 +17,9 @@ public interface IClientFactory
 
 public class ClientFactory(IMediator mediator) : FactoryBase(mediator), IClientFactory
 {
-     public async Task<Client> CreateClientAsync(string name, string code, string? siret, string email, string phoneNumber, string address)
+     public async Task<Customer> CreateClientAsync(string name, string code, string? siret, string email, string phoneNumber, string address)
      {
-          var client = new Client
+          var client = new Customer
           {
                Name = name,
                Code = code,

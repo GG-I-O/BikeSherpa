@@ -1,5 +1,5 @@
-﻿using Ggio.BikeSherpa.Backend.Domain.ClientAggregate;
-using Ggio.BikeSherpa.Backend.Features.Clients.GetAll;
+﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 using Ggio.DddCore;
 using Moq;
 
@@ -7,20 +7,20 @@ namespace BackendTests.Features.Clients.GetAll;
 
 public class GetAllClientsHandlerTests
 {
-     private readonly Mock<IReadRepository<Client>> _mockRepository = new();
+     private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
 
      [Fact]
      public async Task Handle_ShouldReturnAllClients_WhenClientsExist()
      {
           // Arrange
-          var clients = new List<Client>
+          var clients = new List<Customer>
           {
                CreateClient(Guid.NewGuid(), "Client A", "AAA", null, "a@g.com", "0123456789", "123 rue des roses"),
                CreateClient(Guid.NewGuid(), "Client B", "BBB", null, "b@h.com", "9876543210", "12 avenue des hortensias")
           };
 
           var sut = CreateSut(clients);
-          var query = new GetAllClientsQuery();
+          var query = new GetAllClientsQuery(null);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -37,8 +37,8 @@ public class GetAllClientsHandlerTests
      public async Task Handle_ShouldReturnEmptyList_WhenNoClientsExist()
      {
           // Arrange
-          var sut = CreateSut(new List<Client>());
-          var query = new GetAllClientsQuery();
+          var sut = CreateSut(new List<Customer>());
+          var query = new GetAllClientsQuery(null);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -49,7 +49,7 @@ public class GetAllClientsHandlerTests
           VerifyRepositoryCalledOnce();
      }
 
-     private GetAllClientsHandler CreateSut(List<Client> returnClients)
+     private GetAllClientsHandler CreateSut(List<Customer> returnClients)
      {
           _mockRepository
                .Setup(repo => repo.ListAsync(It.IsAny<CancellationToken>()))
@@ -65,7 +65,7 @@ public class GetAllClientsHandlerTests
           );
      }
 
-     private Client CreateClient(
+     private Customer CreateClient(
           Guid id,
           string name,
           string code,
@@ -75,7 +75,7 @@ public class GetAllClientsHandlerTests
           string address
           )
      {
-          return new Client
+          return new Customer
           {
                Id = id,
                Name = name,

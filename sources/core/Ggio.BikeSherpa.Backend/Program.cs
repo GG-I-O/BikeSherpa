@@ -6,11 +6,12 @@ using Ggio.DddCore.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
-using Ggio.BikeSherpa.Backend.Features.Clients;
 using Ggio.BikeSherpa.Backend.Features.Courses.Get;
-using Ggio.BikeSherpa.Backend.Features.Hateoas;
+using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Notification;
 using Ggio.BikeSherpa.Backend.Infrastructure;
+using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
+using Ggio.BikeSherpa.Backend.Services;
 using Ggio.DddCore;
 using Ggio.DddCore.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,12 +31,15 @@ builder.Services.AddFastEndpoints()
                settings.Title = "Bike Sherpa API";
                settings.Version = "v1";
           };
+
+          options.ShortSchemaNames = true;
      });
 
 // Add connection to the database
 var connectionString = builder.Configuration["ConnectionString"];
 builder.Services.AddDddDbContext<BackendDbContext>((_, options) =>
      options.UseNpgsql(connectionString)
+          .AddInterceptors(new DateInterceptor())
 );
 
 builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<BackendDbContext>());
@@ -51,7 +55,7 @@ builder.Services.AddScoped<IResourceNotificationService, ResourceNotificationSer
 
 // Hateoas
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<LinkService>();
+builder.Services.AddScoped<HateoasService>();
 
 // Add DDD infrastructure services
 builder.Services.AddInfrastructureServices();
@@ -90,7 +94,7 @@ builder.Host.UseSerilog((context, configuration) =>
 {
      configuration.ReadFrom.Configuration(context.Configuration);
      configuration.WriteTo.Console();
-     configuration.WriteTo.GrafanaLoki("http://localhost:3100"); //TODO : créer un setting dans appsettings.Developpement.json et le lire depuis la configuration
+     configuration.WriteTo.GrafanaLoki(builder.Configuration["GrafanaLoki"] ?? "http://localhost:3100");
 });
 builder.Services.AddHttpLogging(o => { });
 

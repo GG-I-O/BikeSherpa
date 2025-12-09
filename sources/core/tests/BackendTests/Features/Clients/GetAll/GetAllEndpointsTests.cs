@@ -1,6 +1,7 @@
 ﻿using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Features.Clients;
-using Ggio.BikeSherpa.Backend.Features.Clients.GetAll;
+using Ggio.BikeSherpa.Backend.Features.Customers;
+using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
+using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,7 @@ public class GetAllEndpointsTests
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenClientsExist()
      {
           // Arrange
-          var clients = new List<ClientCrud>
+          var clients = new List<CustomerCrud>
           {
                CreateClientCrud(Guid.NewGuid(), "Client A", "AAA", null, "a@g.com", "0123456789", "123 rue des roses"),
                CreateClientCrud(Guid.NewGuid(), "Client B", "BBB", null, "b@h.com", "9876543210", "12 avenue des hortensias")
@@ -35,7 +36,7 @@ public class GetAllEndpointsTests
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenNoClientsExist()
      {
           // Arrange
-          var sut = CreateSut(new List<ClientCrud>());
+          var sut = CreateSut(new List<CustomerCrud>());
 
           // Act
           await sut.HandleAsync(CancellationToken.None);
@@ -45,7 +46,7 @@ public class GetAllEndpointsTests
           Assert.Equal(StatusCodes.Status200OK, sut.HttpContext.Response.StatusCode);
      }
 
-     private GetAllEndpoint CreateSut(List<ClientCrud> returnClients)
+     private GetAllEndpoint CreateSut(List<CustomerCrud> returnClients)
      {
           _mockMediator
                .Setup(m => m.Send(It.IsAny<GetAllClientsQuery>(), It.IsAny<CancellationToken>()))
@@ -73,7 +74,7 @@ public class GetAllEndpointsTests
           );
      }
 
-     private ClientCrud CreateClientCrud(
+     private CustomerCrud CreateClientCrud(
           Guid id,
           string name,
           string code,
@@ -83,7 +84,7 @@ public class GetAllEndpointsTests
           string address
      )
      {
-          return new ClientCrud
+          return new CustomerCrud
           {
                Id = id,
                Name = name,

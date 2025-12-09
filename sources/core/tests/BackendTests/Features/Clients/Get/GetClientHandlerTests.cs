@@ -1,8 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using Ardalis.Specification;
-using Ggio.BikeSherpa.Backend.Domain.ClientAggregate;
-using Ggio.BikeSherpa.Backend.Domain.ClientAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Features.Clients.Get;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.DddCore;
 using Moq;
 
@@ -10,7 +10,7 @@ namespace BackendTests.Features.Clients.Get;
 
 public class GetClientHandlerTests
 {
-     private readonly Mock<IReadRepository<Client>> _mockRepository = new();
+     private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
 
      [Fact]
      public async Task Handle_ShouldReturnOneClient_WhenClientExists()
@@ -53,11 +53,11 @@ public class GetClientHandlerTests
           VerifyRepositoryCalledOnce();
      }
 
-     private GetClientHandler CreateSut(Client? existingClient)
+     private GetClientHandler CreateSut(Customer? existingClient)
      {
           _mockRepository
                .Setup(repo => repo.FirstOrDefaultAsync(
-                    It.Is<ISpecification<Client>>(s => s is ClientByIdSpecification && existingClient != null && s.IsSatisfiedBy(existingClient)), 
+                    It.Is<ISpecification<Customer>>(s => s is ClientByIdSpecification && existingClient != null && s.IsSatisfiedBy(existingClient)), 
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(existingClient);
           return new GetClientHandler(_mockRepository.Object);
@@ -66,13 +66,13 @@ public class GetClientHandlerTests
      private void VerifyRepositoryCalledOnce()
      {
           _mockRepository.Verify(repo => repo.FirstOrDefaultAsync(
-               It.IsAny<ISpecification<Client>>(), 
+               It.IsAny<ISpecification<Customer>>(), 
                It.IsAny<CancellationToken>()),
                Times.Once
           );
      }
 
-     private Client CreateClient(
+     private Customer CreateClient(
           Guid id,
           string name,
           string code,
@@ -82,7 +82,7 @@ public class GetClientHandlerTests
           string address
      )
      {
-          return new Client
+          return new Customer
           {
                Id = id,
                Name = name,

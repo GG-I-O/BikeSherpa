@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Ggio.BikeSherpa.Backend.Domain.ClientAggregate;
+namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 
 public static class Bootstrap
 {

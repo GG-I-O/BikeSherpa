@@ -1,11 +1,11 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain.ClientAggregate;
-using Ggio.BikeSherpa.Backend.Domain.ClientAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
 using Ggio.DddCore;
 using Mediator;
 
-namespace Ggio.BikeSherpa.Backend.Features.Clients.Update;
+namespace Ggio.BikeSherpa.Backend.Features.Customers.Update;
 
 public record UpdateClientCommand(
      Guid Id,
@@ -31,7 +31,7 @@ public class UpdateClientCommandValidator : AbstractValidator<UpdateClientComman
 }
 
 public class UpdateClientHandler(
-     IReadRepository<Client> repository,
+     IReadRepository<Customer> repository,
      IValidator<UpdateClientCommand> validator,
      IApplicationTransaction transaction
 ) : ICommandHandler<UpdateClientCommand, Result<Guid>>
@@ -43,7 +43,7 @@ public class UpdateClientHandler(
           if (entity is null)
                return Result.NotFound();
           entity.Name = command.Name;
-          entity.Code = command.Code;
+          // entity.Code = command.Code;
           entity.Siret = command.Siret;
           entity.Email = command.Email;
           entity.PhoneNumber = command.PhoneNumber;

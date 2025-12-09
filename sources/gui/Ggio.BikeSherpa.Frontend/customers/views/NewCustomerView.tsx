@@ -54,7 +54,7 @@ export default function NewCustomerView() {
             <ThemedInput
                 control={control}
                 name="phone"
-                error={errors.phone}
+                error={errors.phoneNumber}
                 label="Téléphone"
                 placeholder="06 10 11 12 13"
                 required
