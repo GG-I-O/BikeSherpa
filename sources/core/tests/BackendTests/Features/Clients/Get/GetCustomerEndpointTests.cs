@@ -11,14 +11,14 @@ using Moq;
 
 namespace BackendTests.Features.Clients.Get;
 
-public class GetEndpointTests
+public class GetCustomerEndpointTests
 {
      private readonly Mock<IMediator> _mockMediator = new();
      private readonly Mock<IHateoasService> _mockHateoasService = new();
      
      private readonly CustomerCrud _mockCustomer;
 
-     public GetEndpointTests()
+     public GetCustomerEndpointTests()
      {
           _mockCustomer = CustomerTestHelper.CreateCustomerCrud(
                Guid.NewGuid(),
@@ -64,7 +64,7 @@ public class GetEndpointTests
           Assert.Equal(StatusCodes.Status404NotFound, sut.HttpContext.Response.StatusCode);
      }
           
-     private GetEndpoint CreateSut(CustomerCrud? existingClient)
+     private GetCustomerEndpoint CreateSut(CustomerCrud? existingClient)
      {
           var id = existingClient?.Id ?? Guid.NewGuid();
           _mockMediator
@@ -79,7 +79,7 @@ public class GetEndpointTests
                s.AddSingleton(_mockHateoasService.Object);
           });
 
-          var endpoint = Factory.Create<GetEndpoint>(
+          var endpoint = Factory.Create<GetCustomerEndpoint>(
                ctx =>
                {
                     ctx.Request.Method = "GET";

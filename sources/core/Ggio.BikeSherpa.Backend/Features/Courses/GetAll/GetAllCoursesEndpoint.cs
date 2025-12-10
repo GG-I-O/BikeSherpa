@@ -3,7 +3,7 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Courses.GetAll;
 
-public class GetAllEndpoint(IMediator mediator) : EndpointWithoutRequest<List<CourseCrud>>
+public class GetAllCoursesEndpoint(IMediator mediator) : EndpointWithoutRequest<List<CourseCrud>>
 {
      public override void Configure()
      {

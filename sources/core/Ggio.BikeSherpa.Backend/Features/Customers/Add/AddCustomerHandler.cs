@@ -28,7 +28,7 @@ public class AddClientCommandValidator : AbstractValidator<AddClientCommand>
      }
 }
 
-public class AddClientHandler(
+public class AddCustomerHandler(
      IClientFactory factory,
      IValidator<AddClientCommand> validator,
      IApplicationTransaction transaction)  : ICommandHandler<AddClientCommand, Result<Guid>>

@@ -1,22 +1,18 @@
 ﻿using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
-using Ggio.BikeSherpa.Backend.Features.Customers.Update;
-using Ggio.BikeSherpa.Backend.Services;
-using Ggio.BikeSherpa.Backend.Services.Hateoas;
+using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Mediator;
-using Microsoft.AspNetCore.Builder;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Get;
 
-public class GetEndpoint(IMediator mediator, IHateoasService hateoasService): EndpointWithoutRequest<CustomerDto>
+public class GetCustomerEndpoint(IMediator mediator, ICustomerLinks customerLinks): EndpointWithoutRequest<CustomerDto>
 {
      public override void Configure()
      {
           Get("/api/customer/{customerId:guid}");
           Claims("scope", "read:customers");
-          Description(x => x.WithName("GetCustomer"));
-          Options(x => x.WithName("GetCustomer"));
+          // Description(x => x.WithName("GetCustomer"));
+          // Options(x => x.WithName("GetCustomer"));
      }
 
      public override async Task HandleAsync(CancellationToken ct)
@@ -32,13 +28,7 @@ public class GetEndpoint(IMediator mediator, IHateoasService hateoasService): En
           {
                Data = customer
           };
-          clientDto.Links = hateoasService.GenerateLinks(
-               IEndpoint.GetName<GetEndpoint>(),
-               IEndpoint.GetName<AddClientEndpoint>(),
-               IEndpoint.GetName<UpdateEndpoint>(),
-               null,
-               new { clientDto.Data.Id }
-          );
+          clientDto.Links = customerLinks.GenerateLinks(clientDto.Data.Id);
           
           await Send.OkAsync(clientDto, ct);
      }

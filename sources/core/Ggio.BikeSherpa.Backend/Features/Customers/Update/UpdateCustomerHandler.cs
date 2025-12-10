@@ -31,7 +31,7 @@ public class UpdateClientCommandValidator : AbstractValidator<UpdateClientComman
      }
 }
 
-public class UpdateClientHandler(
+public class UpdateCustomerHandler(
      IReadRepository<Customer> repository,
      IValidator<UpdateClientCommand> validator,
      IApplicationTransaction transaction

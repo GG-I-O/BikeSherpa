@@ -72,14 +72,14 @@ public class GetCustomerHandlerTests
           VerifyRepositoryCalledOnce();
      }
 
-     private GetClientHandler CreateSut(Customer? existingCustomer)
+     private GetCustomerHandler CreateSut(Customer? existingCustomer)
      {
           _mockRepository
                .Setup(repo => repo.FirstOrDefaultAsync(
                     It.Is<ISpecification<Customer>>(s => s is ClientByIdSpecification && existingCustomer != null && s.IsSatisfiedBy(existingCustomer)), 
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(existingCustomer);
-          return new GetClientHandler(_mockRepository.Object);
+          return new GetCustomerHandler(_mockRepository.Object);
      }
 
      private void VerifyRepositoryCalledOnce()

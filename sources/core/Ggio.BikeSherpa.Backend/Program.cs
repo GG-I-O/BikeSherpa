@@ -10,7 +10,6 @@ using Ggio.BikeSherpa.Backend.Features.Courses.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
-using Ggio.BikeSherpa.Backend.Services;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Notification;
 using Ggio.DddCore;
@@ -106,7 +105,10 @@ app.MapHub<ResourceNotificationHub>("/hubs/notifications");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseFastEndpoints()
+app.UseFastEndpoints(config =>
+     {
+          config.Endpoints.ShortNames = true;
+     })
      .UseSwaggerGen();
 
 app.UseResourceNotifications();

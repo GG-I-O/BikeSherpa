@@ -8,7 +8,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Customers.Get;
 
 public record GetClientQuery(Guid Id) : IQuery<CustomerCrud?>;
 
-public class GetClientHandler(IReadRepository<Customer> clientRepository): IQueryHandler<GetClientQuery, CustomerCrud?>
+public class GetCustomerHandler(IReadRepository<Customer> clientRepository): IQueryHandler<GetClientQuery, CustomerCrud?>
 {
      public async ValueTask<CustomerCrud?> Handle(GetClientQuery query, CancellationToken ct)
      {

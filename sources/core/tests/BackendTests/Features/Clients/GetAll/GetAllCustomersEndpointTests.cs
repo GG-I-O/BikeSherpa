@@ -10,7 +10,7 @@ using Moq;
 
 namespace BackendTests.Features.Clients.GetAll;
 
-public class GetAllEndpointsTests
+public class GetAllCustomersEndpointTests
 {
      private readonly Mock<IMediator> _mockMediator = new();
      private readonly Mock<IHateoasService> _mockHateoasService = new();
@@ -18,7 +18,7 @@ public class GetAllEndpointsTests
      private readonly CustomerCrud _mockCustomerA;
      private readonly CustomerCrud _mockCustomerB;
 
-     public GetAllEndpointsTests()
+     public GetAllCustomersEndpointTests()
      {
           _mockCustomerA = CustomerTestHelper.CreateCustomerCrud(
                Guid.NewGuid(),
@@ -83,7 +83,7 @@ public class GetAllEndpointsTests
           Assert.Equal(StatusCodes.Status200OK, sut.HttpContext.Response.StatusCode);
      }
 
-     private GetAllEndpoint CreateSut(List<CustomerCrud> returnClients)
+     private GetAllCustomersEndpoint CreateSut(List<CustomerCrud> returnClients)
      {
           _mockMediator
                .Setup(m => m.Send(It.IsAny<GetAllClientsQuery>(), It.IsAny<CancellationToken>()))
@@ -95,7 +95,7 @@ public class GetAllEndpointsTests
                s.AddSingleton(_mockHateoasService.Object);
           });
 
-          var endpoint = Factory.Create<GetAllEndpoint>(
+          var endpoint = Factory.Create<GetAllCustomersEndpoint>(
                ctx =>
                {
                     ctx.Request.Method = "GET";
