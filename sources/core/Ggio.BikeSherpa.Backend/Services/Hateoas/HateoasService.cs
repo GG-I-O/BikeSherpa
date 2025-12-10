@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
-namespace Ggio.BikeSherpa.Backend.Services;
+namespace Ggio.BikeSherpa.Backend.Services.Hateoas;
 
-public class HateoasService(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator)
+public class HateoasService(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator): IHateoasService
 {
      public string GenerateLink(string routeName, object routeValues)
      {

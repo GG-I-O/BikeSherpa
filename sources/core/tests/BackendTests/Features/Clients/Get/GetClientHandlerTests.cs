@@ -1,5 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using Ardalis.Specification;
+﻿using Ardalis.Specification;
+using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
@@ -8,17 +8,38 @@ using Moq;
 
 namespace BackendTests.Features.Clients.Get;
 
-public class GetClientHandlerTests
+public class GetCustomerHandlerTests
 {
      private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
 
+     private readonly Customer _mockCustomer;
+
+     public GetCustomerHandlerTests()
+     {
+          _mockCustomer = CustomerTestHelper.CreateCustomer(
+               Guid.NewGuid(),
+               "Client A",
+               "AAA",
+               null,
+               "a@g.com",
+               "0123456789",
+               new Address
+               {
+                    name = "Client A",
+                    streetInfo = "123 rue des roses",
+                    postcode = "12502",
+                    city = "Obiwan"
+               });
+     }
+     
+
      [Fact]
-     public async Task Handle_ShouldReturnOneClient_WhenClientExists()
+     public async Task Handle_ShouldReturnOneCustomer_WhenCustomerExists()
      {
           // Arrange
           var guid = Guid.NewGuid();
-          var client = CreateClient(guid, "Client A", "AAA", null, "a@g.com", "0123456789", "123 rue des roses");
-          var sut = CreateSut(client);
+          _mockCustomer.Id = guid;
+          var sut = CreateSut(_mockCustomer);
           var query = new GetClientQuery(guid);
           
           // Act
@@ -34,15 +55,13 @@ public class GetClientHandlerTests
      [Theory]
      [InlineData(true)]
      [InlineData(false)]
-     public async Task Handle_ShouldReturnNull_WhenClientDoesNotExist(bool emptyRepository)
+     public async Task Handle_ShouldReturnNull_WhenCustomerDoesNotExist(bool emptyRepository)
      {
           // Arrange
           var guidA = Guid.NewGuid();
           var guidB = Guid.NewGuid();
-          var client = CreateClient(guidA, "Client A", "AAA", null, "a@g.com", "0123456789", "123 rue des roses");
-          if (emptyRepository)
-               client = null;
-          var sut = CreateSut(client);
+          _mockCustomer.Id = guidA;
+          var sut = CreateSut(emptyRepository ? null : _mockCustomer);
           var query = new GetClientQuery(guidB);
           
           // Act
@@ -53,13 +72,13 @@ public class GetClientHandlerTests
           VerifyRepositoryCalledOnce();
      }
 
-     private GetClientHandler CreateSut(Customer? existingClient)
+     private GetClientHandler CreateSut(Customer? existingCustomer)
      {
           _mockRepository
                .Setup(repo => repo.FirstOrDefaultAsync(
-                    It.Is<ISpecification<Customer>>(s => s is ClientByIdSpecification && existingClient != null && s.IsSatisfiedBy(existingClient)), 
+                    It.Is<ISpecification<Customer>>(s => s is ClientByIdSpecification && existingCustomer != null && s.IsSatisfiedBy(existingCustomer)), 
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(existingClient);
+               .ReturnsAsync(existingCustomer);
           return new GetClientHandler(_mockRepository.Object);
      }
 
@@ -72,25 +91,5 @@ public class GetClientHandlerTests
           );
      }
 
-     private Customer CreateClient(
-          Guid id,
-          string name,
-          string code,
-          string? siret,
-          string email,
-          string phoneNumber,
-          string address
-     )
-     {
-          return new Customer
-          {
-               Id = id,
-               Name = name,
-               Code = code,
-               Siret = siret,
-               Email = email,
-               PhoneNumber = phoneNumber,
-               Address = address
-          };
-     }
+     
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace Ggio.BikeSherpa.Backend.Features.Notification;
+namespace Ggio.BikeSherpa.Backend.Services.Notification;
 
 public class ResourceNotificationHub: Hub
 {

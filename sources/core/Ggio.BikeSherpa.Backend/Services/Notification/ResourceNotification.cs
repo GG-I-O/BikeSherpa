@@ -1,4 +1,4 @@
-﻿namespace Ggio.BikeSherpa.Backend.Features.Notification;
+﻿namespace Ggio.BikeSherpa.Backend.Services.Notification;
 
 public class ResourceNotification(string dataType, ResourceOperation operation, string id)
 {

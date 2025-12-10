@@ -8,7 +8,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 
 public record GetAllClientsQuery(DateTimeOffset? lastSync): IQuery<List<CustomerCrud>>;
 
-public class GetAllClientsHandler(IReadRepository<Customer> repository): IQueryHandler<GetAllClientsQuery, List<CustomerCrud>>
+public class GetAllCustomersHandler(IReadRepository<Customer> repository): IQueryHandler<GetAllClientsQuery, List<CustomerCrud>>
 {
      public async ValueTask<List<CustomerCrud>> Handle(GetAllClientsQuery query, CancellationToken ct)
      {

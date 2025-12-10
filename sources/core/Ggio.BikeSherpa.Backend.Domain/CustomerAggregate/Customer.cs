@@ -9,7 +9,7 @@ public class Customer : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public string? Siret { get; set; }
      public required string Email { get; set; }
      public required string PhoneNumber { get; set; }
-     public required string Address { get; set; }
+     public required Address Address { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
 }

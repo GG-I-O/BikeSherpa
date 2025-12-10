@@ -1,6 +1,8 @@
 ﻿using FastEndpoints;
+using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
+using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -12,13 +14,33 @@ namespace BackendTests.Features.Clients.Get;
 public class GetEndpointTests
 {
      private readonly Mock<IMediator> _mockMediator = new();
+     private readonly Mock<IHateoasService> _mockHateoasService = new();
+     
+     private readonly CustomerCrud _mockCustomer;
+
+     public GetEndpointTests()
+     {
+          _mockCustomer = CustomerTestHelper.CreateCustomerCrud(
+               Guid.NewGuid(),
+               "Client A",
+               "AAA",
+               null,
+               "a@g.com",
+               "0123456789",
+               new Address
+               {
+                    name = "Client A",
+                    streetInfo = "123 rue des roses",
+                    postcode = "12502",
+                    city = "Obiwan"
+               });
+     }
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenClientExists()
      {
           // Arrange
-          var client = CreateClientCrud(Guid.NewGuid(), "Client A", "AAA", null, "a@g.com", "0123456789", "123 rue des roses");
-          var sut = CreateSut(client);
+          var sut = CreateSut(_mockCustomer);
           
           // Act
           await sut.HandleAsync(CancellationToken.None);
@@ -51,16 +73,21 @@ public class GetEndpointTests
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(existingClient);
           
-          Factory.RegisterTestServices(s => s.AddSingleton(_mockMediator.Object));
+          Factory.RegisterTestServices(s =>
+          {
+               s.AddSingleton(_mockMediator.Object);
+               s.AddSingleton(_mockHateoasService.Object);
+          });
 
           var endpoint = Factory.Create<GetEndpoint>(
                ctx =>
                {
                     ctx.Request.Method = "GET";
-                    ctx.Request.Path = $"/api/client/{id}";
-                    ctx.Request.QueryString = new QueryString($"?Id={id}");
+                    ctx.Request.Path = $"/api/customer/{id}";
+                    ctx.Request.QueryString = new QueryString($"?customerId={id}");
                },
-               _mockMediator.Object
+               _mockMediator.Object,
+               _mockHateoasService.Object
           );
 
           return endpoint;
@@ -74,28 +101,6 @@ public class GetEndpointTests
                     It.IsAny<CancellationToken>()),
                Times.Once
           );
-     }
-          
-     private CustomerCrud CreateClientCrud(
-          Guid id,
-          string name,
-          string code,
-          string? siret,
-          string email,
-          string phoneNumber,
-          string address
-     )
-     {
-          return new CustomerCrud
-          {
-               Id = id,
-               Name = name,
-               Code = code,
-               Siret = siret,
-               Email = email,
-               PhoneNumber = phoneNumber,
-               Address = address
-          };
      }
 }
 

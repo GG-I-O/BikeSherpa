@@ -1,9 +1,8 @@
-﻿using System.Reflection;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace Ggio.BikeSherpa.Backend.Features.Notification;
+namespace Ggio.BikeSherpa.Backend.Services.Notification;
 
 public class ResourceNotificationMiddleware(RequestDelegate next)
 {

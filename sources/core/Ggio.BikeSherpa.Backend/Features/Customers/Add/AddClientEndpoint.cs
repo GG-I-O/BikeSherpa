@@ -3,12 +3,13 @@ using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers.Update;
 using Ggio.BikeSherpa.Backend.Model;
 using Ggio.BikeSherpa.Backend.Services;
+using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Mediator;
 using Microsoft.AspNetCore.Builder;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Add;
 
-public class AddClientEndpoint(IMediator mediator, HateoasService hateoasService) : Endpoint<CustomerCrud, AddResult<GuidWithHateoas>>
+public class AddClientEndpoint(IMediator mediator, IHateoasService hateoasService) : Endpoint<CustomerCrud, AddResult<GuidWithHateoas>>
 {
      public override void Configure()
      {

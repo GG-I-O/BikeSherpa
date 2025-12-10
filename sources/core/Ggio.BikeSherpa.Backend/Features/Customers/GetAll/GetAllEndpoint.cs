@@ -5,12 +5,13 @@ using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Ggio.BikeSherpa.Backend.Features.Customers.Update;
 using Ggio.BikeSherpa.Backend.Model;
 using Ggio.BikeSherpa.Backend.Services;
+using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Mediator;
 using Microsoft.AspNetCore.Builder;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 
-public class GetAllEndpoint(IMediator mediator, HateoasService hateoasService) : EndpointWithoutRequest<List<CustomerDto>>
+public class GetAllEndpoint(IMediator mediator, IHateoasService hateoasService) : EndpointWithoutRequest<List<CustomerDto>>
 {
      public override void Configure()
      {

@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
+using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.DddCore;
 using Mediator;
@@ -12,7 +13,7 @@ public record AddClientCommand(
      string? Siret,
      string Email,
      string PhoneNumber,
-     string Address
+     Address Address
 ) : ICommand<Result<Guid>>;
 
 public class AddClientCommandValidator : AbstractValidator<AddClientCommand>

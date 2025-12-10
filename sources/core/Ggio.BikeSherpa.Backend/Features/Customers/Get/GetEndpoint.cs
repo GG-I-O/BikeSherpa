@@ -3,16 +3,17 @@ using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Ggio.BikeSherpa.Backend.Features.Customers.Update;
 using Ggio.BikeSherpa.Backend.Services;
+using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Mediator;
 using Microsoft.AspNetCore.Builder;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Get;
 
-public class GetEndpoint(IMediator mediator, HateoasService hateoasService): EndpointWithoutRequest<CustomerDto>
+public class GetEndpoint(IMediator mediator, IHateoasService hateoasService): EndpointWithoutRequest<CustomerDto>
 {
      public override void Configure()
      {
-          Get("/api/clients/{Id:guid}");
+          Get("/api/customer/{customerId:guid}");
           Claims("scope", "read:customers");
           Description(x => x.WithName("GetCustomer"));
           Options(x => x.WithName("GetCustomer"));
@@ -20,7 +21,7 @@ public class GetEndpoint(IMediator mediator, HateoasService hateoasService): End
 
      public override async Task HandleAsync(CancellationToken ct)
      {
-          var customer = await mediator.Send(new GetClientQuery(Query<Guid>("Id")), ct);
+          var customer = await mediator.Send(new GetClientQuery(Query<Guid>("customerId")), ct);
           if (customer is null)
           {
                await Send.NotFoundAsync(ct);

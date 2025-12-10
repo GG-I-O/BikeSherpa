@@ -8,10 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
 using Ggio.BikeSherpa.Backend.Features.Courses.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
-using Ggio.BikeSherpa.Backend.Features.Notification;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
 using Ggio.BikeSherpa.Backend.Services;
+using Ggio.BikeSherpa.Backend.Services.Hateoas;
+using Ggio.BikeSherpa.Backend.Services.Notification;
 using Ggio.DddCore;
 using Ggio.DddCore.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -55,7 +56,7 @@ builder.Services.AddScoped<IResourceNotificationService, ResourceNotificationSer
 
 // Hateoas
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<HateoasService>();
+builder.Services.AddScoped<IHateoasService, HateoasService>();
 
 // Add DDD infrastructure services
 builder.Services.AddInfrastructureServices();

@@ -1,7 +1,8 @@
 ﻿using FastEndpoints;
+using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
-using Ggio.BikeSherpa.Backend.Model;
+using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,42 @@ namespace BackendTests.Features.Clients.GetAll;
 public class GetAllEndpointsTests
 {
      private readonly Mock<IMediator> _mockMediator = new();
+     private readonly Mock<IHateoasService> _mockHateoasService = new();
+     
+     private readonly CustomerCrud _mockCustomerA;
+     private readonly CustomerCrud _mockCustomerB;
+
+     public GetAllEndpointsTests()
+     {
+          _mockCustomerA = CustomerTestHelper.CreateCustomerCrud(
+               Guid.NewGuid(),
+               "Client A",
+               "AAA",
+               null,
+               "a@g.com",
+               "0123456789",
+               new Address
+               {
+                    name = "Client A",
+                    streetInfo = "123 rue des roses",
+                    postcode = "12502",
+                    city = "Obiwan"
+               });
+          _mockCustomerB = CustomerTestHelper.CreateCustomerCrud(
+               Guid.NewGuid(),
+               "Client B",
+               "BBB",
+               null,
+               "b@h.com",
+               "9876543210",
+               new Address
+               {
+                    name = "Client B",
+                    streetInfo = "321 rue des roses",
+                    postcode = "54855",
+                    city = "Anakin"
+               });
+     }
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenClientsExist()
@@ -19,8 +56,8 @@ public class GetAllEndpointsTests
           // Arrange
           var clients = new List<CustomerCrud>
           {
-               CreateClientCrud(Guid.NewGuid(), "Client A", "AAA", null, "a@g.com", "0123456789", "123 rue des roses"),
-               CreateClientCrud(Guid.NewGuid(), "Client B", "BBB", null, "b@h.com", "9876543210", "12 avenue des hortensias")
+               _mockCustomerA,
+               _mockCustomerB
           };
           var sut = CreateSut(clients);
 
@@ -52,7 +89,11 @@ public class GetAllEndpointsTests
                .Setup(m => m.Send(It.IsAny<GetAllClientsQuery>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(returnClients);
           
-          Factory.RegisterTestServices(s => s.AddSingleton(_mockMediator.Object));
+          Factory.RegisterTestServices(s =>
+          {
+               s.AddSingleton(_mockMediator.Object);
+               s.AddSingleton(_mockHateoasService.Object);
+          });
 
           var endpoint = Factory.Create<GetAllEndpoint>(
                ctx =>
@@ -60,7 +101,8 @@ public class GetAllEndpointsTests
                     ctx.Request.Method = "GET";
                     ctx.Request.Path = "/api/clients";
                },
-               _mockMediator.Object
+               _mockMediator.Object,
+               _mockHateoasService.Object
           );
 
           return endpoint;
@@ -72,27 +114,5 @@ public class GetAllEndpointsTests
                m => m.Send(It.IsAny<GetAllClientsQuery>(), It.IsAny<CancellationToken>()),
                Times.Once
           );
-     }
-
-     private CustomerCrud CreateClientCrud(
-          Guid id,
-          string name,
-          string code,
-          string? siret,
-          string email,
-          string phoneNumber,
-          string address
-     )
-     {
-          return new CustomerCrud
-          {
-               Id = id,
-               Name = name,
-               Code = code,
-               Siret = siret,
-               Email = email,
-               PhoneNumber = phoneNumber,
-               Address = address
-          };
      }
 }

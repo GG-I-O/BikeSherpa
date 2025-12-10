@@ -11,13 +11,13 @@ public interface IClientFactory
           string? siret,
           string email,
           string phoneNumber,
-          string address
+          Address address
      );
 }
 
 public class ClientFactory(IMediator mediator) : FactoryBase(mediator), IClientFactory
 {
-     public async Task<Customer> CreateClientAsync(string name, string code, string? siret, string email, string phoneNumber, string address)
+     public async Task<Customer> CreateClientAsync(string name, string code, string? siret, string email, string phoneNumber, Address address)
      {
           var client = new Customer
           {

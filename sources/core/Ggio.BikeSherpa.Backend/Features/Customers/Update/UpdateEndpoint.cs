@@ -2,17 +2,17 @@
 using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.BikeSherpa.Backend.Model;
-using Ggio.BikeSherpa.Backend.Services;
+using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Mediator;
 using Microsoft.AspNetCore.Builder;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Update;
 
-public class UpdateEndpoint(IMediator mediator, HateoasService hateoasService) : Endpoint<CustomerCrud, AddResult<GuidWithHateoas>>
+public class UpdateEndpoint(IMediator mediator, IHateoasService hateoasService) : Endpoint<CustomerCrud, AddResult<GuidWithHateoas>>
 {
      public override void Configure()
      {
-          Put("/api/client/{Id:guid}");
+          Put("/api/client/{customerId:guid}");
           Claims("scope", "write:customers");
           Description(x => x.WithName("UpdateCustomer"));
           Options(x => x.WithName("UpdateCustomer"));
@@ -21,7 +21,7 @@ public class UpdateEndpoint(IMediator mediator, HateoasService hateoasService) :
      public override async Task HandleAsync(CustomerCrud req, CancellationToken ct)
      {
           var command = new UpdateClientCommand(
-               req.Id,
+               Query<Guid>("customerId"),
                req.Name,
                req.Code,
                req.Siret,
