@@ -17,8 +17,8 @@ public class GetAllCustomersEndpoint(IMediator mediator, ICustomerLinks customer
 
      public override async Task HandleAsync(CancellationToken ct)
      {
-          var lastSync = Query<string?>("lastSync");
-          var query = new GetAllClientsQuery(lastSync is null ? null : DateTimeOffset.Parse(lastSync));
+          var lastSync = Query<string?>("lastSync", isRequired: false);
+          var query = new GetAllClientsQuery(String.IsNullOrEmpty(lastSync) ? null : DateTimeOffset.Parse(lastSync));
           var clients = await mediator.Send(query, ct);
           var clientDtoList = new List<CustomerDto>();
           foreach (var client in clients)

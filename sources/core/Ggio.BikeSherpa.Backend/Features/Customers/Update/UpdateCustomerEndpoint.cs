@@ -9,7 +9,7 @@ public class UpdateCustomerEndpoint(IMediator mediator, ICustomerLinks customerL
 {
      public override void Configure()
      {
-          Put("/api/client/{customerId:guid}");
+          Put("/api/customer/{customerId:guid}");
           Claims("scope", "write:customers");
           // Description(x => x.WithName("UpdateCustomer"));
           // Options(x => x.WithName("UpdateCustomer"));
@@ -18,7 +18,7 @@ public class UpdateCustomerEndpoint(IMediator mediator, ICustomerLinks customerL
      public override async Task HandleAsync(CustomerCrud req, CancellationToken ct)
      {
           var command = new UpdateClientCommand(
-               Query<Guid>("customerId"),
+               Route<Guid>("customerId"),
                req.Name,
                req.Code,
                req.Siret,

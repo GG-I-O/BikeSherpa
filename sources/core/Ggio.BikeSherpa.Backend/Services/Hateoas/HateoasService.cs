@@ -6,7 +6,7 @@ namespace Ggio.BikeSherpa.Backend.Services.Hateoas;
 
 public class HateoasService(IHttpContextAccessor httpContextAccessor, LinkGenerator linkGenerator): IHateoasService
 {
-     public string GenerateLink(string routeName, object routeValues)
+     public string GenerateLink(string routeName, object? routeValues)
      {
           var httpContext = httpContextAccessor.HttpContext;
           if (httpContext == null) return "";
@@ -21,7 +21,7 @@ public class HateoasService(IHttpContextAccessor httpContextAccessor, LinkGenera
           links.Add(new Link { Href = GenerateLink(getRouteName, routeValues), Rel = "self", Method = "GET" });
           
           if (string.IsNullOrEmpty(postRouteName)) return links;
-          links.Add(new Link { Href = GenerateLink(postRouteName, routeValues), Rel = "create", Method = "POST" });
+          links.Add(new Link { Href = GenerateLink(postRouteName, null), Rel = "create", Method = "POST" });
           
           if (string.IsNullOrEmpty(putRouteName)) return links;
           links.Add(new Link { Href = GenerateLink(putRouteName, routeValues), Rel = "update", Method = "PUT" });
