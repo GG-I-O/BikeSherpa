@@ -8,7 +8,7 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud>
      public override void Configure()
      {
           Put("/api/customer/{customerId:guid}");
-          Claims("scope", "write:customers");
+          Policies("write:customers");
           // Description(x => x.WithName("UpdateCustomer"));
           // Options(x => x.WithName("UpdateCustomer"));
      }

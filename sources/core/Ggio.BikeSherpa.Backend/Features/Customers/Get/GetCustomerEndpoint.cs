@@ -10,7 +10,7 @@ public class GetCustomerEndpoint(IMediator mediator, ICustomerLinks customerLink
      public override void Configure()
      {
           Get("/api/customer/{customerId:guid}");
-          Claims("scope", "read:customers");
+          Policies("read:customers");
           // Description(x => x.WithName("GetCustomer"));
           // Options(x => x.WithName("GetCustomer"));
      }

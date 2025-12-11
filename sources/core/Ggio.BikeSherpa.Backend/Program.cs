@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Security.Claims;
+using FastEndpoints;
 using FastEndpoints.Swagger;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Features.Courses;
@@ -81,7 +82,11 @@ builder.Services.AddCors(options =>
 });
 
 // Authentification
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+     options.AddPolicy("read:customers", policy => policy.RequireClaim("scope", "read:customers"));
+     options.AddPolicy("write:customers", policy => policy.RequireClaim("scope","write:customers"));
+});
 builder.Services.AddAuth0ApiAuthentication(options =>
 {
      options.Domain = builder.Configuration["Auth0Domain"];
@@ -98,6 +103,22 @@ builder.Services.AddAuth0ApiAuthentication(options =>
                ValidateIssuerSigningKey = true,
                ValidIssuer = builder.Configuration["Auth0Issuer"],
                ValidAudience = builder.Configuration["Auth0Identifier"]
+          },
+          Events = new JwtBearerEvents()
+          {
+               OnTokenValidated = async (context) =>
+               {
+                    if (context.Principal?.Identity is ClaimsIdentity claimsIdentity)
+                    {
+                         var scopeClaims = claimsIdentity.FindFirst("scope");
+                         if (scopeClaims is not null)
+                         {
+                              claimsIdentity.RemoveClaim(scopeClaims);
+                              claimsIdentity.AddClaims(scopeClaims.Value.Split(' ').Select(scope => new Claim("scope", scope)));
+                         }
+                    }
+                    await Task.CompletedTask;
+               }
           }
      };
 });

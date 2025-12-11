@@ -10,7 +10,7 @@ public class AddCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud, Ad
      public override void Configure()
      {
           Post("/api/customer");
-          Claims("scope", "write:customers");
+          Policies("write:customers");
           // Description(x => x.WithName("AddCustomer"));
           // Options(x => x.WithName("AddCustomer"));
      }

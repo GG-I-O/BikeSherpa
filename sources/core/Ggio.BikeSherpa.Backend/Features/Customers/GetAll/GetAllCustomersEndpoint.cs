@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+﻿using System.Net;
+using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Mediator;
@@ -10,7 +11,7 @@ public class GetAllCustomersEndpoint(IMediator mediator, ICustomerLinks customer
      public override void Configure()
      {
           Get("/api/customers/{lastSync?}");
-          Claims("scope", "read:customers");
+          Policies("read:customers");
           // Description(x => x.WithName("GetAllCustomers"));
           // Options(x => x.WithName("GetAllCustomers"));
      }
