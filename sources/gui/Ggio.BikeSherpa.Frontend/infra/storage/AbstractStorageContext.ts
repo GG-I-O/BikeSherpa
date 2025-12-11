@@ -1,4 +1,4 @@
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { ILogger } from "@/spi/LogsSPI";
 import { INotificationService, IStorageContext } from "@/spi/StorageSPI";
 import { Observable, observable } from "@legendapp/state";
@@ -22,8 +22,8 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
     protected constructor(
         storeName: string,
-        @inject(ServicesIndentifiers.Logger) logger: ILogger,
-        @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
+        @inject(ServicesIdentifiers.Logger) logger: ILogger,
+        @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService
     ) {
         this.logger = logger.extend(storeName);
         this.store = this.initStore(storeName);

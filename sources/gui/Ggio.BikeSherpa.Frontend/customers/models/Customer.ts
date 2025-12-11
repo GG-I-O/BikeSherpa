@@ -10,13 +10,14 @@ export default class Customer extends InputCustomer implements Storable, Hateoas
     public readonly id: string;
     public createdAt?: string;
     public updatedAt?: string;
-    public links: Link[];
+    public links?: Link[];
 
     public constructor(
-        name: string, address: Address, code: string, phone: string, email: string, siret?: number, comment?: string
+        name: string, address: Address, code: string, phone: string, email: string, siret?: string
     ) {
-        super(name, address, code, phone, email, siret, comment);
+        super(name, address, code, phone, email, siret);
         this.id = Crypto.randomUUID();
         this.links = [];
     }
+    
 };

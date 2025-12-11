@@ -1,7 +1,7 @@
 
 import Customer from "../models/Customer";
 import { inject, injectable } from "inversify";
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { ILogger } from "@/spi/LogsSPI";
 import AbstractStorageContext from "@/infra/storage/AbstractStorageContext";
 import { INotificationService } from "@/spi/StorageSPI";
@@ -13,8 +13,8 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     private apiClient;
 
     public constructor(
-        @inject(ServicesIndentifiers.Logger) logger: ILogger,
-        @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
+        @inject(ServicesIdentifiers.Logger) logger: ILogger,
+        @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService
     ) {
         super("Customers", logger, notificationService);
         this.apiClient = createApiClient(axios.defaults.baseURL || '', {
@@ -24,10 +24,16 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
 
     protected async getList(lastSync?: string): Promise<Customer[]> {
         try {
-            const data = await this.apiClient.GetAllCustomers({
-                queries: { lastSync }
+            const data = await this.apiClient.GetAllCustomersEndpoint({
+                params: { lastSync: lastSync ?? '' }
             });
-            return data || [];
+
+            const customers = data.map((customerDto) => {
+                let customer: Customer = {...customerDto.data, links: customerDto.links ?? []};
+                return customer;
+            });
+
+            return customers || [];
         } catch (e) {
             this.logger.error('GetAll error:', e);
             return [];

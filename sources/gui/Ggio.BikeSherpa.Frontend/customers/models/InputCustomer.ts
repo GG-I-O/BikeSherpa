@@ -7,11 +7,10 @@ export default class InputCustomer {
     public code: string;
     public phoneNumber: string;
     public email: string;
-    public siret?: number;
-    public comment?: string;
+    public siret?: string | null;
 
     public constructor(
-        name: string, address: Address, code: string, phone: string, email: string, siret?: number, comment?: string
+        name: string, address: Address, code: string, phone: string, email: string, siret?: string
     ) {
         this.name = name;
         this.address = address;
@@ -19,6 +18,5 @@ export default class InputCustomer {
         this.phoneNumber = phone;
         this.email = email;
         this.siret = siret;
-        this.comment = comment;
     }
 }

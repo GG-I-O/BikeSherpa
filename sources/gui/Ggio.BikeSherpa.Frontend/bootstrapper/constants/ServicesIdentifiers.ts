@@ -1,4 +1,4 @@
-export const ServicesIndentifiers = {
+export const ServicesIdentifiers = {
     Logger: Symbol.for('Logger'),
     LoggerConfig: Symbol.for('LoggerConfig'),
     UserService: Symbol.for('UserService'),

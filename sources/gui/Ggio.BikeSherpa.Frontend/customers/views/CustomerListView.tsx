@@ -1,10 +1,17 @@
 import datatableStyle from "@/style/datatableStyle";
 import { ScrollView } from "react-native";
 import { DataTable, IconButton, useTheme } from "react-native-paper";
+import useCustomerViewModel from "../viewModel/CustomerViewModel";
+import { use$ } from "@legendapp/state/react";
 
 export default function CustomerListView() {
     const theme = useTheme();
     const style = datatableStyle;
+
+    const viewModel = useCustomerViewModel();
+    const customerList$ = viewModel.getCustomerList$();
+    const customerRecord = use$(customerList$);
+    const customerList = Object.values(customerRecord);
 
     return (
         <ScrollView style={{ backgroundColor: theme.colors.background, height: '100%' }}>
@@ -12,25 +19,27 @@ export default function CustomerListView() {
                 <DataTable.Header>
                     <DataTable.Title style={[style.column]}>Nom</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Code</DataTable.Title>
+                    <DataTable.Title style={[style.column]}>Num Tél</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Adresse</DataTable.Title>
                     <DataTable.Title style={[style.column]}>SIRET</DataTable.Title>
-                    <DataTable.Title style={[style.column]}>Commentaire</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width80]}>Actions</DataTable.Title>
                 </DataTable.Header>
 
-                <DataTable.Row>
-                    <DataTable.Cell>NomSociété</DataTable.Cell>
-                    <DataTable.Cell style={[style.column]}>NSO</DataTable.Cell>
-                    <DataTable.Cell style={[style.column]}>10 avenue de la république, 38100 Grenoble</DataTable.Cell>
-                    <DataTable.Cell style={[style.column]}>362 521 879 00034</DataTable.Cell>
-                    <DataTable.Cell style={[style.column]}>Commentaire élogieux.</DataTable.Cell>
-                    <DataTable.Cell style={[style.column, style.width40]}>
-                        <IconButton icon="account-edit" />
-                    </DataTable.Cell>
-                    <DataTable.Cell style={[style.column, style.width40]}>
-                        <IconButton icon="trash-can-outline" />
-                    </DataTable.Cell>
-                </DataTable.Row>
+                {customerList.map((customer) => (
+                    <DataTable.Row>
+                        <DataTable.Cell>{customer.name}</DataTable.Cell>
+                        <DataTable.Cell style={[style.column]}>{customer.code}</DataTable.Cell>
+                        <DataTable.Cell style={[style.column]}>{customer.phoneNumber}</DataTable.Cell>
+                        <DataTable.Cell style={[style.column]}>{`${customer.address.streetInfo} ${customer.address.postcode} ${customer.address.city}`}</DataTable.Cell>
+                        <DataTable.Cell style={[style.column]}>{customer.siret}</DataTable.Cell>
+                        <DataTable.Cell style={[style.column, style.width40]}>
+                            <IconButton icon="account-edit" />
+                        </DataTable.Cell>
+                        <DataTable.Cell style={[style.column, style.width40]}>
+                            <IconButton icon="trash-can-outline" />
+                        </DataTable.Cell>
+                    </DataTable.Row>
+                ))}
             </DataTable>
         </ScrollView>
     );

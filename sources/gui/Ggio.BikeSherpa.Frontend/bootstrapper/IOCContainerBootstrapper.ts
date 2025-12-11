@@ -6,12 +6,13 @@ import { ILogger, ILoggerConfig } from "@/spi/LogsSPI";
 import { INotificationService, IStorageContext } from "@/spi/StorageSPI";
 import { Platform } from "react-native";
 import { IOCContainer } from "./constants/IOCContainer";
-import { ServicesIndentifiers } from "./constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "./constants/ServicesIdentifiers";
 import { IUserService } from "@/spi/AuthSPI";
 import { UserService } from "@/infra/auth/UserService";
 import AppLogger from "@/infra/logger/services/AppLogger";
 import { IAddressService } from "@/spi/AddressSPI";
 import AddressService from "@/services/AddressService";
+import { NotificationService } from "@/infra/notification/NotificationService";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -20,7 +21,7 @@ export default class IOCContainerBootstrapper {
 
         IOCContainerBootstrapper.bindLogger();
 
-        // IOCContainerBootstrapper.bindNotificationHub();
+        IOCContainerBootstrapper.bindNotificationHub();
 
         IOCContainerBootstrapper.bindCustomerStorageContext();
 
@@ -28,7 +29,7 @@ export default class IOCContainerBootstrapper {
     }
 
     private static bindUserService() {
-        IOCContainer.bind<IUserService>(ServicesIndentifiers.UserService).to(UserService).inSingletonScope();
+        IOCContainer.bind<IUserService>(ServicesIdentifiers.UserService).to(UserService).inSingletonScope();
     }
 
     private static bindLogger() {
@@ -38,7 +39,7 @@ export default class IOCContainerBootstrapper {
         }
 
         IOCContainer
-            .bind<ILoggerConfig>(ServicesIndentifiers.LoggerConfig)
+            .bind<ILoggerConfig>(ServicesIdentifiers.LoggerConfig)
             .toConstantValue({
                 host: LOKI_HOST,
                 app: 'bike-sherpa',
@@ -46,20 +47,20 @@ export default class IOCContainerBootstrapper {
             });
 
         IOCContainer
-            .bind<ILogger>(ServicesIndentifiers.Logger)
+            .bind<ILogger>(ServicesIdentifiers.Logger)
             .to(AppLogger)
             .inSingletonScope();
     }
 
-    // private static bindNotificationHub() {
-    //     IOCContainer.bind<INotificationService>(ServicesIndentifiers.NotificationService).to(NotificationService);
-    // }
+    private static bindNotificationHub() {
+        IOCContainer.bind<INotificationService>(ServicesIdentifiers.NotificationService).to(NotificationService);
+    }
 
     private static bindCustomerStorageContext() {
-        IOCContainer.bind<IStorageContext<Customer>>(ServicesIndentifiers.CustomerStorage).to(CustomerStorageContext).inSingletonScope();
+        IOCContainer.bind<IStorageContext<Customer>>(ServicesIdentifiers.CustomerStorage).to(CustomerStorageContext).inSingletonScope();
     }
 
     private static bindAddressService() {
-        IOCContainer.bind<IAddressService>(ServicesIndentifiers.AddressService).to(AddressService).inSingletonScope();
+        IOCContainer.bind<IAddressService>(ServicesIdentifiers.AddressService).to(AddressService).inSingletonScope();
     }
 }

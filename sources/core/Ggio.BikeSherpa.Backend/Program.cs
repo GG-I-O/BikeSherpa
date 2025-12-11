@@ -67,6 +67,19 @@ builder.Services.AddMediator(options =>
      options.ServiceLifetime = ServiceLifetime.Scoped;
 });
 
+// Cors
+var allowedOrigins = (builder.Configuration["CORS:AllowedOrigins"] ?? "").Split(',');
+builder.Services.AddCors(options =>
+{
+     options.AddDefaultPolicy(policy =>
+     {
+          policy.WithOrigins(allowedOrigins)
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
+     });
+});
+
 // Authentification
 builder.Services.AddAuthorization();
 builder.Services.AddAuth0ApiAuthentication(options =>

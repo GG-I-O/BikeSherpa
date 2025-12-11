@@ -2,13 +2,10 @@ import CustomerStorageContext from '../services/CustomerStorageContext';
 import { Observable } from '@legendapp/state';
 import * as Crypto from 'expo-crypto';
 import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
-import { ServicesIndentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
+import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
 import { ILogger } from '@/spi/LogsSPI';
 import Customer from '../models/Customer';
 import InputCustomer from '../models/InputCustomer';
-import { IStorageContext } from '@/spi/StorageSPI';
-
-
 
 class CustomerViewModel {
     private static instance: CustomerViewModel;
@@ -17,9 +14,9 @@ class CustomerViewModel {
     private customerStore$: Observable<Record<string, Customer>>;
 
     private constructor() {
-        this.logger = IOCContainer.get<ILogger>(ServicesIndentifiers.Logger);
+        this.logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
         this.logger = this.logger.extend("Customer");
-        this.storageContext = IOCContainer.get(ServicesIndentifiers.CustomerStorage);
+        this.storageContext = IOCContainer.get(ServicesIdentifiers.CustomerStorage);
         this.customerStore$ = this.storageContext.getStore();
     }
 

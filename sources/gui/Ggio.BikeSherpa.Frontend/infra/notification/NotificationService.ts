@@ -1,4 +1,4 @@
-import { ServicesIndentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
+import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
 import { ILogger } from '@/spi/LogsSPI';
 import { INotificationService } from '@/spi/StorageSPI';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
@@ -13,7 +13,7 @@ export class NotificationService implements INotificationService {
     private subscribedDataTypes: string[] = [];
 
     constructor(
-        @inject(ServicesIndentifiers.Logger) logger: ILogger
+        @inject(ServicesIdentifiers.Logger) logger: ILogger
     ) {
         this.logger = logger.extend('NotificationService');
     }

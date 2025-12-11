@@ -3,7 +3,7 @@ import * as zod from 'zod';
 export type Address = {
     name: string;
     streetInfo: string;
-    complement?: string;
+    complement?: string | null;
     postcode: string;
     city: string;
 }

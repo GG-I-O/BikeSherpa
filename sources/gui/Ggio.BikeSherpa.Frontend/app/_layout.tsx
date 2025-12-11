@@ -1,6 +1,6 @@
 import AppBootstrapper from "@/bootstrapper/AppBootstrapper";
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { IUserService } from "@/spi/AuthSPI";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
@@ -14,7 +14,7 @@ function AppStack() {
 
     const loggedIn = user !== null && user !== undefined;
 
-    const userService = IOCContainer.get<IUserService>(ServicesIndentifiers.UserService);
+    const userService = IOCContainer.get<IUserService>(ServicesIdentifiers.UserService);
     useEffect(() => {
         userService.setCurrentUser(user);
     }, [userService, user]);

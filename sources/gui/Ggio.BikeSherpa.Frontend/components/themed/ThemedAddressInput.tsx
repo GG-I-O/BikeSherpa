@@ -5,7 +5,7 @@ import formStyle from '@/style/formStyle';
 import { FlatList, View } from 'react-native';
 import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
 import { IAddressService } from '@/spi/AddressSPI';
-import { ServicesIndentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
+import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
 import { Address } from '@/models/Address';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -37,7 +37,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
         name,
     });
 
-    const addressService = IOCContainer.get<IAddressService>(ServicesIndentifiers.AddressService);
+    const addressService = IOCContainer.get<IAddressService>(ServicesIdentifiers.AddressService);
 
     const [query, setQuery] = useState<string | null>(null);
     const [debouncedQuery, setDebouncedQuery] = useState<string | null>(null);

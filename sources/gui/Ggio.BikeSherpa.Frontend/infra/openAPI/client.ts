@@ -1,15 +1,23 @@
 import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
+const Address = z.object({
+  name: z.string(),
+  streetInfo: z.string(),
+  complement: z.string().nullable(),
+  postcode: z.string(),
+  city: z.string(),
+});
 const CustomerCrud = z.object({
   name: z.string(),
   code: z.string(),
   siret: z.string().nullable(),
   email: z.string(),
   phoneNumber: z.string(),
-  address: z.string(),
+  address: Address,
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
+  id: z.string(),
 });
 const Link = z.object({
   href: z.string(),
@@ -27,13 +35,12 @@ const CustomerDto = z.object({
 });
 const CourseCrud = z.object({
   startDate: z.string().datetime({ offset: true }),
-  createdAt: z.string().datetime({ offset: true }),
-  updatedAt: z.string().datetime({ offset: true }),
   id: z.string(),
 });
 const AddResultOfGuid = z.object({ id: z.string() });
 
 export const schemas = {
+  Address,
   CustomerCrud,
   Link,
   GuidWithHateoas,
@@ -46,91 +53,8 @@ export const schemas = {
 const endpoints = makeApi([
   {
     method: "post",
-    path: "/api/client",
-    alias: "AddCustomer",
-    requestFormat: "json",
-    parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: CustomerCrud,
-      },
-    ],
-    response: AddResultOfGuidWithHateoas,
-    errors: [
-      {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
-  },
-  {
-    method: "put",
-    path: "/api/client/:id",
-    alias: "UpdateCustomer",
-    requestFormat: "json",
-    parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: CustomerCrud,
-      },
-      {
-        name: "id",
-        type: "Path",
-        schema: z.string(),
-      },
-    ],
-    response: AddResultOfGuidWithHateoas,
-    errors: [
-      {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
-  },
-  {
-    method: "get",
-    path: "/api/clients/:Id",
-    alias: "GetCustomer",
-    requestFormat: "json",
-    parameters: [
-      {
-        name: "id",
-        type: "Path",
-        schema: z.string(),
-      },
-    ],
-    response: CustomerDto,
-    errors: [
-      {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
-  },
-  {
-    method: "post",
     path: "/api/course",
-    alias: "GgioBikeSherpaBackendFeaturesCoursesAddAddCourseEndpoint",
+    alias: "AddCourseEndpoint",
     requestFormat: "json",
     parameters: [
       {
@@ -156,7 +80,7 @@ const endpoints = makeApi([
   {
     method: "get",
     path: "/api/course/:Id",
-    alias: "GgioBikeSherpaBackendFeaturesCoursesGetGetEndpoint",
+    alias: "GetCourseEndpoint",
     requestFormat: "json",
     parameters: [
       {
@@ -182,7 +106,7 @@ const endpoints = makeApi([
   {
     method: "get",
     path: "/api/courses",
-    alias: "GgioBikeSherpaBackendFeaturesCoursesGetAllGetAllEndpoint",
+    alias: "GetAllCoursesEndpoint",
     requestFormat: "json",
     response: z.array(CourseCrud),
     errors: [
@@ -199,10 +123,100 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "get",
-    path: "/api/customers",
-    alias: "GetAllCustomers",
+    method: "post",
+    path: "/api/customer",
+    alias: "AddCustomerEndpoint",
     requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: CustomerCrud,
+      },
+    ],
+    response: AddResultOfGuidWithHateoas,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "put",
+    path: "/api/customer/:customerId",
+    alias: "UpdateCustomerEndpoint",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: CustomerCrud,
+      },
+      {
+        name: "customerId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: AddResultOfGuidWithHateoas,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/api/customer/:customerId",
+    alias: "GetCustomerEndpoint",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "customerId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: CustomerDto,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/api/customers/:lastSync",
+    alias: "GetAllCustomersEndpoint",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "lastSync",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
     response: z.array(CustomerDto),
     errors: [
       {

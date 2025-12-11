@@ -1,4 +1,4 @@
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { Address } from "@/models/Address";
 import { IAddressService } from "@/spi/AddressSPI";
 import { ILogger } from "@/spi/LogsSPI";
@@ -11,7 +11,7 @@ export default class AddressService implements IAddressService {
     private logger: ILogger;
 
     constructor(
-        @inject(ServicesIndentifiers.Logger) logger: ILogger
+        @inject(ServicesIdentifiers.Logger) logger: ILogger
     ) {
         this.logger = logger;
     }
