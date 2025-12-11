@@ -1,13 +1,11 @@
 ﻿using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Features.Customers.Get;
-using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Add;
 
-public class AddCustomerEndpoint(IMediator mediator, ICustomerLinks customerLinks) : Endpoint<CustomerCrud, AddResult<GuidWithHateoas>>
+public class AddCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud, AddResult<Guid>>
 {
      public override void Configure()
      {
@@ -31,13 +29,7 @@ public class AddCustomerEndpoint(IMediator mediator, ICustomerLinks customerLink
           var result = await mediator.Send(command, ct);
           if (result.IsSuccess)
           {
-               var response = new GuidWithHateoas
-               {
-                    Id = result.Value,
-                    Links = customerLinks.GenerateLinks(result.Value)
-               };
-               // await Send.CreatedAtAsync(new AddResult<GuidWithHateoas>(response), cancellation: ct);
-               await Send.ResultAsync(TypedResults.Created("", response));
+               await Send.ResultAsync(TypedResults.Created("", new { Id = result.Value }));
           }
      }
 }

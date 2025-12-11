@@ -19,18 +19,17 @@ public class GetAllCustomersEndpoint(IMediator mediator, ICustomerLinks customer
      {
           var lastSync = Query<string?>("lastSync", isRequired: false);
           var query = new GetAllClientsQuery(String.IsNullOrEmpty(lastSync) ? null : DateTimeOffset.Parse(lastSync));
-          var clients = await mediator.Send(query, ct);
-          var clientDtoList = new List<CustomerDto>();
-          foreach (var client in clients)
+          var customers = await mediator.Send(query, ct);
+          var customerDtoList = new List<CustomerDto>();
+          foreach (var customer in customers)
           {
-               var clientDto = new CustomerDto
+               var customerDto = new CustomerDto
                {
-                    Data = client
+                    Data = customer,
+                    Links = customerLinks.GenerateLinks(customer.Id)
                };
-               clientDto.Links = customerLinks.GenerateLinks(clientDto.Data.Id);
-               clientDtoList.Add(clientDto);
+               customerDtoList.Add(customerDto);
           }
-
-          await Send.OkAsync(clientDtoList, ct);
+          await Send.OkAsync(customerDtoList, ct);
      }
 }

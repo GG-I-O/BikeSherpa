@@ -15,7 +15,6 @@ public class CustomerLinks(IHateoasService hateoasService): ICustomerLinks
           
           return hateoasService.GenerateLinks(
                IEndpoint.GetName<GetCustomerEndpoint>(),
-               IEndpoint.GetName<AddCustomerEndpoint>(),
                IEndpoint.GetName<UpdateCustomerEndpoint>(),
                null,
                new { customerId = id }

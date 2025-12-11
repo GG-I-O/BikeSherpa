@@ -23,13 +23,11 @@ public class GetCustomerEndpoint(IMediator mediator, ICustomerLinks customerLink
                await Send.NotFoundAsync(ct);
                return;
           }
-          
-          var clientDto = new CustomerDto
+          var customerDto = new CustomerDto
           {
-               Data = customer
+               Data = customer,
+               Links = customerLinks.GenerateLinks(customer.Id)
           };
-          clientDto.Links = customerLinks.GenerateLinks(clientDto.Data.Id);
-          
-          await Send.OkAsync(clientDto, ct);
+          await Send.OkAsync(customerDto, ct);
      }
 }

@@ -13,15 +13,12 @@ public class HateoasService(IHttpContextAccessor httpContextAccessor, LinkGenera
           return linkGenerator.GetUriByName(httpContext, routeName, routeValues) ?? string.Empty;
      }
 
-     public List<Link> GenerateLinks(string? getRouteName, string? postRouteName, string? putRouteName, string? deleteRouteName, object routeValues)
+     public List<Link> GenerateLinks(string? getRouteName, string? putRouteName, string? deleteRouteName, object routeValues)
      {
           var links = new List<Link>();
           
           if (string.IsNullOrEmpty(getRouteName)) return links;
           links.Add(new Link { Href = GenerateLink(getRouteName, routeValues), Rel = "self", Method = "GET" });
-          
-          if (string.IsNullOrEmpty(postRouteName)) return links;
-          links.Add(new Link { Href = GenerateLink(postRouteName, null), Rel = "create", Method = "POST" });
           
           if (string.IsNullOrEmpty(putRouteName)) return links;
           links.Add(new Link { Href = GenerateLink(putRouteName, routeValues), Rel = "update", Method = "PUT" });
