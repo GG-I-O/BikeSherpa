@@ -1,0 +1,63 @@
+name: Qodana
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: # Specify your branches here
+      - main # The 'main' branch
+      - "releases/*" # The release branches
+
+jobs:
+  qodanadotnet:
+    name: Qodana Scan Dotnet
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }} # to check out the actual pull request commit, not the merge commit
+          fetch-depth: 0 # a full history is required for pull request analysis
+      - name: "Qodana Scan"
+        uses: JetBrains/qodana-action@v2025.2
+        with:
+          pr-mode: false
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+          QODANA_ENDPOINT: "https://qodana.cloud"
+
+  qodanatypescript:
+    name: Qodana Scan TS
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }} # to check out the actual pull request commit, not the merge commit
+          fetch-depth: 0 # a full history is required for pull request analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: sources/gui/Ggio.BikeSherpa.Frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+        working-directory: sources/gui/Ggio.BikeSherpa.Frontend
+        
+      - name: "Qodana Scan"
+        uses: JetBrains/qodana-action@v2025.2
+        with:
+          pr-mode: false
+          args: --linter,qodana-js
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_TS }}
+          QODANA_ENDPOINT: "https://qodana.cloud"
+
+          name: Qodana

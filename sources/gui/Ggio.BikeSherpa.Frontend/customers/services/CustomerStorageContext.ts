@@ -1,38 +1,33 @@
 
 import Customer from "../models/Customer";
-import axios from "axios";
 import { inject, injectable } from "inversify";
 import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { ILogger } from "@/spi/LogsSPI";
-import { INotificationService } from "@/spi/StorageSPI";
-import { Link } from "@/models/HateoasLink";
 import AbstractStorageContext from "@/infra/storage/AbstractStorageContext";
-// import { createApiClient } from "@/services/OpenAPI/client";
+import { INotificationService } from "@/spi/StorageSPI";
+import { createApiClient } from "@/infra/openAPI/client";
+import axios from "axios";
 
 @injectable()
 export default class CustomerStorageContext extends AbstractStorageContext<Customer> {
-    // private apiClient;
+    private apiClient;
 
     public constructor(
         @inject(ServicesIndentifiers.Logger) logger: ILogger,
-        // @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
+        @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
     ) {
-        // super("Customers", logger, notificationService);
-        super("Customers", logger);
-
-        // this.apiClient = createApiClient(axios.defaults.baseURL || '', {
-        //     axiosInstance: axios
-        // });
+        super("Customers", logger, notificationService);
+        this.apiClient = createApiClient(axios.defaults.baseURL || '', {
+            axiosInstance: axios
+        });
     }
 
     protected async getList(lastSync?: string): Promise<Customer[]> {
         try {
-            return [];
-
-            // const data = await this.apiClient.GetCustomers({
-            //     queries: { lastSync }
-            // });
-            // return data || [];
+            const data = await this.apiClient.GetAllCustomers({
+                queries: { lastSync }
+            });
+            return data || [];
         } catch (e) {
             this.logger.error('GetAll error:', e);
             return [];
@@ -40,11 +35,13 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
     protected async getItem(id: string): Promise<Customer | null> {
         try {
-            const store = this.getStore();
-            return store[id].peek();
-            // return await this.apiClient.GetCustomer({
-            //     params: { id: id }
-            // });
+            const link = this.getLinkHref(id, "self");
+            if (!link)
+                throw new Error(`Cannot read the customer with id ${id}`);
+
+            const response = await axios.get(link);
+            const data = await response.data;
+            return data;
         } catch (e) {
             this.logger.error('Get error:', e);
             return null;
@@ -52,9 +49,17 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
     protected async create(item: Customer): Promise<Customer> {
         try {
-            return item;
+            const link = this.getLinkHref(item.id, "create");
+            if (!link)
+                throw new Error(`Cannot create a customer`);
 
-            // return await this.apiClient.CreateCustomer(item);
+            const response = await axios.post(link);
+            if (response.status !== 201)
+                throw new Error("Could not create the customer");
+
+            // Synchronize with the item created at back-end
+            const data = await response.data;
+            return await this.getItem(data.id) ?? item;
         } catch (e) {
             this.logger.error('Post error:', e);
             throw e; // Throw to legendapp
@@ -62,13 +67,14 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
     protected async update(item: Customer): Promise<Customer> {
         try {
-            return item;
-            // const response = await axios.put(
-            //     item.links?.find((link: Link) => link.rel == "update")?.href ?? '',
-            //     JSON.stringify(item)
-            // );
+            const link = this.getLinkHref(item.id, "update");
+            if (!link)
+                throw new Error(`Cannot update the customer ${item.id}`);
 
-            // await this.apiClient.UpdateCustomer(item, { params: { id: item.id } });
+            const response = await axios.put(link, JSON.stringify(item));
+            if (response.status !== 200)
+                throw new Error(`Could not update the customer ${item.id}`);
+
             return item;
         } catch (e) {
             this.logger.error('Put error:', e);
@@ -77,13 +83,14 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
     protected async delete(item: Customer): Promise<void> {
         try {
-            if (!item.id)
-                throw new Error("Customer need an ID to delete");
-            // const response = await axios.delete(
-            //     item.links?.find((link: Link) => link.rel == "delete")?.href ?? ''
-            // );
+            const link = this.getLinkHref(item.id, "delete");
+            if (!link)
+                throw new Error(`Cannot delete the customer ${item.id}`);
 
-            // await this.apiClient.DeleteCustomer(undefined, { params: { id: item.id } })
+            const response = await axios.delete(link);
+            if (response.status !== 200)
+                throw new Error(`Could not delete the customer ${item.id}`);
+
         } catch (e) {
             this.logger.error("Delete error:", e);
             throw e;

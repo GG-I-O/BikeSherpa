@@ -39,6 +39,84 @@ npx expo prebuild --clean
 npx expo run:android
 ```
 
+## Release
+Follow the steps or run the command :  
+```sh
+npm run build:apk:windows
+or
+npm run build:apk:linux
+```
+
+### Android
+
+#### Prérequis
+JDK 17  
+Android Studio  
+Variables d'environnement ANDROID_HOME  
+
+#### Prebuild
+```sh
+npx expo prebuild --platform android --clean
+```
+
+#### Generate key
+```sh
+cd android/app
+keytool -genkeypair -v -storetype PKCS12 -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000
+```
+
+#### Config
+android/gradle.properties
+```sh
+MYAPP_RELEASE_STORE_FILE=my-release-key.keystore
+MYAPP_RELEASE_KEY_ALIAS=my-key-alias
+MYAPP_RELEASE_STORE_PASSWORD=your_keystore_password
+MYAPP_RELEASE_KEY_PASSWORD=your_key_password
+```  
+
+android/app/build.gradle
+```java
+android {
+    // All config remain the same except those lines
+    signingConfigs {
+	    // No changes there
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+	    // Add this here
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(project.property('MYAPP_RELEASE_STORE_FILE'))
+                storePassword project.property('MYAPP_RELEASE_STORE_PASSWORD')
+                keyAlias project.property('MYAPP_RELEASE_KEY_ALIAS')
+                keyPassword project.property('MYAPP_RELEASE_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        // Modify only this line, keep the rest
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+```
+
+#### Build APK
+```sh
+cd android
+./gradlew assembleRelease
+```
+
+#### Enjoy
+APK file is in
+```sh
+android/app/build/outputs/apk/release/app-release.apk
+```
+
 # Packages
 
 ## Expo
@@ -157,12 +235,25 @@ Subscribe and receive notification
 npm install @microsoft/signalr
 ```
 
-## OpenAPI zod client
+## OpenAPI zod client & Zodios
 
 Generate API url from back-end openAPI json
 
 ```sh
 npm install --save-dev openapi-zod-client
+npm install @zodios/core
+```
+
+If zodios have dependency errors  
+```sh
+npm uninstall axios
+npm uninstall zod
+npm install @zodios/core zod axios
+```
+
+Usage  
+```sh
+npm run openAPI
 ```
 
 ## Jest

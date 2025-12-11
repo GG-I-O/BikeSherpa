@@ -18,13 +18,13 @@ export default function TimePickerInput({ hours, minutes, onConfirm, onOpen, onC
     const onDismiss = useCallback(() => {
         setVisible(false);
         onClose?.();
-    }, [setVisible]);
+    }, [setVisible, onClose]);
 
     const onConfirmPress = useCallback(({ hours, minutes }: { hours: number, minutes: number }) => {
         onConfirm({ hours, minutes });
         setVisible(false);
         onClose?.();
-    }, [setVisible]);
+    }, [setVisible, onConfirm, onClose]);
 
     return (
         <SafeAreaProvider>

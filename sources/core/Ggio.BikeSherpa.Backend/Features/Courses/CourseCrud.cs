@@ -1,7 +1,7 @@
 using Facet;
 using Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
 
-namespace Ggio.BikeSherpa.BackendSaaS.Features.Courses;
+namespace Ggio.BikeSherpa.Backend.Features.Courses;
 
-[Facet(typeof(Course))]
+[Facet(typeof(Course), exclude:nameof(Course.DomainEvents))]
 public partial record CourseCrud;

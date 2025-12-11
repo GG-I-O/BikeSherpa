@@ -2,6 +2,7 @@ using Ardalis.GuardClauses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Npgsql;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure;
 
@@ -18,7 +19,6 @@ public class BackendDbContextDesignTimeFactory : IDesignTimeDbContextFactory<Bac
 
           var options = new DbContextOptionsBuilder<BackendDbContext>()
                .UseNpgsql(connectionString);
-
 
           return new BackendDbContext(options.Options);
      }

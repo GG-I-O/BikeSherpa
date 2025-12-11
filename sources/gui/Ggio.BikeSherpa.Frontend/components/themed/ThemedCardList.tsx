@@ -4,7 +4,7 @@ import { FlatList, ListRenderItem, StyleProp, View, ViewStyle } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type Props = {
-    data: Array<Identifiable<string | number>>,
+    data: Identifiable<string | number>[],
     searchBar?: ReactElement,
     card: ListRenderItem<Identifiable<string | number>> | null | undefined,
     style?: StyleProp<ViewStyle>,

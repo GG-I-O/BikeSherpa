@@ -1,7 +1,7 @@
 import React from 'react';
 import { Control, FieldError, useController } from 'react-hook-form';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { Checkbox, Provider, Text, TextInput } from 'react-native-paper';
+import { Checkbox, Text } from 'react-native-paper';
 import formStyle from '@/style/formStyle';
 import { View } from 'react-native';
 

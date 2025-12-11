@@ -4,12 +4,14 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
+    "build:apk:linux": "bash scripts/buildapk.sh",
+    "build:apk:windows": "powershell -ExecutionPolicy Bypass -File .\\scripts\\buildapk.ps1",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll=false",
+    "openAPI": "openapi-zod-client \"http://192.168.11.89:5287/swagger/v1/swagger.json\" -o \"./infra/openAPI/client.ts\""
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -19,6 +21,7 @@
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
+    "@zodios/core": "^10.9.6",
     "axios": "^1.13.2",
     "expo": "~54.0.25",
     "expo-auth-session": "~7.0.9",
@@ -56,7 +59,7 @@
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
     "reflect-metadata": "^0.2.2",
-    "zod": "^4.1.12"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "^7.28.0",
