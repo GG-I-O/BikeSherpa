@@ -11,8 +11,6 @@ public class GetAllCustomersEndpoint(IMediator mediator, ICustomerLinks customer
      {
           Get("/api/customers/{lastSync?}");
           Policies("read:customers");
-          // Description(x => x.WithName("GetAllCustomers"));
-          // Options(x => x.WithName("GetAllCustomers"));
      }
 
      public override async Task HandleAsync(CancellationToken ct)

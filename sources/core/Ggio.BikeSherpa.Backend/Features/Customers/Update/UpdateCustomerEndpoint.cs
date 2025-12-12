@@ -9,8 +9,6 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud>
      {
           Put("/api/customer/{customerId:guid}");
           Policies("write:customers");
-          // Description(x => x.WithName("UpdateCustomer"));
-          // Options(x => x.WithName("UpdateCustomer"));
      }
 
      public override async Task HandleAsync(CustomerCrud req, CancellationToken ct)

@@ -11,8 +11,6 @@ public class GetCustomerEndpoint(IMediator mediator, ICustomerLinks customerLink
      {
           Get("/api/customer/{customerId:guid}");
           Policies("read:customers");
-          // Description(x => x.WithName("GetCustomer"));
-          // Options(x => x.WithName("GetCustomer"));
      }
 
      public override async Task HandleAsync(CancellationToken ct)

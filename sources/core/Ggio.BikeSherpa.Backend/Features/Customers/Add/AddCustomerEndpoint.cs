@@ -11,8 +11,6 @@ public class AddCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud, Ad
      {
           Post("/api/customer");
           Policies("write:customers");
-          // Description(x => x.WithName("AddCustomer"));
-          // Options(x => x.WithName("AddCustomer"));
      }
 
      public override async Task HandleAsync(CustomerCrud req, CancellationToken ct)

@@ -16,6 +16,7 @@ public class GetCustomerEndpointTests
      private readonly Mock<IMediator> _mockMediator = new();
      private readonly Mock<IHateoasService> _mockHateoasService = new();
      
+     
      private readonly CustomerCrud _mockCustomer = CustomerTestHelper.CreateCustomerCrud(
           Guid.NewGuid(),
           "Client A",

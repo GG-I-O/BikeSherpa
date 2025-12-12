@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using Ggio.DddCore;
 using Ggio.DddCore.Infrastructure;
 using Mediator;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +20,7 @@ public class AddDomainEntityTests(MediatorTestFixture fixture) : IClassFixture<M
           var serviceScope = serviceCollection.BuildServiceProvider().CreateScope();
           var dbContext = serviceScope.ServiceProvider.GetRequiredService<TestDbContext>();
           
-          var factory = new MyAggragateRootFactory(serviceScope.ServiceProvider.GetRequiredService<IMediator>());
+          var factory = new MyAggregateRootFactory(serviceScope.ServiceProvider.GetRequiredService<IMediator>());
           
           // Act
           var entity = await factory.CreateAsync("test");

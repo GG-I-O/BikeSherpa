@@ -132,7 +132,7 @@ builder.Host.UseSerilog((context, configuration) =>
      configuration.ReadFrom.Configuration(context.Configuration);
      configuration.WriteTo.GrafanaLoki(builder.Configuration["GrafanaLoki"]!);
 });
-builder.Services.AddHttpLogging(o => { });
+builder.Services.AddHttpLogging();
 
 var app = builder.Build();
 

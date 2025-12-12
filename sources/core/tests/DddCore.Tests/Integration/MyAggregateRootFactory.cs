@@ -3,7 +3,7 @@ using Mediator;
 
 namespace DddCore.Tests.Integration;
 
-public class MyAggragateRootFactory(IMediator mediator) : FactoryBase(mediator)
+public class MyAggregateRootFactory(IMediator mediator) : FactoryBase(mediator)
 {
      public async Task<MyAggregateRoot> CreateAsync(string name)
      {

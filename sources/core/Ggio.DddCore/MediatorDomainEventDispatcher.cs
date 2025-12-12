@@ -20,7 +20,7 @@ public class MediatorDomainEventDispatcher(IMediator mediator, ILogger<MediatorD
 
           foreach (var entity in entitiesWithEvents)
           {
-               if (entity is IHasDomainEvents hasDomainEvents)
+               if (entity is { } hasDomainEvents)
                {
                     var events = hasDomainEvents.DomainEvents.ToArray();
                     if (clearEvents)

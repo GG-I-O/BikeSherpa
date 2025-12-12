@@ -8,6 +8,5 @@ public class EfCoreDomainEntityAddedEventHandler(DbContext dbContext) : INotific
      public async ValueTask Handle(DomainEntityAddedEvent notification, CancellationToken cancellationToken)
      {
           await dbContext.AddAsync(notification.NewEntity, cancellationToken);
-         // await dbContext.SaveChangesAsync(cancellationToken);
      }
 }
