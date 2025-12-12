@@ -10,10 +10,10 @@ public static class Bootstrap
 {
      extension(IServiceCollection services)
      {
-          public IServiceCollection ConfigureClientFeature()
+          public IServiceCollection ConfigureCustomerFeature()
           {
                services.AddScoped<ICustomerLinks, CustomerLinks>();
-               services.AddScoped<IValidator<AddClientCommand>, AddClientCommandValidator>();
+               services.AddScoped<IValidator<AddCustomerCommand>, AddCustomerCommandValidator>();
                services.AddScoped<IValidator<UpdateClientCommand>, UpdateClientCommandValidator>();
                return services;
           }

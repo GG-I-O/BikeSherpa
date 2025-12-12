@@ -48,6 +48,14 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                     this.logger.error('Failed to start NotificationService', error);
                 }
             }
+            if (this.notificationService) {
+                try {
+                    await this.notificationService.start(this.resourceName);
+                    this.logger.info('NotificationService started, enabling sync');
+                } catch (error) {
+                    this.logger.error('Failed to start NotificationService', error);
+                }
+            }
             this.canSync$.set(true);
             this.initialLoad = false;
         }

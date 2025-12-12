@@ -6,9 +6,9 @@ public static class Bootstrap
 {
      extension(IServiceCollection services)
      {
-          public IServiceCollection AddClientAggregate()
+          public IServiceCollection AddCustomerAggregate()
           {
-               services.AddScoped<IClientFactory, ClientFactory>();
+               services.AddScoped<ICustomerFactory, CustomerFactory>();
                return services;
           }
      }

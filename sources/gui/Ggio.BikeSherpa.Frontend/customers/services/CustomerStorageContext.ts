@@ -1,4 +1,3 @@
-
 import Customer from "../models/Customer";
 import { inject, injectable } from "inversify";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";

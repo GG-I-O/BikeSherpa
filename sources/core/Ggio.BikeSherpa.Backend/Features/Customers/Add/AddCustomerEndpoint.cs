@@ -17,7 +17,7 @@ public class AddCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud, Ad
 
      public override async Task HandleAsync(CustomerCrud req, CancellationToken ct)
      {
-          var command = new AddClientCommand(
+          var command = new AddCustomerCommand(
                req.Name,
                req.Code,
                req.Siret,

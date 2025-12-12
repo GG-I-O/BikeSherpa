@@ -2,9 +2,9 @@
 
 namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
 
-public class ClientByIdSpecification : SingleResultSpecification<Customer>
+public class CustomerByIdSpecification : SingleResultSpecification<Customer>
 {
-     public ClientByIdSpecification(Guid id)
+     public CustomerByIdSpecification(Guid id)
      {
           Query.Where(x => x.Id == id);
      }

@@ -8,58 +8,52 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace BackendTests.Features.Clients.GetAll;
+namespace BackendTests.Features.Customers.GetAll;
 
 public class GetAllCustomersEndpointTests
 {
      private readonly Mock<IMediator> _mockMediator = new();
      private readonly Mock<IHateoasService> _mockHateoasService = new();
      
-     private readonly CustomerCrud _mockCustomerA;
-     private readonly CustomerCrud _mockCustomerB;
-
-     public GetAllCustomersEndpointTests()
-     {
-          _mockCustomerA = CustomerTestHelper.CreateCustomerCrud(
-               Guid.NewGuid(),
-               "Client A",
-               "AAA",
-               null,
-               "a@g.com",
-               "0123456789",
-               new Address
-               {
-                    name = "Client A",
-                    streetInfo = "123 rue des roses",
-                    postcode = "12502",
-                    city = "Obiwan"
-               });
-          _mockCustomerB = CustomerTestHelper.CreateCustomerCrud(
-               Guid.NewGuid(),
-               "Client B",
-               "BBB",
-               null,
-               "b@h.com",
-               "9876543210",
-               new Address
-               {
-                    name = "Client B",
-                    streetInfo = "321 rue des roses",
-                    postcode = "54855",
-                    city = "Anakin"
-               });
-     }
+     private readonly CustomerCrud _mockCustomerA = CustomerTestHelper.CreateCustomerCrud(
+          Guid.NewGuid(),
+          "Client A",
+          "AAA",
+          null,
+          "a@g.com",
+          "0123456789",
+          new Address
+          {
+               name = "Client A",
+               streetInfo = "123 rue des roses",
+               postcode = "12502",
+               city = "Obi-wan"
+          });
+     private readonly CustomerCrud _mockCustomerB = CustomerTestHelper.CreateCustomerCrud(
+          Guid.NewGuid(),
+          "Client B",
+          "BBB",
+          null,
+          "b@h.com",
+          "9876543210",
+          new Address
+          {
+               name = "Client B",
+               streetInfo = "321 rue des roses",
+               postcode = "54855",
+               city = "Anakin"
+          });
 
      [Fact]
-     public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenClientsExist()
+     public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenCustomersExist()
      {
           // Arrange
-          var clients = new List<CustomerCrud>
+          var customers = new List<CustomerCrud>
           {
                _mockCustomerA,
                _mockCustomerB
           };
-          var sut = CreateSut(clients);
+          var sut = CreateSut(customers);
 
           // Act
           await sut.HandleAsync(CancellationToken.None);
@@ -70,7 +64,7 @@ public class GetAllCustomersEndpointTests
      }
 
      [Fact]
-     public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenNoClientsExist()
+     public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenNoCustomersExist()
      {
           // Arrange
           var sut = CreateSut(new List<CustomerCrud>());
@@ -83,11 +77,11 @@ public class GetAllCustomersEndpointTests
           Assert.Equal(StatusCodes.Status200OK, sut.HttpContext.Response.StatusCode);
      }
 
-     private GetAllCustomersEndpoint CreateSut(List<CustomerCrud> returnClients)
+     private GetAllCustomersEndpoint CreateSut(List<CustomerCrud> returnCustomers)
      {
           _mockMediator
-               .Setup(m => m.Send(It.IsAny<GetAllClientsQuery>(), It.IsAny<CancellationToken>()))
-               .ReturnsAsync(returnClients);
+               .Setup(m => m.Send(It.IsAny<GetAllCustomersQuery>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(returnCustomers);
           
           Factory.RegisterTestServices(s =>
           {
@@ -99,7 +93,7 @@ public class GetAllCustomersEndpointTests
                ctx =>
                {
                     ctx.Request.Method = "GET";
-                    ctx.Request.Path = "/api/clients";
+                    ctx.Request.Path = "/api/customers";
                },
                _mockMediator.Object,
                _mockHateoasService.Object
@@ -111,7 +105,7 @@ public class GetAllCustomersEndpointTests
      private void VerifyMediatorCalledOnce()
      {
           _mockMediator.Verify(
-               m => m.Send(It.IsAny<GetAllClientsQuery>(), It.IsAny<CancellationToken>()),
+               m => m.Send(It.IsAny<GetAllCustomersQuery>(), It.IsAny<CancellationToken>()),
                Times.Once
           );
      }

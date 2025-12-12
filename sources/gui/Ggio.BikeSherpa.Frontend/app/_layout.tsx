@@ -19,7 +19,7 @@ function AppStack() {
     useEffect(() => {
         userService.setCurrentUser(user);
         authService.setCredentialMethod(getCredentials);
-    }, [userService, user, getCredentials]);
+    }, [userService, authService, user, getCredentials]);
 
     return (
         <Stack>

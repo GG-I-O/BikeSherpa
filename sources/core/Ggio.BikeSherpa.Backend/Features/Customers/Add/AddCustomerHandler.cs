@@ -7,7 +7,7 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Add;
 
-public record AddClientCommand(
+public record AddCustomerCommand(
      string Name,
      string Code,
      string? Siret,
@@ -16,9 +16,9 @@ public record AddClientCommand(
      Address Address
 ) : ICommand<Result<Guid>>;
 
-public class AddClientCommandValidator : AbstractValidator<AddClientCommand>
+public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
 {
-     public AddClientCommandValidator()
+     public AddCustomerCommandValidator()
      {
           RuleFor(x => x.Name).NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
@@ -29,15 +29,15 @@ public class AddClientCommandValidator : AbstractValidator<AddClientCommand>
 }
 
 public class AddCustomerHandler(
-     IClientFactory factory,
-     IValidator<AddClientCommand> validator,
-     IApplicationTransaction transaction)  : ICommandHandler<AddClientCommand, Result<Guid>>
+     ICustomerFactory factory,
+     IValidator<AddCustomerCommand> validator,
+     IApplicationTransaction transaction)  : ICommandHandler<AddCustomerCommand, Result<Guid>>
 {
-     public async ValueTask<Result<Guid>> Handle(AddClientCommand command, CancellationToken cancellationToken)
+     public async ValueTask<Result<Guid>> Handle(AddCustomerCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
-          var client = await factory.CreateClientAsync(command.Name, command.Code, command.Siret, command.Email, command.PhoneNumber, command.Address);
+          var customer = await factory.CreateCustomerAsync(command.Name, command.Code, command.Siret, command.Email, command.PhoneNumber, command.Address);
           await transaction.CommitAsync(cancellationToken);
-          return Result.Created(client.Id);
+          return Result.Created(customer.Id);
      }
 }

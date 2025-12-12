@@ -1,5 +1,4 @@
-﻿using System.Net;
-using FastEndpoints;
+﻿using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Mediator;
@@ -19,7 +18,7 @@ public class GetAllCustomersEndpoint(IMediator mediator, ICustomerLinks customer
      public override async Task HandleAsync(CancellationToken ct)
      {
           var lastSync = Query<string?>("lastSync", isRequired: false);
-          var query = new GetAllClientsQuery(String.IsNullOrEmpty(lastSync) ? null : DateTimeOffset.Parse(lastSync));
+          var query = new GetAllCustomersQuery(String.IsNullOrEmpty(lastSync) ? null : DateTimeOffset.Parse(lastSync));
           var customers = await mediator.Send(query, ct);
           var customerDtoList = new List<CustomerDto>();
           foreach (var customer in customers)

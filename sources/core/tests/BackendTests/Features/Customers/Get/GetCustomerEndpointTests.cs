@@ -9,32 +9,27 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace BackendTests.Features.Clients.Get;
+namespace BackendTests.Features.Customers.Get;
 
 public class GetCustomerEndpointTests
 {
      private readonly Mock<IMediator> _mockMediator = new();
      private readonly Mock<IHateoasService> _mockHateoasService = new();
      
-     private readonly CustomerCrud _mockCustomer;
-
-     public GetCustomerEndpointTests()
-     {
-          _mockCustomer = CustomerTestHelper.CreateCustomerCrud(
-               Guid.NewGuid(),
-               "Client A",
-               "AAA",
-               null,
-               "a@g.com",
-               "0123456789",
-               new Address
-               {
-                    name = "Client A",
-                    streetInfo = "123 rue des roses",
-                    postcode = "12502",
-                    city = "Obiwan"
-               });
-     }
+     private readonly CustomerCrud _mockCustomer = CustomerTestHelper.CreateCustomerCrud(
+          Guid.NewGuid(),
+          "Client A",
+          "AAA",
+          null,
+          "a@g.com",
+          "0123456789",
+          new Address
+          {
+               name = "Client A",
+               streetInfo = "123 rue des roses",
+               postcode = "12502",
+               city = "Obi-wan"
+          });
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenClientExists()
@@ -106,5 +101,5 @@ public class GetCustomerEndpointTests
 
 internal class RoutingFeature : IRoutingFeature
 {
-     public RouteData RouteData { get; set; } = new();
+     public RouteData? RouteData { get; set; } = new();
 }

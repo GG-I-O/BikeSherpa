@@ -6,32 +6,27 @@ using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.DddCore;
 using Moq;
 
-namespace BackendTests.Features.Clients.Get;
+namespace BackendTests.Features.Customers.Get;
 
 public class GetCustomerHandlerTests
 {
      private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
 
-     private readonly Customer _mockCustomer;
+     private readonly Customer _mockCustomer = CustomerTestHelper.CreateCustomer(
+          Guid.NewGuid(),
+          "Client A",
+          "AAA",
+          null,
+          "a@g.com",
+          "0123456789",
+          new Address
+          {
+               name = "Client A",
+               streetInfo = "123 rue des roses",
+               postcode = "12502",
+               city = "Obi-wan"
+          });
 
-     public GetCustomerHandlerTests()
-     {
-          _mockCustomer = CustomerTestHelper.CreateCustomer(
-               Guid.NewGuid(),
-               "Client A",
-               "AAA",
-               null,
-               "a@g.com",
-               "0123456789",
-               new Address
-               {
-                    name = "Client A",
-                    streetInfo = "123 rue des roses",
-                    postcode = "12502",
-                    city = "Obiwan"
-               });
-     }
-     
 
      [Fact]
      public async Task Handle_ShouldReturnOneCustomer_WhenCustomerExists()
@@ -76,7 +71,7 @@ public class GetCustomerHandlerTests
      {
           _mockRepository
                .Setup(repo => repo.FirstOrDefaultAsync(
-                    It.Is<ISpecification<Customer>>(s => s is ClientByIdSpecification && existingCustomer != null && s.IsSatisfiedBy(existingCustomer)), 
+                    It.Is<ISpecification<Customer>>(s => s is CustomerByIdSpecification && existingCustomer != null && s.IsSatisfiedBy(existingCustomer)), 
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(existingCustomer);
           return new GetCustomerHandler(_mockRepository.Object);

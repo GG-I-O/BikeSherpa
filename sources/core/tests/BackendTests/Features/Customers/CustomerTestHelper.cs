@@ -2,7 +2,7 @@
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 
-namespace BackendTests.Features.Clients;
+namespace BackendTests.Features.Customers;
 
 public static class CustomerTestHelper
 {

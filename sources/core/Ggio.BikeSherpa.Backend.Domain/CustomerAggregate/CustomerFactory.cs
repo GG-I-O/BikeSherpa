@@ -3,9 +3,9 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 
-public interface IClientFactory
+public interface ICustomerFactory
 {
-     Task<Customer> CreateClientAsync(
+     Task<Customer> CreateCustomerAsync(
           string name,
           string code,
           string? siret,
@@ -15,11 +15,11 @@ public interface IClientFactory
      );
 }
 
-public class ClientFactory(IMediator mediator) : FactoryBase(mediator), IClientFactory
+public class CustomerFactory(IMediator mediator) : FactoryBase(mediator), ICustomerFactory
 {
-     public async Task<Customer> CreateClientAsync(string name, string code, string? siret, string email, string phoneNumber, Address address)
+     public async Task<Customer> CreateCustomerAsync(string name, string code, string? siret, string email, string phoneNumber, Address address)
      {
-          var client = new Customer
+          var customer = new Customer
           {
                Name = name,
                Code = code,
@@ -29,7 +29,7 @@ public class ClientFactory(IMediator mediator) : FactoryBase(mediator), IClientF
                Address = address
           };
 
-          await NotifyNewEntityAdded(client);
-          return client;
+          await NotifyNewEntityAdded(customer);
+          return customer;
      }
 }

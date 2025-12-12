@@ -12,7 +12,7 @@ public class GetCustomerHandler(IReadRepository<Customer> clientRepository): IQu
 {
      public async ValueTask<CustomerCrud?> Handle(GetClientQuery query, CancellationToken ct)
      {
-          var entity = await clientRepository.FirstOrDefaultAsync(new ClientByIdSpecification(query.Id), ct);
+          var entity = await clientRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(query.Id), ct);
           return entity?.ToFacet<CustomerCrud>();
      }
 }

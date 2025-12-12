@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Ggio.BikeSherpa.Backend.Domain;
@@ -47,7 +47,7 @@ builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<Ba
 
 // Injection
 builder.Services.ConfigureCourseFeature();
-builder.Services.ConfigureClientFeature();
+builder.Services.ConfigureCustomerFeature();
 builder.Services.AddBackendDomain();
 
 // Notification

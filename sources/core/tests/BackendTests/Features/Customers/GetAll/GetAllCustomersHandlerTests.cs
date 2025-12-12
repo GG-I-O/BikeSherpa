@@ -4,49 +4,42 @@ using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 using Ggio.DddCore;
 using Moq;
 
-namespace BackendTests.Features.Clients.GetAll;
+namespace BackendTests.Features.Customers.GetAll;
 
 public class GetAllCustomersHandlerTests
 {
      private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
 
-     private readonly Customer _mockCustomerA;
-     private readonly Customer _mockCustomerB;
-
-     public GetAllCustomersHandlerTests()
-     {
-          _mockCustomerA = CustomerTestHelper.CreateCustomer(
-               Guid.NewGuid(),
-               "Client A",
-               "AAA",
-               null,
-               "a@g.com",
-               "0123456789",
-               new Address
-               {
-                    name = "Client A",
-                    streetInfo = "123 rue des roses",
-                    postcode = "12502",
-                    city = "Obiwan"
-               }
-          );
-
-          _mockCustomerB = CustomerTestHelper.CreateCustomer(
-               Guid.NewGuid(),
-               "Client B",
-               "BBB",
-               null,
-               "b@h.com",
-               "9876543210",
-               new Address
-               {
-                    name = "Client B",
-                    streetInfo = "321 rue des hortensias",
-                    postcode = "78458",
-                    city = "Anakin"
-               }
-          );
-     }
+     private readonly Customer _mockCustomerA = CustomerTestHelper.CreateCustomer(
+          Guid.NewGuid(),
+          "Client A",
+          "AAA",
+          null,
+          "a@g.com",
+          "0123456789",
+          new Address
+          {
+               name = "Client A",
+               streetInfo = "123 rue des roses",
+               postcode = "12502",
+               city = "Obi-wan"
+          }
+     );
+     private readonly Customer _mockCustomerB = CustomerTestHelper.CreateCustomer(
+          Guid.NewGuid(),
+          "Client B",
+          "BBB",
+          null,
+          "b@h.com",
+          "9876543210",
+          new Address
+          {
+               name = "Client B",
+               streetInfo = "321 rue des Hortensia",
+               postcode = "78458",
+               city = "Anakin"
+          }
+     );
 
      [Fact]
      public async Task Handle_ShouldReturnAllCustomers_WhenCustomersExist()
@@ -59,7 +52,7 @@ public class GetAllCustomersHandlerTests
           };
 
           var sut = CreateSut(customers);
-          var query = new GetAllClientsQuery(null);
+          var query = new GetAllCustomersQuery(null);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -77,7 +70,7 @@ public class GetAllCustomersHandlerTests
      {
           // Arrange
           var sut = CreateSut(new List<Customer>());
-          var query = new GetAllClientsQuery(null);
+          var query = new GetAllCustomersQuery(null);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);

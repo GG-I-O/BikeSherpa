@@ -18,5 +18,4 @@ export default class Customer extends InputCustomer implements Storable, Hateoas
         this.id = Crypto.randomUUID();
         this.links = [];
     }
-    
 };

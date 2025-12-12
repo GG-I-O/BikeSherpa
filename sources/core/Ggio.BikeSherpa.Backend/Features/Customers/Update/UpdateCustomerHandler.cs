@@ -40,7 +40,7 @@ public class UpdateCustomerHandler(
      public async ValueTask<Result<Guid>> Handle(UpdateClientCommand command, CancellationToken ct)
      {
           await validator.ValidateAndThrowAsync(command, ct);
-          var entity = await repository.FirstOrDefaultAsync(new ClientByIdSpecification(command.Id), ct);
+          var entity = await repository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.Id), ct);
           if (entity is null)
                return Result.NotFound();
           entity.Name = command.Name;

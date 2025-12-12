@@ -11,7 +11,7 @@ public static class Bootstrap
           public IServiceCollection AddBackendDomain()
           {
                services.AddCourseAggregate();
-               services.AddClientAggregate();
+               services.AddCustomerAggregate();
                return services;
           }
      }

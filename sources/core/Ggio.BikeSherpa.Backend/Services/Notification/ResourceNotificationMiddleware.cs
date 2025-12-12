@@ -81,7 +81,7 @@ public class ResourceNotificationMiddleware(RequestDelegate next)
           }
           catch (Exception ex)
           {
-               Console.WriteLine("Error while notifying resource change :", ex);
+               Console.WriteLine("Error while notifying resource change : ${0}", ex.Message);
           }
      }
 }
