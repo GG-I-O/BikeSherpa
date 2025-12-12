@@ -22,6 +22,7 @@ public class ResourceNotificationHub: Hub
      public async Task SubscribeToDataType(string dataType)
      {
           await Groups.AddToGroupAsync(Context.ConnectionId, dataType);
+          //TODO ajouter log Debug
           Console.WriteLine("Client {0} subscribed to {1}", Context.ConnectionId, dataType);
      }
 

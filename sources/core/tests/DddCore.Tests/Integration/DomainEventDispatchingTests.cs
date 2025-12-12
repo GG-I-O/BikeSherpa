@@ -15,7 +15,7 @@ public class DomainEventDispatchingTests(MediatorTestFixture fixture) : IClassFi
           var serviceCollection = fixture.GetServiceCollection();
           
           serviceCollection.AddDddDbContext<TestDbContext>((_, option) => option.UseInMemoryDatabase("test"));
-          serviceCollection.AddInfrastructureServices();
+          serviceCollection.AddDddInfrastructureServices();
           
           serviceCollection.AddLogging();
 

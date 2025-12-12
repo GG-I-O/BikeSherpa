@@ -1,9 +1,8 @@
 ﻿using Mediator;
-using Microsoft.Extensions.Logging;
 
 namespace Ggio.DddCore;
 
-public class MediatorDomainEventDispatcher(IMediator mediator, ILogger<MediatorDomainEventDispatcher> logger) : IDomainEventDispatcher
+public class MediatorDomainEventDispatcher(IMediator mediator) : IDomainEventDispatcher
 {
      public async Task DispatchEventsAsync(IEnumerable<IHasDomainEvents> entitiesWithEvents)
      {
@@ -17,27 +16,16 @@ public class MediatorDomainEventDispatcher(IMediator mediator, ILogger<MediatorD
 
      private async Task DispatchInternal(IEnumerable<IHasDomainEvents> entitiesWithEvents, bool clearEvents = true)
      {
-
           foreach (var entity in entitiesWithEvents)
           {
-               if (entity is { } hasDomainEvents)
+               var events = entity.DomainEvents.ToArray();
+               if (clearEvents)
                {
-                    var events = hasDomainEvents.DomainEvents.ToArray();
-                    if (clearEvents)
-                    {
-                         hasDomainEvents.ClearDomainEvents();
-                    }
+                    entity.ClearDomainEvents();
+               }
 
-                    foreach (var domainEvent in events)
-                         await mediator.Publish(domainEvent).ConfigureAwait(false);
-               }
-               else
-               {
-                    logger.LogError(
-                         "Entity of type {EntityType} does not inherit from {BaseType}. Unable to clear domain events.",
-                         entity.GetType().Name,
-                         nameof(IHasDomainEvents));
-               }
+               foreach (var domainEvent in events)
+                    await mediator.Publish(domainEvent).ConfigureAwait(false);
           }
      }
 }

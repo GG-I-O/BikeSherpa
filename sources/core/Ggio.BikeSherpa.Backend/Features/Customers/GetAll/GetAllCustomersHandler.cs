@@ -10,11 +10,11 @@ public record GetAllCustomersQuery(DateTimeOffset? lastSync): IQuery<List<Custom
 
 public class GetAllCustomersHandler(IReadRepository<Customer> repository): IQueryHandler<GetAllCustomersQuery, List<CustomerCrud>>
 {
-     public async ValueTask<List<CustomerCrud>> Handle(GetAllCustomersQuery query, CancellationToken ct)
+     public async ValueTask<List<CustomerCrud>> Handle(GetAllCustomersQuery query, CancellationToken cancellationToken)
      {
           var allCustomers = query.lastSync is null ?
-               (await repository.ListAsync(ct)).SelectFacets<CustomerCrud>() :
-               (await repository.ListAsync(new ClientByUpdatedAtSpecification((DateTimeOffset)query.lastSync) ,ct)).SelectFacets<CustomerCrud>();
+               (await repository.ListAsync(cancellationToken)).SelectFacets<Customer, CustomerCrud>() :
+               (await repository.ListAsync(new ClientByUpdatedAtSpecification(query.lastSync!.Value) ,cancellationToken)).SelectFacets<Customer, CustomerCrud>();
           return allCustomers.ToList();
      }
 }

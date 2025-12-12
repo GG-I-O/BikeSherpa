@@ -43,7 +43,7 @@ public class GetCustomerHandlerTests
           var result = await sut.Handle(query, CancellationToken.None);
           
           // Assert
-          Assert.NotNull(result);
+          Assert.NotNull(result);//CACA
           Assert.Equal(guid, result.Id);
           Assert.Equal("Client A", result.Name);
           VerifyRepositoryCalledOnce();

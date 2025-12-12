@@ -1,10 +1,9 @@
-﻿using Facet.Extensions;
+﻿using AutoFixture;
+using AwesomeAssertions;
 using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Domain;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
-using Ggio.BikeSherpa.Backend.Services.Hateoas;
+using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -16,37 +15,23 @@ namespace BackendTests.Features.Customers.Get;
 public class GetCustomerEndpointTests
 {
      private readonly Mock<IMediator> _mockMediator = new();
-     private readonly Mock<IHateoasService> _mockHateoasService = new();
-     
-     private readonly CustomerCrud _mockCustomer = new Customer
-     {
-          Id = Guid.NewGuid(),
-          Name = "Client A",
-          Code = "AAA",
-          Siret = null,
-          Email = "a@g.com",
-          PhoneNumber = "0123456789",
-          Address = new Address
-          {
-               name = "Client A",
-               streetInfo = "123 rue des roses",
-               postcode = "12502",
-               city = "Obi-wan"
-          }
-     }.ToFacet<Customer, CustomerCrud>();
+     private readonly Mock<ICustomerLinks> _mockCustomerLinks = new();
+     private readonly Fixture _fixture = new();
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenClientExists()
      {
           // Arrange
-          var sut = CreateSut(_mockCustomer);
-          
+          var expectedCustomer = _fixture.Create<CustomerCrud>();
+          var sut = CreateSut(expectedCustomer);
+
           // Act
           await sut.HandleAsync(CancellationToken.None);
-          
+
           // Assert
           VerifyMediatorCalledOnce();
-          Assert.Equal(StatusCodes.Status200OK, sut.HttpContext.Response.StatusCode);
+          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+          sut.Response.Should().BeEquivalentTo(expectedCustomer);
      }
 
      [Fact]
@@ -54,15 +39,15 @@ public class GetCustomerEndpointTests
      {
           // Arrange
           var sut = CreateSut(null);
-          
+
           // Act
           await sut.HandleAsync(CancellationToken.None);
-          
+
           // Assert
           VerifyMediatorCalledOnce();
           Assert.Equal(StatusCodes.Status404NotFound, sut.HttpContext.Response.StatusCode);
      }
-          
+
      private GetCustomerEndpoint CreateSut(CustomerCrud? existingClient)
      {
           var id = existingClient?.Id ?? Guid.NewGuid();
@@ -71,11 +56,11 @@ public class GetCustomerEndpointTests
                     It.IsAny<GetClientQuery>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(existingClient);
-          
+
           Factory.RegisterTestServices(s =>
           {
                s.AddSingleton(_mockMediator.Object);
-               s.AddSingleton(_mockHateoasService.Object);
+               s.AddSingleton(_mockCustomerLinks.Object);
           });
 
           var endpoint = Factory.Create<GetCustomerEndpoint>(
@@ -86,17 +71,17 @@ public class GetCustomerEndpointTests
                     ctx.Request.QueryString = new QueryString($"?customerId={id}");
                },
                _mockMediator.Object,
-               _mockHateoasService.Object
+               _mockCustomerLinks.Object
           );
 
           return endpoint;
      }
-          
+
      private void VerifyMediatorCalledOnce()
      {
           _mockMediator.Verify(
                m => m.Send(
-                    It.IsAny<GetClientQuery>(), 
+                    It.IsAny<GetClientQuery>(),
                     It.IsAny<CancellationToken>()),
                Times.Once
           );

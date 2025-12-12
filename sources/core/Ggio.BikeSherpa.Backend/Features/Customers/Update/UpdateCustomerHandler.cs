@@ -37,19 +37,19 @@ public class UpdateCustomerHandler(
      IApplicationTransaction transaction
 ) : ICommandHandler<UpdateClientCommand, Result<Guid>>
 {
-     public async ValueTask<Result<Guid>> Handle(UpdateClientCommand command, CancellationToken ct)
+     public async ValueTask<Result<Guid>> Handle(UpdateClientCommand command, CancellationToken cancellationToken)
      {
-          await validator.ValidateAndThrowAsync(command, ct);
-          var entity = await repository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.Id), ct);
+          await validator.ValidateAndThrowAsync(command, cancellationToken);
+          var entity = await repository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.Id), cancellationToken);
           if (entity is null)
                return Result.NotFound();
           entity.Name = command.Name;
-          // entity.Code = command.Code;
+          entity.Code = command.Code;
           entity.Siret = command.Siret;
           entity.Email = command.Email;
           entity.PhoneNumber = command.PhoneNumber;
           entity.Address = command.Address;
-          await transaction.CommitAsync(ct);
+          await transaction.CommitAsync(cancellationToken);
           return Result.Success(command.Id);
      }
 }

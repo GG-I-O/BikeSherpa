@@ -36,14 +36,8 @@ builder.Services.AddFastEndpoints()
           options.ShortSchemaNames = true;
      });
 
-// Add connection to the database
-var connectionString = builder.Configuration["ConnectionString"];
-builder.Services.AddDddDbContext<BackendDbContext>((_, options) =>
-     options.UseNpgsql(connectionString)
-          .AddInterceptors(new DateInterceptor())
-);
-
-builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<BackendDbContext>());
+// Backend infrastructure layer dependencies
+builder.Services.AddBackendInfrastructure(builder.Configuration);
 
 // Injection
 builder.Services.ConfigureCourseFeature();
@@ -62,7 +56,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IHateoasService, HateoasService>();
 
 // Add DDD infrastructure services
-builder.Services.AddInfrastructureServices();
+builder.Services.AddDddInfrastructureServices();
 
 // Add Mediator for domain event dispatching
 builder.Services.AddMediator(options =>

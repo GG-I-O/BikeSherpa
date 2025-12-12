@@ -14,7 +14,7 @@ public class AddDomainEntityTests(MediatorTestFixture fixture) : IClassFixture<M
           // Arrange
           var serviceCollection = fixture.GetServiceCollection();
           serviceCollection.AddDddDbContext<TestDbContext>((_, option) => option.UseInMemoryDatabase(Guid.NewGuid().ToString()));
-          serviceCollection.AddInfrastructureServices();
+          serviceCollection.AddDddInfrastructureServices();
           serviceCollection.AddLogging();
          
           var serviceScope = serviceCollection.BuildServiceProvider().CreateScope();
