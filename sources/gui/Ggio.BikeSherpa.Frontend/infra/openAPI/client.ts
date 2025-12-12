@@ -24,30 +24,23 @@ const Link = z.object({
   rel: z.string(),
   method: z.string(),
 });
-const GuidWithHateoas = z.object({
-  id: z.string(),
-  links: z.array(Link).nullable(),
-});
-const AddResultOfGuidWithHateoas = z.object({ id: GuidWithHateoas.nullable() });
 const CustomerDto = z.object({
   data: CustomerCrud,
   links: z.array(Link).nullable(),
 });
+const AddResultOfGuid = z.object({ id: z.string() });
 const CourseCrud = z.object({
   startDate: z.string().datetime({ offset: true }),
   id: z.string(),
 });
-const AddResultOfGuid = z.object({ id: z.string() });
 
 export const schemas = {
   Address,
   CustomerCrud,
   Link,
-  GuidWithHateoas,
-  AddResultOfGuidWithHateoas,
   CustomerDto,
-  CourseCrud,
   AddResultOfGuid,
+  CourseCrud,
 };
 
 const endpoints = makeApi([
@@ -134,7 +127,7 @@ const endpoints = makeApi([
         schema: CustomerCrud,
       },
     ],
-    response: AddResultOfGuidWithHateoas,
+    response: z.object({ id: z.string() }),
     errors: [
       {
         status: 401,
@@ -165,7 +158,7 @@ const endpoints = makeApi([
         schema: z.string(),
       },
     ],
-    response: AddResultOfGuidWithHateoas,
+    response: z.void(),
     errors: [
       {
         status: 401,

@@ -1,5 +1,4 @@
 import { Address } from "@/models/Address";
-import CustomerOptions from "./CustomerOptions";
 
 export default class InputCustomer {
     public name: string;

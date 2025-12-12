@@ -12,7 +12,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest --watchAll=false",
-    "openAPI": "openapi-zod-client \"http://192.168.11.89:5287/swagger/v1/swagger.json\" -o \"./infra/openAPI/client.ts\" --implicit-required"
+    "openAPI:web": "openapi-zod-client \"https://192.168.11.89:5287/swagger/v1/swagger.json\" -o \"./infra/openAPI/client.ts\" --implicit-required",
+    "openAPI:file": "openapi-zod-client \"./infra/openAPI/swagger.json\" -o \"./infra/openAPI/client.ts\" --implicit-required"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

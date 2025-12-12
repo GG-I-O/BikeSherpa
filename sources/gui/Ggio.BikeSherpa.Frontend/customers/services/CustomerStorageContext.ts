@@ -5,7 +5,7 @@ import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifier
 import { ILogger } from "@/spi/LogsSPI";
 import AbstractStorageContext from "@/infra/storage/AbstractStorageContext";
 import { INotificationService } from "@/spi/StorageSPI";
-import { createApiClient } from "@/infra/openAPI/client";
+import { createApiClient, schemas } from "@/infra/openAPI/client";
 import axios from "axios";
 
 @injectable()
@@ -55,17 +55,12 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
     protected async create(item: Customer): Promise<Customer> {
         try {
-            const link = this.getLinkHref(item.id, "create");
-            if (!link)
-                throw new Error(`Cannot create a customer`);
+            const customer = schemas.CustomerCrud.parse(item);
 
-            const response = await axios.post(link);
-            if (response.status !== 201)
-                throw new Error("Could not create the customer");
-
+            const response = await this.apiClient.AddCustomerEndpoint(customer);
+            
             // Synchronize with the item created at back-end
-            const data = await response.data;
-            return await this.getItem(data.id) ?? item;
+            return await this.getItem(response.id) ?? item;
         } catch (e) {
             this.logger.error('Post error:', e);
             throw e; // Throw to legendapp
