@@ -12,20 +12,22 @@ public class GetCustomerHandlerTests
 {
      private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
 
-     private readonly Customer _mockCustomer = CustomerTestHelper.CreateCustomer(
-          Guid.NewGuid(),
-          "Client A",
-          "AAA",
-          null,
-          "a@g.com",
-          "0123456789",
-          new Address
+     private readonly Customer _mockCustomer = new()
+     {
+          Id = Guid.NewGuid(),
+          Name = "Client A",
+          Code = "AAA",
+          Siret = null,
+          Email = "a@g.com",
+          PhoneNumber = "0123456789",
+          Address = new Address
           {
                name = "Client A",
                streetInfo = "123 rue des roses",
                postcode = "12502",
                city = "Obi-wan"
-          });
+          }
+     };
 
 
      [Fact]

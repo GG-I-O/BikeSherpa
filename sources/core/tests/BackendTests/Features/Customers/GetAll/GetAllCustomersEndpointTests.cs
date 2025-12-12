@@ -1,5 +1,7 @@
-﻿using FastEndpoints;
+﻿using Facet.Extensions;
+using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Domain;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
@@ -15,34 +17,38 @@ public class GetAllCustomersEndpointTests
      private readonly Mock<IMediator> _mockMediator = new();
      private readonly Mock<IHateoasService> _mockHateoasService = new();
      
-     private readonly CustomerCrud _mockCustomerA = CustomerTestHelper.CreateCustomerCrud(
-          Guid.NewGuid(),
-          "Client A",
-          "AAA",
-          null,
-          "a@g.com",
-          "0123456789",
-          new Address
+     private readonly CustomerCrud _mockCustomerA = new Customer
+     {
+          Id = Guid.NewGuid(),
+          Name = "Client A",
+          Code = "AAA",
+          Siret = null,
+          Email = "a@g.com",
+          PhoneNumber = "0123456789",
+          Address = new Address
           {
                name = "Client A",
                streetInfo = "123 rue des roses",
                postcode = "12502",
                city = "Obi-wan"
-          });
-     private readonly CustomerCrud _mockCustomerB = CustomerTestHelper.CreateCustomerCrud(
-          Guid.NewGuid(),
-          "Client B",
-          "BBB",
-          null,
-          "b@h.com",
-          "9876543210",
-          new Address
+          }
+     }.ToFacet<Customer, CustomerCrud>();
+     private readonly CustomerCrud _mockCustomerB = new Customer
+     {
+          Id = Guid.NewGuid(),
+          Name = "Client B",
+          Code = "BBB",
+          Siret = null,
+          Email = "b@h.com",
+          PhoneNumber = "9876543210",
+          Address = new Address
           {
                name = "Client B",
                streetInfo = "321 rue des roses",
                postcode = "54855",
                city = "Anakin"
-          });
+          }
+     }.ToFacet<Customer, CustomerCrud>();
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenCustomersExist()

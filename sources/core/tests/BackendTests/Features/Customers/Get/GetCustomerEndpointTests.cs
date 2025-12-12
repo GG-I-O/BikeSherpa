@@ -1,5 +1,7 @@
-﻿using FastEndpoints;
+﻿using Facet.Extensions;
+using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Domain;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
@@ -16,21 +18,22 @@ public class GetCustomerEndpointTests
      private readonly Mock<IMediator> _mockMediator = new();
      private readonly Mock<IHateoasService> _mockHateoasService = new();
      
-     
-     private readonly CustomerCrud _mockCustomer = CustomerTestHelper.CreateCustomerCrud(
-          Guid.NewGuid(),
-          "Client A",
-          "AAA",
-          null,
-          "a@g.com",
-          "0123456789",
-          new Address
+     private readonly CustomerCrud _mockCustomer = new Customer
+     {
+          Id = Guid.NewGuid(),
+          Name = "Client A",
+          Code = "AAA",
+          Siret = null,
+          Email = "a@g.com",
+          PhoneNumber = "0123456789",
+          Address = new Address
           {
                name = "Client A",
                streetInfo = "123 rue des roses",
                postcode = "12502",
                city = "Obi-wan"
-          });
+          }
+     }.ToFacet<Customer, CustomerCrud>();
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenClientExists()

@@ -10,36 +10,38 @@ public class GetAllCustomersHandlerTests
 {
      private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
 
-     private readonly Customer _mockCustomerA = CustomerTestHelper.CreateCustomer(
-          Guid.NewGuid(),
-          "Client A",
-          "AAA",
-          null,
-          "a@g.com",
-          "0123456789",
-          new Address
+     private readonly Customer _mockCustomerA = new()
+     {
+          Id = Guid.NewGuid(),
+          Name = "Client A",
+          Code = "AAA",
+          Siret = null,
+          Email = "a@g.com",
+          PhoneNumber = "0123456789",
+          Address = new Address
           {
                name = "Client A",
                streetInfo = "123 rue des roses",
                postcode = "12502",
                city = "Obi-wan"
           }
-     );
-     private readonly Customer _mockCustomerB = CustomerTestHelper.CreateCustomer(
-          Guid.NewGuid(),
-          "Client B",
-          "BBB",
-          null,
-          "b@h.com",
-          "9876543210",
-          new Address
+     };
+     private readonly Customer _mockCustomerB = new ()
+     {
+          Id = Guid.NewGuid(),
+          Name = "Client B",
+          Code = "BBB",
+          Siret = null,
+          Email = "b@h.com",
+          PhoneNumber = "9876543210",
+          Address = new Address
           {
                name = "Client B",
-               streetInfo = "321 rue des Hortensia",
-               postcode = "78458",
+               streetInfo = "321 rue des roses",
+               postcode = "54855",
                city = "Anakin"
           }
-     );
+     };
 
      [Fact]
      public async Task Handle_ShouldReturnAllCustomers_WhenCustomersExist()
