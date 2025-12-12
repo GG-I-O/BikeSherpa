@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Serilog;
 
 namespace Ggio.BikeSherpa.Backend.Services.Notification;
 
-public class ResourceNotificationHub: Hub
+public class ResourceNotificationHub(ILogger logger): Hub
 {
      public async Task BroadcastResourceChange(ResourceNotification notification)
      {
@@ -22,13 +23,12 @@ public class ResourceNotificationHub: Hub
      public async Task SubscribeToDataType(string dataType)
      {
           await Groups.AddToGroupAsync(Context.ConnectionId, dataType);
-          //TODO ajouter log Debug
-          Console.WriteLine("Client {0} subscribed to {1}", Context.ConnectionId, dataType);
+          logger.Debug("Client {0} subscribed to {1}", Context.ConnectionId, dataType);
      }
 
      public async Task UnsubscribeFromDataType(string dataType)
      {
           await Groups.RemoveFromGroupAsync(Context.ConnectionId, dataType);
-          Console.WriteLine("Client {0} unsubscribed from {1}", Context.ConnectionId, dataType);
+          logger.Debug("Client {0} unsubscribed from {1}", Context.ConnectionId, dataType);
      }
 }

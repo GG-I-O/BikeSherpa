@@ -1,9 +1,9 @@
-﻿using Facet.Extensions;
+﻿using AutoFixture;
+using AwesomeAssertions;
 using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Domain;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
+using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Mediator;
 using Microsoft.AspNetCore.Http;
@@ -15,58 +15,24 @@ namespace BackendTests.Features.Customers.GetAll;
 public class GetAllCustomersEndpointTests
 {
      private readonly Mock<IMediator> _mockMediator = new();
-     private readonly Mock<IHateoasService> _mockHateoasService = new();
-     
-     private readonly CustomerCrud _mockCustomerA = new Customer
-     {
-          Id = Guid.NewGuid(),
-          Name = "Client A",
-          Code = "AAA",
-          Siret = null,
-          Email = "a@g.com",
-          PhoneNumber = "0123456789",
-          Address = new Address
-          {
-               name = "Client A",
-               streetInfo = "123 rue des roses",
-               postcode = "12502",
-               city = "Obi-wan"
-          }
-     }.ToFacet<Customer, CustomerCrud>();
-     private readonly CustomerCrud _mockCustomerB = new Customer
-     {
-          Id = Guid.NewGuid(),
-          Name = "Client B",
-          Code = "BBB",
-          Siret = null,
-          Email = "b@h.com",
-          PhoneNumber = "9876543210",
-          Address = new Address
-          {
-               name = "Client B",
-               streetInfo = "321 rue des roses",
-               postcode = "54855",
-               city = "Anakin"
-          }
-     }.ToFacet<Customer, CustomerCrud>();
+     private readonly Mock<ICustomerLinks> _mockLinksService = new();
+     private readonly Fixture _fixture = new();
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenCustomersExist()
      {
           // Arrange
-          var customers = new List<CustomerCrud>
-          {
-               _mockCustomerA,
-               _mockCustomerB
-          };
-          var sut = CreateSut(customers);
+          var expectedCustomers = _fixture.Create<List<CustomerCrud>>();
+          var sut = CreateSut(expectedCustomers);
 
           // Act
           await sut.HandleAsync(CancellationToken.None);
 
           // Assert
           VerifyMediatorCalledOnce();
-          Assert.Equal(StatusCodes.Status200OK, sut.HttpContext.Response.StatusCode);
+          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+          sut.Response.Should().HaveCount(expectedCustomers.Count);
+          sut.Response.Select(x => x.Data).Should().BeEquivalentTo(expectedCustomers);
      }
 
      [Fact]
@@ -80,19 +46,22 @@ public class GetAllCustomersEndpointTests
 
           // Assert
           VerifyMediatorCalledOnce();
-          Assert.Equal(StatusCodes.Status200OK, sut.HttpContext.Response.StatusCode);
+          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+          sut.Response.Should().BeEmpty();
      }
 
      private GetAllCustomersEndpoint CreateSut(List<CustomerCrud> returnCustomers)
      {
           _mockMediator
-               .Setup(m => m.Send(It.IsAny<GetAllCustomersQuery>(), It.IsAny<CancellationToken>()))
+               .Setup(m => m.Send(
+                    It.IsAny<GetAllCustomersQuery>(),
+                    It.IsAny<CancellationToken>()))
                .ReturnsAsync(returnCustomers);
-          
+
           Factory.RegisterTestServices(s =>
           {
                s.AddSingleton(_mockMediator.Object);
-               s.AddSingleton(_mockHateoasService.Object);
+               s.AddSingleton(_mockLinksService.Object);
           });
 
           var endpoint = Factory.Create<GetAllCustomersEndpoint>(
@@ -102,7 +71,7 @@ public class GetAllCustomersEndpointTests
                     ctx.Request.Path = "/api/customers";
                },
                _mockMediator.Object,
-               _mockHateoasService.Object
+               _mockLinksService.Object
           );
 
           return endpoint;

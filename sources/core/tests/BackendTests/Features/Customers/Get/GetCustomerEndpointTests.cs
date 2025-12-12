@@ -6,7 +6,6 @@ using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Mediator;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -31,7 +30,7 @@ public class GetCustomerEndpointTests
           // Assert
           VerifyMediatorCalledOnce();
           sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-          sut.Response.Should().BeEquivalentTo(expectedCustomer);
+          sut.Response.Data.Should().BeEquivalentTo(expectedCustomer);
      }
 
      [Fact]
@@ -45,7 +44,8 @@ public class GetCustomerEndpointTests
 
           // Assert
           VerifyMediatorCalledOnce();
-          Assert.Equal(StatusCodes.Status404NotFound, sut.HttpContext.Response.StatusCode);
+          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status404NotFound);
+          sut.HttpContext.Response.Body.Length.Should().Be(0);
      }
 
      private GetCustomerEndpoint CreateSut(CustomerCrud? existingClient)
@@ -69,6 +69,8 @@ public class GetCustomerEndpointTests
                     ctx.Request.Method = "GET";
                     ctx.Request.Path = $"/api/customer/{id}";
                     ctx.Request.QueryString = new QueryString($"?customerId={id}");
+                    ctx.Request.RouteValues["customerId"] = id;
+                    ctx.Response.Body = new MemoryStream();
                },
                _mockMediator.Object,
                _mockCustomerLinks.Object
@@ -86,9 +88,4 @@ public class GetCustomerEndpointTests
                Times.Once
           );
      }
-}
-
-internal class RoutingFeature : IRoutingFeature
-{
-     public RouteData? RouteData { get; set; } = new();
 }

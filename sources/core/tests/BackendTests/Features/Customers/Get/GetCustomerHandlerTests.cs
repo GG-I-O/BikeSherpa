@@ -1,4 +1,5 @@
 ﻿using Ardalis.Specification;
+using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
@@ -29,7 +30,6 @@ public class GetCustomerHandlerTests
           }
      };
 
-
      [Fact]
      public async Task Handle_ShouldReturnOneCustomer_WhenCustomerExists()
      {
@@ -43,9 +43,11 @@ public class GetCustomerHandlerTests
           var result = await sut.Handle(query, CancellationToken.None);
           
           // Assert
-          Assert.NotNull(result);//CACA
-          Assert.Equal(guid, result.Id);
-          Assert.Equal("Client A", result.Name);
+          result.Should().NotBeNull();
+          result.Id.Should().Be(guid);
+          result.Name.Should().Be("Client A");
+          result.Code.Should().Be("AAA");
+          result.Address.streetInfo.Should().Be("123 rue des roses");
           VerifyRepositoryCalledOnce();
      }
      
@@ -65,7 +67,7 @@ public class GetCustomerHandlerTests
           var result = await sut.Handle(query, CancellationToken.None);
           
           // Assert
-          Assert.Null(result);
+          result.Should().BeNull();
           VerifyRepositoryCalledOnce();
      }
 
