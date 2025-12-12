@@ -51,7 +51,10 @@ builder.Services.ConfigureClientFeature();
 builder.Services.AddBackendDomain();
 
 // Notification
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(config =>
+{
+     config.EnableDetailedErrors = true;
+});
 builder.Services.AddScoped<IResourceNotificationService, ResourceNotificationService>();
 
 // Hateoas
@@ -127,18 +130,18 @@ builder.Services.AddAuth0ApiAuthentication(options =>
 builder.Host.UseSerilog((context, configuration) =>
 {
      configuration.ReadFrom.Configuration(context.Configuration);
-     configuration.WriteTo.Console();
-     configuration.WriteTo.GrafanaLoki(builder.Configuration["GrafanaLoki"] ?? "http://localhost:3100");
+     configuration.WriteTo.GrafanaLoki(builder.Configuration["GrafanaLoki"]!);
 });
 builder.Services.AddHttpLogging(o => { });
 
 var app = builder.Build();
 
-app.MapHub<ResourceNotificationHub>("/hubs/notifications");
-
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<ResourceNotificationHub>("/hubs/notifications");
+
 app.UseFastEndpoints(config =>
      {
           config.Endpoints.ShortNames = true;
