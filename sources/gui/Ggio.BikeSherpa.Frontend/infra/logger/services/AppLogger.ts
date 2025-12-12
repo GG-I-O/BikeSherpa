@@ -1,6 +1,6 @@
 import { consoleTransport, logger } from "react-native-logs";
 import { createLokiTransport } from "../options/LokiTransporter";
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { ILogger, ILoggerConfig } from "@/spi/LogsSPI";
 import { IUserService } from "@/spi/AuthSPI";
 import { inject, injectable } from "inversify";
@@ -11,8 +11,8 @@ export default class AppLogger implements ILogger {
     private userService: IUserService;
 
     public constructor(
-        @inject(ServicesIndentifiers.UserService) userService: IUserService,
-        @inject(ServicesIndentifiers.LoggerConfig) config: ILoggerConfig
+        @inject(ServicesIdentifiers.UserService) userService: IUserService,
+        @inject(ServicesIdentifiers.LoggerConfig) config: ILoggerConfig
     ) {
         this.userService = userService;
 

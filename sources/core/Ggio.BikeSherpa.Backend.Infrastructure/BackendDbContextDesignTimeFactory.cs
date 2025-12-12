@@ -2,7 +2,6 @@ using Ardalis.GuardClauses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Npgsql;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure;
 

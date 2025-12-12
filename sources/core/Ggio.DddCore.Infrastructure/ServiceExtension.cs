@@ -14,12 +14,12 @@ public static class ServiceExtension
                services.AddScoped<IApplicationTransaction, ApplicationTransaction<TDbContext>>();
 
                services.AddDbContext<TDbContext>(dbBuilder);
-               services.AddScoped<DbContext>(provider => provider.GetService<TDbContext>());
+               services.AddScoped<DbContext>(provider => provider.GetService<TDbContext>()!);
 
                return services;
           }
 
-          public IServiceCollection AddInfrastructureServices()
+          public IServiceCollection AddDddInfrastructureServices()
           {
                services.AddScoped(typeof(IReadRepository<>), typeof(EfCoreReadRepository<>))
                     .AddScoped<IApplicationTransactionContext, ApplicationTransactionContext>()

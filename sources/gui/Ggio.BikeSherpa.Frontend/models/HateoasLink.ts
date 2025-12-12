@@ -5,5 +5,5 @@ export type Link = {
 }
 
 export type HateoasLinks = {
-    links: Link[];  
+    links?: Link[];  
 };

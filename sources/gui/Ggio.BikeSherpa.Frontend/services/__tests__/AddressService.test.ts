@@ -1,4 +1,4 @@
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { IAddressService } from "@/spi/AddressSPI";
 import { ILogger } from "@/spi/LogsSPI";
 import { Container } from "inversify";
@@ -34,9 +34,9 @@ const mockLogger: jest.Mocked<ILogger> = {
     debug: jest.fn(),
     extend: jest.fn()
 };
-container.bind<ILogger>(ServicesIndentifiers.Logger).toConstantValue(mockLogger);
-container.bind<IAddressService>(ServicesIndentifiers.AddressService).to(AddressService);
-const addressService = container.get<IAddressService>(ServicesIndentifiers.AddressService);
+container.bind<ILogger>(ServicesIdentifiers.Logger).toConstantValue(mockLogger);
+container.bind<IAddressService>(ServicesIdentifiers.AddressService).to(AddressService);
+const addressService = container.get<IAddressService>(ServicesIdentifiers.AddressService);
 
 describe("AddressService.fetchAddress", () => {
     beforeEach(() => {

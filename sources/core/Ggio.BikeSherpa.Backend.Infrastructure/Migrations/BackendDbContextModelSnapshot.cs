@@ -22,19 +22,32 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.ClientAggregate.Client", b =>
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CourseAggregate.Course", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -48,26 +61,53 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Siret")
-                        .HasColumnType("text");
+                    b.Property<int?>("Siret")
+                        .HasColumnType("integer");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Clients");
-                });
-
-            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CourseAggregate.Course", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("StartDate")
+                    b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer", b =>
+                {
+                    b.OwnsOne("Ggio.BikeSherpa.Backend.Domain.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("CustomerId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("city")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("complement")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("name")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("postcode")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("streetInfo")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("CustomerId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CustomerId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

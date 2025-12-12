@@ -1,4 +1,4 @@
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { ILogger } from "@/spi/LogsSPI";
 import { INotificationService, IStorageContext } from "@/spi/StorageSPI";
 import { Observable, observable } from "@legendapp/state";
@@ -22,8 +22,8 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
     protected constructor(
         storeName: string,
-        @inject(ServicesIndentifiers.Logger) logger: ILogger,
-        @inject(ServicesIndentifiers.NotificationService) notificationService: INotificationService
+        @inject(ServicesIdentifiers.Logger) logger: ILogger,
+        @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService
     ) {
         this.logger = logger.extend(storeName);
         this.store = this.initStore(storeName);
@@ -40,6 +40,14 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
     private async initNetworkState() {
         const networkState = await Network.getNetworkStateAsync();
         if (networkState.isInternetReachable) {
+            if (this.notificationService) {
+                try {
+                    await this.notificationService.start(this.resourceName);
+                    this.logger.info('NotificationService started, enabling sync');
+                } catch (error) {
+                    this.logger.error('Failed to start NotificationService', error);
+                }
+            }
             if (this.notificationService) {
                 try {
                     await this.notificationService.start(this.resourceName);

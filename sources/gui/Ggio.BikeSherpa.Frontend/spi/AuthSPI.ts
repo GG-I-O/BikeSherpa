@@ -10,3 +10,8 @@ export interface IUserService {
     getUserProfile: () => User | null;
     setCurrentUser: (user: User | null) => void;
 }
+
+export interface IAuthService {
+    setCredentialMethod: (method: (params: any) => Promise<any>) => void;
+    getToken: () => Promise<string | null>;
+}

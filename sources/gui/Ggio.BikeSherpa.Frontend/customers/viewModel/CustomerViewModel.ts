@@ -2,24 +2,21 @@ import CustomerStorageContext from '../services/CustomerStorageContext';
 import { Observable } from '@legendapp/state';
 import * as Crypto from 'expo-crypto';
 import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
-import { ServicesIndentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
+import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
 import { ILogger } from '@/spi/LogsSPI';
 import Customer from '../models/Customer';
 import InputCustomer from '../models/InputCustomer';
-import { IStorageContext } from '@/spi/StorageSPI';
-
-
 
 class CustomerViewModel {
     private static instance: CustomerViewModel;
     private logger: ILogger;
     private storageContext: CustomerStorageContext;
-    private customerStore$: Observable<Record<string, Customer>>;
+    private readonly customerStore$: Observable<Record<string, Customer>>;
 
     private constructor() {
-        this.logger = IOCContainer.get<ILogger>(ServicesIndentifiers.Logger);
+        this.logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
         this.logger = this.logger.extend("Customer");
-        this.storageContext = IOCContainer.get(ServicesIndentifiers.CustomerStorage);
+        this.storageContext = IOCContainer.get(ServicesIdentifiers.CustomerStorage);
         this.customerStore$ = this.storageContext.getStore();
     }
 
@@ -69,39 +66,13 @@ class CustomerViewModel {
     };
 
     // Wrapper for EditCustomerForm
-    private updateCustomer(customer: Customer) {
+    public updateCustomer(customer: Customer) {
         try {
             this.customerStore$[customer.id].assign(customer);
         } catch (e) {
             this.logger.error("updateCustomer Error :", e);
         }
     };
-
-    /**
-     * @returns react-hook-form for updating an existing customer
-     */
-    // public getEditCustomerForm() {
-    //     const {
-    //         control,
-    //         handleSubmit,
-    //         formState: { errors },
-    //         setValue
-    //     } = useForm<Customer>({
-    //         defaultValues: {
-    //             id: '',
-    //             firstName: '',
-    //             lastName: '',
-    //             phoneNumber: ''
-    //         },
-    //         resolver: zodResolver(editCustomerSchema)
-    //     });
-
-    //     const onSubmit = (customer: Customer) => {
-    //         this.updateCustomer(customer);
-    //     };
-
-    //     return { control, handleSubmit: handleSubmit(onSubmit), errors, setValue }
-    // }
 }
 
 export default function useCustomerViewModel() {
