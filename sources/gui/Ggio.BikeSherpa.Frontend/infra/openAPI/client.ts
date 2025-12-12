@@ -9,12 +9,12 @@ const Address = z.object({
   city: z.string(),
 });
 const CustomerCrud = z.object({
-  name: z.string(),
-  code: z.string(),
-  siret: z.string().nullable(),
-  email: z.string(),
-  phoneNumber: z.string(),
-  address: Address,
+  name: z.string().nullable(),
+  code: z.string().nullable(),
+  siret: z.number().int().nullable(),
+  email: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
+  address: Address.nullable(),
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
   id: z.string(),

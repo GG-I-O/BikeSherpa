@@ -7,7 +7,7 @@ import { IAuthService } from '@/spi/AuthSPI';
 
 export default class Interceptors {
 
-    private logger: ILogger;
+    private readonly logger: ILogger;
 
     public constructor() {
         this.logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
