@@ -1,23 +1,24 @@
 import Customer from "@/customers/models/Customer";
 import CustomerStorageContext from "@/customers/services/CustomerStorageContext";
-// import { NotificationService } from "@/infra/storage/notification/NotificationService";
-// import AppLogger from "@/logs/services/AppLogger";
 import { ILogger, ILoggerConfig } from "@/spi/LogsSPI";
 import { INotificationService, IStorageContext } from "@/spi/StorageSPI";
 import { Platform } from "react-native";
 import { IOCContainer } from "./constants/IOCContainer";
 import { ServicesIdentifiers } from "./constants/ServicesIdentifiers";
-import { IUserService } from "@/spi/AuthSPI";
+import { IAuthService, IUserService } from "@/spi/AuthSPI";
 import { UserService } from "@/infra/auth/UserService";
 import AppLogger from "@/infra/logger/services/AppLogger";
 import { IAddressService } from "@/spi/AddressSPI";
 import AddressService from "@/services/AddressService";
 import { NotificationService } from "@/infra/notification/NotificationService";
+import AuthService from "@/infra/auth/AuthService";
 
 export default class IOCContainerBootstrapper {
     public static init() {
 
         IOCContainerBootstrapper.bindUserService();
+
+        IOCContainerBootstrapper.bindAuthService();
 
         IOCContainerBootstrapper.bindLogger();
 
@@ -30,6 +31,10 @@ export default class IOCContainerBootstrapper {
 
     private static bindUserService() {
         IOCContainer.bind<IUserService>(ServicesIdentifiers.UserService).to(UserService).inSingletonScope();
+    }
+
+    private static bindAuthService() {
+        IOCContainer.bind<IAuthService>(ServicesIdentifiers.AuthService).to(AuthService).inSingletonScope();
     }
 
     private static bindLogger() {

@@ -1,18 +1,15 @@
 import axios from 'axios';
-// import AuthInterceptor from '../../auth/services/AuthInterceptor';
 import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
-// import { IAuthExtension } from '@/auth/services/AuthExtension';
 import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
 import { ILogger } from '@/spi/LogsSPI';
+import AuthInterceptor from '@/infra/auth/AuthInterceptor';
+import { IAuthService } from '@/spi/AuthSPI';
 
 export default class Interceptors {
 
     private logger: ILogger;
 
     public constructor() {
-        axios.defaults.baseURL = process.env.EXPO_PUBLIC_API_URL;
-
-        // Logger
         this.logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
         this.logger = this.logger.extend("Interceptors");
     }
@@ -30,8 +27,8 @@ export default class Interceptors {
         );
 
         // Authentification interceptor
-    //     const authExtension = IOCContainer.get<IAuthExtension>(ServicesIndentifiers.AuthService);
-    //     const authInterceptor = new AuthInterceptor(authExtension, this.logger);
-    //     authInterceptor.intercept();
+        const authService = IOCContainer.get<IAuthService>(ServicesIdentifiers.AuthService);
+        const authInterceptor = new AuthInterceptor(this.logger, authService);
+        authInterceptor.intercept();
     }
 }

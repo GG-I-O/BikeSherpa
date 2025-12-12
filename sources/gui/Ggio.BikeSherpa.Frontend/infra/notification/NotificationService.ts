@@ -26,7 +26,7 @@ export class NotificationService implements INotificationService {
 
         try {
             this.connection = new HubConnectionBuilder()
-                .withUrl(`${axios.defaults.baseURL}/hubs`)
+                .withUrl(`${axios.defaults.baseURL}/hubs/notifications`)
                 .withAutomaticReconnect({
                     nextRetryDelayInMilliseconds: (retryContext) => {
                         // Exponential backoff: 0s, 2s, 10s, 30s, then 60s

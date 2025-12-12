@@ -1,7 +1,7 @@
 import AppBootstrapper from "@/bootstrapper/AppBootstrapper";
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
-import { IUserService } from "@/spi/AuthSPI";
+import { IAuthService, IUserService } from "@/spi/AuthSPI";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
 import { Platform } from "react-native";
@@ -10,14 +10,16 @@ import { Auth0Provider, useAuth0 } from "react-native-auth0";
 AppBootstrapper.init();
 
 function AppStack() {
-    const { user } = useAuth0();
+    const { user, getCredentials } = useAuth0();
 
     const loggedIn = user !== null && user !== undefined;
 
     const userService = IOCContainer.get<IUserService>(ServicesIdentifiers.UserService);
+    const authService = IOCContainer.get<IAuthService>(ServicesIdentifiers.AuthService);
     useEffect(() => {
         userService.setCurrentUser(user);
-    }, [userService, user]);
+        authService.setCredentialMethod(getCredentials);
+    }, [userService, user, getCredentials]);
 
     return (
         <Stack>

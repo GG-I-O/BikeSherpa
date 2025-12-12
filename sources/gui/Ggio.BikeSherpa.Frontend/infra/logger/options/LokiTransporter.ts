@@ -63,7 +63,7 @@ export const createLokiTransport = (
             };
 
             // Post logs to loki
-            const response = await fetch(`${lokiOptions.host}/loki/api/v1/push`, {
+            const response = await fetch(`${lokiOptions.host}/api/v1/push`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
