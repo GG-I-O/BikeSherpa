@@ -12,7 +12,7 @@ public record UpdateClientCommand(
      Guid Id,
      string Name,
      string Code,
-     string? Siret,
+     int? Siret,
      string Email,
      string PhoneNumber,
      Address Address

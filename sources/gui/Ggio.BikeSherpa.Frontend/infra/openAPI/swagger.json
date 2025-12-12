@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://192.168.11.89:5287"
+      "url": "https://localhost:5287"
     }
   ],
   "paths": {
@@ -314,23 +314,33 @@
         "additionalProperties": false,
         "properties": {
           "name": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "siret": {
             "type": "string",
             "nullable": true
           },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "siret": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "email": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "phoneNumber": {
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "address": {
-            "$ref": "#/components/schemas/Address"
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ]
           },
           "createdAt": {
             "type": "string",

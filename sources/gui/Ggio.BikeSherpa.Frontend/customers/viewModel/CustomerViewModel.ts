@@ -11,7 +11,7 @@ class CustomerViewModel {
     private static instance: CustomerViewModel;
     private logger: ILogger;
     private storageContext: CustomerStorageContext;
-    private customerStore$: Observable<Record<string, Customer>>;
+    private readonly customerStore$: Observable<Record<string, Customer>>;
 
     private constructor() {
         this.logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
@@ -66,39 +66,13 @@ class CustomerViewModel {
     };
 
     // Wrapper for EditCustomerForm
-    private updateCustomer(customer: Customer) {
+    public updateCustomer(customer: Customer) {
         try {
             this.customerStore$[customer.id].assign(customer);
         } catch (e) {
             this.logger.error("updateCustomer Error :", e);
         }
     };
-
-    /**
-     * @returns react-hook-form for updating an existing customer
-     */
-    // public getEditCustomerForm() {
-    //     const {
-    //         control,
-    //         handleSubmit,
-    //         formState: { errors },
-    //         setValue
-    //     } = useForm<Customer>({
-    //         defaultValues: {
-    //             id: '',
-    //             firstName: '',
-    //             lastName: '',
-    //             phoneNumber: ''
-    //         },
-    //         resolver: zodResolver(editCustomerSchema)
-    //     });
-
-    //     const onSubmit = (customer: Customer) => {
-    //         this.updateCustomer(customer);
-    //     };
-
-    //     return { control, handleSubmit: handleSubmit(onSubmit), errors, setValue }
-    // }
 }
 
 export default function useCustomerViewModel() {

@@ -1,22 +1,14 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from "react-hook-form";
+import Customer from "../models/Customer";
+import { zodResolver } from "@hookform/resolvers/zod";
+import useCustomerViewModel from "../viewModel/CustomerViewModel";
 import * as zod from 'zod';
-import useCustomerViewModel from '../viewModel/CustomerViewModel';
-import InputCustomer from '../models/InputCustomer';
 import { addressSchema } from '@/models/Address';
 
-const customerOptionSchema = zod.object({
-    canValidateWithPhoto: zod
-        .boolean(),
-    canValidateWithSignature: zod
-        .boolean(),
-    canValidateWithFile: zod
-        .boolean(),
-    discount: zod
-        .number(),
-}).required();
-
-const newCustomerSchema = zod.object({
+const editCustomerSchema = zod.object({
+    id: zod
+        .string()
+        .min(1),
     name: zod
         .string()
         .trim()
@@ -43,16 +35,17 @@ const newCustomerSchema = zod.object({
         .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
 }).partial({ complement: true, siret: true });
 
-export function useNewCustomerForm() {
+export const getEditCustomerForm = () => {
     const viewModel = useCustomerViewModel();
 
     const {
         control,
         handleSubmit,
         formState: { errors },
-        reset
-    } = useForm<InputCustomer>({
+        setValue
+    } = useForm<Customer>({
         defaultValues: {
+            id: '',
             name: '',
             code: '',
             phoneNumber: '',
@@ -65,18 +58,12 @@ export function useNewCustomerForm() {
                 city: ''
             },
         },
-        resolver: zodResolver(newCustomerSchema)
+        resolver: zodResolver(editCustomerSchema)
     });
 
-    const onSubmit = (customer: InputCustomer) => {
-        customer.address.name = customer.name;
-        viewModel.createCustomer(customer);
-        reset(); // Clear form after submission
+    const onSubmit = (customer: Customer) => {
+        viewModel.updateCustomer(customer);
     };
 
-    return {
-        control,
-        handleSubmit: handleSubmit(onSubmit),
-        errors
-    };
+    return { control, handleSubmit: handleSubmit(onSubmit), errors, setValue }
 }

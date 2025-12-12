@@ -25,8 +25,8 @@ export default function CustomerListView() {
                     <DataTable.Title style={[style.column, style.width80]}>Actions</DataTable.Title>
                 </DataTable.Header>
 
-                {customerList.map((customer) => (
-                    <DataTable.Row>
+                {customerList.map((customer, index) => (
+                    <DataTable.Row key={index}>
                         <DataTable.Cell>{customer.name}</DataTable.Cell>
                         <DataTable.Cell style={[style.column]}>{customer.code}</DataTable.Cell>
                         <DataTable.Cell style={[style.column]}>{customer.phoneNumber}</DataTable.Cell>
