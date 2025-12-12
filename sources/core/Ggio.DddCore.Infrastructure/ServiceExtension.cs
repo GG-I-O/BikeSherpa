@@ -19,7 +19,7 @@ public static class ServiceExtension
                return services;
           }
 
-          public IServiceCollection AddInfrastructureServices()
+          public IServiceCollection AddDddInfrastructureServices()
           {
                services.AddScoped(typeof(IReadRepository<>), typeof(EfCoreReadRepository<>))
                     .AddScoped<IApplicationTransactionContext, ApplicationTransactionContext>()

@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Ggio.BikeSherpa.Backend.Domain\Ggio.BikeSherpa.Backend.Domain.csproj"/>
+        <ProjectReference Include="..\Ggio.DddCore.Infrastructure\Ggio.DddCore.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

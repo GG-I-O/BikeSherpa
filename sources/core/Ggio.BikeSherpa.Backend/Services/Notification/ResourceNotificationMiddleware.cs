@@ -1,10 +1,11 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Ggio.BikeSherpa.Backend.Services.Notification;
 
-public class ResourceNotificationMiddleware(RequestDelegate next)
+public class ResourceNotificationMiddleware(RequestDelegate next, ILogger<ResourceNotificationMiddleware> logger)
 {
      public async Task InvokeAsync(HttpContext context, IResourceNotificationService notificationService)
      {
@@ -81,15 +82,19 @@ public class ResourceNotificationMiddleware(RequestDelegate next)
           }
           catch (Exception ex)
           {
-               Console.WriteLine("Error while notifying resource change : ${0}", ex.Message);
+               logger.LogError(ex, "Error while notifying resource change from middleware");
+               throw new InvalidOperationException("Error while notifying resource change", ex);
           }
      }
 }
 
 public static class ResourceNotificationExtensions
 {
-     public static IApplicationBuilder UseResourceNotifications(this IApplicationBuilder builder)
+     extension(IApplicationBuilder builder)
      {
-          return builder.UseMiddleware<ResourceNotificationMiddleware>();
+          public IApplicationBuilder UseResourceNotifications()
+          {
+               return builder.UseMiddleware<ResourceNotificationMiddleware>();
+          }
      }
 }
