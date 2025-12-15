@@ -1,4 +1,5 @@
 import { transportFunctionType } from "react-native-logs";
+import { ConsoleTransportOptions } from "react-native-logs/dist/transports/consoleTransport";
 
 // Type for Loki transport options
 export type LokiTransportOptions = {
@@ -21,7 +22,7 @@ type LogBatchEntry = {
 // Loki custom transport factory
 export const createLokiTransport = (
     lokiOptions: LokiTransportOptions
-): transportFunctionType<{}> => {
+): transportFunctionType<ConsoleTransportOptions> => {
     let logBatch: LogBatchEntry[] = [];
     let batchTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -85,7 +86,7 @@ export const createLokiTransport = (
 
     const flushBatch = (): void => {
         if (logBatch.length > 0) {
-            sendBatchToLoki([...logBatch]);
+            sendBatchToLoki([...logBatch]).then();
             logBatch = [];
         }
         if (batchTimeout) {
@@ -101,7 +102,7 @@ export const createLokiTransport = (
         const timestamp = Date.now() * 1000 * 1000;
 
         // Format the log message
-        let logMessage = "";
+        let logMessage;
         if (Array.isArray(rawMsg)) {
             logMessage = rawMsg.map((m) => JSON.stringify(m)).join(" ");
         } else if (typeof rawMsg === "object" && rawMsg !== null) {
@@ -142,7 +143,7 @@ export const createLokiTransport = (
                     line: logMessage,
                     level: level.text,
                 },
-            ]);
+            ]).then();
         }
     };
 };

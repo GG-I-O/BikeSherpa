@@ -4,7 +4,7 @@ import { Step } from "@/steps/models/Step";
 
 class DeliveryViewModel {
     private static instance: DeliveryViewModel;
-    private deliveries: Array<Delivery>;
+    private readonly deliveries: Delivery[];
 
     public static getInstance(): DeliveryViewModel {
         if (!DeliveryViewModel.instance)
@@ -16,19 +16,19 @@ class DeliveryViewModel {
         this.deliveries = [];
     }
 
-    public getDeliveryList(): Array<Delivery> {
+    public getDeliveryList(): Delivery[] {
         return this.deliveries;
     }
 
     public getDelivery(deliveryId: string): Delivery | undefined {
-        return this.deliveries.find((delivery) => delivery.id == deliveryId);
+        return this.deliveries.find((delivery) => delivery.id === deliveryId);
     }
 
     public getDeliveryByCode(deliveryCode: string): Delivery | undefined {
-        return this.deliveries.find((delivery) => delivery.code == deliveryCode);
+        return this.deliveries.find((delivery) => delivery.code === deliveryCode);
     }
 
-    public getFilteredDeliveries(dateFilter: string, courier: string): Array<Delivery> {
+    public getFilteredDeliveries(dateFilter: string, courier: string): Delivery[] {
         // Today
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0);
@@ -58,7 +58,7 @@ class DeliveryViewModel {
         }
 
         const courierFilterFunction = (courierFilter: string, courier: string): boolean => {
-            return (courierFilter == 'NONE' && courier == undefined) || courierFilter == courier;
+            return (courierFilter === 'NONE' && courier === undefined) || courierFilter === courier;
         }
 
         // Remove all deliveries that have no steps for the filter asked
@@ -85,7 +85,7 @@ class DeliveryViewModel {
     }
 
     public getStep(stepId: string): Step | undefined {
-        return this.getStepList().find((step) => step.id == stepId);
+        return this.getStepList().find((step) => step.id === stepId);
     }
 
     public getStepList(): Array<Step> {
@@ -93,7 +93,7 @@ class DeliveryViewModel {
     }
 
     public assignSteps(courier: string, steps: Array<Step>): void {
-        steps.forEach((step: Step) => step.courier = courier != 'NONE' ? courier : undefined);
+        steps.forEach((step: Step) => step.courier = courier !== 'NONE' ? courier : undefined);
     }
 }
 

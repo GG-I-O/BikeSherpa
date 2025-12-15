@@ -52,15 +52,15 @@ export function useSecureStorageState(key: string): UseStateHook<string> {
                 setState(value);
             });
         }
-    }, [key]);
+    }, [key, setState]);
 
     // Set
     const setValue = useCallback(
         (value: string | null) => {
             setState(value);
-            setStorageItemAsync(key, value);
+            setStorageItemAsync(key, value).then();
         },
-        [key]
+        [key, setState]
     );
 
     return [state, setValue];

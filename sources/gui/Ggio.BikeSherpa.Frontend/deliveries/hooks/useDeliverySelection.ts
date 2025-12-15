@@ -3,8 +3,8 @@ import { useCallback, useState } from "react";
 import { Delivery } from "../models/Delivery";
 
 export function useDeliverySelection() {
-    const [selectedSteps, setSelectedSteps] = useState<Array<Step>>([]);
-    const [selectedDeliveries, setSelectedDeliveries] = useState<Array<Delivery>>([]);
+    const [selectedSteps, setSelectedSteps] = useState<Step[]>([]);
+    const [selectedDeliveries, setSelectedDeliveries] = useState<Delivery[]>([]);
 
     const isStepSelected = useCallback((step: Step) => {
         return selectedSteps.some(s => s.id === step.id);

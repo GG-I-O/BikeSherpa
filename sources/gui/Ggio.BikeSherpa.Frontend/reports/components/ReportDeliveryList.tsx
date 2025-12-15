@@ -2,12 +2,11 @@ import { Delivery } from "@/deliveries/models/Delivery";
 import datatableStyle from "@/style/datatableStyle";
 import { ScrollView } from "react-native";
 import { DataTable, useTheme } from "react-native-paper";
-import useDeliveryViewModel from "@/deliveries/viewModel/DeliveryViewModel";
 import ReportDeliveryRow from "./ReportDeliveryRow";
 
 type Props = {
-    deliveries: Array<Delivery>,
-    onRowPress: (delivery: Delivery) => void
+    deliveries: Delivery[],
+    onRowPress?: (delivery: Delivery) => void
 }
 
 export default function ReportDeliveryList({ deliveries, onRowPress }: Props) {
@@ -29,11 +28,11 @@ export default function ReportDeliveryList({ deliveries, onRowPress }: Props) {
                     </DataTable.Title>
                 </DataTable.Header>
 
-                {deliveries.map((delivery) => (
-                    <ReportDeliveryRow
+                {deliveries.map((delivery, index) => (
+                    <ReportDeliveryRow key={index}
                         delivery={delivery}
                         onPress={() => {
-                            onRowPress(delivery);
+                            onRowPress ? onRowPress(delivery) : null;
                         }}
                     />
                 ))}

@@ -3,7 +3,7 @@ import { Delivery } from "../models/Delivery";
 import DeliveryCard from "./DeliveryCard";
 
 type Props = {
-    deliveries: Array<Delivery>,
+    deliveries: Delivery[],
     isDeliverySelected?: (delivery: Delivery) => boolean,
     onDeliveryPress?: (delivery: Delivery) => void
 }

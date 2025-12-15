@@ -21,13 +21,13 @@ export default function StepCardAssign({ step, onAssign, onTimePicker, onDelete 
 
     useEffect(() => {
         onAssign(step, courierDropDown);
-    }, [courierDropDown]);
+    }, [courierDropDown, onAssign, step]);
 
     useEffect(() => {
         const date = new Date(step.contractDate);
         date.setHours(timePicker.hours, timePicker.minutes, 0, 0);
         onTimePicker(step, date);
-    }, [timePicker]);
+    }, [timePicker, onTimePicker, step]);
 
     return (
         <Card

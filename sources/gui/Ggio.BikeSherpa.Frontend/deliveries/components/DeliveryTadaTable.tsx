@@ -6,7 +6,7 @@ import DeliveryDataTableRow from "./DeliveryDataTableRow";
 import { Step } from "@/steps/models/Step";
 
 type Props = {
-    deliveries: Array<Delivery>,
+    deliveries: Delivery[],
     isDeliverySelected?: (delivery: Delivery) => boolean,
     isStepSelected?: (step: Step) => boolean,
     onDeliveryPress?: (delivery: Delivery) => void,
@@ -34,8 +34,8 @@ export default function DeliveryDataTable({ deliveries, isDeliverySelected, isSt
                     <DataTable.Title style={[style.column]}>Actions</DataTable.Title>
                 </DataTable.Header>
 
-                {deliveries.map((delivery) => (
-                    <DeliveryDataTableRow
+                {deliveries.map((delivery, index) => (
+                    <DeliveryDataTableRow key={index}
                         delivery={delivery}
                         isSelected={isDeliverySelected ? isDeliverySelected(delivery) : false}
                         isStepSelected={isStepSelected}

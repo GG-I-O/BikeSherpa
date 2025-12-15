@@ -35,7 +35,7 @@ const editCustomerSchema = zod.object({
         .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
 }).partial({ complement: true, siret: true });
 
-export const getEditCustomerForm = () => {
+export function useEditCustomerForm() {
     const viewModel = useCustomerViewModel();
 
     const {

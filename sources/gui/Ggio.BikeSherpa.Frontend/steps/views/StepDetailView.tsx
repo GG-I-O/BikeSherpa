@@ -2,11 +2,10 @@ import AppStyle from "@/constants/AppStyle";
 import { useLocalSearchParams } from "expo-router";
 import { navigate } from "expo-router/build/global-state/routing";
 import { useEffect, useState } from "react";
-import { Dimensions, View } from "react-native";
+import { View } from "react-native";
 import { Button, Text, useTheme } from "react-native-paper";
 import { Delivery } from "@/deliveries/models/Delivery";
 import { Step } from "../models/Step";
-import datatableStyle from "@/style/datatableStyle";
 import useDeliveryViewModel from "../../deliveries/viewModel/DeliveryViewModel";
 import { StepType } from "../models/StepType";
 
@@ -15,9 +14,8 @@ type Props = {
     canValidate?: boolean
 }
 
-export default function StepDetailView({ canEdit = false, canValidate = false }: Props) {
+export default function StepDetailView({ canEdit = false }: Props) {
     const theme = useTheme();
-    const style = datatableStyle;
 
     const { stepId } = useLocalSearchParams<{ stepId: string }>();
 
@@ -32,8 +30,6 @@ export default function StepDetailView({ canEdit = false, canValidate = false }:
         if (step)
             setDelivery(viewModel.getDeliveryByCode(step.id));
     }, [stepId, viewModel, step]);
-
-    const screenWidth = Dimensions.get('window').width;
 
     if (!step || !delivery)
         return (
@@ -82,7 +78,7 @@ export default function StepDetailView({ canEdit = false, canValidate = false }:
                     <View style={{ justifyContent: 'center' }}>
                         <Text style={AppStyle.textStyle.h3}>Expéditeur</Text>
                         <Text>Nom Prénom</Text>
-                        <Text>1 Rue de l'Expéditeur</Text>
+                        <Text>1 Rue de l’Expéditeur</Text>
                         <Text>38000 Grenoble</Text>
                     </View>
                     <View style={{ justifyContent: 'center' }}>

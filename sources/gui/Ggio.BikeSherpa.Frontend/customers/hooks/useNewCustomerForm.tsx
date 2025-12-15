@@ -5,17 +5,6 @@ import useCustomerViewModel from '../viewModel/CustomerViewModel';
 import InputCustomer from '../models/InputCustomer';
 import { addressSchema } from '@/models/Address';
 
-const customerOptionSchema = zod.object({
-    canValidateWithPhoto: zod
-        .boolean(),
-    canValidateWithSignature: zod
-        .boolean(),
-    canValidateWithFile: zod
-        .boolean(),
-    discount: zod
-        .number(),
-}).required();
-
 const newCustomerSchema = zod.object({
     name: zod
         .string()

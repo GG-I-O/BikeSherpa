@@ -1,7 +1,7 @@
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import { Delivery } from "@/deliveries/models/Delivery";
 import datatableStyle from "@/style/datatableStyle";
-import { DataTable, useTheme } from "react-native-paper";
+import { DataTable } from "react-native-paper";
 
 type Props = {
     delivery: Delivery,
@@ -9,7 +9,6 @@ type Props = {
 }
 
 export default function ReportDeliveryRow({ delivery, onPress }: Props) {
-    const theme = useTheme();
     const style = datatableStyle;
     const pricePrecision = 100;
 

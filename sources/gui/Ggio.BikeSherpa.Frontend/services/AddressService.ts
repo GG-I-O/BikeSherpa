@@ -32,7 +32,7 @@ export default class AddressService implements IAddressService {
                 }) ?? '';
             }
 
-            Linking.openURL(url ?? '');
+            Linking.openURL(url ?? '').then();
         }
         catch (e) {
             this.logger.error('Error opening maps:', e);
@@ -42,8 +42,9 @@ export default class AddressService implements IAddressService {
     public async fetchAddress(text: string): Promise<Address[] | null> {
         try {
             const response = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${text}&limit=5`);
-            if (response.status != 200) {
-                throw new Error("Aucune adresse trouvée")
+            if (response.status !== 200) {
+                this.logger.error("Aucune adresse trouvée");
+                return null;
             }
             const data = await response.json();
             return data.features.map((feature: any) => {

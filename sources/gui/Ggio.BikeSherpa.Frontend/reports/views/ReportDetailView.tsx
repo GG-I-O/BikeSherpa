@@ -22,7 +22,7 @@ export default function ReportDetailView() {
 
     useEffect(() => {
         nav.setOptions({ headerTitle: report ? report.reportDate : 'Détails rapport' });
-    }, [report])
+    }, [report, nav])
 
     if (!report)
         return (
@@ -41,7 +41,7 @@ export default function ReportDetailView() {
                     {report.reportDate.toLocaleDateString()}
                 </Text>
             </View>
-            <ReportDeliveryList deliveries={report.deliveries} onRowPress={(delivery: Delivery) => { }} />
+            <ReportDeliveryList deliveries={report.deliveries} />
         </View>
     );
 }

@@ -15,10 +15,10 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         id: number;
     } ? number : string, T>>;
     private initialLoad: boolean = true;
-    private canSync$: Observable<boolean>;
+    private readonly canSync$: Observable<boolean>;
 
-    private notificationService: INotificationService;
-    private resourceName: string;
+    private readonly notificationService: INotificationService;
+    private readonly resourceName: string;
 
     protected constructor(
         storeName: string,
@@ -34,7 +34,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         this.notificationService = notificationService;
 
         // Init canSync observable + connect to notification service if canSync
-        this.initNetworkState();
+        this.initNetworkState().then();
     }
 
     private async initNetworkState() {
@@ -181,13 +181,13 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                             break;
                         case ResourceOperation.DELETE:
                             this.logger.debug(`${this.resourceName} deleted via NotificationService`, notification.id);
-                            
+
                             // Filter the deleted item out of the local data
                             const localRecord: Record<string, T> = this.store.peek();
                             let localArray = Object.values(localRecord);
                             localArray = localArray.filter((item: T) => item.id !== notification.id);
                             update({ value: localArray, mode: 'set' })// Use mode: 'set' to replace instead of merge
-                            
+
                             break;
                         default:
                             this.logger.error("Received a notification with unknown operation :", notification)
