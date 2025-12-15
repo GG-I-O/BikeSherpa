@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import { Text, View } from "react-native";
 import { useAuth0 } from "react-native-auth0";
 import { Button } from "react-native-paper";
