@@ -4,7 +4,6 @@ import { useAuth0 } from "react-native-auth0";
 import { Button } from "react-native-paper";
 
 export default function Login() {
-
     const { authorize, error, isLoading } = useAuth0();
     const audience = process.env.EXPO_PUBLIC_AUTH_AUDIENCE;
 
