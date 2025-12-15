@@ -5,7 +5,7 @@ import { ILogger } from '@/spi/LogsSPI';
 import AuthInterceptor from '@/infra/auth/AuthInterceptor';
 import { IAuthService } from '@/spi/AuthSPI';
 
-export default class Interceptors {
+export default class InterceptorBootstrap {
 
     private readonly logger: ILogger;
 
