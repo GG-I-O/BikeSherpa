@@ -1,7 +1,9 @@
 ﻿using Ardalis.Result;
+using Facet.Extensions;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Model;
 using Ggio.DddCore;
 using Mediator;
 
@@ -13,7 +15,7 @@ public record AddCustomerCommand(
      int? Siret,
      string Email,
      string PhoneNumber,
-     Address Address
+     AddressCrud Address
 ) : ICommand<Result<Guid>>;
 
 public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
@@ -31,12 +33,20 @@ public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
 public class AddCustomerHandler(
      ICustomerFactory factory,
      IValidator<AddCustomerCommand> validator,
-     IApplicationTransaction transaction)  : ICommandHandler<AddCustomerCommand, Result<Guid>>
+     IApplicationTransaction transaction) : ICommandHandler<AddCustomerCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddCustomerCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
-          var customer = await factory.CreateCustomerAsync(command.Name, command.Code, command.Siret, command.Email, command.PhoneNumber, command.Address);
+          var customer = await factory.CreateCustomerAsync(
+               command.Name,
+               command.Code,
+               command.Siret,
+               command.Email,
+               command.PhoneNumber,
+               command.Address.ToSource<AddressCrud, Address>()
+          );
+
           await transaction.CommitAsync(cancellationToken);
           return Result.Created(customer.Id);
      }

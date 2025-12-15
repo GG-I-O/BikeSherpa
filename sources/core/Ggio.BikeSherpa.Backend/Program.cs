@@ -131,6 +131,7 @@ builder.Services.AddHttpLogging();
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 

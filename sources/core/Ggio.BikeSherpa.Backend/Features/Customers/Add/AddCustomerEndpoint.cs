@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Add;
 
-public class AddCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud, AddResult<Guid>>
+public class AddCustomerEndpoint(IMediator mediator) : Endpoint<Model.CustomerCrud, AddResult<Guid>>
 {
      public override void Configure()
      {
@@ -13,7 +13,7 @@ public class AddCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud, Ad
           Policies("write:customers");
      }
 
-     public override async Task HandleAsync(CustomerCrud req, CancellationToken ct)
+     public override async Task HandleAsync(Model.CustomerCrud req, CancellationToken ct)
      {
           var command = new AddCustomerCommand(
                req.Name,

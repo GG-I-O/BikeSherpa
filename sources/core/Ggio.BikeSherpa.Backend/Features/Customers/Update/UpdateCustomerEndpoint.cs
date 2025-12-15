@@ -3,7 +3,7 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Update;
 
-public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud>
+public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.CustomerCrud>
 {
      public override void Configure()
      {
@@ -11,7 +11,7 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud>
           Policies("write:customers");
      }
 
-     public override async Task HandleAsync(CustomerCrud req, CancellationToken ct)
+     public override async Task HandleAsync(Model.CustomerCrud req, CancellationToken ct)
      {
           var command = new UpdateClientCommand(
                Route<Guid>("customerId"),

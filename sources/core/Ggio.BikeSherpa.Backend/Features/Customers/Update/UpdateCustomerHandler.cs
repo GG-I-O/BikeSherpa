@@ -1,8 +1,10 @@
 ﻿using Ardalis.Result;
+using Facet.Extensions;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Model;
 using Ggio.DddCore;
 using Mediator;
 
@@ -15,7 +17,7 @@ public record UpdateClientCommand(
      int? Siret,
      string Email,
      string PhoneNumber,
-     Address Address
+     AddressCrud Address
 ) : ICommand<Result<Guid>>;
 
 public class UpdateClientCommandValidator : AbstractValidator<UpdateClientCommand>
@@ -43,12 +45,13 @@ public class UpdateCustomerHandler(
           var entity = await repository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.Id), cancellationToken);
           if (entity is null)
                return Result.NotFound();
+
           entity.Name = command.Name;
           entity.Code = command.Code;
           entity.Siret = command.Siret;
           entity.Email = command.Email;
           entity.PhoneNumber = command.PhoneNumber;
-          entity.Address = command.Address;
+          entity.Address = command.Address.ToSource<AddressCrud, Address>();
           await transaction.CommitAsync(cancellationToken);
           return Result.Success(command.Id);
      }

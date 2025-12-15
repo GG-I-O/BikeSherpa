@@ -9,6 +9,7 @@ using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using CustomerCrud = Ggio.BikeSherpa.Backend.Features.Customers.Model.CustomerCrud;
 
 namespace BackendTests.Features.Customers.GetAll;
 
