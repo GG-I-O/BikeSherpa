@@ -80,7 +80,7 @@ class DeliveryViewModel {
         return sortedDeliveries;
     }
 
-    public getFilteredStepList(dateFilter: string, courier: string): Array<Step> {
+    public getFilteredStepList(dateFilter: string, courier: string): Step[] {
         return this.getFilteredDeliveries(dateFilter, courier).flatMap((delivery) => delivery.steps ?? []);
     }
 
@@ -88,11 +88,11 @@ class DeliveryViewModel {
         return this.getStepList().find((step) => step.id === stepId);
     }
 
-    public getStepList(): Array<Step> {
+    public getStepList(): Step[] {
         return this.deliveries.flatMap((delivery) => delivery.steps ?? []);
     }
 
-    public assignSteps(courier: string, steps: Array<Step>): void {
+    public assignSteps(courier: string, steps: Step[]): void {
         steps.forEach((step: Step) => step.courier = courier !== 'NONE' ? courier : undefined);
     }
 }

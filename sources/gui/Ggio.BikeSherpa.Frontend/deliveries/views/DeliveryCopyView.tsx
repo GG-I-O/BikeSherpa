@@ -5,7 +5,6 @@ import { Button, Text, TextInput, useTheme } from "react-native-paper";
 import StepInputDataTable from "@/steps/components/inputs/StepInputDataTable";
 import { Delivery } from "../models/Delivery";
 import { Step } from "@/steps/models/Step";
-import datatableStyle from "@/style/datatableStyle";
 import formStyle from "@/style/formStyle";
 import useDeliveryViewModel from "../viewModel/DeliveryViewModel";
 

@@ -6,7 +6,6 @@ import StepInputDataTable from "@/steps/components/inputs/StepInputDataTable";
 import useDeliveryViewModel from "../viewModel/DeliveryViewModel";
 import { Delivery } from "../models/Delivery";
 import { Step } from "@/steps/models/Step";
-import datatableStyle from "@/style/datatableStyle";
 import formStyle from "@/style/formStyle";
 
 export default function DeliveryEditView() {

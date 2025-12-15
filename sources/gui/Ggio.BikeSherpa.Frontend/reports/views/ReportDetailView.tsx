@@ -6,7 +6,6 @@ import { Text, useTheme } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import ReportDeliveryList from "../components/ReportDeliveryList";
 import useReportViewModel from "../viewModels/ReportViewModel";
-import { Delivery } from "@/deliveries/models/Delivery";
 import Report from "../models/Report";
 
 export default function ReportDetailView() {

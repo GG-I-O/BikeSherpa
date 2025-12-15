@@ -6,10 +6,9 @@ import ReportDeliveryRow from "./ReportDeliveryRow";
 
 type Props = {
     deliveries: Delivery[],
-    onRowPress?: (delivery: Delivery) => void
 }
 
-export default function ReportDeliveryList({ deliveries, onRowPress }: Props) {
+export default function ReportDeliveryList({ deliveries }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
 
@@ -31,9 +30,6 @@ export default function ReportDeliveryList({ deliveries, onRowPress }: Props) {
                 {deliveries.map((delivery, index) => (
                     <ReportDeliveryRow key={index}
                         delivery={delivery}
-                        onPress={() => {
-                            onRowPress ? onRowPress(delivery) : null;
-                        }}
                     />
                 ))}
             </DataTable>
