@@ -52,9 +52,7 @@ export class NotificationService implements INotificationService {
                     }
                 }
 
-                this.reconnectCallbacks.forEach(async (callback) => {
-                    return await callback();
-                });
+                await Promise.all(this.reconnectCallbacks.map(callback => callback()));
             });
 
             this.connection.onreconnecting(() => {
