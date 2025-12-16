@@ -38,9 +38,13 @@ export default function RootLayout() {
 
     let authClient;
     if (Platform.OS === "android")
-        authClient = process.env.EXPO_PUBLIC_AUTH_CLIENT_ANDROID;
+        authClient = __DEV__ ?
+            process.env.EXPO_PUBLIC_AUTH_DEV_CLIENT_ANDROID :
+            process.env.EXPO_PUBLIC_AUTH_PROD_CLIENT_ANDROID;
     else
-        authClient = process.env.EXPO_PUBLIC_AUTH_CLIENT_WEB;
+        authClient = __DEV__ ?
+            process.env.EXPO_PUBLIC_AUTH_DEV_CLIENT_WEB :
+            process.env.EXPO_PUBLIC_AUTH_PROD_CLIENT_WEB;
 
     return (
         <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>

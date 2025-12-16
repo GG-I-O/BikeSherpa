@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "startHTTPS": "local-ssl-proxy --source 443 --target 8081 --cert localhost.pem --key localhost-key.pem",
+    "startHTTPS": "local-ssl-proxy --source 443 --target 8081 --cert dev.bike.local.pem --key dev.bike.local-key.pem",
     "build:apk:linux": "bash scripts/buildapk.sh",
     "build:apk:windows": "powershell -ExecutionPolicy Bypass -File .\\scripts\\buildapk.ps1",
     "android": "expo run:android",

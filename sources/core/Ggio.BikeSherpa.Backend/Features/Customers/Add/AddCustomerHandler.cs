@@ -12,7 +12,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Customers.Add;
 public record AddCustomerCommand(
      string Name,
      string Code,
-     int? Siret,
+     string? Siret,
      string Email,
      string PhoneNumber,
      AddressCrud Address

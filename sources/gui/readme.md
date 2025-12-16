@@ -18,9 +18,13 @@ npm install -g npm@latest
 
 ```sh
 npm install -g npm@latest
+
+# Create the project from scratch
 npx create-expo-app@latest Ggio.BikeSherpa.Frontend
 cd Ggio.BikeSherpa.Frontend
 npm run reset-project
+
+# Download packages
 npm update
 ```
 
@@ -30,6 +34,12 @@ npm update
 
 ```sh
 npx expo start --clear
+```
+
+#### HTTPS
+```sh
+# proxy from 8081 to 443
+npm run startHTTPS
 ```
 
 ### Mobile
@@ -66,6 +76,16 @@ keytool -genkeypair -v -storetype PKCS12 -keystore release.keystore -alias relea
 ```
 
 #### Config
+
+##### Automatic
+```sh
+# bash
+npm run build:apk:linux
+# powershell
+npm run build:apk:windows
+```
+
+##### Manual
 android/gradle.properties
 ```sh
 MYAPP_RELEASE_STORE_FILE=my-release-key.keystore
@@ -116,6 +136,24 @@ APK file is in
 ```sh
 android/app/build/outputs/apk/release/app-release.apk
 ```
+
+# Authentication
+
+## Auth0
+
+### Setup on PC
+```sh
+# linux : Add to /etc/hosts
+127.0.0.1 dev.bike.local
+
+# windows : Add to C:\Windows\System32\drivers\etc\hosts
+127.0.0.1 dev.bike.local
+```
+
+### Setup on Auth0 dashboard
+1. Create a Dev only Tenant
+- Create a new application (SPA for web, Native for android)
+- Put infos of this tenant in .env.local (see .env.blank)
 
 # Packages
 
@@ -253,7 +291,10 @@ npm install @zodios/core zod axios
 
 Usage  
 ```sh
-npm run openAPI
+# To create an openAPI file from a swagger url
+npm run openAPI:web
+# To create an openAPI file from a swagger file
+npm run openAPI:file
 ```
 
 ## Jest
