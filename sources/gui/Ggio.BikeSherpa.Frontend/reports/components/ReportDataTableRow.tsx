@@ -1,7 +1,6 @@
-import { DataTable, IconButton, useTheme } from "react-native-paper";
+import { DataTable, useTheme } from "react-native-paper";
 import Report from "../models/Report";
 import datatableStyle from "@/style/datatableStyle";
-import { View } from "react-native";
 
 type Props = {
     report: Report,

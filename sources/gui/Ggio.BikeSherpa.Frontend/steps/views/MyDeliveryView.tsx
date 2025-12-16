@@ -9,7 +9,7 @@ import { SegmentedButtons, useTheme } from "react-native-paper";
 export function MyDeliveryView() {
     const theme = useTheme();
     // Data
-    const [steps, setSteps] = useState<Array<Step>>([]);
+    const [steps, setSteps] = useState<Step[]>([]);
 
     const viewModel = useDeliveryViewModel();
 

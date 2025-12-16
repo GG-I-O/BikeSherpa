@@ -5,7 +5,7 @@ import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import { useState } from "react";
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
 import { IAddressService } from "@/spi/AddressSPI";
-import { ServicesIndentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 
 type Props = {
     step: Step,
@@ -18,7 +18,7 @@ export default function StepCard({ step, onPress, isSelected = false }: Props) {
 
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-    const addressService = IOCContainer.get<IAddressService>(ServicesIndentifiers.AddressService);
+    const addressService = IOCContainer.get<IAddressService>(ServicesIdentifiers.AddressService);
 
     const screenWidth = Dimensions.get('window').width;
 

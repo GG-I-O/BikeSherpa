@@ -2,12 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DddCore.Tests.Integration;
 
-public class TestDbContext : DbContext
+public class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
 {
-     public TestDbContext(DbContextOptions<TestDbContext> options) : base(options)
-     {
-
-     }
-
      public DbSet<MyAggregateRoot> MyAggregateRoots { get; set; }
 }

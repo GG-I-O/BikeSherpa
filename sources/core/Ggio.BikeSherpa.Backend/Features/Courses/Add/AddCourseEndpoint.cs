@@ -19,7 +19,7 @@ public class AddCourseEndpoint(IMediator mediator) : Endpoint<CourseCrud, AddRes
           var result = await mediator.Send(command, ct);
           if (result.IsSuccess)
           {
-               await Send.CreatedAtAsync<GetEndpoint>(new AddResult<Guid>(result.Value), cancellation: ct);
+               await Send.CreatedAtAsync<GetCourseEndpoint>(new AddResult<Guid>(result.Value), cancellation: ct);
           }
          
      }

@@ -5,7 +5,7 @@ import StepDataTableRowAssign from "./StepDataTableRowAssign";
 import { ScrollView } from "react-native";
 
 type Props = {
-    steps: Array<Step>,
+    steps: Step[],
     isStepSelected?: (step: Step) => boolean,
     onRowPress?: (step: Step) => void,
     canChangeDate?: boolean,

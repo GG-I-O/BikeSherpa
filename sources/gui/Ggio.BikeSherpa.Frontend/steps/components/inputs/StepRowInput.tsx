@@ -1,6 +1,6 @@
 import TimePickerInput from "@/components/general/TimePickerInput";
 import { useState } from "react";
-import { Button, DataTable, IconButton, Text, TextInput, useTheme } from "react-native-paper";
+import { Button, DataTable, IconButton, Text, TextInput } from "react-native-paper";
 import { DatePickerInput } from "react-native-paper-dates";
 import { Step } from "@/steps/models/Step";
 import datatableStyle from "@/style/datatableStyle";
@@ -13,8 +13,6 @@ type Props = {
 }
 
 export default function StepRowInput({ step, deleteRow }: Props) {
-    const theme = useTheme();
-    const style = datatableStyle;
 
     // Input useState
     // TODO: change it for react-hook-form
@@ -33,7 +31,7 @@ export default function StepRowInput({ step, deleteRow }: Props) {
             <DataTable.Cell style={[datatableStyle.column, datatableStyle.width60]}>
                 <Button
                     mode='outlined'
-                    onPress={() => setType(type == StepType.PickUp ? StepType.Drop : StepType.PickUp)}
+                    onPress={() => setType(type === StepType.PickUp ? StepType.Drop : StepType.PickUp)}
                 >
                     {/* Wrap the Icon into a text to be able to reduce margin */}
                     <Text style={{ marginInline: 0 }}>

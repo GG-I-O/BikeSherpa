@@ -11,6 +11,7 @@ export default function ReportListView() {
     const viewModel = useReportViewModel();
     const theme = useTheme();
     const [reports, setReports] = useState<Report[]>([]);
+    const [date, setDate] = useState<Date>();
 
     useEffect(() => {
         setReports(viewModel.getReportList());
@@ -38,8 +39,8 @@ export default function ReportListView() {
         <Searchbar value={""} />
         <DatePickerInput
             inputMode={"end"}
-            onChange={(date: Date | undefined) => { }}
-            value={undefined} locale={"fr"} mode="outlined" />
+            onChange={(date: Date | undefined) => setDate(date)}
+            value={date} locale={"fr"} mode="outlined" />
     </ScrollView>
 
         <ReportDataTable

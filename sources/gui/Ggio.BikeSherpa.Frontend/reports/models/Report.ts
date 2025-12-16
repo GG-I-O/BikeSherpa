@@ -18,20 +18,4 @@ export default class Report {
         this.reportDate = reportDate;
         this.deliveries = deliveries;
     }
-
-    static fromPlainObject(obj: any, allDeliveries: Delivery[]): Report {
-        const deliveries = obj.deliveryIds
-            ? obj.deliveryIds
-                .map((id: string) => allDeliveries.find(c => c.id === id))
-                .filter((c: Delivery | undefined) => c !== undefined)
-            : [];
-
-        return new Report(
-            obj.id,
-            obj.customer,
-            obj.reportNumber,
-            obj.reportDate instanceof Date ? obj.reportDate : new Date(obj.reportDate),
-            deliveries
-        );
-    }
 }

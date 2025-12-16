@@ -24,6 +24,7 @@
         <PackageReference Include="Facet.Extensions" Version="5.0.1"/>
         <PackageReference Include="FastEndpoints" Version="7.1.1"/>
         <PackageReference Include="FastEndpoints.Swagger" Version="7.1.1" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
         <PackageReference Include="Mediator.Abstractions" Version="3.0.1"/>
         <PackageReference Include="Mediator.SourceGenerator" Version="3.0.1">
             <PrivateAssets>all</PrivateAssets>
@@ -38,6 +39,14 @@
     <ItemGroup>
       <Content Include="..\..\..\.dockerignore">
         <Link>.dockerignore</Link>
+      </Content>
+      <None Remove="appsettings.json" />
+      <Content Include="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="appsettings.Development.json" />
+      <Content Include="appsettings.Development.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
 

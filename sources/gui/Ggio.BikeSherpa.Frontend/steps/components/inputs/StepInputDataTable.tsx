@@ -4,7 +4,7 @@ import datatableStyle from "@/style/datatableStyle";
 import StepRowInput from "./StepRowInput";
 
 type Props = {
-    steps: Array<Step>,
+    steps: Step[],
     deleteRow: (step: Step) => void
 }
 

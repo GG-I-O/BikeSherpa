@@ -1,4 +1,4 @@
-import { ServicesIndentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
+import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
 import { ILogger } from '@/spi/LogsSPI';
 import { INotificationService } from '@/spi/StorageSPI';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
@@ -13,7 +13,7 @@ export class NotificationService implements INotificationService {
     private subscribedDataTypes: string[] = [];
 
     constructor(
-        @inject(ServicesIndentifiers.Logger) logger: ILogger
+        @inject(ServicesIdentifiers.Logger) logger: ILogger
     ) {
         this.logger = logger.extend('NotificationService');
     }
@@ -26,7 +26,7 @@ export class NotificationService implements INotificationService {
 
         try {
             this.connection = new HubConnectionBuilder()
-                .withUrl(`${axios.defaults.baseURL}/hubs`)
+                .withUrl(`${axios.defaults.baseURL}/hubs/notifications`)
                 .withAutomaticReconnect({
                     nextRetryDelayInMilliseconds: (retryContext) => {
                         // Exponential backoff: 0s, 2s, 10s, 30s, then 60s
@@ -52,7 +52,7 @@ export class NotificationService implements INotificationService {
                     }
                 }
 
-                this.reconnectCallbacks.forEach(async callback => await callback());
+                await Promise.all(this.reconnectCallbacks.map(callback => callback()));
             });
 
             this.connection.onreconnecting(() => {

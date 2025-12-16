@@ -5,9 +5,7 @@ import { Button, Text, TextInput, useTheme } from "react-native-paper";
 import StepInputDataTable from "@/steps/components/inputs/StepInputDataTable";
 import useDeliveryViewModel from "../viewModel/DeliveryViewModel";
 import { Delivery } from "../models/Delivery";
-import { Address } from "@/models/Address";
 import { Step } from "@/steps/models/Step";
-import datatableStyle from "@/style/datatableStyle";
 import formStyle from "@/style/formStyle";
 
 export default function DeliveryEditView() {
@@ -18,7 +16,7 @@ export default function DeliveryEditView() {
     const [delivery, setDelivery] = useState<Delivery | undefined>();
     const [code, setCode] = useState<string>("");
     const [client, setClient] = useState<string>("");
-    const [steps, setSteps] = useState<Array<Step>>([]);
+    const [steps, setSteps] = useState<Step[]>([]);
 
     useEffect(() => {
         const auxDelivery = viewModel.getDelivery(deliveryId);
@@ -32,7 +30,6 @@ export default function DeliveryEditView() {
     }, [viewModel, deliveryId]);
 
     const theme = useTheme();
-    const style = datatableStyle;
 
     if (!delivery)
         return (
@@ -69,7 +66,7 @@ export default function DeliveryEditView() {
 
             <StepInputDataTable
                 steps={steps}
-                deleteRow={(step) => setSteps(steps.filter((s) => s.id != step.id))}
+                deleteRow={(step) => setSteps(steps.filter((s) => s.id !== step.id))}
             />
             <Button
                 mode="outlined"

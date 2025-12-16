@@ -8,5 +8,5 @@ type Props = {
 export default function DeliveryTypeIcon({ type }: Props) {
     const theme = useTheme();
 
-    return <Icon source={type == StepType.PickUp ? "archive-arrow-up-outline" : "arrow-down-bold"} size={28} color={theme.colors.onBackground} />
+    return <Icon source={type === StepType.PickUp ? "archive-arrow-up-outline" : "arrow-down-bold"} size={28} color={theme.colors.onBackground} />
 }

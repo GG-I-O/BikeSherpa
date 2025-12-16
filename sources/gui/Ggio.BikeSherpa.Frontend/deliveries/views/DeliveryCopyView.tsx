@@ -1,4 +1,3 @@
-import { Address } from "@/models/Address";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
@@ -6,10 +5,8 @@ import { Button, Text, TextInput, useTheme } from "react-native-paper";
 import StepInputDataTable from "@/steps/components/inputs/StepInputDataTable";
 import { Delivery } from "../models/Delivery";
 import { Step } from "@/steps/models/Step";
-import datatableStyle from "@/style/datatableStyle";
 import formStyle from "@/style/formStyle";
 import useDeliveryViewModel from "../viewModel/DeliveryViewModel";
-import Customer from "@/customers/models/Customer";
 
 export default function DeliveryCopyView() {
     const { deliveryId } = useLocalSearchParams<{ deliveryId: string }>();
@@ -19,7 +16,7 @@ export default function DeliveryCopyView() {
     const [delivery, setDelivery] = useState<Delivery | undefined>();
     const [code, setCode] = useState<string>("");
     const [customer, setCustomer] = useState<string>("");
-    const [steps, setSteps] = useState<Array<Step>>([]);
+    const [steps, setSteps] = useState<Step[]>([]);
 
     useEffect(() => {
         const auxDelivery = viewModel.getDelivery(deliveryId);
@@ -33,7 +30,6 @@ export default function DeliveryCopyView() {
     }, [viewModel, deliveryId]);
 
     const theme = useTheme();
-    const style = datatableStyle;
 
     if (!delivery)
         return (
@@ -70,7 +66,7 @@ export default function DeliveryCopyView() {
 
             <StepInputDataTable
                 steps={steps}
-                deleteRow={(step) => setSteps(steps.filter((s) => s.id != step.id))}
+                deleteRow={(step) => setSteps(steps.filter((s) => s.id !== step.id))}
             />
             <Button
                 mode="outlined"

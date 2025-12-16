@@ -6,7 +6,6 @@ import { Text, useTheme } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import ReportDeliveryList from "../components/ReportDeliveryList";
 import useReportViewModel from "../viewModels/ReportViewModel";
-import { Delivery } from "@/deliveries/models/Delivery";
 import Report from "../models/Report";
 
 export default function ReportDetailView() {
@@ -22,7 +21,7 @@ export default function ReportDetailView() {
 
     useEffect(() => {
         nav.setOptions({ headerTitle: report ? report.reportDate : 'Détails rapport' });
-    }, [report])
+    }, [report, nav])
 
     if (!report)
         return (
@@ -41,7 +40,7 @@ export default function ReportDetailView() {
                     {report.reportDate.toLocaleDateString()}
                 </Text>
             </View>
-            <ReportDeliveryList deliveries={report.deliveries} onRowPress={(delivery: Delivery) => { }} />
+            <ReportDeliveryList deliveries={report.deliveries} />
         </View>
     );
 }

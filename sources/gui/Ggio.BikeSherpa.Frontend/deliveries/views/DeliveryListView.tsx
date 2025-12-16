@@ -18,11 +18,10 @@ export function DeliveryListView() {
     const [courierFilter, setCourierFilter] = useState<string>('NONE');
     const [isAssigning, setIsAssigning] = useState<boolean>(false);
     const [assignDropdown, setAssignDropdown] = useState<string>('NONE');
-    const [selectionKey, setSelectionKey] = useState(0); // Used to reload datatable when we assign some
 
     // Data
-    const [deliveries, setDeliveries] = useState<Array<Delivery>>([]);
-    const [steps, setSteps] = useState<Array<Step>>([]);
+    const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+    const [steps, setSteps] = useState<Step[]>([]);
 
     const viewModel = useDeliveryViewModel();
     const { selectedSteps, isStepSelected, isDeliverySelected, toggleStepSelection, toggleDeliverySelection, clearSelection } = useDeliverySelection();
@@ -102,7 +101,6 @@ export function DeliveryListView() {
                             onPress={() => {
                                 assignSteps(assignDropdown, selectedSteps);
                                 clearSelection();
-                                setSelectionKey(prev => prev + 1);
                                 setIsAssigning(false);
                             }}
                         >
@@ -112,7 +110,6 @@ export function DeliveryListView() {
                             style={{ backgroundColor: theme.colors.background, borderWidth: 1, borderColor: theme.colors.onBackground }}
                             onPress={() => {
                                 clearSelection();
-                                setSelectionKey(prev => prev + 1);
                                 setIsAssigning(false);
                             }}
                         >
@@ -136,7 +133,7 @@ export function DeliveryListView() {
                 />
             ) : (
                 <>
-                    {courierFilter == 'NONE' ? (
+                    {courierFilter === 'NONE' ? (
                         <DeliveryDataTable
                             deliveries={deliveries}
                             isDeliverySelected={isAssigning ? isDeliverySelected : undefined}
@@ -156,14 +153,17 @@ export function DeliveryListView() {
                                 pathname: '/(tabs)/(deliveries)/copy',
                                 params: { deliveryId: delivery.id }
                             })}
-                            onDelete={(delivery: Delivery) => { }}
+                            onDelete={(delivery: Delivery) => navigate({
+                                pathname: '/(tabs)/(deliveries)/[deliveryId]',
+                                params: { deliveryId: delivery.id }
+                            })}
                         />
                     ) : (
                         <StepDataTableAssign
                             steps={steps}
                             isStepSelected={isAssigning ? isStepSelected : undefined}
                             onRowPress={(step) => {
-                                const delivery = deliveries.find((d) => d.code == step.id);
+                                const delivery = deliveries.find((d) => d.code === step.id);
                                 if (!delivery) return
                                 if (isAssigning)
                                     toggleStepSelection(step, delivery);

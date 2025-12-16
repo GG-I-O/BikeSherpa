@@ -4,7 +4,7 @@ import datatableStyle from "@/style/datatableStyle";
 import StepDataTableRow from "./StepDataTableRow";
 
 type Props = {
-    steps: Array<Step>,
+    steps: Step[],
     isStepSelected?: (step: Step) => boolean,
     onRowPress?: (step: Step) => void,
     canChangeDate?: boolean,

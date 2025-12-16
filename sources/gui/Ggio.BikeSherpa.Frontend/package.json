@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "startHTTPS": "local-ssl-proxy --source 443 --target 8081 --cert localhost.pem --key localhost-key.pem",
     "build:apk:linux": "bash scripts/buildapk.sh",
     "build:apk:windows": "powershell -ExecutionPolicy Bypass -File .\\scripts\\buildapk.ps1",
     "android": "expo run:android",
@@ -11,7 +12,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest --watchAll=false",
-    "openAPI": "openapi-zod-client \"http://192.168.11.89:5287/swagger/v1/swagger.json\" -o \"./infra/openAPI/client.ts\""
+    "openAPI:web": "openapi-zod-client \"https://192.168.11.89:5287/swagger/v1/swagger.json\" -o \"./infra/openAPI/client.ts\" --implicit-required",
+    "openAPI:file": "openapi-zod-client \"./infra/openAPI/swagger.json\" -o \"./infra/openAPI/client.ts\" --implicit-required"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -48,7 +50,7 @@
     "react-native-auth0": "^5.1.0",
     "react-native-gesture-handler": "~2.28.0",
     "react-native-logs": "^5.5.0",
-    "react-native-mmkv": "^4.0.1",
+    "react-native-mmkv": "^3.3.3",
     "react-native-nitro-modules": "^0.31.9",
     "react-native-paper": "^5.14.5",
     "react-native-paper-dates": "^0.22.51",

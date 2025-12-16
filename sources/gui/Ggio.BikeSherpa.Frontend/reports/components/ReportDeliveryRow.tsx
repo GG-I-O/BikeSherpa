@@ -1,20 +1,18 @@
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import { Delivery } from "@/deliveries/models/Delivery";
 import datatableStyle from "@/style/datatableStyle";
-import { DataTable, useTheme } from "react-native-paper";
+import { DataTable } from "react-native-paper";
 
 type Props = {
-    delivery: Delivery,
-    onPress: () => void
+    delivery: Delivery
 }
 
-export default function ReportDeliveryRow({ delivery, onPress }: Props) {
-    const theme = useTheme();
+export default function ReportDeliveryRow({ delivery }: Props) {
     const style = datatableStyle;
     const pricePrecision = 100;
 
     return <>
-        <DataTable.Row onPress={onPress}>
+        <DataTable.Row>
             <DataTable.Cell style={[style.column, style.width100]}>
                 {delivery.steps ? delivery.steps[0].getContractDate() : "Date inconnue"}
             </DataTable.Cell>
@@ -27,7 +25,7 @@ export default function ReportDeliveryRow({ delivery, onPress }: Props) {
         </DataTable.Row>
 
         {delivery.steps ? delivery.steps.map((step) => <>
-            <DataTable.Row onPress={onPress} style={{ marginLeft: 110 }}>
+            <DataTable.Row style={{ marginLeft: 110 }}>
                 <DataTable.Cell style={[style.column, style.width40]}>
                     <DeliveryTypeIcon type={step.type} />
                 </DataTable.Cell>

@@ -1,4 +1,5 @@
-﻿using FastEndpoints;
+using System.Security.Claims;
+using FastEndpoints;
 using FastEndpoints.Swagger;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Features.Courses;
@@ -6,11 +7,12 @@ using Ggio.DddCore.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
-using Ggio.BikeSherpa.Backend.Features.Clients;
 using Ggio.BikeSherpa.Backend.Features.Courses.Get;
-using Ggio.BikeSherpa.Backend.Features.Hateoas;
-using Ggio.BikeSherpa.Backend.Features.Notification;
+using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Infrastructure;
+using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
+using Ggio.BikeSherpa.Backend.Services.Hateoas;
+using Ggio.BikeSherpa.Backend.Services.Notification;
 using Ggio.DddCore;
 using Ggio.DddCore.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,31 +32,31 @@ builder.Services.AddFastEndpoints()
                settings.Title = "Bike Sherpa API";
                settings.Version = "v1";
           };
+
+          options.ShortSchemaNames = true;
      });
 
-// Add connection to the database
-var connectionString = builder.Configuration["ConnectionString"];
-builder.Services.AddDddDbContext<BackendDbContext>((_, options) =>
-     options.UseNpgsql(connectionString)
-);
-
-builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<BackendDbContext>());
+// Backend infrastructure layer dependencies
+builder.Services.AddBackendInfrastructure(builder.Configuration);
 
 // Injection
 builder.Services.ConfigureCourseFeature();
-builder.Services.ConfigureClientFeature();
+builder.Services.ConfigureCustomerFeature();
 builder.Services.AddBackendDomain();
 
 // Notification
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(config =>
+{
+     config.EnableDetailedErrors = true;
+});
 builder.Services.AddScoped<IResourceNotificationService, ResourceNotificationService>();
 
 // Hateoas
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<LinkService>();
+builder.Services.AddScoped<IHateoasService, HateoasService>();
 
 // Add DDD infrastructure services
-builder.Services.AddInfrastructureServices();
+builder.Services.AddDddInfrastructureServices();
 
 // Add Mediator for domain event dispatching
 builder.Services.AddMediator(options =>
@@ -63,8 +65,25 @@ builder.Services.AddMediator(options =>
      options.ServiceLifetime = ServiceLifetime.Scoped;
 });
 
+// Cors
+var allowedOrigins = (builder.Configuration["CORS:AllowedOrigins"] ?? "").Split(',');
+builder.Services.AddCors(options =>
+{
+     options.AddDefaultPolicy(policy =>
+     {
+          policy.WithOrigins(allowedOrigins)
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .AllowCredentials();
+     });
+});
+
 // Authentification
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+     options.AddPolicy("read:customers", policy => policy.RequireClaim("scope", "read:customers"));
+     options.AddPolicy("write:customers", policy => policy.RequireClaim("scope","write:customers"));
+});
 builder.Services.AddAuth0ApiAuthentication(options =>
 {
      options.Domain = builder.Configuration["Auth0Domain"];
@@ -81,6 +100,22 @@ builder.Services.AddAuth0ApiAuthentication(options =>
                ValidateIssuerSigningKey = true,
                ValidIssuer = builder.Configuration["Auth0Issuer"],
                ValidAudience = builder.Configuration["Auth0Identifier"]
+          },
+          Events = new JwtBearerEvents()
+          {
+               OnTokenValidated = async (context) =>
+               {
+                    if (context.Principal?.Identity is ClaimsIdentity claimsIdentity)
+                    {
+                         var scopeClaims = claimsIdentity.FindFirst("scope");
+                         if (scopeClaims is not null)
+                         {
+                              claimsIdentity.RemoveClaim(scopeClaims);
+                              claimsIdentity.AddClaims(scopeClaims.Value.Split(' ').Select(scope => new Claim("scope", scope)));
+                         }
+                    }
+                    await Task.CompletedTask;
+               }
           }
      };
 });
@@ -89,19 +124,23 @@ builder.Services.AddAuth0ApiAuthentication(options =>
 builder.Host.UseSerilog((context, configuration) =>
 {
      configuration.ReadFrom.Configuration(context.Configuration);
-     configuration.WriteTo.Console();
-     configuration.WriteTo.GrafanaLoki("http://localhost:3100"); //TODO : créer un setting dans appsettings.Developpement.json et le lire depuis la configuration
+     configuration.WriteTo.GrafanaLoki(builder.Configuration["GrafanaLoki"]!);
 });
-builder.Services.AddHttpLogging(o => { });
+builder.Services.AddHttpLogging();
 
 var app = builder.Build();
 
-app.MapHub<ResourceNotificationHub>("/hubs/notifications");
-
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseFastEndpoints()
+
+app.MapHub<ResourceNotificationHub>("/hubs/notifications");
+
+app.UseFastEndpoints(config =>
+     {
+          config.Endpoints.ShortNames = true;
+     })
      .UseSwaggerGen();
 
 app.UseResourceNotifications();

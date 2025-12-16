@@ -13,7 +13,7 @@ public abstract class EntityBase : HasDomainEventsBase
 public abstract class EntityBase<TId> : HasDomainEventsBase
   where TId : struct, IEquatable<TId>
 {
-  public TId Id { get; set; } = default!;
+  public TId Id { get; set; }
 }
 
 /// <summary>

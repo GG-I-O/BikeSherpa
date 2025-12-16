@@ -1,7 +1,5 @@
-import { Address } from "@/models/Address";
 import StepInputDataTable from "@/steps/components/inputs/StepInputDataTable";
 import { Step } from "@/steps/models/Step";
-import datatableStyle from "@/style/datatableStyle";
 import formStyle from "@/style/formStyle";
 import { useState } from "react";
 import { ScrollView } from "react-native";
@@ -13,9 +11,7 @@ export default function NewDeliveryView() {
     const [code, setCode] = useState<string>("");
     const [customer, setCustomer] = useState<string>("");
 
-    const [steps, setSteps] = useState<Array<Step>>([]);
-
-    const style = datatableStyle;
+    const [steps, setSteps] = useState<Step[]>([]);
 
     return (
         <ScrollView
@@ -45,7 +41,7 @@ export default function NewDeliveryView() {
 
             <StepInputDataTable
                 steps={steps}
-                deleteRow={(step) => setSteps(steps.filter((s) => s.id != step.id))}
+                deleteRow={(step) => setSteps(steps.filter((s) => s.id !== step.id))}
             />
             <Button
                 mode="outlined"
