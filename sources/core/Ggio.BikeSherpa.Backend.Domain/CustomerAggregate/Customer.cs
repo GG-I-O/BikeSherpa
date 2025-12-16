@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Ggio.DddCore;
+﻿using Ggio.DddCore;
 
 namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 
