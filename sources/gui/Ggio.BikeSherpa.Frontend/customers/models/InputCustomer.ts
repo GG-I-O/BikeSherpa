@@ -6,10 +6,10 @@ export default class InputCustomer {
     public code: string;
     public phoneNumber: string;
     public email: string;
-    public siret?: number | null;
+    public siret?: string | null;
 
     public constructor(
-        name: string, address: Address, code: string, phone: string, email: string, siret?: number
+        name: string, address: Address, code: string, phone: string, email: string, siret?: string
     ) {
         this.name = name;
         this.address = address;

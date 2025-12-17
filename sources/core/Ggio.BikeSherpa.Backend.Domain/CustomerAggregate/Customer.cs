@@ -6,7 +6,7 @@ public class Customer : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 {
      public required string Name { get; set; }
      public required string Code { get; set; }
-     public int? Siret { get; set; }
+     public string? Siret { get; set; }
      public required string Email { get; set; }
      public required string PhoneNumber { get; set; }
      public required Address Address { get; set; }

@@ -27,7 +27,7 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
             params: { lastSync: lastSync ?? '' }
         });
 
-        const customers = data.map((customerDto: { data: Customer, links: Link[] }) => {
+        const customers = data.map((customerDto: { data: Customer, links: Link[] | null }) => {
             let customer: Customer = { ...customerDto.data, links: customerDto.links ?? [] };
             return customer;
         });

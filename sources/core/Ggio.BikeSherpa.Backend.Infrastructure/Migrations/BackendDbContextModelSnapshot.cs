@@ -62,7 +62,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<int?>("Siret")
-                        .HasColumnType("integer");
+                        .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

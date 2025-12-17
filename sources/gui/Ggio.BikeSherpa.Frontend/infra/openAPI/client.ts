@@ -1,7 +1,7 @@
 import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
-const Address = z.object({
+const AddressCrud = z.object({
   name: z.string(),
   streetInfo: z.string(),
   complement: z.string().nullable(),
@@ -9,12 +9,12 @@ const Address = z.object({
   city: z.string(),
 });
 const CustomerCrud = z.object({
-  name: z.string().nullable(),
-  code: z.string().nullable(),
-  siret: z.number().int().nullable(),
-  email: z.string().nullable(),
-  phoneNumber: z.string().nullable(),
-  address: Address.nullable(),
+  name: z.string(),
+  code: z.string(),
+  siret: z.string().nullable(),
+  email: z.string(),
+  phoneNumber: z.string(),
+  address: AddressCrud,
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
   id: z.string(),
@@ -35,7 +35,7 @@ const CourseCrud = z.object({
 });
 
 export const schemas = {
-  Address,
+  AddressCrud,
   CustomerCrud,
   Link,
   CustomerDto,

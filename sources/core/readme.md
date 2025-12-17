@@ -4,7 +4,15 @@
 
 ## Database connection
 To develop locally, you can use the local PostGresql database defined in docker compose file `infrastructure/dev`
-Then add user secrets name `DesignTimeConnectionString` with value expected value wihtin the ` ./sources/core/Ggio.DddCore.Infrastructure` folder. 
+
+Add user secrets name `ConnectionString` with value expected value wihtin the `./sources/core/Ggio.BikeSherpa.Backend` folder. 
+```json 
+{
+  "ConnectionString": "Host=localhost;Port=5432;Database=<db_name>;Username=<user_name>;Password=<password>"
+}
+```
+
+Add user secrets name `DesignTimeConnectionString` with value expected value wihtin the `./sources/core/Ggio.BikeSherpa.Backend.Infrastructure` folder. 
 ```json 
 {
   "DesignConnectionString": "Host=localhost;Port=5432;Database=<db_name>;Username=<user_name>;Password=<password>"
@@ -39,6 +47,3 @@ So a wrapper of Ardalis RepositoryBase implementing our IRepository interface is
  
 ### Application domain :
 We take as presented Ardalis library
-
-
-

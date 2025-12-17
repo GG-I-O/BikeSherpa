@@ -1,10 +1,7 @@
 # Initialisation
 
 ## Prérequis
-
-- npm  
-  npm update :
-
+node & npm
 ```sh
 nvm install node --reinstall-packages-from=node
 nvm use node
@@ -17,10 +14,12 @@ npm install -g npm@latest
 ## Install
 
 ```sh
-npm install -g npm@latest
+# Create the project from scratch
 npx create-expo-app@latest Ggio.BikeSherpa.Frontend
 cd Ggio.BikeSherpa.Frontend
 npm run reset-project
+
+# Download packages
 npm update
 ```
 
@@ -30,6 +29,31 @@ npm update
 
 ```sh
 npx expo start --clear
+```
+
+#### HTTPS
+##### Setup on PC
+```sh
+# linux : Add to /etc/hosts
+127.0.0.1 dev.bike.local
+
+# windows : Add to C:\Windows\System32\drivers\etc\hosts
+127.0.0.1 dev.bike.local
+```
+
+##### Generate Certificate
+```sh
+# generate SSL certificate
+# Windows :
+choco install mkcert
+mkcert dev.bike.local
+mkcert --install
+```
+
+##### Proxy
+```sh
+# proxy from 8081 to 443
+npm run startHTTPS
 ```
 
 ### Mobile
@@ -117,8 +141,15 @@ APK file is in
 android/app/build/outputs/apk/release/app-release.apk
 ```
 
-# Packages
+# Authentication
+## Auth0
+### Setup on Auth0 dashboard
+Create a new application (SPA for web, Native for android)  
+Make one by environmnent
+### Setup on Expo
+Put infos of this tenant in .env.local (ex: .env.blank)
 
+# Packages
 ## Expo
 
 React native framework and its library
@@ -253,7 +284,10 @@ npm install @zodios/core zod axios
 
 Usage  
 ```sh
-npm run openAPI
+# To create an openAPI file from a swagger url
+npm run openAPI:web
+# To create an openAPI file from a swagger file
+npm run openAPI:file
 ```
 
 ## Jest

@@ -14,7 +14,7 @@ public record UpdateClientCommand(
      Guid Id,
      string Name,
      string Code,
-     int? Siret,
+     string? Siret,
      string Email,
      string PhoneNumber,
      AddressCrud Address
