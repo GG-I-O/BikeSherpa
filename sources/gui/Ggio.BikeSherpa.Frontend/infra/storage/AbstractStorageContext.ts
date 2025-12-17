@@ -34,20 +34,14 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         this.notificationService = notificationService;
 
         // Init canSync observable + connect to notification service if canSync
-        this.initNetworkState().then();
+        this.initNetworkState().catch((error) => {
+            this.logger.error('Failed to initialize network state', error);
+        });
     }
 
     private async initNetworkState() {
         const networkState = await Network.getNetworkStateAsync();
         if (networkState.isInternetReachable) {
-            if (this.notificationService) {
-                try {
-                    await this.notificationService.start(this.resourceName);
-                    this.logger.info('NotificationService started, enabling sync');
-                } catch (error) {
-                    this.logger.error('Failed to start NotificationService', error);
-                }
-            }
             if (this.notificationService) {
                 try {
                     await this.notificationService.start(this.resourceName);

@@ -16,7 +16,7 @@ export default class AddressService implements IAddressService {
         this.logger = logger;
     }
 
-    public openAdressInMaps(address: string) {
+    public openAddressInMaps(address: string) {
         try {
             const encodedAddress = encodeURIComponent(address);
 
