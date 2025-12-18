@@ -117,8 +117,9 @@ const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/api/customer",
-    alias: "AddCustomerEndpoint",
+    path: "/customer",
+    alias: "CreateCustomer",
+    tags: ["customer"],
     requestFormat: "json",
     parameters: [
       {
@@ -143,8 +144,9 @@ const endpoints = makeApi([
   },
   {
     method: "put",
-    path: "/api/customer/:customerId",
-    alias: "UpdateCustomerEndpoint",
+    path: "/customer/:customerId",
+    alias: "UpdateCustomer",
+    tags: ["customer"],
     requestFormat: "json",
     parameters: [
       {
@@ -174,8 +176,9 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/api/customer/:customerId",
-    alias: "GetCustomerEndpoint",
+    path: "/customer/:customerId",
+    alias: "GetCustomer",
+    tags: ["customer"],
     requestFormat: "json",
     parameters: [
       {
@@ -200,8 +203,9 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/api/customers/:lastSync",
-    alias: "GetAllCustomersEndpoint",
+    path: "/customers/:lastSync",
+    alias: "GetCustomers",
+    tags: ["customer"],
     requestFormat: "json",
     parameters: [
       {
@@ -230,4 +234,12 @@ export const api = new Zodios(endpoints);
 
 export function createApiClient(baseUrl: string, options?: ZodiosOptions) {
   return new Zodios(baseUrl, endpoints, options);
+}
+
+// Helper function to get the first tag from an endpoint by alias
+export function getTagByAlias(alias: string): string | undefined {
+  const endpoint = endpoints.find((e) => "alias" in e && e.alias === alias);
+  return endpoint && "tags" in endpoint && Array.isArray(endpoint.tags)
+    ? endpoint.tags[0]
+    : undefined;
 }

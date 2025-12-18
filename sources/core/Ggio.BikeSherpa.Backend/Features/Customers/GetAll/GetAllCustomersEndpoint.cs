@@ -2,6 +2,8 @@
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Mediator;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 
@@ -9,8 +11,10 @@ public class GetAllCustomersEndpoint(IMediator mediator, ICustomerLinks customer
 {
      public override void Configure()
      {
-          Get("/api/customers/{lastSync?}");
+          Get("/customers/{lastSync?}");
           Policies("read:customers");
+          Description(x => x.WithTags("customer").WithName("GetCustomers"));
+          
      }
 
      public override async Task HandleAsync(CancellationToken ct)

@@ -4,7 +4,7 @@ import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifier
 import { ILogger } from "@/spi/LogsSPI";
 import AbstractStorageContext from "@/infra/storage/AbstractStorageContext";
 import { INotificationService } from "@/spi/StorageSPI";
-import { createApiClient, schemas } from "@/infra/openAPI/client";
+import { createApiClient, schemas, getTagByAlias } from "@/infra/openAPI/client";
 import axios from "axios";
 import { Link } from "@/models/HateoasLink";
 
@@ -16,14 +16,16 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
         @inject(ServicesIdentifiers.Logger) logger: ILogger,
         @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService
     ) {
-        super("Customers", logger, notificationService);
-        this.apiClient = createApiClient(axios.defaults.baseURL || '', {
+        const apiClient = createApiClient(axios.defaults.baseURL || '', {
             axiosInstance: axios
         });
+        const tag = getTagByAlias("CreateCustomer") || "Customer";
+        super(tag, logger, notificationService);
+        this.apiClient = apiClient;
     }
 
     protected async getList(lastSync?: string): Promise<Customer[]> {
-        const data = await this.apiClient.GetAllCustomersEndpoint({
+        const data = await this.apiClient.GetCustomers({
             params: { lastSync: lastSync ?? '' }
         });
 
@@ -36,21 +38,40 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
 
     protected async getItem(id: string): Promise<Customer | null> {
+        let data;
         const link = this.getLinkHref(id, "self");
-        if (!link)
-            throw new Error(`Cannot read the customer with id ${id}`);
-
-        const response = await axios.get(link);
-        const data = await response.data;
+        if (link) {
+            const response = await axios.get(link);
+            data = await response.data;
+        }
+        else {
+            const response = await this.apiClient.GetCustomer({
+                params: { customerId: id }
+            });
+            data = response.data;
+        }
         return data;
     }
 
-    protected async create(item: Customer): Promise<Customer> {
-        const customer = schemas.CustomerCrud.parse(item);
-        const response = await this.apiClient.AddCustomerEndpoint(customer);
+    protected async create(item: Customer): Promise<string> {
+        const nowIso = new Date().toISOString();
+        item.siret = item.siret ?? null;
+        item.createdAt = nowIso;
+        item.updatedAt = nowIso;
+        item.address.complement = item.address.complement ?? "";
+
+        const parsed = schemas.CustomerCrud.safeParse(item);
+        if (!parsed.success) {
+            console.error("Create Debug (CustomerCrud validation failed):");
+            console.error(parsed.error.format());
+            throw parsed.error;
+        }
+
+        const customer = parsed.data;
+        const response = await this.apiClient.CreateCustomer(customer);
 
         // Synchronize with the item created at back-end
-        return await this.getItem(response.id) ?? item;
+        return response.id;
     }
 
     protected async update(item: Customer): Promise<Customer> {

@@ -26,7 +26,7 @@ const editCustomerSchema = zod.object({
         .string()
         .email("Adresse e-mail non valide"),
     siret: zod
-        .number()
+        .string()
         .min(14)
         .max(14).nullable(),
     phoneNumber: zod

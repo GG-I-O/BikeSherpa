@@ -11,12 +11,12 @@
     }
   ],
   "paths": {
-    "/api/customer/{customerId}": {
+    "/customer/{customerId}": {
       "put": {
         "tags": [
-          "Api"
+          "customer"
         ],
-        "operationId": "UpdateCustomerEndpoint",
+        "operationId": "UpdateCustomer",
         "parameters": [
           {
             "name": "customerId",
@@ -60,9 +60,9 @@
       },
       "get": {
         "tags": [
-          "Api"
+          "customer"
         ],
-        "operationId": "GetCustomerEndpoint",
+        "operationId": "GetCustomer",
         "parameters": [
           {
             "name": "customerId",
@@ -99,12 +99,12 @@
         ]
       }
     },
-    "/api/customers/{lastSync}": {
+    "/customers/{lastSync}": {
       "get": {
         "tags": [
-          "Api"
+          "customer"
         ],
-        "operationId": "GetAllCustomersEndpoint",
+        "operationId": "GetCustomers",
         "parameters": [
           {
             "name": "lastSync",
@@ -143,12 +143,12 @@
         ]
       }
     },
-    "/api/customer": {
+    "/customer": {
       "post": {
         "tags": [
-          "Api"
+          "customer"
         ],
-        "operationId": "AddCustomerEndpoint",
+        "operationId": "CreateCustomer",
         "requestBody": {
           "x-name": "CustomerCrud",
           "description": "",
@@ -189,9 +189,6 @@
     },
     "/api/course/{Id}": {
       "get": {
-        "tags": [
-          "Api"
-        ],
         "operationId": "GetCourseEndpoint",
         "parameters": [
           {
@@ -230,9 +227,6 @@
     },
     "/api/courses": {
       "get": {
-        "tags": [
-          "Api"
-        ],
         "operationId": "GetAllCoursesEndpoint",
         "responses": {
           "200": {
@@ -264,9 +258,6 @@
     },
     "/api/course": {
       "post": {
-        "tags": [
-          "Api"
-        ],
         "operationId": "AddCourseEndpoint",
         "requestBody": {
           "x-name": "CourseCrud",

@@ -12,8 +12,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest --watchAll=false",
-    "openAPI:web": "openapi-zod-client \"https://192.168.11.89:5287/swagger/v1/swagger.json\" -o \"./infra/openAPI/client.ts\" --implicit-required",
-    "openAPI:file": "openapi-zod-client \"./infra/openAPI/swagger.json\" -o \"./infra/openAPI/client.ts\" --implicit-required"
+    "openAPI:web": "openapi-zod-client \"https://192.168.11.89:5287/swagger/v1/swagger.json\" -o \"./infra/openAPI/client.ts\" --implicit-required --template ./infra/openAPI/template.hbs",
+    "openAPI:file": "tsx ./infra/openAPI/generate.ts"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -75,6 +75,7 @@
     "jest-expo": "~54.0.13",
     "openapi-zod-client": "^1.18.3",
     "react-test-renderer": "19.1.0",
+    "tsx": "^4.19.2",
     "typescript": "~5.9.2"
   },
   "jest": {

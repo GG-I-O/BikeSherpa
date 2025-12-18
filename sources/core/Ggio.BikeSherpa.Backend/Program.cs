@@ -32,6 +32,7 @@ builder.Services.AddFastEndpoints()
           };
 
           options.ShortSchemaNames = true;
+          options.AutoTagPathSegmentIndex = 0;
      });
 
 // Backend infrastructure layer dependencies
@@ -127,22 +128,19 @@ builder.Host.UseSerilog((context, configuration) =>
 builder.Services.AddHttpLogging();
 
 var app = builder.Build();
-
-app.UseHttpsRedirection();
-app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.MapHub<ResourceNotificationHub>("/hubs/notifications");
 
+app.UseCors();
+app.UseHttpsRedirection();
+app.UsePathBase("/api");
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseFastEndpoints(config =>
      {
           config.Endpoints.ShortNames = true;
      })
      .UseSwaggerGen();
-
 app.UseResourceNotifications();
-
 app.UseSerilogRequestLogging();
 app.UseHttpLogging();
 

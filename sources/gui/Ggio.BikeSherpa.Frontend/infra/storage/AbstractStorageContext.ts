@@ -8,6 +8,7 @@ import * as Network from 'expo-network';
 import { inject } from "inversify";
 import { ResourceNotification, ResourceOperation } from "../notification/Notification";
 import { HateoasLinks, Link } from "@/models/HateoasLink";
+import { id } from "react-native-paper-dates";
 
 export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks> implements IStorageContext<T> {
     protected logger: ILogger;
@@ -90,7 +91,11 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             },
             create: async (item: T) => {
                 const result = await this.create(item);
-                return result; // return server version
+                try {
+                    return await this.getItem(result); // return server version
+                } catch (error) {
+                    console.log(error);
+                }
             },
             update: async (item: T) => {
                 // Check if we have the rights to update
@@ -136,14 +141,6 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             // Merge mode on incoming changes
             mode: 'merge',
 
-            // Retry configuration - May be useless with waitFor and WaitForSet
-            retry: {
-                infinite: true, // Keep retrying forever
-                backoff: 'exponential',
-                delay: 10000, // Start with 10 seconds delay
-                maxDelay: 60000 // Max 60 seconds between retries
-            },
-
             // Wait for authentication before syncing
             waitFor: () => this.canSync$,
             waitForSet: () => this.canSync$,
@@ -160,10 +157,17 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 }
 
                 const onNotification = async (notification: ResourceNotification) => {
+                    const localRecord: Record<string, T> = this.store.peek();
                     switch (notification.operation) {
                         case ResourceOperation.POST:
                             this.logger.debug(`${this.resourceName} created via NotificationService`, notification.id);
+
+                            const doesItemExist = undefined !== Object.values(localRecord).find((item) => item.id === notification.id);
+
+                            if (doesItemExist) break;
+
                             const postItem = await this.getItem(notification.id);
+
                             if (postItem)
                                 update({ value: [postItem] });
                             break;
@@ -177,7 +181,6 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                             this.logger.debug(`${this.resourceName} deleted via NotificationService`, notification.id);
 
                             // Filter the deleted item out of the local data
-                            const localRecord: Record<string, T> = this.store.peek();
                             let localArray = Object.values(localRecord);
                             localArray = localArray.filter((item: T) => item.id !== notification.id);
                             update({ value: localArray, mode: 'set' })// Use mode: 'set' to replace instead of merge
@@ -215,7 +218,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
     protected abstract getList(lastSync?: string): Promise<T[]>;
     protected abstract getItem(id: string): Promise<T | null>;
-    protected abstract create(item: T): Promise<T>;
+    protected abstract create(item: T): Promise<string>;
     protected abstract update(item: T): Promise<T>;
     protected abstract delete(item: T): Promise<void>;
 }
