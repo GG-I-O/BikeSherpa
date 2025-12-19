@@ -57,6 +57,7 @@ class CustomerViewModel {
         try {
             const newCustomer: Customer = {
                 id: Crypto.randomUUID(),
+                operationId: Crypto.randomUUID(),
                 ...customer,
             };
             this.customerStore$[newCustomer.id].set(newCustomer);

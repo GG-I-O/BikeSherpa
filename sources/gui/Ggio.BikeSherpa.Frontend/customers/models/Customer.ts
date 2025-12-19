@@ -9,6 +9,7 @@ export default class Customer extends InputCustomer implements Storable, Hateoas
     public readonly id: string;
     public createdAt?: string;
     public updatedAt?: string;
+    public operationId?: string;
     public links?: Link[];
 
     public constructor(

@@ -7,6 +7,7 @@ import { INotificationService } from "@/spi/StorageSPI";
 import { createApiClient, schemas, getTagByAlias } from "@/infra/openAPI/client";
 import axios from "axios";
 import { Link } from "@/models/HateoasLink";
+import * as Crypto from 'expo-crypto';
 
 @injectable()
 export default class CustomerStorageContext extends AbstractStorageContext<Customer> {
@@ -55,6 +56,8 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
 
     protected async create(item: Customer): Promise<string> {
         const nowIso = new Date().toISOString();
+
+        // Zod need a complete body, even for optional fields
         item.siret = item.siret ?? null;
         item.createdAt = nowIso;
         item.updatedAt = nowIso;
@@ -68,7 +71,12 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
         }
 
         const customer = parsed.data;
-        const response = await this.apiClient.CreateCustomer(customer);
+        const response = await this.apiClient.CreateCustomer(
+            customer,
+            {
+                headers: { operationId: item.operationId }
+            }
+        );
 
         // Synchronize with the item created at back-end
         return response.id;
@@ -79,7 +87,13 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
         if (!link)
             throw new Error(`Cannot update the customer ${item.id}`);
 
-        const response = await axios.put(link, JSON.stringify(item));
+        const response = await axios.put(
+            link,
+            JSON.stringify(item),
+            {
+                headers: { operationId: item.operationId }
+            }
+        );
         if (response.status !== 200)
             throw new Error(`Could not update the customer ${item.id}`);
 
@@ -91,7 +105,12 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
         if (!link)
             throw new Error(`Cannot delete the customer ${item.id}`);
 
-        const response = await axios.delete(link);
+        const response = await axios.delete(
+            link,
+            {
+                headers: { operationId: item.operationId }
+            }
+        );
         if (response.status !== 200)
             throw new Error(`Could not delete the customer ${item.id}`);
     }

@@ -11,6 +11,7 @@ using Ggio.BikeSherpa.Backend.Features.Courses.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
+using Ggio.BikeSherpa.Backend.Services.Middleware;
 using Ggio.BikeSherpa.Backend.Services.Notification;
 using Ggio.DddCore;
 using Ggio.DddCore.Infrastructure.Persistence;
@@ -140,6 +141,8 @@ app.UseFastEndpoints(config =>
           config.Endpoints.ShortNames = true;
      })
      .UseSwaggerGen();
+
+app.UseOperationId();
 app.UseResourceNotifications();
 app.UseSerilogRequestLogging();
 app.UseHttpLogging();

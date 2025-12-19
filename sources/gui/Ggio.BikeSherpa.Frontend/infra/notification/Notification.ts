@@ -1,7 +1,8 @@
 export type ResourceNotification = {
     dataType: string,
     operation: ResourceOperation,
-    id: string
+    id: string;
+    operationId: string
 }
 
 export enum ResourceOperation

@@ -8,9 +8,9 @@ import * as Network from 'expo-network';
 import { inject } from "inversify";
 import { ResourceNotification, ResourceOperation } from "../notification/Notification";
 import { HateoasLinks, Link } from "@/models/HateoasLink";
-import { id } from "react-native-paper-dates";
+import Storable from "@/models/Storable";
 
-export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks> implements IStorageContext<T> {
+export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks & Storable> implements IStorageContext<T> {
     protected logger: ILogger;
     protected store: Observable<Record<T extends {
         id: number;
@@ -91,11 +91,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             },
             create: async (item: T) => {
                 const result = await this.create(item);
-                try {
-                    return await this.getItem(result); // return server version
-                } catch (error) {
-                    console.log(error);
-                }
+                return await this.getItem(result);
             },
             update: async (item: T) => {
                 // Check if we have the rights to update
@@ -157,19 +153,23 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 }
 
                 const onNotification = async (notification: ResourceNotification) => {
-                    const localRecord: Record<string, T> = this.store.peek();
+                    let localRecord: Record<string, T>;
                     switch (notification.operation) {
                         case ResourceOperation.POST:
                             this.logger.debug(`${this.resourceName} created via NotificationService`, notification.id);
 
-                            const doesItemExist = undefined !== Object.values(localRecord).find((item) => item.id === notification.id);
-
-                            if (doesItemExist) break;
+                            if (notification.operationId) {
+                                localRecord = this.store.peek();
+                                let localArray = Object.values(localRecord);
+                                const createdItem = localArray.find((item: T) => item.operationId === notification.operationId);
+                                if (createdItem)
+                                    break;
+                            }
 
                             const postItem = await this.getItem(notification.id);
-
-                            if (postItem)
+                            if (postItem) {
                                 update({ value: [postItem] });
+                            }
                             break;
                         case ResourceOperation.PUT:
                             this.logger.debug(`${this.resourceName} updated via NotificationService`, notification.id);
@@ -181,6 +181,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                             this.logger.debug(`${this.resourceName} deleted via NotificationService`, notification.id);
 
                             // Filter the deleted item out of the local data
+                            localRecord = this.store.peek();
                             let localArray = Object.values(localRecord);
                             localArray = localArray.filter((item: T) => item.id !== notification.id);
                             update({ value: localArray, mode: 'set' })// Use mode: 'set' to replace instead of merge
