@@ -1,9 +1,11 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
-import useCustomerViewModel from '../viewModel/CustomerViewModel';
 import InputCustomer from '../models/InputCustomer';
 import { addressSchema } from '@/models/Address';
+import { ICustomerService } from '@/spi/CustomerSPI';
+import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
+import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
 
 const newCustomerSchema = zod.object({
     name: zod
@@ -32,8 +34,8 @@ const newCustomerSchema = zod.object({
         .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
 }).partial({ complement: true, siret: true });
 
-export function useNewCustomerForm() {
-    const viewModel = useCustomerViewModel();
+export function useNewCustomerFormViewModel() {
+    const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
 
     const {
         control,
@@ -59,7 +61,7 @@ export function useNewCustomerForm() {
 
     const onSubmit = (customer: InputCustomer) => {
         customer.address.name = customer.name;
-        viewModel.createCustomer(customer);
+        customerServices.createCustomer(customer);
         reset(); // Clear form after submission
     };
 

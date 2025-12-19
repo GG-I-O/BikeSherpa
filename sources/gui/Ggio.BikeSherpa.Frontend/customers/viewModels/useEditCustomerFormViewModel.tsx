@@ -1,9 +1,11 @@
 import { useForm } from "react-hook-form";
 import Customer from "../models/Customer";
 import { zodResolver } from "@hookform/resolvers/zod";
-import useCustomerViewModel from "../viewModel/CustomerViewModel";
 import * as zod from 'zod';
 import { addressSchema } from '@/models/Address';
+import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
+import { ICustomerService } from "@/spi/CustomerSPI";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 
 const editCustomerSchema = zod.object({
     id: zod
@@ -35,9 +37,9 @@ const editCustomerSchema = zod.object({
         .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
 }).partial({ complement: true, siret: true });
 
-export function useEditCustomerForm(customerId: string) {
-    const viewModel = useCustomerViewModel();
-    const customer = viewModel.getCustomer(customerId);
+export function useEditCustomerFormViewModel(customerId: string) {
+    const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
+    const customer = customerServices.getCustomer$(customerId).peek();
 
     const {
         control,
@@ -50,7 +52,7 @@ export function useEditCustomerForm(customerId: string) {
     });
 
     const onSubmit = (customer: Customer) => {
-        viewModel.updateCustomer(customer);
+        customerServices.updateCustomer(customer);
     };
 
     return { control, handleSubmit: handleSubmit(onSubmit), errors, setValue }

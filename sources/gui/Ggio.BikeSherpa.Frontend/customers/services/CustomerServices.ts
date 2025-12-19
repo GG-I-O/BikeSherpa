@@ -1,30 +1,26 @@
-import CustomerStorageContext from '../services/CustomerStorageContext';
 import { Observable } from '@legendapp/state';
 import * as Crypto from 'expo-crypto';
-import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
 import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
 import { ILogger } from '@/spi/LogsSPI';
 import Customer from '../models/Customer';
 import InputCustomer from '../models/InputCustomer';
+import { inject, injectable } from 'inversify';
+import { IStorageContext } from '@/spi/StorageSPI';
+import { ICustomerService } from '@/spi/CustomerSPI';
 
-class CustomerViewModel {
-    private static instance: CustomerViewModel;
+@injectable()
+export default class CustomerServices implements ICustomerService {
     private logger: ILogger;
-    private storageContext: CustomerStorageContext;
+    private storageContext: IStorageContext<Customer>;
     private readonly customerStore$: Observable<Record<string, Customer>>;
 
-    private constructor() {
-        this.logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
+    public constructor(
+        @inject(ServicesIdentifiers.Logger) logger: ILogger,
+        @inject(ServicesIdentifiers.CustomerStorage) customerContext: IStorageContext<Customer>) {
+        this.logger = logger;
         this.logger = this.logger.extend("Customer");
-        this.storageContext = IOCContainer.get(ServicesIdentifiers.CustomerStorage);
+        this.storageContext = customerContext;
         this.customerStore$ = this.storageContext.getStore();
-    }
-
-    public static getInstance(): CustomerViewModel {
-        if (!CustomerViewModel.instance) {
-            CustomerViewModel.instance = new CustomerViewModel();
-        }
-        return CustomerViewModel.instance;
     }
 
     /**
@@ -74,8 +70,4 @@ class CustomerViewModel {
             this.logger.error("updateCustomer Error :", e);
         }
     };
-}
-
-export default function useCustomerViewModel() {
-    return CustomerViewModel.getInstance();
 }

@@ -1,11 +1,10 @@
-import formStyle from "@/style/formStyle";
-import { useNewCustomerForm } from "../hooks/useNewCustomerForm";
+import { useNewCustomerFormViewModel } from "../viewModels/useNewCustomerFormViewModel";
 
 import CustomerForm from "../components/CustomerForm";
 import InputCustomer from "../models/InputCustomer";
 
 export default function NewCustomerView() {
-    const { control, errors, handleSubmit } = useNewCustomerForm();
+    const { control, errors, handleSubmit } = useNewCustomerFormViewModel();
 
     return (
         <CustomerForm<InputCustomer>

@@ -1,4 +1,4 @@
-import Customer from "../models/Customer";
+import Customer, { CustomerCrud, CustomerDto } from "../models/Customer";
 import { inject, injectable } from "inversify";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { ILogger } from "@/spi/LogsSPI";
@@ -7,7 +7,8 @@ import { INotificationService } from "@/spi/StorageSPI";
 import { createApiClient, schemas, getTagByAlias } from "@/infra/openAPI/client";
 import axios from "axios";
 import { Link } from "@/models/HateoasLink";
-import * as Crypto from 'expo-crypto';
+import { z } from "zod";
+import CustomerMapper from "./CustomerMapper";
 
 @injectable()
 export default class CustomerStorageContext extends AbstractStorageContext<Customer> {
@@ -30,28 +31,28 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
             params: { lastSync: lastSync ?? '' }
         });
 
-        const customers = data.map((customerDto: { data: Customer, links: Link[] | null }) => {
-            let customer: Customer = { ...customerDto.data, links: customerDto.links ?? [] };
-            return customer;
+        const customers = data.map((customerDto: { data: CustomerCrud, links: Link[] | null }) => {
+            return CustomerMapper.CustomerDtoToCustomer(customerDto);
         });
 
         return customers || [];
     }
 
     protected async getItem(id: string): Promise<Customer | null> {
-        let data;
+        let customer: Customer | null;
         const link = this.getLinkHref(id, "self");
         if (link) {
             const response = await axios.get(link);
-            data = await response.data;
+            const data = await response.data as CustomerDto;
+            customer = CustomerMapper.CustomerDtoToCustomer(data);
         }
         else {
             const response = await this.apiClient.GetCustomerEndpoint({
                 params: { customerId: id }
             });
-            data = response.data;
+            customer = CustomerMapper.CustomerDtoToCustomer(response);
         }
-        return data;
+        return customer;
     }
 
     protected async create(item: Customer): Promise<string> {

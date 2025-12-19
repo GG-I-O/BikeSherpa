@@ -12,6 +12,8 @@ import { IAddressService } from "@/spi/AddressSPI";
 import AddressService from "@/services/AddressService";
 import { NotificationService } from "@/infra/notification/NotificationService";
 import AuthService from "@/infra/auth/AuthService";
+import { ICustomerService } from "@/spi/CustomerSPI";
+import CustomerServices from "@/customers/services/CustomerServices";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -25,6 +27,8 @@ export default class IOCContainerBootstrapper {
         IOCContainerBootstrapper.bindNotificationHub();
 
         IOCContainerBootstrapper.bindCustomerStorageContext();
+
+        IOCContainerBootstrapper.bindCustomerServices();
 
         IOCContainerBootstrapper.bindAddressService();
     }
@@ -63,6 +67,10 @@ export default class IOCContainerBootstrapper {
 
     private static bindCustomerStorageContext() {
         IOCContainer.bind<IStorageContext<Customer>>(ServicesIdentifiers.CustomerStorage).to(CustomerStorageContext).inSingletonScope();
+    }
+
+    private static bindCustomerServices() {
+        IOCContainer.bind<ICustomerService>(ServicesIdentifiers.CustomerServices).to(CustomerServices).inSingletonScope();
     }
 
     private static bindAddressService() {
