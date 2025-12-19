@@ -16,7 +16,7 @@
         "tags": [
           "customer"
         ],
-        "operationId": "UpdateCustomer",
+        "operationId": "UpdateCustomerEndpoint",
         "parameters": [
           {
             "name": "customerId",
@@ -62,7 +62,7 @@
         "tags": [
           "customer"
         ],
-        "operationId": "GetCustomer",
+        "operationId": "GetCustomerEndpoint",
         "parameters": [
           {
             "name": "customerId",
@@ -104,7 +104,7 @@
         "tags": [
           "customer"
         ],
-        "operationId": "GetCustomers",
+        "operationId": "GetAllCustomersEndpoint",
         "parameters": [
           {
             "name": "lastSync",
@@ -148,7 +148,7 @@
         "tags": [
           "customer"
         ],
-        "operationId": "CreateCustomer",
+        "operationId": "AddCustomerEndpoint",
         "requestBody": {
           "x-name": "CustomerCrud",
           "description": "",

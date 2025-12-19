@@ -26,7 +26,7 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
 
     protected async getList(lastSync?: string): Promise<Customer[]> {
-        const data = await this.apiClient.GetCustomers({
+        const data = await this.apiClient.GetAllCustomersEndpoint({
             params: { lastSync: lastSync ?? '' }
         });
 
@@ -46,7 +46,7 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
             data = await response.data;
         }
         else {
-            const response = await this.apiClient.GetCustomer({
+            const response = await this.apiClient.GetCustomerEndpoint({
                 params: { customerId: id }
             });
             data = response.data;
@@ -71,7 +71,7 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
         }
 
         const customer = parsed.data;
-        const response = await this.apiClient.CreateCustomer(
+        const response = await this.apiClient.AddCustomerEndpoint(
             customer,
             {
                 headers: { operationId: item.operationId }

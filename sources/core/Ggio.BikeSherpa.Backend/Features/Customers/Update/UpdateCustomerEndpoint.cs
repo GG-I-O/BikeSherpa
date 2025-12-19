@@ -11,7 +11,7 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.Custome
      {
           Put("/customer/{customerId:guid}");
           Policies("write:customers");
-          Description(x => x.WithTags("customer").WithName("UpdateCustomer"));
+          Description(x => x.WithTags("customer"));
      }
 
      public override async Task HandleAsync(Model.CustomerCrud req, CancellationToken ct)

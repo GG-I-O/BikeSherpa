@@ -9,7 +9,7 @@ interface CustomTextInputProps {
     control: Control<any>;
     label: string;
     placeholder: string;
-    error?: FieldError | undefined
+    error?: FieldError | undefined;
     secureTextEntry?: boolean;
     placeholderTextColor?: string;
     required?: boolean;

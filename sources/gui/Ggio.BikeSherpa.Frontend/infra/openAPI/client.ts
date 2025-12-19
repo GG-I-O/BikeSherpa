@@ -118,7 +118,7 @@ const endpoints = makeApi([
   {
     method: "post",
     path: "/customer",
-    alias: "CreateCustomer",
+    alias: "AddCustomerEndpoint",
     tags: ["customer"],
     requestFormat: "json",
     parameters: [
@@ -145,7 +145,7 @@ const endpoints = makeApi([
   {
     method: "put",
     path: "/customer/:customerId",
-    alias: "UpdateCustomer",
+    alias: "UpdateCustomerEndpoint",
     tags: ["customer"],
     requestFormat: "json",
     parameters: [
@@ -177,7 +177,7 @@ const endpoints = makeApi([
   {
     method: "get",
     path: "/customer/:customerId",
-    alias: "GetCustomer",
+    alias: "GetCustomerEndpoint",
     tags: ["customer"],
     requestFormat: "json",
     parameters: [
@@ -204,7 +204,7 @@ const endpoints = makeApi([
   {
     method: "get",
     path: "/customers/:lastSync",
-    alias: "GetCustomers",
+    alias: "GetAllCustomersEndpoint",
     tags: ["customer"],
     requestFormat: "json",
     parameters: [

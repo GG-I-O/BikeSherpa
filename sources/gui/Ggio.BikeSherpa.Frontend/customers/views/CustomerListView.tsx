@@ -5,6 +5,7 @@ import useCustomerViewModel from "../viewModel/CustomerViewModel";
 import { observe } from "@legendapp/state";
 import { useEffect, useState } from "react";
 import Customer from "../models/Customer";
+import { navigate } from "expo-router/build/global-state/routing";
 
 export default function CustomerListView() {
     const theme = useTheme();
@@ -33,15 +34,20 @@ export default function CustomerListView() {
                     <DataTable.Title style={[datatableStyle.column, datatableStyle.width80]}>Actions</DataTable.Title>
                 </DataTable.Header>
 
-                {customerList.map((customer) => (
-                    <DataTable.Row key={customer.id}>
+                {customerList.map((customer, index) => (
+                    <DataTable.Row key={index}>
                         <DataTable.Cell>{customer.name}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column]}>{customer.code}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column]}>{customer.phoneNumber}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column]}>{`${customer.address?.streetInfo ?? ''} ${customer.address?.postcode ?? ''} ${customer.address?.city ?? ''}`.trim()}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column]}>{customer.siret}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column, datatableStyle.width40]}>
-                            <IconButton icon="account-edit" />
+                            <IconButton icon="account-edit" onPress={() => {
+                                navigate({
+                                    pathname: '/(tabs)/(customers)/edit',
+                                    params: { customerId: customer.id }
+                                })
+                            }} />
                         </DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column, datatableStyle.width40]}>
                             <IconButton icon="trash-can-outline" />

@@ -32,6 +32,13 @@ export default function CustomerLayout() {
                     title: "Nouveau client"
                 }}
             />
+            <Stack.Screen
+                name="edit"
+                options={{
+                    headerShown: true,
+                    title: "Modifier le client"
+                }}
+            />
         </Stack>
     )
 }

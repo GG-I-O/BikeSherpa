@@ -13,7 +13,7 @@ public class GetAllCustomersEndpoint(IMediator mediator, ICustomerLinks customer
      {
           Get("/customers/{lastSync?}");
           Policies("read:customers");
-          Description(x => x.WithTags("customer").WithName("GetCustomers"));
+          Description(x => x.WithTags("customer"));
           
      }
 

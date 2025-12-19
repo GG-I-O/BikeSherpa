@@ -13,7 +13,7 @@ public class GetCustomerEndpoint(IMediator mediator, ICustomerLinks customerLink
      {
           Get("/customer/{customerId:guid}");
           Policies("read:customers");
-          Description(x => x.WithTags("customer").WithName("GetCustomer"));
+          Description(x => x.WithTags("customer"));
      }
 
      public override async Task HandleAsync(CancellationToken ct)

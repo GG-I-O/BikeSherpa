@@ -35,8 +35,9 @@ const editCustomerSchema = zod.object({
         .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
 }).partial({ complement: true, siret: true });
 
-export function useEditCustomerForm() {
+export function useEditCustomerForm(customerId: string) {
     const viewModel = useCustomerViewModel();
+    const customer = viewModel.getCustomer(customerId);
 
     const {
         control,
@@ -44,20 +45,7 @@ export function useEditCustomerForm() {
         formState: { errors },
         setValue
     } = useForm<Customer>({
-        defaultValues: {
-            id: '',
-            name: '',
-            code: '',
-            phoneNumber: '',
-            email: '',
-            address: {
-                name: '',
-                streetInfo: '',
-                complement: '',
-                postcode: '',
-                city: ''
-            },
-        },
+        defaultValues: customer,
         resolver: zodResolver(editCustomerSchema)
     });
 
