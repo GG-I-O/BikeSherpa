@@ -90,6 +90,9 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 return await this.getList(lastSyncDate);
             },
             create: async (item: T) => {
+                item.createdAt = new Date().toISOString();
+                item.updatedAt = new Date().toISOString();
+
                 const result = await this.create(item);
                 return await this.getItem(result);
             },
@@ -97,8 +100,10 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 // Check if we have the rights to update
                 if (!item.links?.some((link: Link) => link.rel === "update")) return;
 
-                const result = await this.update(item);
-                return result; // return server version
+                item.updatedAt = new Date().toISOString();
+
+                await this.update(item);
+                return await this.getItem(item.id);
             },
             delete: async (item: T) => {
                 // Check if we have the rights to delete
@@ -142,7 +147,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             waitForSet: () => this.canSync$,
 
             // Subscribe to NotificationService
-            subscribe: ({ update }) => {
+            subscribe: ({ update, refresh }) => {
                 this.logger.info(`Setting up NotificationService subscription for ${storeName}`);
 
                 const connection = this.notificationService.getConnection();
@@ -173,9 +178,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                             break;
                         case ResourceOperation.PUT:
                             this.logger.debug(`${this.resourceName} updated via NotificationService`, notification.id);
-                            const putItem = await this.getItem(notification.id);
-                            if (putItem)
-                                update({ value: [putItem] });
+                            refresh();
                             break;
                         case ResourceOperation.DELETE:
                             this.logger.debug(`${this.resourceName} deleted via NotificationService`, notification.id);
@@ -220,6 +223,6 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
     protected abstract getList(lastSync?: string): Promise<T[]>;
     protected abstract getItem(id: string): Promise<T | null>;
     protected abstract create(item: T): Promise<string>;
-    protected abstract update(item: T): Promise<T>;
+    protected abstract update(item: T): Promise<void>;
     protected abstract delete(item: T): Promise<void>;
 }

@@ -55,12 +55,8 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
 
     protected async create(item: Customer): Promise<string> {
-        const nowIso = new Date().toISOString();
-
         // Zod need a complete body, even for optional fields
         item.siret = item.siret ?? null;
-        item.createdAt = nowIso;
-        item.updatedAt = nowIso;
         item.address.complement = item.address.complement ?? "";
 
         const parsed = schemas.CustomerCrud.safeParse(item);
@@ -82,7 +78,7 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
         return response.id;
     }
 
-    protected async update(item: Customer): Promise<Customer> {
+    protected async update(item: Customer): Promise<void> {
         const link = this.getLinkHref(item.id, "update");
         if (!link)
             throw new Error(`Cannot update the customer ${item.id}`);
@@ -96,8 +92,6 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
         );
         if (response.status !== 200)
             throw new Error(`Could not update the customer ${item.id}`);
-
-        return item;
     }
 
     protected async delete(item: Customer): Promise<void> {
