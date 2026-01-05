@@ -2,7 +2,6 @@
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Mediator;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Get;

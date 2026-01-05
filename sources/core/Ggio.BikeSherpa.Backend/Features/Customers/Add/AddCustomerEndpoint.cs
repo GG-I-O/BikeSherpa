@@ -1,7 +1,6 @@
 ﻿using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Add;

@@ -116,6 +116,26 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "delete",
+    path: "/customer",
+    alias: "DeleteCustomerEndpoint",
+    tags: ["customer"],
+    requestFormat: "json",
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "post",
     path: "/customer",
     alias: "AddCustomerEndpoint",

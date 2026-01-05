@@ -11,12 +11,20 @@ export default function useCustomerListViewModel() {
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
     const customerStore$ = customerServices.getCustomerList$();
     const [customerList, setCustomerList] = useState<Customer[]>([]);
+    const [customerToDelete, setCustomerToDelete] = useState<string | null>(null);
 
     function displayEditForm(id: string) {
         navigate({
             pathname: '/(tabs)/(customers)/edit',
             params: { customerId: id }
         });
+    }
+
+    function deleteCustomer() {
+        if (customerToDelete) {
+            customerServices.deleteCustomer(customerToDelete);
+            
+        };
     }
 
     useEffect(() => {
@@ -26,5 +34,5 @@ export default function useCustomerListViewModel() {
         });
     }, [customerStore$]);
 
-    return { customerList, displayEditForm };
+    return { customerList, displayEditForm, deleteCustomer, setCustomerToDelete };
 }

@@ -1,13 +1,16 @@
 import datatableStyle from "@/style/datatableStyle";
 import { ScrollView } from "react-native";
 import { DataTable, IconButton, useTheme } from "react-native-paper";
-import { navigate } from "expo-router/build/global-state/routing";
 import useCustomerListViewModel from "../viewModels/useCustomerListViewModel";
+import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal";
+import { useState } from "react";
 
 export default function CustomerListView() {
     const theme = useTheme();
     const backgroundColor = theme.colors.background;
-    const { customerList, displayEditForm } = useCustomerListViewModel();
+    const { customerList, displayEditForm, deleteCustomer, setCustomerToDelete } = useCustomerListViewModel();
+    const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
+
 
     return (
         <ScrollView style={{ backgroundColor, height: '100%' }}>
@@ -32,11 +35,25 @@ export default function CustomerListView() {
                             <IconButton icon="account-edit" onPress={() => displayEditForm(customer.id)} />
                         </DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column, datatableStyle.width40]}>
-                            <IconButton icon="trash-can-outline" />
+                            <IconButton icon="trash-can-outline" onPress={() => {
+                                setDisplayConfirmationModal(true);
+                                setCustomerToDelete(customer.id);
+                            }
+                            } />
                         </DataTable.Cell>
                     </DataTable.Row>
                 ))}
             </DataTable>
+            <ThemedConfirmationModal
+                visible={displayConfirmationModal}
+                title="Supprimer le client ?"
+                confirmButton={() => {
+                    deleteCustomer();
+                    setDisplayConfirmationModal(false);
+                }}
+                cancelButton={() => {
+                    setDisplayConfirmationModal(false);
+                }} />
         </ScrollView>
     );
 }
