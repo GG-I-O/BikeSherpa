@@ -61,7 +61,10 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
     const onAddressSelect = (address: Address) => {
         onTextInputChange(null);
         setSuggestedAddresses(null);
-        field.onChange(address);
+        // address is coming from the API and does not contain a fulladdress property
+        const newAddress = address;
+        newAddress.fullAddress = address.name;
+        field.onChange(newAddress);
     }
 
     useEffect(() => {
@@ -75,7 +78,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
             setSuggestedAddresses(addresses);
         }
         fetchAddresses(debouncedQuery)
-        .then();
+            .then();
     }, [debouncedQuery, query, addressService]);
 
     return (
@@ -92,9 +95,9 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
             >
                 <TextInput
                     testID='themedAddressInputTextInput'
-                    value={field.value.name}
+                    value={field.value.fullAddress}
                     onChangeText={(text: string) => {
-                        field.onChange({ name: text });
+                        field.onChange({ fullAddress: text });
                         onTextInputChange(text);
                     }}
                     placeholder={placeholder}
@@ -122,7 +125,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
                         <View style={{ height: safeInset.bottom * 2 }} />
                     }
                     data={suggestedAddresses}
-                    keyExtractor={item => item.name}
+                    keyExtractor={item => item.fullAddress}
                     style={[formStyle.addressOptionList, {
                         borderColor: theme.colors.primaryContainer,
                         backgroundColor: theme.colors.background,
