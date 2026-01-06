@@ -5,9 +5,8 @@ export type ResourceNotification = {
     operationId: string
 }
 
-export enum ResourceOperation
-{
+export enum ResourceOperation {
     POST,
     PUT,
     DELETE
-}
+};

@@ -1,5 +1,5 @@
 import ThemedCardList from "@/components/themed/ThemedCardList";
-import { Step } from "../models/Step"
+import { Step } from "../models/Step";
 import StepCard from "@/steps/components/StepCard";
 import { Dimensions, StyleProp, ViewStyle } from "react-native";
 

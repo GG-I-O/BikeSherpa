@@ -7,6 +7,7 @@ import InputCustomer from '../models/InputCustomer';
 import { inject, injectable } from 'inversify';
 import { IStorageContext } from '@/spi/StorageSPI';
 import { ICustomerService } from '@/spi/CustomerSPI';
+import { hateoasRel } from '@/models/HateoasLink';
 
 @injectable()
 export default class CustomerServices implements ICustomerService {
@@ -45,6 +46,11 @@ export default class CustomerServices implements ICustomerService {
     }
 
     public deleteCustomer(customerId: string): void {
+        const customer = this.getCustomer(customerId);
+        const canDelete = customer.links?.some((link) => link.rel === hateoasRel.delete);
+
+        if (!canDelete)
+            throw new Error(`Cannot delete the customer ${customerId}`);
         this.customerStore$[customerId].delete();
     }
 
@@ -64,6 +70,10 @@ export default class CustomerServices implements ICustomerService {
 
     // Wrapper for EditCustomerForm
     public updateCustomer(customer: Customer) {
+        const customerToUpdate = this.getCustomer(customer.id);
+        const canUpdate = customerToUpdate.links?.some((link) => link.rel === hateoasRel.update);
+        if (!canUpdate)
+            throw new Error(`Cannot update customer ${customer.id}`);
         try {
             this.customerStore$[customer.id].assign(customer);
         } catch (e) {

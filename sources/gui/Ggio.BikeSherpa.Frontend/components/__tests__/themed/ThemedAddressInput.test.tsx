@@ -1,6 +1,6 @@
 import * as ReactHookForm from 'react-hook-form';
 import { act, render, screen, userEvent, waitFor } from '@testing-library/react-native';
-import { IOCContainer } from "@/bootstrapper/constants/IOCContainer"
+import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import { Address } from "@/models/Address";
 import { UserEventInstance } from '@testing-library/react-native/build/user-event/setup';
@@ -8,18 +8,21 @@ import { useTheme, TextInput as PaperTextInput } from 'react-native-paper';
 
 const mockAddress1: Address = {
     name: "Société 1",
+    fullAddress: "",
     streetInfo: "10 rue de la Société 1",
     postcode: "38000",
     city: "Grenoble"
 }
 const mockAddress2: Address = {
     name: "Société 2",
+    fullAddress: "",
     streetInfo: "10 rue de la Société 2",
     postcode: "38300",
     city: "Grenoble"
 }
 const mockAddress3: Address = {
     name: "Société 3",
+    fullAddress: "",
     streetInfo: "10 rue de la Société 3",
     postcode: "38100",
     city: "Échirolles"

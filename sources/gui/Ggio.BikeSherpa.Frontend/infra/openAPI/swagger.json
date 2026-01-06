@@ -97,6 +97,39 @@
             "JWTBearerAuth": []
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "customer"
+        ],
+        "operationId": "DeleteCustomerEndpoint",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
       }
     },
     "/customers/{lastSync}": {
@@ -144,28 +177,6 @@
       }
     },
     "/customer": {
-      "delete": {
-        "tags": [
-          "customer"
-        ],
-        "operationId": "DeleteCustomerEndpoint",
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          }
-        },
-        "security": [
-          {
-            "JWTBearerAuth": []
-          }
-        ]
-      },
       "post": {
         "tags": [
           "customer"

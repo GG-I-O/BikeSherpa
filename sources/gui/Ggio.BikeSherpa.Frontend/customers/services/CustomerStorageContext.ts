@@ -7,7 +7,6 @@ import { INotificationService } from "@/spi/StorageSPI";
 import { createApiClient, schemas, getTagByAlias } from "@/infra/openAPI/client";
 import axios from "axios";
 import { Link } from "@/models/HateoasLink";
-import { z } from "zod";
 import CustomerMapper from "./CustomerMapper";
 
 @injectable()
@@ -56,7 +55,7 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
 
     protected async create(item: Customer): Promise<string> {
-        // Zod need a complete body, even for optional fields
+        // Zod needs a complete body, even for optional fields
         item.siret = item.siret ?? null;
         item.address.complement = item.address.complement ?? "";
 
@@ -80,33 +79,34 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
     }
 
     protected async update(item: Customer): Promise<void> {
-        const link = this.getLinkHref(item.id, "update");
-        if (!link)
-            throw new Error(`Cannot update the customer ${item.id}`);
+        // Zod needs a complete body, even for optional fields
+        item.siret = item.siret ?? null;
+        item.address.complement = item.address.complement ?? "";
 
-        const response = await axios.put(
-            link,
-            JSON.stringify(item),
+        const parsed = schemas.CustomerCrud.safeParse(item);
+        if (!parsed.success) {
+            console.error("Create Debug (CustomerCrud validation failed):");
+            console.error(parsed.error.format());
+            throw parsed.error;
+        }
+
+        const customer = parsed.data;
+        await this.apiClient.UpdateCustomerEndpoint(
+            customer,
             {
+                params: { customerId: customer.id },
                 headers: { operationId: item.operationId }
             }
         );
-        if (response.status !== 200)
-            throw new Error(`Could not update the customer ${item.id}`);
     }
 
     protected async delete(item: Customer): Promise<void> {
-        const link = this.getLinkHref(item.id, "delete");
-        if (!link)
-            throw new Error(`Cannot delete the customer ${item.id}`);
-
-        const response = await axios.delete(
-            link,
+        await this.apiClient.DeleteCustomerEndpoint(
+            undefined,
             {
+                params: { customerId: item.id },
                 headers: { operationId: item.operationId }
             }
         );
-        if (response.status !== 200)
-            throw new Error(`Could not delete the customer ${item.id}`);
     }
 }

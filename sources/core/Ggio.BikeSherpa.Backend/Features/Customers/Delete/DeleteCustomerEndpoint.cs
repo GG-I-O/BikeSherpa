@@ -8,7 +8,7 @@ public class DeleteCustomerEndpoint(IMediator mediator) : EndpointWithoutRequest
 {
      public override void Configure()
      {
-         Delete("/customer");
+         Delete("/customer/{customerId:guid}");
          Policies("write:customers");
          Description(x => x.WithTags("customer"));
      }
@@ -21,7 +21,7 @@ public class DeleteCustomerEndpoint(IMediator mediator) : EndpointWithoutRequest
           var result = await mediator.Send(command, ct);
           if (result.IsSuccess)
           {
-               await Send.OkAsync(new object(), ct);
+               await Send.OkAsync(cancellation: ct);
           }
      }
 }

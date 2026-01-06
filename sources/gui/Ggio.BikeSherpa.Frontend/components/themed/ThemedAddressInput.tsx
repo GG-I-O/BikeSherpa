@@ -95,7 +95,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
             >
                 <TextInput
                     testID='themedAddressInputTextInput'
-                    value={field.value.fullAddress}
+                    value={field.value?.fullAddress || ''}
                     onChangeText={(text: string) => {
                         field.onChange({ fullAddress: text });
                         onTextInputChange(text);
