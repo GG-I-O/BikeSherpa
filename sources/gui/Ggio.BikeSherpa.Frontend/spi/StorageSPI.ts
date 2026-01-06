@@ -2,7 +2,7 @@ import { Observable } from "@legendapp/state";
 import { HubConnection } from "@microsoft/signalr";
 
 export interface IStorageContext<T> {
-    getStore(): Observable<Record<T extends { id: number } ? number : string, T>>
+    getStore(): Observable<Record<T extends { id: number } ? number : string, T>>;
 }
 
 export interface INotificationService {

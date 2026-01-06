@@ -230,6 +230,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 if (this.canSync$ && params.revert) {
                     params.revert();
                 }
+                throw new Error(error.message);
             }
         }));
     }

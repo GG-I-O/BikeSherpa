@@ -125,7 +125,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
                         <View style={{ height: safeInset.bottom * 2 }} />
                     }
                     data={suggestedAddresses}
-                    keyExtractor={item => item.fullAddress}
+                    keyExtractor={item => item.name}
                     style={[formStyle.addressOptionList, {
                         borderColor: theme.colors.primaryContainer,
                         backgroundColor: theme.colors.background,

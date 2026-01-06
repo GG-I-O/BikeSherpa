@@ -23,14 +23,14 @@ export default function useCustomerListViewModel() {
     function deleteCustomer() {
         if (customerToDelete) {
             customerServices.deleteCustomer(customerToDelete);
-            
+
         };
     }
 
     useEffect(() => {
         return observe(() => {
             const record = customerStore$.get() ?? {};
-            setCustomerList(Object.values(record));
+            setCustomerList(Object.values(record).filter((item) => item !== undefined));
         });
     }, [customerStore$]);
 

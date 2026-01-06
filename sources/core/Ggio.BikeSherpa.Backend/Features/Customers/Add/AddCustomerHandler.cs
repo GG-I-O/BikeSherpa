@@ -3,6 +3,7 @@ using Facet.Extensions;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Model;
 using Ggio.DddCore;
 using Mediator;
@@ -20,10 +21,17 @@ public record AddCustomerCommand(
 
 public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
 {
-     public AddCustomerCommandValidator()
+     public AddCustomerCommandValidator(IReadRepository<Customer> repository)
      {
           RuleFor(x => x.Name).NotEmpty();
-          RuleFor(x => x.Code).NotEmpty();
+          RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
+          {
+               var codeisValid = !await repository.AnyAsync(new CustomerByCodeSpecification(code), cancellationToken);
+               if (!codeisValid)
+               {
+                    context.AddFailure("Code already exists");
+               }
+          });
           RuleFor(x => x.Email).NotEmpty();
           RuleFor(x => x.PhoneNumber).NotEmpty();
           RuleFor(x => x.Address).NotEmpty();
@@ -38,6 +46,7 @@ public class AddCustomerHandler(
      public async ValueTask<Result<Guid>> Handle(AddCustomerCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
+          
           var customer = await factory.CreateCustomerAsync(
                command.Name,
                command.Code,
