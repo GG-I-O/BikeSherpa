@@ -12,7 +12,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest --watchAll=false",
-    "openAPI:web": "openapi-zod-client \"https://192.168.11.89:5287/swagger/v1/swagger.json\" -o \"./infra/openAPI/client.ts\" --implicit-required --template ./infra/openAPI/template.hbs",
+    "openAPI:web": "tsx ./infra/openAPI/generate.ts \"https://localhost:5287/swagger/v1/swagger.json\"",
     "openAPI:file": "tsx ./infra/openAPI/generate.ts"
   },
   "dependencies": {
