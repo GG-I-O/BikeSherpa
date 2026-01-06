@@ -167,8 +167,18 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                                 localRecord = this.store.peek();
                                 let localArray = Object.values(localRecord);
                                 const createdItem = localArray.find((item: T) => item.operationId === notification.operationId);
-                                if (createdItem)
+                                if (createdItem) {
+                                    const backendItem = await this.getItem(notification.id);
+                                    if (backendItem) {
+                                        const index = localArray.findIndex((item: T) => item.id === createdItem.id);
+                                        if (index !== -1) {
+                                            localArray.splice(index, 1);
+                                        }
+                                        localArray.push(backendItem);
+                                        update({ value: localArray, mode: 'set' });
+                                    }
                                     break;
+                                }
                             }
 
                             const postItem = await this.getItem(notification.id);
