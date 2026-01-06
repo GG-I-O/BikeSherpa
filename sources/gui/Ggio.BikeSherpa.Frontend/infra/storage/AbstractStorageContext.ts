@@ -216,6 +216,10 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             // Error handling
             onError: (error, params) => {
                 this.logger.error(`${this.resourceName} storage error :`, error, params);
+
+                if (this.canSync$ && params.revert) {
+                    params.revert();
+                }
             }
         }));
     }
