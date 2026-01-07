@@ -23,7 +23,7 @@ public static class OperationIdExtensions
 {
      extension(IApplicationBuilder builder)
      {
-          public IApplicationBuilder UseOperationId()
+          public IApplicationBuilder UseOperationIdMiddleware()
           {
                return builder.UseMiddleware<OperationIdMiddleware>();
           }
