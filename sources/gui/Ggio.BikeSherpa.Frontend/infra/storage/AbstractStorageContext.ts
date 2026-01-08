@@ -9,6 +9,9 @@ import { inject } from "inversify";
 import { ResourceNotification, ResourceOperation } from "../notification/Notification";
 import { HateoasLinks, Link } from "@/models/HateoasLink";
 import Storable from "@/models/Storable";
+import ServerError from "@/models/ServerError";
+import { EventRegister } from 'react-native-event-listeners';
+
 
 export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks & Storable> implements IStorageContext<T> {
     protected logger: ILogger;
@@ -20,6 +23,9 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
     private readonly notificationService: INotificationService;
     private readonly resourceName: string;
+
+    private listener?: string | boolean;
+    private readonly onErrorEventType: string;
 
     protected constructor(
         storeName: string,
@@ -33,6 +39,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
         this.resourceName = storeName.toLocaleLowerCase();
         this.notificationService = notificationService;
+        this.onErrorEventType = `${this.resourceName}StorageError`;
 
         // Init canSync observable + connect to notification service if canSync
         this.initNetworkState().catch((error) => {
@@ -66,6 +73,18 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
     public getStore() {
         return this.store;
+    }
+
+    public subscribeToOnErrorEvent(callback: (error: string) => void): string {
+        const eventId = EventRegister.addEventListener(this.onErrorEventType, callback);
+        if (eventId) {
+            return eventId as string;
+        }
+        return "";
+    }
+
+    public unsubscribeFromOnErrorEvent(id: string): void {
+        EventRegister.removeEventListener(id);
     }
 
     protected getLinkHref(id: string, rel: string): string | undefined {
@@ -230,7 +249,9 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 if (this.canSync$ && params.revert) {
                     params.revert();
                 }
-                throw new Error(error.message);
+                let serverErrors: ServerError[];
+                serverErrors = (error as any).response.data;
+                serverErrors.forEach((error) => EventRegister.emit(this.onErrorEventType, error.message));
             }
         }));
     }

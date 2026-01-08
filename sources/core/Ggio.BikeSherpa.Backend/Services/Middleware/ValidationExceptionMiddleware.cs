@@ -22,8 +22,8 @@ public class ValidationExceptionMiddleware(RequestDelegate next, ILogger<Validat
                {
                     errors.Add(new ThrownValidationError()
                     {
-                         PropertyName = error.PropertyName,
-                         ErrorMessage = error.ErrorMessage
+                         Origin = error.PropertyName,
+                         Message = error.ErrorMessage
                     });
                }
                var result = Results.BadRequest(errors);

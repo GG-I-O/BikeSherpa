@@ -70,9 +70,9 @@ public class ValidationExceptionMiddlewareTests : IClassFixture<WebApplicationFa
           response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
           var errors = JsonSerializer.Deserialize<List<ThrownValidationError>>(content, _jsonSerializerOptions);
           errors.Should().NotBeNull();
-          errors[0].PropertyName.Should().Be("code");
-          errors[0].ErrorMessage.Should().Be("code non unique");
-          errors[1].PropertyName.Should().Be("name");
-          errors[1].ErrorMessage.Should().Be("nom non unique");
+          errors[0].Origin.Should().Be("code");
+          errors[0].Message.Should().Be("code non unique");
+          errors[1].Origin.Should().Be("name");
+          errors[1].Message.Should().Be("nom non unique");
      }
 }

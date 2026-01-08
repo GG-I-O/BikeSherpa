@@ -1,8 +1,11 @@
+import ServerError from "@/models/ServerError";
 import { Observable } from "@legendapp/state";
 import { HubConnection } from "@microsoft/signalr";
 
 export interface IStorageContext<T> {
     getStore(): Observable<Record<T extends { id: number } ? number : string, T>>;
+    subscribeToOnErrorEvent(callback: (error: string) => void): string;
+    unsubscribeFromOnErrorEvent(id: string): void;
 }
 
 export interface INotificationService {

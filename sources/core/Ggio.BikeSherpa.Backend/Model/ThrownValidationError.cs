@@ -2,6 +2,6 @@
 
 public record ThrownValidationError
 {
-     public required string PropertyName { get; init; }
-     public required string ErrorMessage { get; init; }
+     public required string Origin { get; init; }
+     public required string Message { get; init; }
 }
