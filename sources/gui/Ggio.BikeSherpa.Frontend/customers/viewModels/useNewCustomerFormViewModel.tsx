@@ -74,12 +74,9 @@ export function useNewCustomerFormViewModel() {
 
     const onSubmit = (customer: InputCustomer) => {
         customer.address.name = customer.name;
-        try {
-            customerServices.createCustomer(customer);
-            reset(); // Clear form after submission
-        } catch (error) {
-            console.log("toto est mort");
-        }
+        customerServices.createCustomer(customer);
+        reset(); // Clear form after submission
+
     };
 
     return {

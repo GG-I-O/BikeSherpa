@@ -14,6 +14,8 @@ import { NotificationService } from "@/infra/notification/NotificationService";
 import AuthService from "@/infra/auth/AuthService";
 import { ICustomerService } from "@/spi/CustomerSPI";
 import CustomerServices from "@/customers/services/CustomerServices";
+import { IAppSnackbarService } from "@/spi/AppSnacbarSPI";
+import AppSnackbarService from "@/snackbar/services/AppSnackbarService";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -31,6 +33,9 @@ export default class IOCContainerBootstrapper {
         IOCContainerBootstrapper.bindCustomerServices();
 
         IOCContainerBootstrapper.bindAddressService();
+
+        IOCContainerBootstrapper.bindAppSnackbarService();
+
     }
 
     private static bindUserService() {
@@ -75,5 +80,9 @@ export default class IOCContainerBootstrapper {
 
     private static bindAddressService() {
         IOCContainer.bind<IAddressService>(ServicesIdentifiers.AddressService).to(AddressService).inSingletonScope();
+    }
+
+    private static bindAppSnackbarService() {
+        IOCContainer.bind<IAppSnackbarService>(ServicesIdentifiers.AppSnackbarService).to(AppSnackbarService).inSingletonScope();
     }
 }

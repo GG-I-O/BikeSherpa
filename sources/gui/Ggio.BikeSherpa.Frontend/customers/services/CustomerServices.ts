@@ -12,16 +12,16 @@ import { hateoasRel } from '@/models/HateoasLink';
 @injectable()
 export default class CustomerServices implements ICustomerService {
     private logger: ILogger;
-    private storageContext: IStorageContext<Customer>;
+    private storage: IStorageContext<Customer>;
     private readonly customerStore$: Observable<Record<string, Customer>>;
 
     public constructor(
         @inject(ServicesIdentifiers.Logger) logger: ILogger,
-        @inject(ServicesIdentifiers.CustomerStorage) customerContext: IStorageContext<Customer>) {
+        @inject(ServicesIdentifiers.CustomerStorage) customerStorage: IStorageContext<Customer>) {
         this.logger = logger;
         this.logger = this.logger.extend("Customer");
-        this.storageContext = customerContext;
-        this.customerStore$ = this.storageContext.getStore();
+        this.storage = customerStorage;
+        this.customerStore$ = this.storage.getStore();
     }
 
     /**

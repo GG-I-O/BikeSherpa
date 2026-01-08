@@ -1,6 +1,7 @@
 import AppBootstrapper from "@/bootstrapper/AppBootstrapper";
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import AppSnackbarView from "@/snackbar/views/AppSnackbarView";
 import { IAuthService, IUserService } from "@/spi/AuthSPI";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
@@ -49,6 +50,7 @@ export default function RootLayout() {
     return (
         <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
             <AppStack />
+            <AppSnackbarView />
         </Auth0Provider>
     );
 }

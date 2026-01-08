@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import CustomerServices from "../services/CustomerServices";
 import { observe } from "@legendapp/state";
 import Customer from "../models/Customer";
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";

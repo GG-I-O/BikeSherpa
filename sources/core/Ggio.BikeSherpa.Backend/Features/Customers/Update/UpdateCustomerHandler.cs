@@ -22,11 +22,18 @@ public record UpdateClientCommand(
 
 public class UpdateClientCommandValidator : AbstractValidator<UpdateClientCommand>
 {
-     public UpdateClientCommandValidator()
+     public UpdateClientCommandValidator(IReadRepository<Customer> repository)
      {
           RuleFor(x => x.Id).NotEmpty();
           RuleFor(x => x.Name).NotEmpty();
-          RuleFor(x => x.Code).NotEmpty();
+          RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
+          {
+               var codeisValid = !await repository.AnyAsync(new CustomerByCodeSpecification(code), cancellationToken);
+               if (!codeisValid)
+               {
+                    context.AddFailure("Code client existant");
+               }
+          });
           RuleFor(x => x.Email).NotEmpty();
           RuleFor(x => x.PhoneNumber).NotEmpty();
           RuleFor(x => x.Address).NotEmpty();
