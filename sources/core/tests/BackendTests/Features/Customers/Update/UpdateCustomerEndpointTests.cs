@@ -1,25 +1,23 @@
-﻿using System.Text.Json;
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using AutoFixture;
 using AwesomeAssertions;
 using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
+using Ggio.BikeSherpa.Backend.Features.Customers.Update;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace BackendTests.Features.Customers.Add;
+namespace BackendTests.Features.Customers.Update;
 
-public class AddCustomerEndpointTests(ITestContextAccessor testContextAccessor)
+public class UpdateCustomerEndpointTests
 {
      private readonly Mock<IMediator> _mockMediator = new();
      private readonly Fixture _fixture = new();
-     private readonly CancellationToken _cancellationToken = testContextAccessor.Current.CancellationToken;
-
+     
      [Fact]
-     public async Task AddCustomer_ValidCustomer_ReturnsCreated()
+     public async Task UpdateCustomer_ValidCustomer_ReturnsOk()
      {
           // Arrange
           var customerCrud = _fixture.Create<CustomerCrud>();
@@ -31,23 +29,14 @@ public class AddCustomerEndpointTests(ITestContextAccessor testContextAccessor)
 
           // Assert
           VerifyMediatorCalledOnce();
-          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status201Created);
-
-          // Read the response body
-          sut.HttpContext.Response.Body.Position = 0;
-          using var reader = new StreamReader(sut.HttpContext.Response.Body);
-          var responseBody = await reader.ReadToEndAsync(_cancellationToken);
-          var responseObject = JsonSerializer.Deserialize<JsonElement>(responseBody);
-          var actualId = responseObject.GetProperty("id").GetGuid();
-
-          actualId.Should().Be(expectedId);
+          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
      }
-
-     private AddCustomerEndpoint CreateSut(Guid expectedId)
+     
+     private UpdateCustomerEndpoint CreateSut(Guid expectedId)
      {
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<AddCustomerCommand>(),
+                    It.IsAny<UpdateCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new Result<Guid>(expectedId));
 
@@ -56,11 +45,13 @@ public class AddCustomerEndpointTests(ITestContextAccessor testContextAccessor)
                s.AddSingleton(_mockMediator.Object);
           });
 
-          var endpoint = Factory.Create<AddCustomerEndpoint>(
+          var endpoint = Factory.Create<UpdateCustomerEndpoint>(
                ctx =>
                {
-                    ctx.Request.Method = "POST";
-                    ctx.Request.Path = "/api/customer";
+                    ctx.Request.Method = "PUT";
+                    ctx.Request.Path = $"/api/customer/{expectedId}";
+                    ctx.Request.QueryString = new QueryString($"?customerId={expectedId}");
+                    ctx.Request.RouteValues["customerId"] = expectedId;
                     ctx.Response.Body = new MemoryStream();
                },
                _mockMediator.Object
@@ -73,7 +64,7 @@ public class AddCustomerEndpointTests(ITestContextAccessor testContextAccessor)
      {
           _mockMediator.Verify(
                m => m.Send(
-                    It.IsAny<AddCustomerCommand>(),
+                    It.IsAny<UpdateCustomerCommand>(),
                     It.IsAny<CancellationToken>()),
                Times.Once
           );

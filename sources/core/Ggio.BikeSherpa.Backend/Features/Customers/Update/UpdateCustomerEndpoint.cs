@@ -15,7 +15,7 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.Custome
 
      public override async Task HandleAsync(Model.CustomerCrud req, CancellationToken ct)
      {
-          var command = new UpdateClientCommand(
+          var command = new UpdateCustomerCommand(
                Route<Guid>("customerId"),
                req.Name,
                req.Code,
