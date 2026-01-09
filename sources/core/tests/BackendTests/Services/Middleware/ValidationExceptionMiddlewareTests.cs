@@ -22,7 +22,7 @@ public class ValidationExceptionMiddlewareTests : IClassFixture<WebApplicationFa
           PropertyNameCaseInsensitive = false,
           PropertyNamingPolicy = JsonNamingPolicy.CamelCase
      };
-     private CancellationToken _cancellationToken;
+     private readonly CancellationToken _cancellationToken;
 
      public ValidationExceptionMiddlewareTests(WebApplicationFactory<Program> webApplicationFactory, ITestContextAccessor testContextAccessor)
      {
