@@ -1,6 +1,6 @@
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
-import { IAppSnackbarService } from "@/spi/AppSnacbarSPI";
+import { IAppSnackbarService } from "@/spi/AppSnackbarSPI";
 import { useEffect, useState } from "react";
 
 export default function useAppSnackbarViewModel() {

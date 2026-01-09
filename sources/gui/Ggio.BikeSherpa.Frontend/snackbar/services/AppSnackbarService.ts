@@ -1,6 +1,6 @@
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import Customer from "@/customers/models/Customer";
-import { IAppSnackbarService } from "@/spi/AppSnacbarSPI";
+import { IAppSnackbarService } from "@/spi/AppSnackbarSPI";
 import { IStorageContext } from "@/spi/StorageSPI";
 import { inject, injectable } from "inversify";
 import { EventRegister } from "react-native-event-listeners";
