@@ -15,7 +15,7 @@ public class CustomerLinks(IHttpContextAccessor httpContextAccessor, IHateoasSer
           // Get Links depending permissions
           var context = httpContextAccessor.HttpContext;
           if (context is null)
-               return new List<Link>();
+               return [];
           var scopes = context.User.FindAll("scope")
                .SelectMany(c => c.Value.Split(' '))
                .Distinct()
@@ -23,11 +23,13 @@ public class CustomerLinks(IHttpContextAccessor httpContextAccessor, IHateoasSer
           
           var canRead = scopes.Contains("read:customers");
           var canWrite = scopes.Contains("write:customers");
+          if (!canRead && !canWrite)
+               return [];
 
           return hateoasService.GenerateLinks(
                canRead ? IEndpoint.GetName<GetCustomerEndpoint>() : null,
                canWrite ? IEndpoint.GetName<UpdateCustomerEndpoint>() : null,
-               canRead ? IEndpoint.GetName<DeleteCustomerEndpoint>() : null,
+               canWrite ? IEndpoint.GetName<DeleteCustomerEndpoint>() : null,
                new { customerId = id }
           );
      }

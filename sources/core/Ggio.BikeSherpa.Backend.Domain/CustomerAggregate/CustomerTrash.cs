@@ -5,13 +5,13 @@ namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 
 public interface ICustomerTrash
 {
-     Task DeleteCustomerAsync(Customer customer);
+     Task DeleteCustomerAsync(Customer customer, CancellationToken cancellationToken);
 }
 
 public class CustomerTrash(IMediator mediator) : TrashBase(mediator), ICustomerTrash
 {
-     public async Task DeleteCustomerAsync(Customer customer)
+     public async Task DeleteCustomerAsync(Customer customer, CancellationToken cancellationToken = default)
      {
-          await NotifyEntityDeleted(customer);
+          await NotifyEntityDeleted(customer, cancellationToken);
      }
 }

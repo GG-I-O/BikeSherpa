@@ -22,7 +22,7 @@ public class DeleteCustomerHandler(
           if (entity is null)
                return Result.NotFound();
           
-          await customerTrash.DeleteCustomerAsync(entity);
+          await customerTrash.DeleteCustomerAsync(entity, cancellationToken);
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
      }

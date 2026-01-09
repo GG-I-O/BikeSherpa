@@ -29,9 +29,4 @@
       <ProjectReference Include="..\..\Ggio.DddCore\Ggio.DddCore.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Features\Customers\Model\" />
-      <Folder Include="Features\Customers\Services\" />
-    </ItemGroup>
-
 </Project>
