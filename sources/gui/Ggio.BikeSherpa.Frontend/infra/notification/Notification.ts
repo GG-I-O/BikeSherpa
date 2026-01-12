@@ -9,4 +9,4 @@ export enum ResourceOperation {
     POST,
     PUT,
     DELETE
-};
+}

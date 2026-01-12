@@ -22,8 +22,7 @@ export default function useCustomerListViewModel() {
     function deleteCustomer() {
         if (customerToDelete) {
             customerServices.deleteCustomer(customerToDelete);
-
-        };
+        }
     }
 
     useEffect(() => {

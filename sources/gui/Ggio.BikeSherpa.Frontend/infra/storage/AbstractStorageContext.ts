@@ -24,7 +24,6 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
     private readonly notificationService: INotificationService;
     private readonly resourceName: string;
 
-    private listener?: string | boolean;
     private readonly onErrorEventType: string;
 
     protected constructor(

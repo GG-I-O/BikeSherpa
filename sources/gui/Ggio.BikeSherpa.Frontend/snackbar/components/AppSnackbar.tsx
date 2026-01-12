@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Snackbar } from "react-native-paper";
 
 type AppSnackbarProps = {

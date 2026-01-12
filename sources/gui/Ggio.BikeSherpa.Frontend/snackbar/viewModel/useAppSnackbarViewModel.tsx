@@ -13,7 +13,7 @@ export default function useAppSnackbarViewModel() {
         appSnackbarService.subscribe((message: string) => {
             setMessageList(oldArray => [...oldArray, message]);
         });
-    }, [])
+    }, [appSnackbarService])
 
     function onDismiss() {
         setVisibility(false);

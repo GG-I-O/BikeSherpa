@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, act, userEvent } from '@testing-library/react-native';
+import { render, screen, waitFor, act, userEvent } from '@testing-library/react-native';
 import AppSnackbar from "../../components/AppSnackbar";
 import { UserEventInstance } from '@testing-library/react-native/build/user-event/setup';
 
@@ -35,7 +35,6 @@ describe("AppSnackbar", () => {
             text={"La snackbar s'affiche."}
             onDismiss={function (): void { }}
         />)
-        const snackbar = screen.getByTestId("AppSnackbar");
         const closeButton = screen.queryByText("fermer");
         expect(closeButton).toBeOnTheScreen();
     });

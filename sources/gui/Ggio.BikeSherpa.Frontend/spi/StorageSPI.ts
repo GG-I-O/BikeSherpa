@@ -1,4 +1,3 @@
-import ServerError from "@/models/ServerError";
 import { Observable } from "@legendapp/state";
 import { HubConnection } from "@microsoft/signalr";
 

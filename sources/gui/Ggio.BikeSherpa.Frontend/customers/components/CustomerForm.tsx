@@ -4,6 +4,7 @@ import formStyle from "@/style/formStyle";
 import { Control, FieldError, FieldErrors, FieldValues } from "react-hook-form";
 import { ScrollView } from "react-native";
 import { Button, Text, useTheme } from "react-native-paper";
+import React from 'react';
 
 interface CustomerFormProps<T extends FieldValues> {
     control: Control<T, any, T>;

@@ -1,4 +1,4 @@
-import Customer, { CustomerCrud, CustomerDto } from "../models/Customer";
+import Customer, { CustomerDto } from "../models/Customer";
 
 class CustomerMapper {
     public static CustomerDtoToCustomer(customerDto: CustomerDto) {

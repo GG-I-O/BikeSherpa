@@ -19,11 +19,11 @@ async function fetchSwagger(url: string): Promise<any> {
 
     https.get(url, { agent }, (res) => {
       let data = "";
-      
+
       res.on("data", (chunk) => {
         data += chunk;
       });
-      
+
       res.on("end", () => {
         try {
           resolve(JSON.parse(data));
@@ -40,7 +40,7 @@ async function fetchSwagger(url: string): Promise<any> {
 async function generate() {
   try {
     console.log(`Loading OpenAPI spec from: ${source}`);
-    
+
     const swaggerDoc = isUrl
       ? await fetchSwagger(source)
       : JSON.parse(readFileSync(source, "utf-8"));
@@ -71,4 +71,4 @@ async function generate() {
   }
 }
 
-generate();
+generate().then();
