@@ -41,7 +41,7 @@ public class AddCustomerHandlerTests
           return new AddCustomerHandler(_mockFactory.Object, validator, _mockTransaction.Object);
      }
 
-     private void SetupRepositoryTestingIfCodeExists(string code, bool doesCodeExist)
+     private void SetupRepositoryTestingIfCodeExists(bool doesCodeExist)
      {
           _mockRepository
                .Setup(x => x.AnyAsync(
@@ -72,7 +72,7 @@ public class AddCustomerHandlerTests
      public async Task Handle_ShouldCreateCustomerAndReturnId_WhenCommandIsValid()
      {
           // Arrange
-          SetupRepositoryTestingIfCodeExists(_mockCommand.Code, false); // Tell the validator that the code does not exist
+          SetupRepositoryTestingIfCodeExists(false); // Tell the validator that the code does not exist
           var sut = CreateSut();
 
           // Act
@@ -89,7 +89,7 @@ public class AddCustomerHandlerTests
      public async Task Handle_ShouldCreateCustomerWithCorrectInfos()
      {
           // Arrange
-          SetupRepositoryTestingIfCodeExists(_mockCommand.Code, false);
+          SetupRepositoryTestingIfCodeExists(false);
           var sut = CreateSut();
 
           // Act
@@ -114,7 +114,7 @@ public class AddCustomerHandlerTests
      {
           // Arrange
           var commandWithEmptyName = _mockCommand with { Name = "" };
-          SetupRepositoryTestingIfCodeExists(commandWithEmptyName.Code, false);
+          SetupRepositoryTestingIfCodeExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -139,7 +139,7 @@ public class AddCustomerHandlerTests
      {
           // Arrange
           var commandWithEmptyCode = _mockCommand with { Code = "" };
-          SetupRepositoryTestingIfCodeExists(commandWithEmptyCode.Code, false);
+          SetupRepositoryTestingIfCodeExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -164,7 +164,7 @@ public class AddCustomerHandlerTests
      {
           // Arrange
           var commandWithEmptyEmail = _mockCommand with { Email = "" };
-          SetupRepositoryTestingIfCodeExists(commandWithEmptyEmail.Code, false);
+          SetupRepositoryTestingIfCodeExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -189,7 +189,7 @@ public class AddCustomerHandlerTests
      {
           // Arrange
           var commandWithEmptyPhoneNumber = _mockCommand with { PhoneNumber = "" };
-          SetupRepositoryTestingIfCodeExists(commandWithEmptyPhoneNumber.Code, false);
+          SetupRepositoryTestingIfCodeExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -213,7 +213,7 @@ public class AddCustomerHandlerTests
      public async Task Handle_ShouldThrowValidationException_WhenCodeAlreadyExists()
      {
           // Arrange
-          SetupRepositoryTestingIfCodeExists(_mockCommand.Code, true);
+          SetupRepositoryTestingIfCodeExists(true);
           var sut = CreateSut();
 
           // Act & Assert
@@ -239,7 +239,7 @@ public class AddCustomerHandlerTests
           // Arrange
           var cancellationTokenSource = new CancellationTokenSource();
           await cancellationTokenSource.CancelAsync();
-          SetupRepositoryTestingIfCodeExists(_mockCommand.Code, false);
+          SetupRepositoryTestingIfCodeExists(false);
           var sut = CreateSut();
 
           // Act & Assert

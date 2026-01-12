@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using FluentValidation;
+﻿using FluentValidation;
 using Ggio.BikeSherpa.Backend.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

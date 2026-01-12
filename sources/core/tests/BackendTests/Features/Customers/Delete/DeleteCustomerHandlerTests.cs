@@ -17,18 +17,17 @@ public class DeleteCustomerHandlerTests
      private readonly Fixture _fixture = new();
 
      private readonly DeleteCustomerCommand _mockCommand;
-     private readonly Customer _mockCustomer;
 
      public DeleteCustomerHandlerTests()
      {
           _mockCommand = _fixture.Create<DeleteCustomerCommand>();
-          _mockCustomer = _fixture.Create<Customer>();
+          var mockCustomer = _fixture.Create<Customer>();
 
           _mockRepository
                .Setup(x => x.FirstOrDefaultAsync(
                     It.IsAny<ISpecification<Customer>>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(_mockCustomer);
+               .ReturnsAsync(mockCustomer);
      }
 
      private DeleteCustomerHandler CreateSut()
