@@ -4,7 +4,7 @@ import formStyle from "@/style/formStyle";
 import { Control, FieldError, FieldErrors, FieldValues } from "react-hook-form";
 import { ScrollView } from "react-native";
 import { Button, Text, useTheme } from "react-native-paper";
-import React from 'react';
+import React from 'react'
 
 interface CustomerFormProps<T extends FieldValues> {
     control: Control<T, any, T>;
@@ -24,6 +24,7 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
             contentContainerStyle={formStyle.elements}
         >
             <ThemedInput
+                testID="customerFormNameInput"
                 control={control}
                 name="name"
                 error={errors.name as FieldError | undefined}
@@ -32,6 +33,7 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
                 required
             />
             <ThemedInput
+                testID="customerFormCodeInput"
                 control={control}
                 name="code"
                 error={errors.code as FieldError | undefined}
@@ -40,6 +42,7 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
                 required
             />
             <ThemedInput
+                testID="customerFormEmailInput"
                 control={control}
                 name="email"
                 error={errors.email as FieldError | undefined}
@@ -48,6 +51,7 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
                 required
             />
             <ThemedInput
+                testID="customerFormPhoneInput"
                 control={control}
                 name="phoneNumber"
                 error={errors.phoneNumber as FieldError | undefined}
@@ -64,18 +68,20 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
                 required
             />
             <ThemedInput
+                testID="customerFormComplementInput"
                 control={control}
                 name="complement"
                 error={(errors.address as any)?.complement as FieldError | undefined}
-                label="Complément d’adresse"
+                label="Complément d'adresse"
                 placeholder="Bâtiment B"
             />
             <Button
+                testID="formButton"
                 mode="outlined"
                 onPress={() => handleSubmit()}
                 style={formStyle.button}
             >
-                <Text>{buttonName}</Text>
+                <Text testID="buttonName">{buttonName}</Text>
             </Button>
         </ScrollView>
     );

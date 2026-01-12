@@ -9,18 +9,21 @@ global.fetch = jest.fn();
 
 const mockAddress1: Address = {
     name: "Société 1",
+    fullAddress: "10 rue de la Société 1 Grenoble",
     streetInfo: "10 rue de la Société 1",
     postcode: "38000",
     city: "Grenoble"
 }
 const mockAddress2: Address = {
     name: "Société 2",
+    fullAddress: "10 rue de la Société 2 Grenoble",
     streetInfo: "10 rue de la Société 2",
     postcode: "38300",
     city: "Grenoble"
 }
 const mockAddress3: Address = {
     name: "Société 3",
+    fullAddress: "10 rue de la Société 3 Grenoble",
     streetInfo: "10 rue de la Société 3",
     postcode: "38100",
     city: "Échirolles"
