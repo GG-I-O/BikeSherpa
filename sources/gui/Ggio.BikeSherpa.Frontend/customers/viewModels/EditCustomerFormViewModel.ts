@@ -5,7 +5,7 @@ import { ICustomerService } from "@/spi/CustomerSPI";
 import { inject } from "inversify";
 import * as zod from 'zod';
 
-export default class EditCustomerViewModel {
+export default class EditCustomerFormViewModel {
     private customerServices: ICustomerService;
 
     constructor(

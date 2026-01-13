@@ -6,12 +6,12 @@ import { ICustomerService } from "@/spi/CustomerSPI";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { useEffect, useState } from "react";
 import { observe } from "@legendapp/state";
-import EditCustomerViewModel from "./EditCustomerViewModel";
+import EditCustomerFormViewModel from "./EditCustomerFormViewModel";
 
 export function useEditCustomerFormViewModel(customerId: string) {
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
     const customer = customerServices.getCustomer$(customerId).peek();
-    const editCustomerViewModel = new EditCustomerViewModel(customerServices);
+    const editCustomerFormViewModel = new EditCustomerFormViewModel(customerServices);
 
     const customerStore$ = customerServices.getCustomerList$();
     const [customerList, setCustomerList] = useState<Customer[]>([]);
@@ -30,8 +30,8 @@ export function useEditCustomerFormViewModel(customerId: string) {
         setValue
     } = useForm<Customer>({
         defaultValues: customer,
-        resolver: zodResolver(editCustomerViewModel.getEditCustomerSchema(customer, customerList))
+        resolver: zodResolver(editCustomerFormViewModel.getEditCustomerSchema(customer, customerList))
     });
 
-    return { control, handleSubmit: handleSubmit(editCustomerViewModel.onSubmit), errors, setValue };
+    return { control, handleSubmit: handleSubmit(editCustomerFormViewModel.onSubmit), errors, setValue };
 }

@@ -1,34 +1,37 @@
 import { renderHook, act } from '@testing-library/react-native';
-import { useNewCustomerFormViewModel } from '../../viewModels/useNewCustomerFormViewModel';
+import { useEditCustomerFormViewModel } from '../../viewModels/useEditCustomerFormViewModel';
 import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
 import { ICustomerService } from '@/spi/CustomerSPI';
 import { observable } from '@legendapp/state';
 import Customer from '@/customers/models/Customer';
-import NewCustomerFormViewModel from '../../viewModels/NewCustomerFormViewModel';
+import EditCustomerFormViewModel from '@/customers/viewModels/EditCustomerFormViewModel';
 import { mock } from 'ts-jest-mocker';
 import { z } from 'zod';
 
-const mockViewModel = mock(NewCustomerFormViewModel);
+const mockViewModel = mock(EditCustomerFormViewModel);
 
 jest.mock('@/bootstrapper/constants/IOCContainer');
-jest.mock('../../viewModels/NewCustomerFormViewModel', () => {
+jest.mock('../../viewModels/EditCustomerFormViewModel', () => {
     return jest.fn(() => mockViewModel);
 });
 
 const mockCustomerService = mock<ICustomerService>();
 
-describe('useNewCustomerFormViewModel', () => {
+describe('useEditCustomerFormViewModel', () => {
     let mockCustomerStore$: any;
+    let mockCustomer$: any;
+    const mockCustomer = mock(Customer);
 
     beforeEach(() => {
         mockCustomerStore$ = observable<Record<string, Customer>>({});
+        mockCustomer$ = observable<Customer>(mockCustomer);
         mockCustomerService.getCustomerList$.mockReturnValue(mockCustomerStore$);
+        mockCustomerService.getCustomer$.mockReturnValue(mockCustomer$);
 
         (IOCContainer.get as jest.Mock).mockReturnValue(mockCustomerService);
 
         // Setup mock view model methods
-        mockViewModel.getNewCustomerSchema = jest.fn().mockReturnValue(z.object({}));
-        mockViewModel.setResetCallback = jest.fn();
+        mockViewModel.getEditCustomerSchema = jest.fn().mockReturnValue(z.object({}));
         mockViewModel.onSubmit = jest.fn();
     });
 
@@ -37,7 +40,7 @@ describe('useNewCustomerFormViewModel', () => {
     });
 
     it('properly invokes onSubmit callback when form is submitted', async () => {
-        const { result } = renderHook(() => useNewCustomerFormViewModel());
+        const { result } = renderHook(() => useEditCustomerFormViewModel(mockCustomer.id));
 
         await act(async () => {
             await result.current.handleSubmit({ preventDefault: jest.fn() } as any);
@@ -52,13 +55,13 @@ describe('useNewCustomerFormViewModel', () => {
             "2": { id: "2", name: "Customer 2" }
         });
 
-        const { result } = renderHook(() => useNewCustomerFormViewModel());
+        renderHook(() => useEditCustomerFormViewModel(mockCustomer.id));
 
         await act(async () => {
             await new Promise(resolve => setTimeout(resolve, 10));
         });
 
-        expect(mockViewModel.getNewCustomerSchema).toHaveBeenCalledWith([
+        expect(mockViewModel.getEditCustomerSchema).toHaveBeenCalledWith(mockCustomer, [
             { id: "1", name: "Customer 1" },
             { id: "2", name: "Customer 2" }
         ]);
@@ -67,12 +70,12 @@ describe('useNewCustomerFormViewModel', () => {
     it("handles null/undefined observable state", async () => {
         mockCustomerStore$.set(null as any);
 
-        const { result } = renderHook(() => useNewCustomerFormViewModel());
+        renderHook(() => useEditCustomerFormViewModel(mockCustomer.id));
 
         await act(async () => {
             await new Promise(resolve => setTimeout(resolve, 10));
         });
 
-        expect(mockViewModel.getNewCustomerSchema).toHaveBeenCalledWith([]);
+        expect(mockViewModel.getEditCustomerSchema).toHaveBeenCalledWith(mockCustomer, []);
     });
 });
