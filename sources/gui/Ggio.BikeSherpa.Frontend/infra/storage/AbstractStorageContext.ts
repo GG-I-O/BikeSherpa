@@ -249,8 +249,12 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                     params.revert();
                 }
                 let serverErrors: ServerError[];
-                serverErrors = (error as any).response.data;
-                serverErrors.forEach((error) => EventRegister.emit(this.onErrorEventType, error.message));
+                try {
+                    serverErrors = (error as any).response.data;
+                    serverErrors.forEach((error) => EventRegister.emit(this.onErrorEventType, error.message));
+                } catch (error) {
+                    EventRegister.emit(this.onErrorEventType, "Erreur du serveur");
+                }
             }
         }));
     }

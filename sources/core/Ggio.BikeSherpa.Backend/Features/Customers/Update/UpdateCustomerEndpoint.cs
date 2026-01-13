@@ -28,7 +28,7 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.Custome
           var result = await mediator.Send(command, ct);
           if (result.IsSuccess)
           {
-               await Send.OkAsync(new object(), ct);
+               await Send.OkAsync(null, ct);
           }
      }
 }
