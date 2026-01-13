@@ -44,11 +44,11 @@ export function useNewCustomerFormViewModel() {
         resolver: zodResolver(newCustomerViewModel.getNewCustomerSchema(customerList))
     });
 
-
+    newCustomerViewModel.setResetCallback(reset);
 
     return {
         control,
-        handleSubmit: handleSubmit((inputCustomer) => newCustomerViewModel.onSubmit(inputCustomer, reset)),
+        handleSubmit: handleSubmit(newCustomerViewModel.onSubmit),
         errors
     };
 }

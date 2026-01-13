@@ -9,6 +9,7 @@ import Customer from "../models/Customer";
 
 export default class NewCustomerFormViewModel {
     private customerServices: ICustomerService;
+    private resetCallback?: UseFormReset<InputCustomer>;
 
     constructor(
         @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService
@@ -16,12 +17,17 @@ export default class NewCustomerFormViewModel {
         this.customerServices = customerServices;
     }
 
-    public onSubmit(customer: InputCustomer, reset: UseFormReset<InputCustomer>): void {
+    public onSubmit(customer: InputCustomer): void {
         customer.address.name = customer.name;
         this.customerServices.createCustomer(customer);
-        reset(); // Clear form after submission
-
+        if (this.resetCallback) {
+            this.resetCallback(); // Clear form after submission
+        }
     };
+
+    public setResetCallback(reset?: UseFormReset<InputCustomer>) {
+        this.resetCallback = reset;
+    }
 
     public getNewCustomerSchema(customerList: Customer[]) {
         return zod.object({
