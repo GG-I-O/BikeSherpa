@@ -15,10 +15,12 @@ export default class EditCustomerFormViewModel {
     }
 
     onSubmit = (customer: Customer) => {
+        customer.address.name = customer.name;
         this.customerServices.updateCustomer(customer);
     };
 
     public getEditCustomerSchema(customerToEdit: Customer, customerList: Customer[]) {
+        const originalCode = customerToEdit.code;
         return zod.object({
             id: zod
                 .string()
@@ -37,7 +39,7 @@ export default class EditCustomerFormViewModel {
                 .min(1, "Code requis")
                 .max(3, "Code trop long")
                 .refine((value) => {
-                    if (customerToEdit.code === value) {
+                    if (originalCode === value) {
                         return true;
                     }
                     return !customerList.some((customer) => customer.code === value);

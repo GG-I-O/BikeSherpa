@@ -1,40 +1,30 @@
-import Customer, { CustomerCrud, CustomerDto } from "../models/Customer";
+import Customer, { CustomerDto } from "../models/Customer";
 import { inject, injectable } from "inversify";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { ILogger } from "@/spi/LogsSPI";
 import AbstractStorageContext from "@/infra/storage/AbstractStorageContext";
 import { INotificationService } from "@/spi/StorageSPI";
-import { createApiClient, schemas, getTagByAlias } from "@/infra/openAPI/client";
+import { getTagByAlias } from "@/infra/openAPI/client";
 import axios from "axios";
-import { Link } from "@/models/HateoasLink";
 import CustomerMapper from "./CustomerMapper";
+import { IBackendClient } from "@/spi/BackendClientSPI";
 
 @injectable()
 export default class CustomerStorageContext extends AbstractStorageContext<Customer> {
-    private apiClient;
+    private backendClient;
 
     public constructor(
         @inject(ServicesIdentifiers.Logger) logger: ILogger,
-        @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService
+        @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService,
+        @inject(ServicesIdentifiers.CustomerBackendClientFacade) customerBackendClientFacade: IBackendClient<Customer>
     ) {
-        const apiClient = createApiClient(axios.defaults.baseURL || '', {
-            axiosInstance: axios
-        });
         const tag = getTagByAlias("CreateCustomer") || "Customer";
         super(tag, logger, notificationService);
-        this.apiClient = apiClient;
+        this.backendClient = customerBackendClientFacade;
     }
 
     protected async getList(lastSync?: string): Promise<Customer[]> {
-        const data = await this.apiClient.GetAllCustomersEndpoint({
-            params: { lastSync: lastSync ?? '' }
-        });
-
-        const customers = data.map((customerDto: { data: CustomerCrud, links: Link[] | null }) => {
-            return CustomerMapper.CustomerDtoToCustomer(customerDto);
-        });
-
-        return customers || [];
+        return await this.backendClient.GetAllEndpoint(lastSync);
     }
 
     protected async getItem(id: string): Promise<Customer | null> {
@@ -44,69 +34,22 @@ export default class CustomerStorageContext extends AbstractStorageContext<Custo
             const response = await axios.get(link);
             const data = await response.data as CustomerDto;
             customer = CustomerMapper.CustomerDtoToCustomer(data);
+            return customer;
         }
         else {
-            const response = await this.apiClient.GetCustomerEndpoint({
-                params: { customerId: id }
-            });
-            customer = CustomerMapper.CustomerDtoToCustomer(response);
+            return await this.backendClient.GetEndpoint(id);
         }
-        return customer;
     }
 
     protected async create(item: Customer): Promise<string> {
-        // Zod needs a complete body, even for optional fields
-        item.siret = item.siret ?? null;
-        item.address.complement = item.address.complement ?? "";
-
-        const parsed = schemas.CustomerCrud.safeParse(item);
-        if (!parsed.success) {
-            console.error("Create Debug (CustomerCrud validation failed):");
-            console.error(parsed.error.format());
-            throw parsed.error;
-        }
-
-        const customer = parsed.data;
-        const response = await this.apiClient.AddCustomerEndpoint(
-            customer,
-            {
-                headers: { operationId: item.operationId }
-            }
-        );
-
-        // Synchronize with the item created at back-end
-        return response.id;
+        return await this.backendClient.AddEndpoint(item);
     }
 
     protected async update(item: Customer): Promise<void> {
-        // Zod needs a complete body, even for optional fields
-        item.siret = item.siret ?? null;
-        item.address.complement = item.address.complement ?? "";
-
-        const parsed = schemas.CustomerCrud.safeParse(item);
-        if (!parsed.success) {
-            console.error("Create Debug (CustomerCrud validation failed):");
-            console.error(parsed.error.format());
-            throw parsed.error;
-        }
-
-        const customer = parsed.data;
-        await this.apiClient.UpdateCustomerEndpoint(
-            customer,
-            {
-                params: { customerId: customer.id },
-                headers: { operationId: item.operationId }
-            }
-        );
+        return await this.backendClient.UpdateEndpoint(item);
     }
 
     protected async delete(item: Customer): Promise<void> {
-        await this.apiClient.DeleteCustomerEndpoint(
-            undefined,
-            {
-                params: { customerId: item.id },
-                headers: { operationId: item.operationId }
-            }
-        );
+        return await this.backendClient.DeleteEndpoint(item);
     }
 }

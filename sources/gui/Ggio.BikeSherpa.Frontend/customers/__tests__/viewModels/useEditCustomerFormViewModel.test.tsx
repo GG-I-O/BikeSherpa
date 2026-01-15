@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react-native';
 import { useEditCustomerFormViewModel } from '../../viewModels/useEditCustomerFormViewModel';
 import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
 import { ICustomerService } from '@/spi/CustomerSPI';
-import { observable } from '@legendapp/state';
+import { Observable, observable } from '@legendapp/state';
 import Customer from '@/customers/models/Customer';
 import EditCustomerFormViewModel from '@/customers/viewModels/EditCustomerFormViewModel';
 import { mock } from 'ts-jest-mocker';
@@ -19,7 +19,7 @@ const mockCustomerService = mock<ICustomerService>();
 
 describe('useEditCustomerFormViewModel', () => {
     let mockCustomerStore$: any;
-    let mockCustomer$: any;
+    let mockCustomer$: Observable<Customer>;
     const mockCustomer = mock(Customer);
 
     beforeEach(() => {

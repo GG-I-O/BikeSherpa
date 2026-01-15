@@ -41,7 +41,7 @@ export default class CustomerServices implements ICustomerService {
     /**
      * Get a single customer without subscribing to changes
      */
-    public getCustomer(customerId: string): Customer {
+    private getCustomer(customerId: string): Customer {
         return this.customerStore$[customerId].peek();
     }
 
@@ -56,16 +56,12 @@ export default class CustomerServices implements ICustomerService {
 
     // Wrapper for NewCustomerForm
     public createCustomer(customer: InputCustomer) {
-        try {
-            const newCustomer: Customer = {
-                id: Crypto.randomUUID(),
-                operationId: Crypto.randomUUID(),
-                ...customer,
-            };
-            this.customerStore$[newCustomer.id].set(newCustomer);
-        } catch (e) {
-            this.logger.error("createCustomer Error :", e);
-        }
+        const newCustomer: Customer = {
+            id: Crypto.randomUUID(),
+            operationId: Crypto.randomUUID(),
+            ...customer,
+        };
+        this.customerStore$[newCustomer.id].set(newCustomer);
     };
 
     // Wrapper for EditCustomerForm
@@ -74,10 +70,6 @@ export default class CustomerServices implements ICustomerService {
         const canUpdate = customerToUpdate.links?.some((link) => link.rel === hateoasRel.update);
         if (!canUpdate)
             throw new Error(`Cannot update customer ${customer.id}`);
-        try {
-            this.customerStore$[customer.id].assign(customer);
-        } catch (e) {
-            this.logger.error("updateCustomer Error :", e);
-        }
+        this.customerStore$[customer.id].assign(customer);
     };
 }

@@ -17,7 +17,7 @@ export default class NewCustomerFormViewModel {
         this.customerServices = customerServices;
     }
 
-    public onSubmit(customer: InputCustomer): void {
+    public onSubmit = (customer: InputCustomer): void => {
         customer.address.name = customer.name;
         this.customerServices.createCustomer(customer);
         if (this.resetCallback) {
