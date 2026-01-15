@@ -13,7 +13,7 @@ export default function CustomerListView() {
 
 
     return (
-        <ScrollView style={{ backgroundColor, height: '100%' }}>
+        <ScrollView testID="customerListView" style={{ backgroundColor, height: '100%' }}>
             <DataTable style={{ backgroundColor }}>
                 <DataTable.Header>
                     <DataTable.Title style={[datatableStyle.column]}>Nom</DataTable.Title>
@@ -25,17 +25,17 @@ export default function CustomerListView() {
                 </DataTable.Header>
 
                 {customerList.map((customer, index) => (
-                    <DataTable.Row key={index}>
+                    <DataTable.Row testID={`customerList${index}`} key={index}>
                         <DataTable.Cell>{customer.name}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column]}>{customer.code}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column]}>{customer.phoneNumber}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column]}>{`${customer.address?.streetInfo ?? ''} ${customer.address?.postcode ?? ''} ${customer.address?.city ?? ''}`.trim()}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column]}>{customer.siret}</DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column, datatableStyle.width40]}>
-                            <IconButton icon="account-edit" onPress={() => displayEditForm(customer.id)} />
+                            <IconButton testID={`editButton${index}`} icon="account-edit" onPress={() => displayEditForm(customer.id)} />
                         </DataTable.Cell>
                         <DataTable.Cell style={[datatableStyle.column, datatableStyle.width40]}>
-                            <IconButton icon="trash-can-outline" onPress={() => {
+                            <IconButton testID={`deleteButton${index}`} icon="trash-can-outline" onPress={() => {
                                 setDisplayConfirmationModal(true);
                                 setCustomerToDelete(customer.id);
                             }
