@@ -28,7 +28,7 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
           RuleFor(x => x.Name).NotEmpty();
           RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
           {
-               var command = (UpdateCustomerCommand)context.InstanceToValidate;
+               var command = context.InstanceToValidate;
                var existingCustomer = await repository.FirstOrDefaultAsync(new CustomerByCodeSpecification(code), cancellationToken);
 
                if (existingCustomer != null && existingCustomer.Id != command.Id)

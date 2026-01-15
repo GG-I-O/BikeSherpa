@@ -52,7 +52,7 @@ describe('useNewCustomerFormViewModel', () => {
             "2": { id: "2", name: "Customer 2" }
         });
 
-        const { result } = renderHook(() => useNewCustomerFormViewModel());
+        renderHook(() => useNewCustomerFormViewModel());
 
         await act(async () => {
             await new Promise(resolve => setTimeout(resolve, 10));
