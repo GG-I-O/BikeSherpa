@@ -8,7 +8,7 @@ public interface ICustomerDeleteEventHandler
      Task DeleteCustomerAsync(Customer customer, CancellationToken cancellationToken);
 }
 
-public class CustomerDeleteEventHandler(IMediator mediator) : DeleteEventHandler(mediator), ICustomerDeleteEventHandler
+public class CustomerDeleteService(IMediator mediator) : DeleteService(mediator), ICustomerDeleteEventHandler
 {
      public async Task DeleteCustomerAsync(Customer customer, CancellationToken cancellationToken = default)
      {
