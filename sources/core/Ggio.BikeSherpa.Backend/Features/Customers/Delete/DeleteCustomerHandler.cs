@@ -11,7 +11,7 @@ public record DeleteCustomerCommand(
      ) : ICommand<Result<Guid>>;
 
 public class DeleteCustomerHandler(
-     ICustomerTrash customerTrash,
+     ICustomerDeleteEventHandler customerDeleteEventHandler,
      IReadRepository<Customer> repository,
      IApplicationTransaction transaction
      ) : ICommandHandler<DeleteCustomerCommand, Result<Guid>>
@@ -22,7 +22,7 @@ public class DeleteCustomerHandler(
           if (entity is null)
                return Result.NotFound();
           
-          await customerTrash.DeleteCustomerAsync(entity, cancellationToken);
+          await customerDeleteEventHandler.DeleteCustomerAsync(entity, cancellationToken);
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
      }

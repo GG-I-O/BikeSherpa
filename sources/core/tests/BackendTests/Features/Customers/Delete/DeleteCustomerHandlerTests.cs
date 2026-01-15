@@ -13,7 +13,7 @@ public class DeleteCustomerHandlerTests
 {
      private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
-     private readonly Mock<ICustomerTrash> _mockTrash = new();
+     private readonly Mock<ICustomerDeleteEventHandler> _mockDeleteEventHandler = new();
      private readonly Fixture _fixture = new();
 
      private readonly DeleteCustomerCommand _mockCommand;
@@ -32,7 +32,7 @@ public class DeleteCustomerHandlerTests
 
      private DeleteCustomerHandler CreateSut()
      {
-          return new DeleteCustomerHandler(_mockTrash.Object, _mockRepository.Object, _mockTransaction.Object);
+          return new DeleteCustomerHandler(_mockDeleteEventHandler.Object, _mockRepository.Object, _mockTransaction.Object);
      }
 
      private void VerifyTransactionCommittedOnce()
@@ -42,7 +42,7 @@ public class DeleteCustomerHandlerTests
 
      private void VerifyTrashCalledOnce()
      {
-          _mockTrash.Verify(x => x.DeleteCustomerAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Once);
+          _mockDeleteEventHandler.Verify(x => x.DeleteCustomerAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Once);
      }
 
      [Fact]
@@ -78,6 +78,6 @@ public class DeleteCustomerHandlerTests
           result.IsSuccess.Should().BeFalse();
           result.IsNotFound().Should().BeTrue();
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
-          _mockTrash.Verify(x => x.DeleteCustomerAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Never);
+          _mockDeleteEventHandler.Verify(x => x.DeleteCustomerAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>()), Times.Never);
      }
 }

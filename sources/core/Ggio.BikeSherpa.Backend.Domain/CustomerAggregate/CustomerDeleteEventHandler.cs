@@ -3,12 +3,12 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 
-public interface ICustomerTrash
+public interface ICustomerDeleteEventHandler
 {
      Task DeleteCustomerAsync(Customer customer, CancellationToken cancellationToken);
 }
 
-public class CustomerTrash(IMediator mediator) : TrashBase(mediator), ICustomerTrash
+public class CustomerDeleteEventHandler(IMediator mediator) : DeleteEventHandler(mediator), ICustomerDeleteEventHandler
 {
      public async Task DeleteCustomerAsync(Customer customer, CancellationToken cancellationToken = default)
      {
