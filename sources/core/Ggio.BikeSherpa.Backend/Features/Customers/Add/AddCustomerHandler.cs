@@ -29,7 +29,7 @@ public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
                var codeisValid = !await repository.AnyAsync(new CustomerByCodeSpecification(code), cancellationToken);
                if (!codeisValid)
                {
-                    context.AddFailure("Code client existant");
+                    context.AddFailure("Code client déjà utilisé");
                }
           });
           RuleFor(x => x.Email).NotEmpty();
