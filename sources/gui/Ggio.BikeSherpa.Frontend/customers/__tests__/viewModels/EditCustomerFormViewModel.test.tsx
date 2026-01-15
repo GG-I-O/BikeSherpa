@@ -1,5 +1,4 @@
 import Customer from "@/customers/models/Customer";
-import InputCustomer from "@/customers/models/InputCustomer";
 import EditCustomerFormViewModel from "@/customers/viewModels/EditCustomerFormViewModel";
 import { ICustomerService } from "@/spi/CustomerSPI";
 import { mock } from "ts-jest-mocker";

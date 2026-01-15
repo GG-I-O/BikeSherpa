@@ -255,7 +255,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 try {
                     serverErrors = (error as any).response.data;
                     serverErrors.forEach((error) => EventRegister.emit(this.onErrorEventType, error.message));
-                } catch (error) {
+                } catch (_error) {
                     EventRegister.emit(this.onErrorEventType, "Erreur du serveur");
                 }
             }

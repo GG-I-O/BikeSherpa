@@ -2,6 +2,8 @@ import CustomerForm from "@/customers/components/CustomerForm";
 import { render, renderHook, screen, userEvent } from '@testing-library/react-native';
 import { useForm } from "react-hook-form";
 import { UserEventInstance } from '@testing-library/react-native/build/user-event/setup';
+import ThemedInputModule from '@/components/themed/ThemedInput';
+import ThemedAddressInputModule from '@/components/themed/ThemedAddressInput';
 
 jest.mock('react-native-safe-area-context', () => ({
     useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 })
@@ -19,12 +21,13 @@ jest.mock('@/components/themed/ThemedAddressInput', () => ({
     default: jest.fn(() => null),
 }));
 
+const ThemedInput = jest.mocked(ThemedInputModule);
+const ThemedAddressInput = jest.mocked(ThemedAddressInputModule);
+
 describe("CustomerForm", () => {
     let userAction: UserEventInstance;
     const { result } = renderHook(() => useForm());
     const mockedFunction = jest.fn();
-    const ThemedInput = require('@/components/themed/ThemedInput').default;
-    const ThemedAddressInput = require('@/components/themed/ThemedAddressInput').default;
 
     beforeEach(() => {
         ThemedInput.mockClear();
