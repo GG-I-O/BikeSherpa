@@ -7,7 +7,7 @@ import { syncedCrud } from "@legendapp/state/sync-plugins/crud";
 import * as Network from 'expo-network';
 import { inject } from "inversify";
 import { ResourceNotification, ResourceOperation } from "../notification/Notification";
-import { HateoasLinks, Link } from "@/models/HateoasLink";
+import { HateoasLinks, hateoasRel, Link } from "@/models/HateoasLink";
 import Storable from "@/models/Storable";
 import ServerError from "@/models/ServerError";
 import { EventRegister } from 'react-native-event-listeners';
@@ -116,16 +116,19 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             },
             update: async (item: T) => {
                 // Check if we have the rights to update
-                if (!item.links?.some((link: Link) => link.rel === "update")) return;
+                if (!item.links?.some((link: Link) => link.rel === hateoasRel.update)) {
+                    return;
+                }
 
                 item.updatedAt = new Date().toISOString();
 
                 await this.update(item);
-                return await this.getItem(item.id);
+                const result = await this.getItem(item.id);
+                return result;
             },
             delete: async (item: T) => {
                 // Check if we have the rights to delete
-                if (!item.links?.some((link: Link) => link.rel === "delete")) return;
+                if (!item.links?.some((link: Link) => link.rel === hateoasRel.delete)) return;
 
                 await this.delete(item);
             },
@@ -249,8 +252,12 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                     params.revert();
                 }
                 let serverErrors: ServerError[];
-                serverErrors = (error as any).response.data;
-                serverErrors.forEach((error) => EventRegister.emit(this.onErrorEventType, error.message));
+                try {
+                    serverErrors = (error as any).response.data;
+                    serverErrors.forEach((error) => EventRegister.emit(this.onErrorEventType, error.message));
+                } catch (error) {
+                    EventRegister.emit(this.onErrorEventType, "Erreur du serveur");
+                }
             }
         }));
     }

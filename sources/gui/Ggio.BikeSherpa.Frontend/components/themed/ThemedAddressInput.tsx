@@ -61,9 +61,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
     const onAddressSelect = (address: Address) => {
         onTextInputChange(null);
         setSuggestedAddresses(null);
-        // address is coming from the API and does not contain a fulladdress property
         const newAddress = address;
-        newAddress.fullAddress = address.name;
         field.onChange(newAddress);
     }
 
@@ -125,7 +123,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
                         <View style={{ height: safeInset.bottom * 2 }} />
                     }
                     data={suggestedAddresses}
-                    keyExtractor={item => item.name}
+                    keyExtractor={item => item.fullAddress}
                     style={[formStyle.addressOptionList, {
                         borderColor: theme.colors.primaryContainer,
                         backgroundColor: theme.colors.background,
@@ -160,7 +158,7 @@ function AddressOption({ address, onPress }: AddressOptionProps) {
             onPress={() => onPress(address)}
             style={formStyle.addressOptionElement}
         >
-            <Text style={{ width: '100%', textAlign: 'left' }}>{address.name}</Text>
+            <Text style={{ width: '100%', textAlign: 'left' }}>{address.fullAddress}</Text>
         </Button>
     );
 }

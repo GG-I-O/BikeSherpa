@@ -7,25 +7,6 @@ import { Address } from "@/models/Address";
 
 global.fetch = jest.fn();
 
-const mockAddress1: Address = {
-    name: "Société 1",
-    streetInfo: "10 rue de la Société 1",
-    postcode: "38000",
-    city: "Grenoble"
-}
-const mockAddress2: Address = {
-    name: "Société 2",
-    streetInfo: "10 rue de la Société 2",
-    postcode: "38300",
-    city: "Grenoble"
-}
-const mockAddress3: Address = {
-    name: "Société 3",
-    streetInfo: "10 rue de la Société 3",
-    postcode: "38100",
-    city: "Échirolles"
-}
-
 const container = new Container();
 const mockLogger: jest.Mocked<ILogger> = {
     error: jest.fn(),
@@ -69,10 +50,10 @@ describe("AddressService.fetchAddress", () => {
             json: async () => ({
                 features: [{
                     properties: {
-                        label: mockAddress1.name,
-                        name: mockAddress1.streetInfo,
-                        postcode: mockAddress1.postcode,
-                        city: mockAddress1.city
+                        label: "label 1",
+                        name: "name",
+                        postcode: "postcode",
+                        city: "city"
                     }
                 }]
             }),
@@ -82,14 +63,18 @@ describe("AddressService.fetchAddress", () => {
         );
 
         //Act
-        const data = await addressService.fetchAddress("");
+        const addressList: Address[] | null = await addressService.fetchAddress("");
 
         //Assert
-        expect(data).toBeTruthy();
-        expect(Array.isArray(data)).toBeTruthy();
-        expect(data).toHaveLength(1);
-        if (!data) return
-        expect(data[0].name).toBe("Société 1");
+        expect(addressList).toBeTruthy();
+        expect(Array.isArray(addressList)).toBeTruthy();
+        expect(addressList).toHaveLength(1);
+        if (!addressList) return
+        expect(addressList[0].name).toBe("");
+        expect(addressList[0].fullAddress).toBe("label 1");
+        expect(addressList[0].streetInfo).toBe("name");
+        expect(addressList[0].postcode).toBe("postcode");
+        expect(addressList[0].city).toBe("city");
     });
 
     it("fetch with a 200 response returns a multiple Address array", async () => {
@@ -101,26 +86,26 @@ describe("AddressService.fetchAddress", () => {
                 features: [
                     {
                         properties: {
-                            label: mockAddress1.name,
-                            name: mockAddress1.streetInfo,
-                            postcode: mockAddress1.postcode,
-                            city: mockAddress1.city
+                            label: "label 1",
+                            name: "name 1",
+                            postcode: "postcode 1",
+                            city: "city 1"
                         }
                     },
                     {
                         properties: {
-                            label: mockAddress2.name,
-                            name: mockAddress2.streetInfo,
-                            postcode: mockAddress2.postcode,
-                            city: mockAddress2.city
+                            label: "label 2",
+                            name: "name 2",
+                            postcode: "postcode 2",
+                            city: "city 2"
                         }
                     },
                     {
                         properties: {
-                            label: mockAddress3.name,
-                            name: mockAddress3.streetInfo,
-                            postcode: mockAddress3.postcode,
-                            city: mockAddress3.city
+                            label: "label 3",
+                            name: "name 3",
+                            postcode: "postcode 3",
+                            city: "city 3"
                         }
                     }
                 ]
@@ -138,7 +123,27 @@ describe("AddressService.fetchAddress", () => {
         expect(Array.isArray(data)).toBeTruthy();
         expect(data).toHaveLength(3);
         if (!data) return;
-        expect(data[1].name).toBe("Société 2");
-        expect(data[2].city).toBe("Échirolles");
+        expect(data[1].postcode).toBe("postcode 2");
+        expect(data[2].fullAddress).toBe("label 3");
+    });
+
+    it("fetch with a 400 response returns a null address list", async () => {
+        // Arrange
+        const mockResponse = {
+            ok: false,
+            status: 400,
+            json: async () => ({
+                features: [{}]
+            }),
+        };
+        (fetch as jest.MockedFunction<typeof fetch>).mockRejectedValue(
+            mockResponse as Response
+        );
+
+        //Act
+        const addressList = await addressService.fetchAddress("");
+
+        //Assert
+        expect(addressList).toBeNull();
     });
 });

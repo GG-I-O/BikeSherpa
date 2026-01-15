@@ -7,5 +7,6 @@ export const ServicesIdentifiers = {
     CustomerStorage: Symbol.for('CustomerStorageContext'),
     CustomerServices: Symbol.for('CustomerServices'),
     AddressService: Symbol.for('AddressService'),
-    AppSnackbarService: Symbol.for('AppSnackbarService')
+    AppSnackbarService: Symbol.for('AppSnackbarService'),
+    CustomerBackendClientFacade: Symbol.for('CustomerBackendClientFacade')
 };

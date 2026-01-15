@@ -16,6 +16,8 @@ import { ICustomerService } from "@/spi/CustomerSPI";
 import CustomerServices from "@/customers/services/CustomerServices";
 import { IAppSnackbarService } from "@/spi/AppSnackbarSPI";
 import AppSnackbarService from "@/snackbar/services/AppSnackbarService";
+import { IBackendClient } from "@/spi/BackendClientSPI";
+import { CustomerBackendClientFacade } from "@/customers/services/CustomerBackendClientFacade";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -35,6 +37,8 @@ export default class IOCContainerBootstrapper {
         IOCContainerBootstrapper.bindAddressService();
 
         IOCContainerBootstrapper.bindAppSnackbarService();
+
+        IOCContainerBootstrapper.bindCustomerBackendClientFacade();
 
     }
 
@@ -84,5 +88,9 @@ export default class IOCContainerBootstrapper {
 
     private static bindAppSnackbarService() {
         IOCContainer.bind<IAppSnackbarService>(ServicesIdentifiers.AppSnackbarService).to(AppSnackbarService).inSingletonScope();
+    }
+
+    private static bindCustomerBackendClientFacade() {
+        IOCContainer.bind<IBackendClient<Customer>>(ServicesIdentifiers.CustomerBackendClientFacade).to(CustomerBackendClientFacade).inSingletonScope();
     }
 }

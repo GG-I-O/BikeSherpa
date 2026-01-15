@@ -28,10 +28,12 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
           RuleFor(x => x.Name).NotEmpty();
           RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
           {
-               var codeisValid = !await repository.AnyAsync(new CustomerByCodeSpecification(code), cancellationToken);
-               if (!codeisValid)
+               var command = (UpdateCustomerCommand)context.InstanceToValidate;
+               var existingCustomer = await repository.FirstOrDefaultAsync(new CustomerByCodeSpecification(code), cancellationToken);
+
+               if (existingCustomer != null && existingCustomer.Id != command.Id)
                {
-                    context.AddFailure("Code client existant");
+                    context.AddFailure("Code client déjà utilisé");
                }
           });
           RuleFor(x => x.Email).NotEmpty();
