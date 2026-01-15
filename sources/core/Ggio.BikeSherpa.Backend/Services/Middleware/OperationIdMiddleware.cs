@@ -8,7 +8,7 @@ public class OperationIdMiddleware(RequestDelegate next, ILogger<OperationIdMidd
 {
      public async Task InvokeAsync(HttpContext context)
      {
-          var operationId = context.Request.Headers["operationId"].FirstOrDefault();
+          var operationId = context.Request.Headers["operationId"].FirstOrDefault() ?? Guid.NewGuid().ToString();
 
           context.Response.Headers["operationId"] = operationId;
           context.Items["OperationId"] = operationId;
