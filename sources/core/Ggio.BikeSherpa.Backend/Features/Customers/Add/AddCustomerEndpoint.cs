@@ -30,5 +30,9 @@ public class AddCustomerEndpoint(IMediator mediator) : Endpoint<Model.CustomerCr
           {
                await Send.ResultAsync(TypedResults.Created("", new { Id = result.Value }));
           }
+          else
+          {
+               await Send.ErrorsAsync(cancellation: ct);
+          }
      }
 }

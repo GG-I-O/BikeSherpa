@@ -23,5 +23,9 @@ public class DeleteCustomerEndpoint(IMediator mediator) : EndpointWithoutRequest
           {
                await Send.OkAsync(cancellation: ct);
           }
+          else
+          {
+               await Send.NotFoundAsync(cancellation: ct);
+          }
      }
 }

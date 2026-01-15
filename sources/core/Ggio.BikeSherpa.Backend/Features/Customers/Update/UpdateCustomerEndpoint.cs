@@ -30,5 +30,9 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.Custome
           {
                await Send.OkAsync(new object(), ct);
           }
+          else
+          {
+               await Send.NotFoundAsync(ct);
+          }
      }
 }
