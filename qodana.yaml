@@ -27,7 +27,12 @@ profile:
 #      - <path/where/not/run/inspection>
 
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
-#bootstrap: sh ./prepare-qodana.sh
+dotnet:
+  solution: Ggio.BikeSherpa.slnx
+
+bootstrap: dotnet build; cd sources/core/tests && \\
+  dotnet add package coverlet.msbuild && dotnet add package coverlet.collector && \\
+  ((dotnet test /p:CollectCoverage=true /p:CoverletOutput=sources/core/tests/.qodana/code-coverage/ /p:CoverletOutputFormat=lcov))
 
 #Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
 #plugins:

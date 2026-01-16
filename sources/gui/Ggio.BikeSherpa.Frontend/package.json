@@ -92,8 +92,7 @@
       "!**/expo-env.d.ts",
       "!**/.expo/**"
     ],
-    "coverageDirectory": ".qodana/code-coverage/",
-    "coverageReporters": ["lcovonly"]
+    "coverageDirectory": ".qodana/code-coverage/"
   },
   "private": true
 }
