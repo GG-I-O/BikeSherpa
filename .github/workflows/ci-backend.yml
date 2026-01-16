@@ -51,16 +51,6 @@ jobs:
          name: backend-artifact
          path: sources/core
 
-      - name: Check what was downloaded
-        run: |
-          echo "=== Checking bin directories ==="
-          ls -la sources/core/tests/BackendTests/bin/Release/net10.0/ || echo "No BackendTests binaries"
-          ls -la sources/core/tests/DddCore.Tests/bin/Release/net10.0/ || echo "No DddCore.Tests binaries"
-          echo ""
-          echo "=== Checking for coverlet ==="
-          ls -la sources/core/tests/BackendTests/obj/project.assets.json || echo "No project.assets.json"
-          grep -i coverlet sources/core/tests/BackendTests/BackendTests.csproj || echo "No coverlet in csproj"
-
       - name: Run BackendTests with coverage
         continue-on-error: true
         run: |
@@ -70,17 +60,10 @@ jobs:
             /p:CoverletOutputFormat=lcov \
             /p:CoverletOutput=./.qodana/code-coverage/
 
-      - name: Check if coverage was created
-        run: |
-          echo "=== Looking for coverage files ==="
-          find sources/core/tests/BackendTests -name "*.info" -o -name "coverage.*" || echo "No coverage files found"
-          ls -laR sources/core/tests/BackendTests/.qodana/ || echo "No .qodana folder"
-
       - name: Run DddCore.Tests with coverage
         continue-on-error: true
         run: |
           dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj \
-            --no-restore \
             --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=lcov \

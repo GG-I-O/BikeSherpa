@@ -30,11 +30,6 @@ profile:
 dotnet:
   solution: Ggio.BikeSherpa.slnx
 
-bootstrap: |
-  dotnet build
-  dotnet test sources/core/tests/BackendTests/BackendTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=../../../.qodana/code-coverage/backend- || true
-  dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=../../../.qodana/code-coverage/dddcore- || true
-
 #Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
 #plugins:
 #  - id: <plugin.id> #(plugin id can be found at https://plugins.jetbrains.com)
