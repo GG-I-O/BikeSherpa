@@ -8,8 +8,8 @@ on:
       - "releases/*" # The release branches
 
 jobs:
-  qodanadotnet:
-    name: Qodana Scan Dotnet
+  qodana_dotnet:
+    name: Qodana Scan .Net
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,8 +18,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }} # to check out the actual pull request commit, not the merge commit
-          fetch-depth: 0 # a full history is required for pull request analysis
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+    
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
       - name: "Qodana Scan"
         uses: JetBrains/qodana-action@v2025.2
         with:
@@ -28,7 +34,7 @@ jobs:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
           QODANA_ENDPOINT: "https://qodana.cloud"
 
-  qodanatypescript:
+  qodana_typescript:
     name: Qodana Scan TS
     runs-on: ubuntu-latest
     permissions:
@@ -38,8 +44,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }} # to check out the actual pull request commit, not the merge commit
-          fetch-depth: 0 # a full history is required for pull request analysis
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -47,6 +53,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: sources/gui/Ggio.BikeSherpa.Frontend/package-lock.json
+
       - name: Install dependencies
         run: npm ci
         working-directory: sources/gui/Ggio.BikeSherpa.Frontend
@@ -59,5 +66,3 @@ jobs:
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_TS }}
           QODANA_ENDPOINT: "https://qodana.cloud"
-
-          name: Qodana

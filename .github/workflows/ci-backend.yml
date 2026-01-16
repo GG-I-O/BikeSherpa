@@ -12,30 +12,58 @@ on:
       - "sources/core/**"
 
 jobs:
-  build_job:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
+
       - name: Restore dependencies
         run: dotnet restore
+
       - name: Build
         run: dotnet build --no-restore --configuration Release
+
       - uses: actions/upload-artifact@v6
         with:
             name: backend-artifact
             path: sources/core
 
-  test_job:
+  test:
     runs-on: ubuntu-latest
-    needs: build_job
+    needs: build
     steps:
       - uses: actions/upload-artifact@v6
         with:
          name: backend-artifact
          path: sources/core
-      - name: Run tests with coverage
-        run: dotnet test --no-restore --no-build
+
+      - name: Run BackendTests with coverage
+        run: |
+          dotnet test sources/core/tests/BackendTests/BackendTests.csproj \
+            --no-restore \
+            --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=lcov \
+            /p:CoverletOutput=./.qodana/code-coverage/
+
+      - name: Run DddCore.Tests with coverage
+        run: |
+          dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj \
+            --no-restore \
+            --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=lcov \
+            /p:CoverletOutput=./.qodana/code-coverage/
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v6
+        with:
+          name: backend-coverage
+          path: |
+            sources/core/tests/BackendTests/.qodana/code-coverage/coverage.info
+            sources/core/tests/DddCore.Tests/.qodana/code-coverage/coverage.info

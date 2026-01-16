@@ -32,9 +32,8 @@ dotnet:
 
 bootstrap: |
   dotnet build
-  dotnet add package coverlet.msbuild
-  dotnet add package coverlet.collector
-  dotnet test /p:CollectCoverage=true /p:CoverletOutput=sources/core/tests/.qodana/code-coverage/ /p:CoverletOutputFormat=lcov
+  dotnet test sources/core/tests/BackendTests/BackendTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=../../../.qodana/code-coverage/backend-
+  dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=../../../.qodana/code-coverage/dddcore-
 
 #Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
 #plugins:
