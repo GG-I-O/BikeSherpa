@@ -28,7 +28,8 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - uses: actions/upload-artifact@v6
+      - name: Save artifacts
+        uses: actions/upload-artifact@v6
         with:
             name: backend-artifact
             path: sources/core
@@ -55,10 +56,18 @@ jobs:
         run: |
           dotnet test sources/core/tests/BackendTests/BackendTests.csproj \
             --no-restore \
+            --no-build \
             --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=lcov \
-            /p:CoverletOutput=./.qodana/code-coverage/
+            /p:CoverletOutput=./.qodana/code-coverage/ \
+            --verbosity detailed
+
+      - name: Check if coverage was created
+        run: |
+          echo "=== Looking for coverage files ==="
+          find sources/core/tests/BackendTests -name "*.info" -o -name "coverage.*" || echo "No coverage files found"
+          ls -laR sources/core/tests/BackendTests/.qodana/ || echo "No .qodana folder"
 
       - name: Run DddCore.Tests with coverage
         continue-on-error: true
