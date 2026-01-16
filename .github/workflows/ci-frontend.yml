@@ -41,3 +41,17 @@ jobs:
 
       - name: Run tests
         run: npm run test
+      
+      - name: Archive coverage data
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-coverage-data
+          path: sources/gui/Ggio.BikeSherpa.Frontend/.qodana/code-coverage
+
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@main
+        env:
+         QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_TS }}
+        with:
+          args: "-i,JS/jest,--image,jetbrains/qodana-js:2025.3"
+          pr-mode: false
