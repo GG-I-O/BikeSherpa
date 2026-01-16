@@ -91,7 +91,9 @@
       "!**/babel.config.js",
       "!**/expo-env.d.ts",
       "!**/.expo/**"
-    ]
+    ],
+    "coverageDirectory": ".qodana/code-coverage/",
+    "coverageReporters": ["lcovonly"]
   },
   "private": true
 }
