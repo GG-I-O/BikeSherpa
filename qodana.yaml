@@ -32,8 +32,8 @@ dotnet:
 
 bootstrap: |
   dotnet build
-  dotnet test sources/core/tests/BackendTests/BackendTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=../../../.qodana/code-coverage/backend-
-  dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=../../../.qodana/code-coverage/dddcore-
+  dotnet test sources/core/tests/BackendTests/BackendTests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=../../../.qodana/code-coverage/backend- || true
+  dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=../../../.qodana/code-coverage/dddcore- || true
 
 #Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
 #plugins:

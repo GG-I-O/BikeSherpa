@@ -62,7 +62,7 @@ jobs:
         uses: JetBrains/qodana-action@v2025.2
         with:
           pr-mode: false
-          args: --linter,qodana-js
+          args: --linter qodana-js --project-dir sources/gui/Ggio.BikeSherpa.Frontend
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_TS }}
           QODANA_ENDPOINT: "https://qodana.cloud"
