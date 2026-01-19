@@ -8,6 +8,8 @@ import { mock } from "ts-jest-mocker";
 import * as Network from 'expo-network';
 import { hateoasRel } from "@/models/HateoasLink";
 import axios from "axios";
+import { createRandomCustomerWithUpdateAndDeleteLinks, createRandomCustomerWithUpdateLinks, createRandomNewCustomerWithGetAndUpdateLinks } from "@/fixtures/customer-fixtures";
+import { faker } from "@faker-js/faker";
 
 const logger = mock<ILogger>();
 const notificationService = mock<INotificationService>();
@@ -40,81 +42,10 @@ describe("CustomerStorageContext", () => {
     let mockCustomer3: Customer;
     let customerStore: Observable<Record<string, Customer>>;
     beforeEach(() => {
-        mockCustomer1 = {
-            id: "123",
-            name: "Existing Company",
-            address: {
-                name: "Existing Company",
-                fullAddress: "10 rue de la Paix 75000 Paris",
-                streetInfo: "10 rue de la Paix",
-                complement: undefined,
-                postcode: "75000",
-                city: "Paris"
-            },
-            code: "EX1",
-            phoneNumber: "0609080704",
-            email: "existing.company@gmail.com",
-            createdAt: "2024-01-01T00:00:00.000Z",
-            updatedAt: "2024-01-01T00:00:00.000Z",
-            links: [{
-                href: "",
-                rel: hateoasRel.update,
-                method: ""
-            },
-            {
-                href: "",
-                rel: hateoasRel.delete,
-                method: ""
-            }]
-        };
-
-        mockCustomer2 = {
-            id: "456",
-            name: "Another Existing Company",
-            address: {
-                name: "Another Existing Company",
-                fullAddress: "20 rue de la Paix 75000 Paris",
-                streetInfo: "20 rue de la Paix",
-                complement: undefined,
-                postcode: "75000",
-                city: "Paris"
-            },
-            code: "EX2",
-            phoneNumber: "0609080704",
-            email: "existing.company@gmail.com",
-            createdAt: "2024-01-01T00:00:00.000Z",
-            updatedAt: "2024-01-01T00:00:00.000Z",
-            links: [{
-                href: "",
-                rel: hateoasRel.update,
-                method: ""
-            }]
-        };
-        mockCustomer3 = {
-            id: "789",
-            name: "Yet Another Existing Company",
-            address: {
-                name: "Yet Another Existing Company",
-                fullAddress: "30 rue de la Paix 75000 Paris",
-                streetInfo: "30 rue de la Paix",
-                complement: undefined,
-                postcode: "75000",
-                city: "Paris"
-            },
-            code: "EX3",
-            phoneNumber: "0609080755",
-            email: "existing.company@gmail.com",
-            links: [{
-                href: "https://api.example.com/customers/789",
-                rel: hateoasRel.get,
-                method: "GET"
-            },
-            {
-                href: "",
-                rel: hateoasRel.update,
-                method: ""
-            }]
-        };
+        jest.clearAllMocks();
+        mockCustomer1 = createRandomCustomerWithUpdateAndDeleteLinks();
+        mockCustomer2 = createRandomCustomerWithUpdateLinks();
+        mockCustomer3 = createRandomNewCustomerWithGetAndUpdateLinks();
         logger.extend.mockReturnValue(logger);
         logger.error = jest.fn();
         logger.info = jest.fn();
@@ -149,27 +80,27 @@ describe("CustomerStorageContext", () => {
 
         //assert
         expect(backEndClient.GetAllEndpoint).toHaveBeenCalledTimes(1);
-        expect(store["123"].name).toBe("Existing Company");
-        expect(store["456"].code).toBe("EX2");
+        expect(store[mockCustomer1.id].name).toBe(mockCustomer1.name);
+        expect(store[mockCustomer2.id].code).toBe(mockCustomer2.code);
     }, 10000);
 
     it("should add a customer in the store", async () => {
         //arrange
-        backEndClient.AddEndpoint.mockResolvedValue("789");
-        backEndClient.GetEndpoint.mockResolvedValue({ ...mockCustomer3, createdAt: "aupif" });
+        backEndClient.AddEndpoint.mockResolvedValue(mockCustomer3.id);
+        backEndClient.GetEndpoint.mockResolvedValue({ ...mockCustomer3, createdAt: faker.date.anytime.toString() });
 
         //act
-        customerStore["789"].set(mockCustomer3);
+        customerStore[mockCustomer3.id].set(mockCustomer3);
         let store;
         await when(() => {
             store = customerStore.get();
-            return store!["789"].createdAt !== undefined;
+            return store![mockCustomer3.id].createdAt !== undefined;
         });
 
         //assert
-        expect(store!["789"].name).toBe("Yet Another Existing Company");
-        expect(store!["789"].code).toBe("EX3");
-        expect(store!["789"].createdAt).toBe("aupif");
+        expect(store![mockCustomer3.id].name).toBe(mockCustomer3.name);
+        expect(store![mockCustomer3.id].code).toBe(mockCustomer3.code);
+        expect(store![mockCustomer3.id].createdAt).toBe(mockCustomer3.createdAt);
         expect(backEndClient.GetEndpoint).toHaveBeenCalledTimes(1);
         expect(backEndClient.AddEndpoint).toHaveBeenCalledTimes(1);
     }, 10000);
@@ -183,7 +114,7 @@ describe("CustomerStorageContext", () => {
 
 
         //act
-        customerStore["456"].assign({
+        customerStore[mockCustomer2.id].assign({
             name: "Updated Name",
             updatedAt: new Date().toISOString()
         });
@@ -193,7 +124,7 @@ describe("CustomerStorageContext", () => {
         const store = customerStore.get();
 
         //assert
-        expect(store!["456"].name).toBe("Updated Name");
+        expect(store![mockCustomer2.id].name).toBe("Updated Name");
         expect(backEndClient.UpdateEndpoint).toHaveBeenCalledTimes(1);
         expect(backEndClient.GetEndpoint).toHaveBeenCalledTimes(1);
     }, 10000);
@@ -204,18 +135,18 @@ describe("CustomerStorageContext", () => {
         backEndClient.DeleteEndpoint.mockResolvedValue();
 
         //act
-        customerStore["123"].delete();
+        customerStore[mockCustomer1.id].delete();
 
         let store;
         await when(() => {
             store = customerStore.get();
-            return store!["123"] === undefined;
+            return store![mockCustomer1.id] === undefined;
         });
 
         await new Promise(resolve => setTimeout(resolve, 500));
 
         //assert
-        expect(store!["123"]).toBeUndefined();
+        expect(store![mockCustomer1.id]).toBeUndefined();
         expect(backEndClient.DeleteEndpoint).toHaveBeenCalledTimes(1);
     }, 10000);
 
@@ -224,14 +155,14 @@ describe("CustomerStorageContext", () => {
         const customerWithSelfLink = {
             ...mockCustomer3,
             links: [{
-                href: "https://api.example.com/customers/789",
+                href: `https://api.example.com/customers/${mockCustomer3.id}`,
                 rel: "self",
                 method: "GET"
             },
             {
                 href: "",
                 rel: hateoasRel.update,
-                method: ""
+                method: "PUT"
             }]
         };
 
@@ -250,15 +181,15 @@ describe("CustomerStorageContext", () => {
             }
         });
 
-        backEndClient.AddEndpoint.mockResolvedValue("789");
+        backEndClient.AddEndpoint.mockResolvedValue(mockCustomer3.id);
         backEndClient.UpdateEndpoint.mockResolvedValue();
 
         //act
-        customerStore["789"].set(customerWithSelfLink);
+        customerStore[mockCustomer3.id].set(customerWithSelfLink);
 
-        await when(() => customerStore["789"].peek() !== undefined);
+        await when(() => customerStore[mockCustomer3.id].peek() !== undefined);
 
-        customerStore["789"].assign({
+        customerStore[mockCustomer3.id].assign({
             name: "Trigger Update",
             updatedAt: new Date().toISOString()
         });
@@ -266,6 +197,6 @@ describe("CustomerStorageContext", () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         //assert
-        expect(axios.get).toHaveBeenCalledWith("https://api.example.com/customers/789");
+        expect(axios.get).toHaveBeenCalledWith(`https://api.example.com/customers/${mockCustomer3.id}`);
     }, 10000);
 })

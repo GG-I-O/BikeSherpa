@@ -2,6 +2,7 @@ import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal
 import Customer from "@/customers/models/Customer";
 import useCustomerListViewModel from "@/customers/viewModels/useCustomerListViewModel";
 import CustomerListView from "@/customers/views/CustomerListView";
+import { createRandomCustomerWithUpdateAndDeleteLinks, createRandomCustomerWithUpdateLinks } from "@/fixtures/customer-fixtures";
 import { hateoasRel } from "@/models/HateoasLink";
 import { render, screen, userEvent, waitFor } from "@testing-library/react-native";
 import { UserEventInstance } from "@testing-library/react-native/build/user-event/setup";
@@ -29,56 +30,8 @@ jest.mock("@expo/vector-icons", () => {
 
 describe("CustomerListView", () => {
     let userAction: UserEventInstance;
-    const mockCustomer1: Customer = {
-        id: "123",
-        name: "Existing Company",
-        address: {
-            name: "Existing Company",
-            fullAddress: "10 rue de la Paix 75000 Paris",
-            streetInfo: "10 rue de la Paix",
-            complement: undefined,
-            postcode: "75000",
-            city: "Paris"
-        },
-        code: "EX1",
-        phoneNumber: "0609080704",
-        email: "existing.company@gmail.com",
-        createdAt: "2024-01-01T00:00:00.000Z",
-        updatedAt: "2024-01-01T00:00:00.000Z",
-        links: [{
-            href: "",
-            rel: hateoasRel.update,
-            method: ""
-        },
-        {
-            href: "",
-            rel: hateoasRel.delete,
-            method: ""
-        }]
-    };
-
-    const mockCustomer2: Customer = {
-        id: "456",
-        name: "Another Existing Company",
-        address: {
-            name: "Another Existing Company",
-            fullAddress: "20 rue de la Paix 75000 Paris",
-            streetInfo: "20 rue de la Paix",
-            complement: undefined,
-            postcode: "75000",
-            city: "Paris"
-        },
-        code: "EX2",
-        phoneNumber: "0609080704",
-        email: "existing.company@gmail.com",
-        createdAt: "2024-01-01T00:00:00.000Z",
-        updatedAt: "2024-01-01T00:00:00.000Z",
-        links: [{
-            href: "",
-            rel: hateoasRel.update,
-            method: ""
-        }]
-    };
+    const mockCustomer1: Customer = createRandomCustomerWithUpdateAndDeleteLinks();
+    const mockCustomer2: Customer = createRandomCustomerWithUpdateLinks();
 
     let mockDisplayEditForm: jest.Mock;
     let mockDeleteCustomer: jest.Mock;
@@ -118,8 +71,8 @@ describe("CustomerListView", () => {
         const telTitle = screen.queryByText("Num Tél");
         const customerData1 = screen.getByTestId("customerList0");
         const customerData2 = screen.getByTestId("customerList1");
-        const customerOneName = screen.queryByText("Existing Company");
-        const customerTwoCode = screen.queryByText("EX2");
+        const customerOneName = screen.queryByText(mockCustomer1.name);
+        const customerTwoCode = screen.queryByText(mockCustomer2.code);
 
         //assert
         expect(customerListView).not.toBeNull();
@@ -183,7 +136,7 @@ describe("CustomerListView", () => {
                 name: "Company Without Address",
                 fullAddress: "",
                 streetInfo: undefined as any,
-                complement: undefined,
+                complement: null,
                 postcode: undefined as any,
                 city: undefined as any
             }

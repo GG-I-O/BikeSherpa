@@ -1,9 +1,11 @@
 import Customer from "@/customers/models/Customer";
 import InputCustomer from "@/customers/models/InputCustomer";
 import CustomerServices from "@/customers/services/CustomerServices";
+import { createRandomCustomerWithoutLinks, createRandomInputCustomer } from "@/fixtures/customer-fixtures";
 import { ICustomerService } from "@/spi/CustomerSPI"
 import { ILogger } from "@/spi/LogsSPI";
 import { IStorageContext } from "@/spi/StorageSPI";
+import { faker } from "@faker-js/faker";
 import { Observable, observable } from "@legendapp/state";
 import * as Crypto from "expo-crypto";
 import { mock } from "ts-jest-mocker"
@@ -14,38 +16,14 @@ const storage = mock<IStorageContext<Customer>>();
 describe("CustomerServices", () => {
     let mockCustomerStore$: Observable<Record<string, Customer>>;
     let customerService: ICustomerService;
+    let mocCustomers: Customer[];
     beforeEach(() => {
+        mocCustomers = faker.helpers.multiple(createRandomCustomerWithoutLinks, {
+            count: 2,
+        });
         mockCustomerStore$ = observable<Record<string, Customer>>({
-            "123": {
-                id: "123",
-                name: "Existing Company",
-                address: {
-                    name: "Existing Company",
-                    fullAddress: "10 rue de la Paix 75000 Paris",
-                    streetInfo: "10 rue de la Paix",
-                    complement: undefined,
-                    postcode: "75000",
-                    city: "Paris"
-                },
-                code: "EX1",
-                phoneNumber: "0609080704",
-                email: "existing.company@gmail.com"
-            },
-            "456": {
-                id: "456",
-                name: "Another Existing Company",
-                address: {
-                    name: "Another Existing Company",
-                    fullAddress: "20 rue de la Paix 75000 Paris",
-                    streetInfo: "20 rue de la Paix",
-                    complement: undefined,
-                    postcode: "75000",
-                    city: "Paris"
-                },
-                code: "EX2",
-                phoneNumber: "0609080704",
-                email: "existing.company@gmail.com"
-            }
+            [mocCustomers[0].id]: mocCustomers[0],
+            [mocCustomers[1].id]: mocCustomers[1]
         });
         storage.getStore.mockReturnValue(mockCustomerStore$);
         logger.extend.mockReturnValue(logger);
@@ -67,11 +45,11 @@ describe("CustomerServices", () => {
         //arrange
 
         //act
-        const customer = customerService.getCustomer$("123");
+        const customer = customerService.getCustomer$(mocCustomers[0].id);
 
         //assert
         expect(customer).not.toBeNull();
-        expect(customer).toBe(mockCustomerStore$["123"]);
+        expect(customer).toBe(mockCustomerStore$[mocCustomers[0].id]);
     })
 
     it("deleteCustomer throws an error when no link is present", () => {
@@ -80,41 +58,29 @@ describe("CustomerServices", () => {
         //act
 
         //assert
-        expect(() => customerService.deleteCustomer("123")).toThrow("Cannot delete the customer 123");
+        expect(() => customerService.deleteCustomer(mocCustomers[0].id)).toThrow(`Cannot delete the customer ${mocCustomers[0].id}`);
     })
 
     it("deleteCustomer deletes a customer when links exist", () => {
         //arrange
-        mockCustomerStore$["123"].links.set([
+        mockCustomerStore$[mocCustomers[0].id].links.set([
             {
                 rel: "delete",
-                href: "/api/customers/123",
+                href: `/api/customers/${mocCustomers[0].id}`,
                 method: "DELETE"
             }
         ])
+
         //act
-        customerService.deleteCustomer("123");
+        customerService.deleteCustomer(mocCustomers[0].id);
 
         //assert
-        expect(mockCustomerStore$.peek()["123"]).toBeUndefined();
+        expect(mockCustomerStore$.peek()[mocCustomers[0].id]).toBeUndefined();
     })
 
     it("createCustomer creates a customer", () => {
         //arrange
-        const newCustomer: InputCustomer = {
-            name: "La Société",
-            address: {
-                name: "",
-                fullAddress: "",
-                streetInfo: "",
-                complement: undefined,
-                postcode: "",
-                city: ""
-            },
-            code: "SOC",
-            phoneNumber: "",
-            email: ""
-        }
+        const newCustomer: InputCustomer = createRandomInputCustomer();
         jest.spyOn(Crypto, 'randomUUID').mockReturnValue("789");
 
         //act
@@ -123,65 +89,43 @@ describe("CustomerServices", () => {
         //assert
         const newCustomerPeek = mockCustomerStore$.peek()["789"];
         expect(newCustomerPeek).not.toBeUndefined();
-        expect(newCustomerPeek.name).toBe("La Société");
-        expect(newCustomerPeek.code).toBe("SOC");
+        expect(newCustomerPeek.name).toBe(newCustomer.name);
+        expect(newCustomerPeek.code).toBe(newCustomer.code);
     })
 
     it("updateCustomer updates a customer when links exist", () => {
         //arrange
-        mockCustomerStore$["123"].links.set([
+        mockCustomerStore$[mocCustomers[0].id].links.set([
             {
                 rel: "update",
-                href: "/api/customers/123",
+                href: `/api/customers/${mocCustomers[0].id}`,
                 method: "PUT"
             }
         ])
 
         const customerToUpdate: Customer = {
-            name: "La Société",
-            address: {
-                name: "",
-                fullAddress: "",
-                streetInfo: "",
-                complement: undefined,
-                postcode: "",
-                city: ""
-            },
-            code: "SOC",
-            phoneNumber: "",
-            email: "",
-            id: "123"
-        }
+            ...createRandomCustomerWithoutLinks(),
+            id: mocCustomers[0].id
+        };
 
         //act
         customerService.updateCustomer(customerToUpdate);
-        const updatedCustomerPeek = mockCustomerStore$.peek()["123"];
+        const updatedCustomerPeek = mockCustomerStore$.peek()[mocCustomers[0].id];
 
         //assert
-        expect(updatedCustomerPeek.name).toBe("La Société");
-        expect(updatedCustomerPeek.code).toBe("SOC");
+        expect(updatedCustomerPeek.name).toBe(customerToUpdate.name);
+        expect(updatedCustomerPeek.code).toBe(customerToUpdate.code);
     })
 
-    it("updateCustomer does not update a customer when the is no link", () => {
+    it("updateCustomer does not update a customer when there is no link", () => {
         //arrange
         const customerToUpdate: Customer = {
-            name: "La Société",
-            address: {
-                name: "",
-                fullAddress: "",
-                streetInfo: "",
-                complement: undefined,
-                postcode: "",
-                city: ""
-            },
-            code: "SOC",
-            phoneNumber: "",
-            email: "",
-            id: "123"
-        }
+            ...createRandomCustomerWithoutLinks(),
+            id: mocCustomers[0].id
+        };
         //act
 
         //assert
-        expect(() => customerService.updateCustomer(customerToUpdate)).toThrow("Cannot update customer 123");
+        expect(() => customerService.updateCustomer(customerToUpdate)).toThrow(`Cannot update customer ${customerToUpdate.id}`);
     })
 })

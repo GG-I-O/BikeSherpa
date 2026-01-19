@@ -1,18 +1,14 @@
 import Customer from "@/customers/models/Customer";
 import EditCustomerFormViewModel from "@/customers/viewModels/EditCustomerFormViewModel";
+import { createRandomCustomerWithoutLinks } from "@/fixtures/customer-fixtures";
 import { ICustomerService } from "@/spi/CustomerSPI";
+import { faker } from "@faker-js/faker";
 import { mock } from "ts-jest-mocker";
 
 const customerService = mock<ICustomerService>();
 
 describe("NewCustomerFormViewModel", () => {
-    const mockCustomer = new Customer(
-        "Test Customer",
-        { name: "", fullAddress: "123 Test St", streetInfo: "123 Test St", postcode: "12345", city: "Test City" },
-        "TEST001",
-        "1234567890",
-        "test@example.com"
-    );
+    const mockCustomer = createRandomCustomerWithoutLinks();
     customerService.updateCustomer = jest.fn();
     const viewModel = new EditCustomerFormViewModel(customerService);
 
@@ -28,42 +24,14 @@ describe("NewCustomerFormViewModel", () => {
     })
 
     describe("getEditCustomerSchema", () => {
-        const existingCustomers: Customer[] = [
-            {
-                id: "123",
-                name: "Existing Customer",
-                address: {
-                    name: "Existing Customer",
-                    fullAddress: "",
-                    streetInfo: "",
-                    complement: undefined,
-                    postcode: "",
-                    city: ""
-                },
-                code: "EXI",
-                phoneNumber: "0609080704",
-                email: "existing.customer@gmail.com"
-            }
-        ];
+        const existingCustomers: Customer[] = faker.helpers.multiple(createRandomCustomerWithoutLinks, {
+            count: 1
+        });
 
         let customerToEdit: Customer;
 
         beforeEach(() => {
-            customerToEdit = {
-                id: "456",
-                name: "Existing Company",
-                address: {
-                    name: "Existing Company",
-                    fullAddress: "10 rue de la Paix 75000 Paris",
-                    streetInfo: "10 rue de la Paix",
-                    complement: undefined,
-                    postcode: "75000",
-                    city: "Paris"
-                },
-                code: "EDI",
-                phoneNumber: "0609080704",
-                email: "existing.company@gmail.com"
-            }
+            customerToEdit = createRandomCustomerWithoutLinks();
         })
 
         it("validates name is required", () => {
@@ -114,7 +82,7 @@ describe("NewCustomerFormViewModel", () => {
         it("validates code uniqueness", () => {
             //arrange
             const schema = viewModel.getEditCustomerSchema(customerToEdit, existingCustomers);
-            customerToEdit.code = "EXI";
+            customerToEdit.code = existingCustomers[0].code;
 
             //act
             const result = schema.safeParse(customerToEdit);

@@ -4,7 +4,7 @@ export type Address = {
     name: string;
     fullAddress: string;
     streetInfo: string;
-    complement?: string | null;
+    complement: string | null; // complement? could make the address undefined
     postcode: string;
     city: string;
 }

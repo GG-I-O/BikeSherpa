@@ -5,28 +5,10 @@ import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import { Address } from "@/models/Address";
 import { UserEventInstance } from '@testing-library/react-native/build/user-event/setup';
 import { useTheme, TextInput as PaperTextInput } from 'react-native-paper';
+import { faker } from '@faker-js/faker';
+import { createRandomAddress } from '@/fixtures/address-fixtures';
 
-const mockAddress1: Address = {
-    name: "Société 1",
-    fullAddress: "10 rue de la Société 1 Grenoble",
-    streetInfo: "10 rue de la Société 1",
-    postcode: "38000",
-    city: "Grenoble"
-}
-const mockAddress2: Address = {
-    name: "Société 2",
-    fullAddress: "10 rue de la Société 2 Grenoble",
-    streetInfo: "10 rue de la Société 2",
-    postcode: "38300",
-    city: "Grenoble"
-}
-const mockAddress3: Address = {
-    name: "Société 3",
-    fullAddress: "10 rue de la Société 3 Échirolles",
-    streetInfo: "10 rue de la Société 3",
-    postcode: "38100",
-    city: "Échirolles"
-}
+const mockAddresses: Address[] = faker.helpers.multiple(() => createRandomAddress(faker.company.name()), { count: 3 });
 
 const mockField = {
     name: 'address',
@@ -185,11 +167,10 @@ describe("ThemedAddressInput", () => {
     });
 
     it("renders a list of addresses on text input", async () => {
-        // Arrange
-        const mockAddresses = [mockAddress1, mockAddress2, mockAddress3];
+        // Arrange        
         (mockAddressService.fetchAddress as
             jest.MockedFunction<(text: string) => Promise<Address[]>>)
-            .mockResolvedValue(mockAddresses as Address[]);
+            .mockResolvedValue(mockAddresses);
 
         // Act
         render(
@@ -214,11 +195,10 @@ describe("ThemedAddressInput", () => {
     });
 
     it("fills the input field when an address suggestion is clicked", async () => {
-        // Arrange
-        const mockAddresses = [mockAddress1, mockAddress2, mockAddress3];
+        // Arrange        
         (mockAddressService.fetchAddress as
             jest.MockedFunction<(text: string) => Promise<Address[]>>)
-            .mockResolvedValue(mockAddresses as Address[]);
+            .mockResolvedValue(mockAddresses);
 
         // Act
         render(
@@ -244,21 +224,20 @@ describe("ThemedAddressInput", () => {
         const addressButton = screen.getAllByTestId("themedAddressInputAddressButton");
         expect(addressButton).toHaveLength(3);
 
-        const address3Text = screen.getByText('10 rue de la Société 3 Échirolles');
+        const address3Text = screen.getByText(mockAddresses[2].fullAddress);
         expect(address3Text).toBeOnTheScreen();
 
         await userAction.press(address3Text);
-        expect(mockField.onChange).toHaveBeenLastCalledWith(mockAddress3);
-        expect(mockField.value.city).toBe('Échirolles');
-        expect(mockField.value.streetInfo).toBe('10 rue de la Société 3');
+        expect(mockField.onChange).toHaveBeenLastCalledWith(mockAddresses[2]);
+        expect(mockField.value.city).toBe(mockAddresses[2].city);
+        expect(mockField.value.streetInfo).toBe(mockAddresses[2].streetInfo);
     });
 
     it("hides suggestions when an address suggestion is clicked", async () => {
-        // Arrange
-        const mockAddresses = [mockAddress1, mockAddress2, mockAddress3];
+        // Arrange        
         (mockAddressService.fetchAddress as
             jest.MockedFunction<(text: string) => Promise<Address[]>>)
-            .mockResolvedValue(mockAddresses as Address[]);
+            .mockResolvedValue(mockAddresses);
 
         // Act
         render(
@@ -276,23 +255,22 @@ describe("ThemedAddressInput", () => {
             expect(mockAddressService.fetchAddress).toHaveBeenCalledWith('Avenue de la négoce');
         });
 
-        const address2Text = screen.getByText('10 rue de la Société 2 Grenoble');
+        const address2Text = screen.getByText(mockAddresses[1].fullAddress);
         await userAction.press(address2Text);
 
         // Assert
         const addressList = screen.queryByTestId("themedAddressInputAddressList");
         expect(addressList).toBeNull();
 
-        const address1Text = screen.queryByText('10 rue de la Société 1 Grenoble');
+        const address1Text = screen.queryByText(mockAddresses[0].fullAddress);
         expect(address1Text).toBeNull();
     });
 
     it("adjust list size to have the same as the textInput", async () => {
-        // Arrange
-        const mockAddresses = [mockAddress1, mockAddress2, mockAddress3];
+        // Arrange        
         (mockAddressService.fetchAddress as
             jest.MockedFunction<(text: string) => Promise<Address[]>>)
-            .mockResolvedValue(mockAddresses as Address[]);
+            .mockResolvedValue(mockAddresses);
 
         // Act
         render(
