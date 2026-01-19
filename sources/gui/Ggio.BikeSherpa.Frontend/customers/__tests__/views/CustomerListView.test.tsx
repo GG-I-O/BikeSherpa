@@ -3,7 +3,6 @@ import Customer from "@/customers/models/Customer";
 import useCustomerListViewModel from "@/customers/viewModels/useCustomerListViewModel";
 import CustomerListView from "@/customers/views/CustomerListView";
 import { createRandomCustomerWithUpdateAndDeleteLinks, createRandomCustomerWithUpdateLinks } from "@/fixtures/customer-fixtures";
-import { hateoasRel } from "@/models/HateoasLink";
 import { render, screen, userEvent, waitFor } from "@testing-library/react-native";
 import { UserEventInstance } from "@testing-library/react-native/build/user-event/setup";
 import { act } from "react";
