@@ -1,6 +1,6 @@
 import Customer from "@/customers/models/Customer";
 import EditCustomerFormViewModel from "@/customers/viewModels/EditCustomerFormViewModel";
-import { createRandomCustomerWithoutLinks } from "@/fixtures/customer-fixtures";
+import { createRandomCustomer, linkType } from "@/fixtures/customer-fixtures";
 import { ICustomerService } from "@/spi/CustomerSPI";
 import { faker } from "@faker-js/faker";
 import { mock } from "ts-jest-mocker";
@@ -8,7 +8,7 @@ import { mock } from "ts-jest-mocker";
 const customerService = mock<ICustomerService>();
 
 describe("NewCustomerFormViewModel", () => {
-    const mockCustomer = createRandomCustomerWithoutLinks();
+    const mockCustomer = createRandomCustomer(true, linkType.none);
     customerService.updateCustomer = jest.fn();
     const viewModel = new EditCustomerFormViewModel(customerService);
 
@@ -24,14 +24,14 @@ describe("NewCustomerFormViewModel", () => {
     })
 
     describe("getEditCustomerSchema", () => {
-        const existingCustomers: Customer[] = faker.helpers.multiple(createRandomCustomerWithoutLinks, {
+        const existingCustomers: Customer[] = faker.helpers.multiple(() => createRandomCustomer(true, linkType.none), {
             count: 1
         });
 
         let customerToEdit: Customer;
 
         beforeEach(() => {
-            customerToEdit = createRandomCustomerWithoutLinks();
+            customerToEdit = createRandomCustomer(true, linkType.none);
         })
 
         it("validates name is required", () => {

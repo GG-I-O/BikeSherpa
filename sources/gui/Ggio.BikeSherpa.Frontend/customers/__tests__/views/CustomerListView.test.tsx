@@ -2,7 +2,7 @@ import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal
 import Customer from "@/customers/models/Customer";
 import useCustomerListViewModel from "@/customers/viewModels/useCustomerListViewModel";
 import CustomerListView from "@/customers/views/CustomerListView";
-import { createRandomCustomerWithUpdateAndDeleteLinks, createRandomCustomerWithUpdateLinks } from "@/fixtures/customer-fixtures";
+import { createRandomCustomer, linkType } from "@/fixtures/customer-fixtures";
 import { render, screen, userEvent, waitFor } from "@testing-library/react-native";
 import { UserEventInstance } from "@testing-library/react-native/build/user-event/setup";
 import { act } from "react";
@@ -29,8 +29,8 @@ jest.mock("@expo/vector-icons", () => {
 
 describe("CustomerListView", () => {
     let userAction: UserEventInstance;
-    const mockCustomer1: Customer = createRandomCustomerWithUpdateAndDeleteLinks();
-    const mockCustomer2: Customer = createRandomCustomerWithUpdateLinks();
+    const mockCustomer1: Customer = createRandomCustomer(true, linkType.updateAndDelete);
+    const mockCustomer2: Customer = createRandomCustomer(true, linkType.update);
 
     let mockDisplayEditForm: jest.Mock;
     let mockDeleteCustomer: jest.Mock;

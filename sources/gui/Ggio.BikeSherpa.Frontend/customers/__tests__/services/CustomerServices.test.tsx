@@ -1,7 +1,7 @@
 import Customer from "@/customers/models/Customer";
 import InputCustomer from "@/customers/models/InputCustomer";
 import CustomerServices from "@/customers/services/CustomerServices";
-import { createRandomCustomerWithoutLinks, createRandomInputCustomer } from "@/fixtures/customer-fixtures";
+import { createRandomCustomer, createRandomInputCustomer, linkType } from "@/fixtures/customer-fixtures";
 import { ICustomerService } from "@/spi/CustomerSPI"
 import { ILogger } from "@/spi/LogsSPI";
 import { IStorageContext } from "@/spi/StorageSPI";
@@ -18,7 +18,7 @@ describe("CustomerServices", () => {
     let customerService: ICustomerService;
     let mocCustomers: Customer[];
     beforeEach(() => {
-        mocCustomers = faker.helpers.multiple(createRandomCustomerWithoutLinks, {
+        mocCustomers = faker.helpers.multiple(() => createRandomCustomer(true, linkType.none), {
             count: 2,
         });
         mockCustomerStore$ = observable<Record<string, Customer>>({
@@ -104,7 +104,7 @@ describe("CustomerServices", () => {
         ])
 
         const customerToUpdate: Customer = {
-            ...createRandomCustomerWithoutLinks(),
+            ...createRandomCustomer(true, linkType.none),
             id: mocCustomers[0].id
         };
 
@@ -120,7 +120,7 @@ describe("CustomerServices", () => {
     it("updateCustomer does not update a customer when there is no link", () => {
         //arrange
         const customerToUpdate: Customer = {
-            ...createRandomCustomerWithoutLinks(),
+            ...createRandomCustomer(true, linkType.none),
             id: mocCustomers[0].id
         };
         //act

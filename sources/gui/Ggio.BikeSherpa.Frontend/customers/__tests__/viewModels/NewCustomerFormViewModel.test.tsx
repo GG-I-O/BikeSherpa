@@ -1,7 +1,7 @@
 import Customer from "@/customers/models/Customer";
 import InputCustomer from "@/customers/models/InputCustomer";
 import NewCustomerFormViewModel from "@/customers/viewModels/NewCustomerFormViewModel";
-import { createRandomCustomerWithoutLinks, createRandomInputCustomer } from "@/fixtures/customer-fixtures";
+import { createRandomCustomer, createRandomInputCustomer, linkType } from "@/fixtures/customer-fixtures";
 import { ICustomerService } from "@/spi/CustomerSPI";
 import { faker } from "@faker-js/faker";
 import { mock } from "ts-jest-mocker";
@@ -34,7 +34,7 @@ describe("NewCustomerFormViewModel", () => {
     })
 
     describe("getNewCustomerSchema", () => {
-        const existingCustomers: Customer[] = faker.helpers.multiple(createRandomCustomerWithoutLinks, {
+        const existingCustomers: Customer[] = faker.helpers.multiple(() => createRandomCustomer(true, linkType.none), {
             count: 1
         });
 
@@ -42,7 +42,7 @@ describe("NewCustomerFormViewModel", () => {
         let customerToValidate: Customer;
 
         beforeEach(() => {
-            customerToValidate = createRandomCustomerWithoutLinks();
+            customerToValidate = createRandomCustomer(true, linkType.none);
         })
 
         it("validates name is required", () => {

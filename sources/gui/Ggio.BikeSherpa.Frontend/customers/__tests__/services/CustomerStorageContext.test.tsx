@@ -8,7 +8,7 @@ import { mock } from "ts-jest-mocker";
 import * as Network from 'expo-network';
 import { hateoasRel } from "@/models/HateoasLink";
 import axios from "axios";
-import { createRandomCustomerWithUpdateAndDeleteLinks, createRandomCustomerWithUpdateLinks, createRandomNewCustomerWithGetAndUpdateLinks } from "@/fixtures/customer-fixtures";
+import { createRandomCustomer, linkType } from "@/fixtures/customer-fixtures";
 import { faker } from "@faker-js/faker";
 
 const logger = mock<ILogger>();
@@ -43,9 +43,9 @@ describe("CustomerStorageContext", () => {
     let customerStore: Observable<Record<string, Customer>>;
     beforeEach(() => {
         jest.clearAllMocks();
-        mockCustomer1 = createRandomCustomerWithUpdateAndDeleteLinks();
-        mockCustomer2 = createRandomCustomerWithUpdateLinks();
-        mockCustomer3 = createRandomNewCustomerWithGetAndUpdateLinks();
+        mockCustomer1 = createRandomCustomer(true, linkType.updateAndDelete);
+        mockCustomer2 = createRandomCustomer(true, linkType.update);
+        mockCustomer3 = createRandomCustomer(false, linkType.getAndUpdate);
         logger.extend.mockReturnValue(logger);
         logger.error = jest.fn();
         logger.info = jest.fn();
