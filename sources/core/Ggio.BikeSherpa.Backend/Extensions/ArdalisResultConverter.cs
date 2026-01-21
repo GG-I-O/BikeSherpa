@@ -1,6 +1,5 @@
 using Ardalis.Result;
 using FastEndpoints;
-using Microsoft.AspNetCore.Http;
 using IResult = Ardalis.Result.IResult;
 
 namespace Ggio.BikeSherpa.Backend.Extensions;
@@ -18,7 +17,6 @@ public static class ArdalisResultConverter
                     break;
                case ResultStatus.Created:
                     throw new InvalidOperationException("Created is not supported, you should use CreatedAtAsync inside Endpoint");
-                    break;
                case ResultStatus.NotFound:
                     await sender.NotFoundAsync(cancellation: ct);
                     break;
@@ -34,11 +32,12 @@ public static class ArdalisResultConverter
                case ResultStatus.Conflict:
                case ResultStatus.Error:
                case ResultStatus.Forbidden:
+               default:
                     await sender.ErrorsAsync(cancellation: ct);
                     break;
           }
      }
-     
+
      public async static Task ToEndpointResult<TRequest>(this ResponseSender<TRequest, Result> sender,
           Result result,
           CancellationToken ct) where TRequest : notnull
@@ -50,7 +49,6 @@ public static class ArdalisResultConverter
                     break;
                case ResultStatus.Created:
                     throw new InvalidOperationException("Created is not supported, you should use CreatedAtAsync inside Endpoint");
-                    break;
                case ResultStatus.NotFound:
                     await sender.NotFoundAsync(cancellation: ct);
                     break;
@@ -66,6 +64,7 @@ public static class ArdalisResultConverter
                case ResultStatus.Conflict:
                case ResultStatus.Error:
                case ResultStatus.Forbidden:
+               default:
                     await sender.ErrorsAsync(cancellation: ct);
                     break;
           }

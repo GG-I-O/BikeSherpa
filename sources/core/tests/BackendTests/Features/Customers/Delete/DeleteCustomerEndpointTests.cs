@@ -19,7 +19,7 @@ public class DeleteCustomerEndpointTests
                .Setup(m => m.Send(
                     It.IsAny<DeleteCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(new Result<Guid>(expectedId));
+               .ReturnsAsync(new Result());
 
           Factory.RegisterTestServices(s =>
           {

@@ -29,7 +29,6 @@ public class AddCustomerEndpoint(IMediator mediator) : Endpoint<Model.CustomerCr
 
           var result = await mediator.Send(command, ct);
 
-
-          await Send.CreatedAtAsync<GetCustomerEndpoint>(new AddResult<Guid>(result.Value), cancellation: ct);
+          await Send.CreatedAtAsync<GetCustomerEndpoint>("", new AddResult<Guid>(result.Value), cancellation: ct);
      }
 }
