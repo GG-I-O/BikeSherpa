@@ -7,9 +7,14 @@ import { syncedCrud } from "@legendapp/state/sync-plugins/crud";
 import * as Network from 'expo-network';
 import { inject } from "inversify";
 import { ResourceNotification, ResourceOperation } from "../notification/Notification";
-import { HateoasLinks, Link } from "@/models/HateoasLink";
+import { HateoasLinks, hateoasRel, Link } from "@/models/HateoasLink";
+import Storable from "@/models/Storable";
+import ServerError from "@/models/ServerError";
+import { EventRegister } from 'react-native-event-listeners';
+import { Platform } from 'react-native';
 
-export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks> implements IStorageContext<T> {
+
+export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks & Storable> implements IStorageContext<T> {
     protected logger: ILogger;
     protected store: Observable<Record<T extends {
         id: number;
@@ -19,6 +24,9 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
     private readonly notificationService: INotificationService;
     private readonly resourceName: string;
+
+    private readonly onErrorEventType: string;
+    private networkStateInitialized: boolean = false;
 
     protected constructor(
         storeName: string,
@@ -32,22 +40,34 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
         this.resourceName = storeName.toLocaleLowerCase();
         this.notificationService = notificationService;
+        this.onErrorEventType = `${this.resourceName}StorageError`;
 
-        // Init canSync observable + connect to notification service if canSync
-        this.initNetworkState().then();
+        // Defer network initialization to avoid accessing platform APIs during construction
+        // This prevents "window is not defined" errors on web platform during SSR/initial load
+        if (typeof window !== 'undefined' || Platform.OS !== 'web') {
+            // Safe to initialize immediately on native platforms or when window is available
+            this.initNetworkState().catch((error) => {
+                this.logger.error('Failed to initialize network state', error);
+            });
+        } else {
+            // On web, defer initialization until after mount
+            setTimeout(() => {
+                this.initNetworkState().catch((error) => {
+                    this.logger.error('Failed to initialize network state', error);
+                });
+            }, 0);
+        }
     }
 
     private async initNetworkState() {
+        if (this.networkStateInitialized) {
+            return;
+        }
+
+        this.networkStateInitialized = true;
+
         const networkState = await Network.getNetworkStateAsync();
         if (networkState.isInternetReachable) {
-            if (this.notificationService) {
-                try {
-                    await this.notificationService.start(this.resourceName);
-                    this.logger.info('NotificationService started, enabling sync');
-                } catch (error) {
-                    this.logger.error('Failed to start NotificationService', error);
-                }
-            }
             if (this.notificationService) {
                 try {
                     await this.notificationService.start(this.resourceName);
@@ -73,6 +93,18 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         return this.store;
     }
 
+    public subscribeToOnErrorEvent(callback: (error: string) => void): string {
+        const eventId = EventRegister.addEventListener(this.onErrorEventType, callback);
+        if (eventId) {
+            return eventId as string;
+        }
+        return "";
+    }
+
+    public unsubscribeFromOnErrorEvent(id: string): void {
+        EventRegister.removeEventListener(id);
+    }
+
     protected getLinkHref(id: string, rel: string): string | undefined {
         const item = this.store.peek()[id];
         if (!item) return undefined;
@@ -95,19 +127,27 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 return await this.getList(lastSyncDate);
             },
             create: async (item: T) => {
+                item.createdAt = new Date().toISOString();
+                item.updatedAt = new Date().toISOString();
+
                 const result = await this.create(item);
-                return result; // return server version
+                return await this.getItem(result);
             },
             update: async (item: T) => {
                 // Check if we have the rights to update
-                if (!item.links?.some((link: Link) => link.rel === "update")) return;
+                if (!item.links?.some((link: Link) => link.rel === hateoasRel.update)) {
+                    return;
+                }
 
-                const result = await this.update(item);
-                return result; // return server version
+                item.updatedAt = new Date().toISOString();
+
+                await this.update(item);
+                const result = await this.getItem(item.id);
+                return result;
             },
             delete: async (item: T) => {
                 // Check if we have the rights to delete
-                if (!item.links?.some((link: Link) => link.rel === "delete")) return;
+                if (!item.links?.some((link: Link) => link.rel === hateoasRel.delete)) return;
 
                 await this.delete(item);
             },
@@ -142,20 +182,12 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             // Merge mode on incoming changes
             mode: 'merge',
 
-            // Retry configuration - May be useless with waitFor and WaitForSet
-            retry: {
-                infinite: true, // Keep retrying forever
-                backoff: 'exponential',
-                delay: 10000, // Start with 10 seconds delay
-                maxDelay: 60000 // Max 60 seconds between retries
-            },
-
             // Wait for authentication before syncing
             waitFor: () => this.canSync$,
             waitForSet: () => this.canSync$,
 
             // Subscribe to NotificationService
-            subscribe: ({ update }) => {
+            subscribe: ({ update, refresh }) => {
                 this.logger.info(`Setting up NotificationService subscription for ${storeName}`);
 
                 const connection = this.notificationService.getConnection();
@@ -166,24 +198,43 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 }
 
                 const onNotification = async (notification: ResourceNotification) => {
+                    let localRecord: Record<string, T>;
                     switch (notification.operation) {
                         case ResourceOperation.POST:
                             this.logger.debug(`${this.resourceName} created via NotificationService`, notification.id);
+
+                            if (notification.operationId) {
+                                localRecord = this.store.peek();
+                                let localArray = Object.values(localRecord);
+                                const createdItem = localArray.find((item: T) => item.operationId === notification.operationId);
+                                if (createdItem) {
+                                    const backendItem = await this.getItem(notification.id);
+                                    if (backendItem) {
+                                        const index = localArray.findIndex((item: T) => item.id === createdItem.id);
+                                        if (index !== -1) {
+                                            localArray.splice(index, 1);
+                                        }
+                                        localArray.push(backendItem);
+                                        update({ value: localArray, mode: 'set' });
+                                    }
+                                    break;
+                                }
+                            }
+
                             const postItem = await this.getItem(notification.id);
-                            if (postItem)
+                            if (postItem) {
                                 update({ value: [postItem] });
+                            }
                             break;
                         case ResourceOperation.PUT:
                             this.logger.debug(`${this.resourceName} updated via NotificationService`, notification.id);
-                            const putItem = await this.getItem(notification.id);
-                            if (putItem)
-                                update({ value: [putItem] });
+                            refresh();
                             break;
                         case ResourceOperation.DELETE:
                             this.logger.debug(`${this.resourceName} deleted via NotificationService`, notification.id);
 
                             // Filter the deleted item out of the local data
-                            const localRecord: Record<string, T> = this.store.peek();
+                            localRecord = this.store.peek();
                             let localArray = Object.values(localRecord);
                             localArray = localArray.filter((item: T) => item.id !== notification.id);
                             update({ value: localArray, mode: 'set' })// Use mode: 'set' to replace instead of merge
@@ -215,13 +266,24 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             // Error handling
             onError: (error, params) => {
                 this.logger.error(`${this.resourceName} storage error :`, error, params);
+
+                if (this.canSync$ && params.revert) {
+                    params.revert();
+                }
+                let serverErrors: ServerError[];
+                try {
+                    serverErrors = (error as any).response.data;
+                    serverErrors.forEach((error) => EventRegister.emit(this.onErrorEventType, error.message));
+                } catch {
+                    EventRegister.emit(this.onErrorEventType, "Erreur du serveur");
+                }
             }
         }));
     }
 
     protected abstract getList(lastSync?: string): Promise<T[]>;
     protected abstract getItem(id: string): Promise<T | null>;
-    protected abstract create(item: T): Promise<T>;
-    protected abstract update(item: T): Promise<T>;
+    protected abstract create(item: T): Promise<string>;
+    protected abstract update(item: T): Promise<void>;
     protected abstract delete(item: T): Promise<void>;
 }

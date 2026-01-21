@@ -9,10 +9,11 @@ interface CustomTextInputProps {
     control: Control<any>;
     label: string;
     placeholder: string;
-    error?: FieldError | undefined
+    error?: FieldError | undefined;
     secureTextEntry?: boolean;
     placeholderTextColor?: string;
     required?: boolean;
+    testID?: string;
 }
 const ThemedInput: React.FC<CustomTextInputProps> = ({
     name,
@@ -22,7 +23,8 @@ const ThemedInput: React.FC<CustomTextInputProps> = ({
     error,
     secureTextEntry,
     placeholderTextColor,
-    required = false
+    required = false,
+    testID
 }) => {
     const theme = useTheme();
 
@@ -50,6 +52,7 @@ const ThemedInput: React.FC<CustomTextInputProps> = ({
                 }
                 ]}
                 contentStyle={{ color: theme.colors.onBackground }}
+                testID={testID}
             />
             {error && (<Text style={{ color: theme.colors.error }}>{error.message}</Text>)}
         </View>

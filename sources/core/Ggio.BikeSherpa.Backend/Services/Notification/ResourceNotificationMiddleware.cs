@@ -16,18 +16,23 @@ public class ResourceNotificationMiddleware(RequestDelegate next, ILogger<Resour
 
           var method = context.Request.Method;
           var path = context.Request.Path.Value ?? "";
+          
+          var operationIdString = context.Items["OperationId"]?.ToString();
+          Guid? operationId = string.IsNullOrWhiteSpace(operationIdString) ?
+               null :
+               Guid.Parse(operationIdString);
 
           await next(context);
 
           var statusCode = context.Response.StatusCode;
           if (statusCode is >= 200 and < 300)
-               await TryNotifyResourceChange(method, path, responseBody, notificationService);
+               await TryNotifyResourceChange(method, path, operationId, responseBody, notificationService);
 
           responseBody.Seek(0, SeekOrigin.Begin);
           await responseBody.CopyToAsync(originalBodyStream);
      }
 
-     private async Task TryNotifyResourceChange(string method, string path, MemoryStream body, IResourceNotificationService service)
+     private async Task TryNotifyResourceChange(string method, string path, Guid? operationId, MemoryStream body, IResourceNotificationService service)
      {
           try
           {
@@ -59,7 +64,8 @@ public class ResourceNotificationMiddleware(RequestDelegate next, ILogger<Resour
                               await service.NotifyResourceChangeToGroup(
                                    resourceName,
                                    operation.Value,
-                                   id.ToString()
+                                   id.ToString(),
+                                   operationId
                               );
                          }
 
@@ -72,7 +78,8 @@ public class ResourceNotificationMiddleware(RequestDelegate next, ILogger<Resour
                          await service.NotifyResourceChangeToGroup(
                               resourceName,
                               operation.Value,
-                              urlId
+                              urlId,
+                              operationId
                          );
 
                          break;

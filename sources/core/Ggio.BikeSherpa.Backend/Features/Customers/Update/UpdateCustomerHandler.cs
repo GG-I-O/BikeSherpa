@@ -10,7 +10,7 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Update;
 
-public record UpdateClientCommand(
+public record UpdateCustomerCommand(
      Guid Id,
      string Name,
      string Code,
@@ -20,13 +20,22 @@ public record UpdateClientCommand(
      AddressCrud Address
 ) : ICommand<Result<Guid>>;
 
-public class UpdateClientCommandValidator : AbstractValidator<UpdateClientCommand>
+public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>
 {
-     public UpdateClientCommandValidator()
+     public UpdateCustomerCommandValidator(IReadRepository<Customer> repository)
      {
           RuleFor(x => x.Id).NotEmpty();
           RuleFor(x => x.Name).NotEmpty();
-          RuleFor(x => x.Code).NotEmpty();
+          RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
+          {
+               var command = context.InstanceToValidate;
+               var existingCustomer = await repository.FirstOrDefaultAsync(new CustomerByCodeSpecification(code), cancellationToken);
+
+               if (existingCustomer != null && existingCustomer.Id != command.Id)
+               {
+                    context.AddFailure("Code client déjà utilisé");
+               }
+          });
           RuleFor(x => x.Email).NotEmpty();
           RuleFor(x => x.PhoneNumber).NotEmpty();
           RuleFor(x => x.Address).NotEmpty();
@@ -35,11 +44,11 @@ public class UpdateClientCommandValidator : AbstractValidator<UpdateClientComman
 
 public class UpdateCustomerHandler(
      IReadRepository<Customer> repository,
-     IValidator<UpdateClientCommand> validator,
+     IValidator<UpdateCustomerCommand> validator,
      IApplicationTransaction transaction
-) : ICommandHandler<UpdateClientCommand, Result<Guid>>
+) : ICommandHandler<UpdateCustomerCommand, Result<Guid>>
 {
-     public async ValueTask<Result<Guid>> Handle(UpdateClientCommand command, CancellationToken cancellationToken)
+     public async ValueTask<Result<Guid>> Handle(UpdateCustomerCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           var entity = await repository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.Id), cancellationToken);

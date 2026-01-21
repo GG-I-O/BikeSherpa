@@ -61,7 +61,8 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
     const onAddressSelect = (address: Address) => {
         onTextInputChange(null);
         setSuggestedAddresses(null);
-        field.onChange(address);
+        const newAddress = address;
+        field.onChange(newAddress);
     }
 
     useEffect(() => {
@@ -75,7 +76,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
             setSuggestedAddresses(addresses);
         }
         fetchAddresses(debouncedQuery)
-        .then();
+            .then();
     }, [debouncedQuery, query, addressService]);
 
     return (
@@ -92,9 +93,9 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
             >
                 <TextInput
                     testID='themedAddressInputTextInput'
-                    value={field.value.name}
+                    value={field.value?.fullAddress || ''}
                     onChangeText={(text: string) => {
-                        field.onChange({ name: text });
+                        field.onChange({ fullAddress: text });
                         onTextInputChange(text);
                     }}
                     placeholder={placeholder}
@@ -122,7 +123,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = ({
                         <View style={{ height: safeInset.bottom * 2 }} />
                     }
                     data={suggestedAddresses}
-                    keyExtractor={item => item.name}
+                    keyExtractor={item => item.fullAddress}
                     style={[formStyle.addressOptionList, {
                         borderColor: theme.colors.primaryContainer,
                         backgroundColor: theme.colors.background,
@@ -157,7 +158,7 @@ function AddressOption({ address, onPress }: AddressOptionProps) {
             onPress={() => onPress(address)}
             style={formStyle.addressOptionElement}
         >
-            <Text style={{ width: '100%', textAlign: 'left' }}>{address.name}</Text>
+            <Text style={{ width: '100%', textAlign: 'left' }}>{address.fullAddress}</Text>
         </Button>
     );
 }

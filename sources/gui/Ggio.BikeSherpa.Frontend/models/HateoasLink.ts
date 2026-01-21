@@ -5,5 +5,7 @@ export type Link = {
 }
 
 export type HateoasLinks = {
-    links?: Link[];  
+    links?: Link[];
 };
+
+export const hateoasRel = { get: "get", update: "update", delete: "delete" }

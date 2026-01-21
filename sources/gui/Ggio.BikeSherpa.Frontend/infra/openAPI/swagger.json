@@ -11,10 +11,10 @@
     }
   ],
   "paths": {
-    "/api/customer/{customerId}": {
+    "/customer/{customerId}": {
       "put": {
         "tags": [
-          "Api"
+          "customer"
         ],
         "operationId": "UpdateCustomerEndpoint",
         "parameters": [
@@ -60,7 +60,7 @@
       },
       "get": {
         "tags": [
-          "Api"
+          "customer"
         ],
         "operationId": "GetCustomerEndpoint",
         "parameters": [
@@ -97,12 +97,45 @@
             "JWTBearerAuth": []
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "customer"
+        ],
+        "operationId": "DeleteCustomerEndpoint",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
       }
     },
-    "/api/customers/{lastSync}": {
+    "/customers/{lastSync}": {
       "get": {
         "tags": [
-          "Api"
+          "customer"
         ],
         "operationId": "GetAllCustomersEndpoint",
         "parameters": [
@@ -143,10 +176,10 @@
         ]
       }
     },
-    "/api/customer": {
+    "/customer": {
       "post": {
         "tags": [
-          "Api"
+          "customer"
         ],
         "operationId": "AddCustomerEndpoint",
         "requestBody": {
@@ -189,9 +222,6 @@
     },
     "/api/course/{Id}": {
       "get": {
-        "tags": [
-          "Api"
-        ],
         "operationId": "GetCourseEndpoint",
         "parameters": [
           {
@@ -230,9 +260,6 @@
     },
     "/api/courses": {
       "get": {
-        "tags": [
-          "Api"
-        ],
         "operationId": "GetAllCoursesEndpoint",
         "responses": {
           "200": {
@@ -264,9 +291,6 @@
     },
     "/api/course": {
       "post": {
-        "tags": [
-          "Api"
-        ],
         "operationId": "AddCourseEndpoint",
         "requestBody": {
           "x-name": "CourseCrud",

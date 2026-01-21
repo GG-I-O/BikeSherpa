@@ -1,0 +1,73 @@
+import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
+import { z } from "zod";
+
+{{#each schemas}}
+const {{@key}} = {{{this}}};
+{{/each}}
+
+export const schemas = {
+{{#each schemas}}
+  {{@key}},
+{{/each}}
+};
+
+const endpoints = makeApi([
+{{#each endpoints}}
+  {
+    method: "{{method}}",
+    path: "{{path}}",
+    {{#if alias}}
+    alias: "{{alias}}",
+    {{/if}}
+    {{#if tags.length}}
+    tags: [{{#each tags}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}],
+    {{/if}}
+    {{#if description}}
+    description: `{{description}}`,
+    {{/if}}
+    {{#if requestFormat}}
+    requestFormat: "{{requestFormat}}",
+    {{/if}}
+    {{#if parameters}}
+    parameters: [
+      {{#each parameters}}
+      {
+        name: "{{name}}",
+        {{#if description}}
+        description: `{{description}}`,
+        {{/if}}
+        type: "{{type}}",
+        schema: {{{schema}}}
+      },
+      {{/each}}
+    ],
+    {{/if}}
+    {{#if response}}
+    response: {{{response}}},
+    {{/if}}
+    {{#if errors}}
+    errors: [
+      {{#each errors}}
+      {
+        status: {{status}},
+        description: `{{description}}`,
+        schema: {{{schema}}}
+      },
+      {{/each}}
+    ],
+    {{/if}}
+  },
+{{/each}}
+]);
+
+export const api = new Zodios(endpoints);
+
+export function createApiClient(baseUrl: string, options?: ZodiosOptions) {
+  return new Zodios(baseUrl, endpoints, options);
+}
+
+// Helper function to get the first tag from an endpoint by alias
+export function getTagByAlias(alias: string): string | undefined {
+  const endpoint = endpoints.find((e) => 'alias' in e && e.alias === alias);
+  return endpoint && 'tags' in endpoint && Array.isArray(endpoint.tags) ? endpoint.tags[0] : undefined;
+}

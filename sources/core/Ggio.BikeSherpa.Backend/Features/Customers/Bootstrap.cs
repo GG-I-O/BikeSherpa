@@ -14,7 +14,7 @@ public static class Bootstrap
           {
                services.AddScoped<ICustomerLinks, CustomerLinks>();
                services.AddScoped<IValidator<AddCustomerCommand>, AddCustomerCommandValidator>();
-               services.AddScoped<IValidator<UpdateClientCommand>, UpdateClientCommandValidator>();
+               services.AddScoped<IValidator<UpdateCustomerCommand>, UpdateCustomerCommandValidator>();
                return services;
           }
      }

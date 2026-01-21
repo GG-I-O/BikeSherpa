@@ -1,6 +1,6 @@
 import * as ReactHookForm from 'react-hook-form';
 import { act, render, screen, userEvent, waitFor } from '@testing-library/react-native';
-import { IOCContainer } from "@/bootstrapper/constants/IOCContainer"
+import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import { Address } from "@/models/Address";
 import { UserEventInstance } from '@testing-library/react-native/build/user-event/setup';
@@ -8,18 +8,21 @@ import { useTheme, TextInput as PaperTextInput } from 'react-native-paper';
 
 const mockAddress1: Address = {
     name: "Société 1",
+    fullAddress: "10 rue de la Société 1 Grenoble",
     streetInfo: "10 rue de la Société 1",
     postcode: "38000",
     city: "Grenoble"
 }
 const mockAddress2: Address = {
     name: "Société 2",
+    fullAddress: "10 rue de la Société 2 Grenoble",
     streetInfo: "10 rue de la Société 2",
     postcode: "38300",
     city: "Grenoble"
 }
 const mockAddress3: Address = {
     name: "Société 3",
+    fullAddress: "10 rue de la Société 3 Échirolles",
     streetInfo: "10 rue de la Société 3",
     postcode: "38100",
     city: "Échirolles"
@@ -241,12 +244,12 @@ describe("ThemedAddressInput", () => {
         const addressButton = screen.getAllByTestId("themedAddressInputAddressButton");
         expect(addressButton).toHaveLength(3);
 
-        const address3Text = screen.getByText('Société 3');
+        const address3Text = screen.getByText('10 rue de la Société 3 Échirolles');
         expect(address3Text).toBeOnTheScreen();
 
         await userAction.press(address3Text);
         expect(mockField.onChange).toHaveBeenLastCalledWith(mockAddress3);
-        expect(mockField.value.name).toBe('Société 3');
+        expect(mockField.value.city).toBe('Échirolles');
         expect(mockField.value.streetInfo).toBe('10 rue de la Société 3');
     });
 
@@ -273,14 +276,14 @@ describe("ThemedAddressInput", () => {
             expect(mockAddressService.fetchAddress).toHaveBeenCalledWith('Avenue de la négoce');
         });
 
-        const address2Text = screen.getByText('Société 2');
+        const address2Text = screen.getByText('10 rue de la Société 2 Grenoble');
         await userAction.press(address2Text);
 
         // Assert
         const addressList = screen.queryByTestId("themedAddressInputAddressList");
         expect(addressList).toBeNull();
 
-        const address1Text = screen.queryByText('Société 1');
+        const address1Text = screen.queryByText('10 rue de la Société 1 Grenoble');
         expect(address1Text).toBeNull();
     });
 
