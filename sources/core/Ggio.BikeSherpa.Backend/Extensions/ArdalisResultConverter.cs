@@ -1,43 +1,73 @@
 using Ardalis.Result;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http;
+using IResult = Ardalis.Result.IResult;
 
 namespace Ggio.BikeSherpa.Backend.Extensions;
 
-public abstract class ArdalisResultConverter<TRequest, TResponse> : Endpoint<TRequest, TResponse>
-     where TRequest : notnull
+public static class ArdalisResultConverter
 {
-    protected async Task ConvertToFastEndpointResponse<T>(
-         Result<T> result,
-         Func<T, TResponse> converter,
-         CancellationToken ct)
-    {
-        switch (result.Status)
-        {
-            case ResultStatus.Ok:
-                await Send.OkAsync(converter(result.Value), cancellation: ct);
-                break;
-            case ResultStatus.Created:
-                await Send.ResultAsync(TypedResults.Created(string.Empty, converter(result.Value)));
-                break;
-            case ResultStatus.NotFound:
-                await Send.NotFoundAsync(cancellation: ct);
-                break;
-            case ResultStatus.Unauthorized:
-                await Send.UnauthorizedAsync(cancellation: ct);
-                break;
-            case ResultStatus.NoContent:
-                await Send.NoContentAsync(cancellation: ct);
-                break;
-            case ResultStatus.Invalid:
-            case ResultStatus.Unavailable:
-            case ResultStatus.CriticalError:
-            case ResultStatus.Conflict:
-            case ResultStatus.Error:
-            case ResultStatus.Forbidden:
-            default:
-                await Send.ErrorsAsync(cancellation: ct);
-                break;
-        }
-    }
+     public async static Task ToEndpointWithoutRequestResult<TRequest>(this ResponseSender<TRequest, object?> sender,
+          IResult result,
+          CancellationToken ct) where TRequest : notnull
+     {
+          switch (result.Status)
+          {
+               case ResultStatus.Ok:
+                    await sender.OkAsync(result.GetValue(), cancellation: ct);
+                    break;
+               case ResultStatus.Created:
+                    throw new InvalidOperationException("Created is not supported, you should use CreatedAtAsync inside Endpoint");
+                    break;
+               case ResultStatus.NotFound:
+                    await sender.NotFoundAsync(cancellation: ct);
+                    break;
+               case ResultStatus.Unauthorized:
+                    await sender.UnauthorizedAsync(cancellation: ct);
+                    break;
+               case ResultStatus.NoContent:
+                    await sender.NoContentAsync(cancellation: ct);
+                    break;
+               case ResultStatus.Invalid:
+               case ResultStatus.Unavailable:
+               case ResultStatus.CriticalError:
+               case ResultStatus.Conflict:
+               case ResultStatus.Error:
+               case ResultStatus.Forbidden:
+                    await sender.ErrorsAsync(cancellation: ct);
+                    break;
+          }
+     }
+     
+     public async static Task ToEndpointResult<TRequest>(this ResponseSender<TRequest, Result> sender,
+          Result result,
+          CancellationToken ct) where TRequest : notnull
+     {
+          switch (result.Status)
+          {
+               case ResultStatus.Ok:
+                    await sender.OkAsync(result.Value, cancellation: ct);
+                    break;
+               case ResultStatus.Created:
+                    throw new InvalidOperationException("Created is not supported, you should use CreatedAtAsync inside Endpoint");
+                    break;
+               case ResultStatus.NotFound:
+                    await sender.NotFoundAsync(cancellation: ct);
+                    break;
+               case ResultStatus.Unauthorized:
+                    await sender.UnauthorizedAsync(cancellation: ct);
+                    break;
+               case ResultStatus.NoContent:
+                    await sender.NoContentAsync(cancellation: ct);
+                    break;
+               case ResultStatus.Invalid:
+               case ResultStatus.Unavailable:
+               case ResultStatus.CriticalError:
+               case ResultStatus.Conflict:
+               case ResultStatus.Error:
+               case ResultStatus.Forbidden:
+                    await sender.ErrorsAsync(cancellation: ct);
+                    break;
+          }
+     }
 }
