@@ -27,7 +27,8 @@ profile:
 #      - <path/where/not/run/inspection>
 
 #Execute shell command before Qodana execution (Applied in CI/CD pipeline)
-#bootstrap: sh ./prepare-qodana.sh
+dotnet:
+  solution: Ggio.BikeSherpa.slnx
 
 #Install IDE plugins before Qodana execution (Applied in CI/CD pipeline)
 #plugins:
