@@ -212,6 +212,14 @@ API calls with interceptors
 npm install axios
 ```
 
+## react-native-event-listeners
+
+Create an event listener
+
+```sh
+npm install react-native-event-listeners
+```
+
 ## Inversify
 
 Dependency injection with @injectable / @inject

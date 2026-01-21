@@ -1,6 +1,6 @@
 import { Address } from "@/models/Address";
 
 export interface IAddressService {
-    openAdressInMaps(address: string): void;
+    openAddressInMaps(address: string): void;
     fetchAddress(text: string): Promise<Address[] | null>;
 }

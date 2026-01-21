@@ -1,4 +1,4 @@
-import ReportDetailView from "@/reports/views/ReportDetailView"
+import ReportDetailView from "@/reports/views/ReportDetailView";
 
 export default function ReportDetails() {
     return <ReportDetailView />

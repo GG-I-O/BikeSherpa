@@ -3,5 +3,5 @@ using Ggio.BikeSherpa.Backend.Domain;
 
 namespace Ggio.BikeSherpa.Backend.Model;
 
-[Facet(typeof(Address))]
+[Facet(typeof(Address), GenerateToSource = true)]
 public partial record AddressCrud;

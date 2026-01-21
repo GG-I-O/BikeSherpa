@@ -11,10 +11,11 @@ export default class AuthService implements IAuthService {
     public setCredentialMethod(method: (params: any) => Promise<any>): void {
         this.getCredentials = method;
     }
+
     public async getToken(): Promise<string | null> {
         if (!this.getCredentials || !this.audience)
             throw new Error("AuthService not initialized");
-        const credentials = await this.getCredentials(this.scope, undefined, {audience: this.audience});
+        const credentials = await this.getCredentials(this.scope, undefined, { audience: this.audience });
         return credentials.accessToken;
     }
 }

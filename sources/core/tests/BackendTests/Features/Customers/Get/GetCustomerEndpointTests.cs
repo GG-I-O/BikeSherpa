@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using AwesomeAssertions;
 using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Mediator;

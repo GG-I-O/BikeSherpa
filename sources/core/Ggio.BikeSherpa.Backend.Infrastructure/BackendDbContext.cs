@@ -1,6 +1,5 @@
 using Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure;

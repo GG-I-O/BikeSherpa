@@ -117,8 +117,9 @@ const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/api/customer",
+    path: "/customer",
     alias: "AddCustomerEndpoint",
+    tags: ["customer"],
     requestFormat: "json",
     parameters: [
       {
@@ -143,8 +144,9 @@ const endpoints = makeApi([
   },
   {
     method: "put",
-    path: "/api/customer/:customerId",
+    path: "/customer/:customerId",
     alias: "UpdateCustomerEndpoint",
+    tags: ["customer"],
     requestFormat: "json",
     parameters: [
       {
@@ -174,8 +176,9 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/api/customer/:customerId",
+    path: "/customer/:customerId",
     alias: "GetCustomerEndpoint",
+    tags: ["customer"],
     requestFormat: "json",
     parameters: [
       {
@@ -199,9 +202,37 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "delete",
+    path: "/customer/:customerId",
+    alias: "DeleteCustomerEndpoint",
+    tags: ["customer"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "customerId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "get",
-    path: "/api/customers/:lastSync",
+    path: "/customers/:lastSync",
     alias: "GetAllCustomersEndpoint",
+    tags: ["customer"],
     requestFormat: "json",
     parameters: [
       {
@@ -230,4 +261,12 @@ export const api = new Zodios(endpoints);
 
 export function createApiClient(baseUrl: string, options?: ZodiosOptions) {
   return new Zodios(baseUrl, endpoints, options);
+}
+
+// Helper function to get the first tag from an endpoint by alias
+export function getTagByAlias(alias: string): string | undefined {
+  const endpoint = endpoints.find((e) => "alias" in e && e.alias === alias);
+  return endpoint && "tags" in endpoint && Array.isArray(endpoint.tags)
+    ? endpoint.tags[0]
+    : undefined;
 }

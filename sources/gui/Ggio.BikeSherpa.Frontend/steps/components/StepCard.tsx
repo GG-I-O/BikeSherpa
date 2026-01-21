@@ -67,7 +67,7 @@ export default function StepCard({ step, onPress, isSelected = false }: Props) {
                         <Button
                             mode="outlined"
                             onPress={() => {
-                                addressService.openAdressInMaps(`${step.address.streetInfo}, ${step.address.postcode} ${step.address.city}`);
+                                addressService.openAddressInMaps(`${step.address.streetInfo}, ${step.address.postcode} ${step.address.city}`);
                                 setIsModalVisible(false);
                             }}
                             style={{}}

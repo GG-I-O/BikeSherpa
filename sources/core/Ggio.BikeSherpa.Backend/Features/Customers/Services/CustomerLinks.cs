@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using Ggio.BikeSherpa.Backend.Features.Customers.Delete;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers.Update;
 using Ggio.BikeSherpa.Backend.Model;
@@ -14,7 +15,7 @@ public class CustomerLinks(IHttpContextAccessor httpContextAccessor, IHateoasSer
           // Get Links depending permissions
           var context = httpContextAccessor.HttpContext;
           if (context is null)
-               return new List<Link>();
+               return [];
           var scopes = context.User.FindAll("scope")
                .SelectMany(c => c.Value.Split(' '))
                .Distinct()
@@ -22,11 +23,13 @@ public class CustomerLinks(IHttpContextAccessor httpContextAccessor, IHateoasSer
           
           var canRead = scopes.Contains("read:customers");
           var canWrite = scopes.Contains("write:customers");
-          
+          if (!canRead && !canWrite)
+               return [];
+
           return hateoasService.GenerateLinks(
-               canRead ? IEndpoint.GetName<GetCustomerEndpoint>(): null,
-               canWrite ? IEndpoint.GetName<UpdateCustomerEndpoint>(): null,
-               null,
+               canRead ? IEndpoint.GetName<GetCustomerEndpoint>() : null,
+               canWrite ? IEndpoint.GetName<UpdateCustomerEndpoint>() : null,
+               canWrite ? IEndpoint.GetName<DeleteCustomerEndpoint>() : null,
                new { customerId = id }
           );
      }

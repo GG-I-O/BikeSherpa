@@ -1,16 +1,17 @@
-﻿using FastEndpoints;
+﻿using Ggio.BikeSherpa.Backend.Extensions;
 using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Add;
 
-public class AddCustomerEndpoint(IMediator mediator) : Endpoint<Model.CustomerCrud, AddResult<Guid>>
+public class AddCustomerEndpoint(IMediator mediator) : ArdalisResultConverter<Model.CustomerCrud, AddResult<Guid>>
 {
      public override void Configure()
      {
-          Post("/api/customer");
+          Post("/customer");
           Policies("write:customers");
+          Description(x => x.WithTags("customer"));
      }
 
      public override async Task HandleAsync(Model.CustomerCrud req, CancellationToken ct)
@@ -25,9 +26,7 @@ public class AddCustomerEndpoint(IMediator mediator) : Endpoint<Model.CustomerCr
           );
 
           var result = await mediator.Send(command, ct);
-          if (result.IsSuccess)
-          {
-               await Send.ResultAsync(TypedResults.Created("", new { Id = result.Value }));
-          }
+
+          await ConvertToFastEndpointResponse(result, id => new AddResult<Guid>(id), ct);
      }
 }

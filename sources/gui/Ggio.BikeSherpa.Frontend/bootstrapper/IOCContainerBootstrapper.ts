@@ -12,6 +12,12 @@ import { IAddressService } from "@/spi/AddressSPI";
 import AddressService from "@/services/AddressService";
 import { NotificationService } from "@/infra/notification/NotificationService";
 import AuthService from "@/infra/auth/AuthService";
+import { ICustomerService } from "@/spi/CustomerSPI";
+import CustomerServices from "@/customers/services/CustomerServices";
+import { IAppSnackbarService } from "@/spi/AppSnackbarSPI";
+import AppSnackbarService from "@/snackbar/services/AppSnackbarService";
+import { IBackendClient } from "@/spi/BackendClientSPI";
+import { CustomerBackendClientFacade } from "@/customers/services/CustomerBackendClientFacade";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -26,7 +32,14 @@ export default class IOCContainerBootstrapper {
 
         IOCContainerBootstrapper.bindCustomerStorageContext();
 
+        IOCContainerBootstrapper.bindCustomerServices();
+
         IOCContainerBootstrapper.bindAddressService();
+
+        IOCContainerBootstrapper.bindAppSnackbarService();
+
+        IOCContainerBootstrapper.bindCustomerBackendClientFacade();
+
     }
 
     private static bindUserService() {
@@ -65,7 +78,19 @@ export default class IOCContainerBootstrapper {
         IOCContainer.bind<IStorageContext<Customer>>(ServicesIdentifiers.CustomerStorage).to(CustomerStorageContext).inSingletonScope();
     }
 
+    private static bindCustomerServices() {
+        IOCContainer.bind<ICustomerService>(ServicesIdentifiers.CustomerServices).to(CustomerServices).inSingletonScope();
+    }
+
     private static bindAddressService() {
         IOCContainer.bind<IAddressService>(ServicesIdentifiers.AddressService).to(AddressService).inSingletonScope();
+    }
+
+    private static bindAppSnackbarService() {
+        IOCContainer.bind<IAppSnackbarService>(ServicesIdentifiers.AppSnackbarService).to(AppSnackbarService).inSingletonScope();
+    }
+
+    private static bindCustomerBackendClientFacade() {
+        IOCContainer.bind<IBackendClient<Customer>>(ServicesIdentifiers.CustomerBackendClientFacade).to(CustomerBackendClientFacade).inSingletonScope();
     }
 }

@@ -9,6 +9,7 @@ public static class Bootstrap
           public IServiceCollection AddCustomerAggregate()
           {
                services.AddScoped<ICustomerFactory, CustomerFactory>();
+               services.AddScoped<ICustomerDeleteEventHandler, CustomerDeleteService>();
                return services;
           }
      }

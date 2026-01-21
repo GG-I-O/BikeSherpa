@@ -1,10 +1,8 @@
 ﻿using AutoFixture;
 using AwesomeAssertions;
 using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 using Ggio.BikeSherpa.Backend.Features.Customers.Services;
-using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
