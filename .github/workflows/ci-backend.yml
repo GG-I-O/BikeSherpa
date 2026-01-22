@@ -2,12 +2,12 @@ name: CI-Back
 
 on:
   push:
-    branches: [main, feature/**]
+    branches: [ main, feature/** ]
     paths:
       - "sources/core/**"
       - ".github/workflows/ci-backend.yml"
   pull_request:
-    branches: [main]
+    branches: [ main, feature/** ]
     paths:
       - "sources/core/**"
 
@@ -31,8 +31,8 @@ jobs:
       - name: Save artifacts
         uses: actions/upload-artifact@v6
         with:
-            name: backend-artifact
-            path: sources/core
+          name: backend-artifact
+          path: sources/core
 
   test:
     runs-on: ubuntu-latest
@@ -48,8 +48,8 @@ jobs:
       - name: Download backend artifact
         uses: actions/download-artifact@v6
         with:
-         name: backend-artifact
-         path: sources/core
+          name: backend-artifact
+          path: sources/core
 
       - name: Run BackendTests with coverage
         continue-on-error: true

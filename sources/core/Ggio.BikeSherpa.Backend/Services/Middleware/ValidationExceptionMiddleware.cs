@@ -16,15 +16,20 @@ public class ValidationExceptionMiddleware(RequestDelegate next, ILogger<Validat
           }
           catch (ValidationException exception)
           {
+               logger.LogDebug(exception, "A validation exception occurred: {Errors}",
+                    exception.Errors.Select(e => e.ErrorMessage)
+                         .Aggregate((a, b) => $"{a}, {b}"));
+
                List<ThrownValidationError> errors = [];
                foreach (var error in exception.Errors)
                {
-                    errors.Add(new ThrownValidationError()
+                    errors.Add(new ThrownValidationError
                     {
                          Origin = error.PropertyName,
                          Message = error.ErrorMessage
                     });
                }
+
                var result = Results.BadRequest(errors);
                await result.ExecuteAsync(context);
           }
@@ -35,9 +40,6 @@ public static class ValidationExceptionExtensions
 {
      extension(IApplicationBuilder builder)
      {
-          public IApplicationBuilder UseValidationExceptionMiddleware()
-          {
-               return builder.UseMiddleware<ValidationExceptionMiddleware>();
-          }
+          public IApplicationBuilder UseValidationExceptionMiddleware() => builder.UseMiddleware<ValidationExceptionMiddleware>();
      }
 }

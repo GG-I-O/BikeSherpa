@@ -1,12 +1,12 @@
-﻿using Ardalis.Result;
-using FastEndpoints;
+﻿using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Extensions;
+using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Update;
 
-public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.CustomerCrud, Result>
+public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud>
 {
      public override void Configure()
      {
@@ -15,7 +15,7 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.Custome
           Description(x => x.WithTags("customer"));
      }
 
-     public override async Task HandleAsync(Model.CustomerCrud req, CancellationToken ct)
+     public override async Task HandleAsync(CustomerCrud req, CancellationToken ct)
      {
           var command = new UpdateCustomerCommand(
                Route<Guid>("customerId"),

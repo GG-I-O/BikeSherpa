@@ -13,9 +13,9 @@ namespace BackendTests.Features.Customers.Update;
 
 public class UpdateCustomerEndpointTests
 {
-     private readonly Mock<IMediator> _mockMediator = new();
      private readonly Fixture _fixture = new();
-     
+     private readonly Mock<IMediator> _mockMediator = new();
+
      [Fact]
      public async Task UpdateCustomer_ValidCustomer_ReturnsOk()
      {
@@ -31,19 +31,16 @@ public class UpdateCustomerEndpointTests
           VerifyMediatorCalledOnce();
           sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
      }
-     
+
      private UpdateCustomerEndpoint CreateSut(Guid expectedId)
      {
           _mockMediator
                .Setup(m => m.Send(
                     It.IsAny<UpdateCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(new Result<Guid>(expectedId));
+               .ReturnsAsync(Result.Success());
 
-          Factory.RegisterTestServices(s =>
-          {
-               s.AddSingleton(_mockMediator.Object);
-          });
+          Factory.RegisterTestServices(s => { s.AddSingleton(_mockMediator.Object); });
 
           var endpoint = Factory.Create<UpdateCustomerEndpoint>(
                ctx =>
