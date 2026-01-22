@@ -2,7 +2,7 @@ name: CI-Back
 
 on:
   push:
-    branches: [ main, feature/** ]
+    branches: [ main ]
     paths:
       - "sources/core/**"
       - ".github/workflows/ci-backend.yml"
@@ -52,7 +52,7 @@ jobs:
           path: sources/core
 
       - name: Run BackendTests with coverage
-        continue-on-error: true
+        continue-on-error: false
         run: |
           dotnet test sources/core/tests/BackendTests/BackendTests.csproj \
             --configuration Release \
@@ -61,7 +61,7 @@ jobs:
             /p:CoverletOutput=./.qodana/code-coverage/
 
       - name: Run DddCore.Tests with coverage
-        continue-on-error: true
+        continue-on-error: false
         run: |
           dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj \
             --configuration Release \

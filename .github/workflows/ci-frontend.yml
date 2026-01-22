@@ -2,7 +2,7 @@ name: CI-Front
 
 on:
   push:
-    branches: [ main, feature/** ]
+    branches: [ main ]
     paths:
       - 'sources/gui/**'
   pull_request:
