@@ -18,7 +18,7 @@ public record UpdateCustomerCommand(
      string Email,
      string PhoneNumber,
      AddressCrud Address
-) : ICommand<Result<Guid>>;
+) : ICommand<Result>;
 
 public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>
 {
@@ -46,9 +46,9 @@ public class UpdateCustomerHandler(
      IReadRepository<Customer> repository,
      IValidator<UpdateCustomerCommand> validator,
      IApplicationTransaction transaction
-) : ICommandHandler<UpdateCustomerCommand, Result<Guid>>
+) : ICommandHandler<UpdateCustomerCommand, Result>
 {
-     public async ValueTask<Result<Guid>> Handle(UpdateCustomerCommand command, CancellationToken cancellationToken)
+     public async ValueTask<Result> Handle(UpdateCustomerCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           var entity = await repository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.Id), cancellationToken);
@@ -62,6 +62,6 @@ public class UpdateCustomerHandler(
           entity.PhoneNumber = command.PhoneNumber;
           entity.Address = command.Address.ToSource<AddressCrud, Address>();
           await transaction.CommitAsync(cancellationToken);
-          return Result.Success(command.Id);
+          return Result.Success();
      }
 }

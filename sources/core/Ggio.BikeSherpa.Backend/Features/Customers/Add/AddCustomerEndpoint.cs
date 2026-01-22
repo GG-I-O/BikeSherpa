@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Extensions;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.BikeSherpa.Backend.Model;
 using Mediator;

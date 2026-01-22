@@ -1,10 +1,12 @@
-﻿using FastEndpoints;
+﻿using Ardalis.Result;
+using FastEndpoints;
+using Ggio.BikeSherpa.Backend.Extensions;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Update;
 
-public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.CustomerCrud>
+public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.CustomerCrud, Result>
 {
      public override void Configure()
      {
@@ -26,13 +28,6 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<Model.Custome
           );
 
           var result = await mediator.Send(command, ct);
-          if (result.IsSuccess)
-          {
-               await Send.OkAsync(null, ct);
-          }
-          else
-          {
-               await Send.NotFoundAsync(ct);
-          }
+          await Send.ToEndpointResult(result, ct);
      }
 }
