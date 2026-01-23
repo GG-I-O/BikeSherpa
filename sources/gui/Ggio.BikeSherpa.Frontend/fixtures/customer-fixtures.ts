@@ -4,7 +4,7 @@ import { hateoasRel, Link } from '@/models/HateoasLink';
 import { fakerFR as faker } from '@faker-js/faker';
 import { createRandomAddress } from './address-fixtures';
 
-export enum linkType { "none", "update", "delete", "get", "getAndUpdate", "updateAndDelete" };
+export enum linkType { "none", "update", "delete", "get", "getAndUpdate", "updateAndDelete" }
 
 export function createRandomInputCustomer(): InputCustomer {
   const fakeCompanyName = faker.company.name();
