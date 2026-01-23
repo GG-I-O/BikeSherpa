@@ -1,0 +1,78 @@
+name: CI-Back
+
+on:
+  push:
+    branches: [main, feature/**]
+    paths:
+      - "sources/core/**"
+      - ".github/workflows/ci-backend.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "sources/core/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Save artifacts
+        uses: actions/upload-artifact@v6
+        with:
+            name: backend-artifact
+            path: sources/core
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Download backend artifact
+        uses: actions/download-artifact@v6
+        with:
+         name: backend-artifact
+         path: sources/core
+
+      - name: Run BackendTests with coverage
+        continue-on-error: true
+        run: |
+          dotnet test sources/core/tests/BackendTests/BackendTests.csproj \
+            --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=lcov \
+            /p:CoverletOutput=./.qodana/code-coverage/
+
+      - name: Run DddCore.Tests with coverage
+        continue-on-error: true
+        run: |
+          dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj \
+            --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=lcov \
+            /p:CoverletOutput=./.qodana/code-coverage/
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v6
+        with:
+          name: backend-coverage
+          path: |
+            sources/core/tests/BackendTests/.qodana/code-coverage/coverage.info
+            sources/core/tests/DddCore.Tests/.qodana/code-coverage/coverage.info

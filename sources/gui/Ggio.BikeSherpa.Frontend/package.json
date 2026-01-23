@@ -94,10 +94,9 @@
       "!**/node_modules/**",
       "!**/babel.config.js",
       "!**/expo-env.d.ts",
-      "!**/.expo/**",
-      "!**/dist/**",
-      "!**/style/**"
-    ]
+      "!**/.expo/**"
+    ],
+    "coverageDirectory": ".qodana/code-coverage/"
   },
   "private": true
 }

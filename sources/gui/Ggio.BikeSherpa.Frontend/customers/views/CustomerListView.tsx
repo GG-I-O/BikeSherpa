@@ -4,9 +4,15 @@ import { DataTable, IconButton, useTheme } from "react-native-paper";
 import useCustomerListViewModel from "../viewModels/useCustomerListViewModel";
 import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal";
 import { useState } from "react";
+import useCustomerListViewModel from "../viewModels/useCustomerListViewModel";
+import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal";
+import { useState } from "react";
 
 export default function CustomerListView() {
     const theme = useTheme();
+    const backgroundColor = theme.colors.background;
+    const { customerList, displayEditForm, deleteCustomer, setCustomerToDelete } = useCustomerListViewModel();
+    const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
     const backgroundColor = theme.colors.background;
     const { customerList, displayEditForm, deleteCustomer, setCustomerToDelete } = useCustomerListViewModel();
     const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
@@ -16,6 +22,12 @@ export default function CustomerListView() {
         <ScrollView testID="customerListView" style={{ backgroundColor, height: '100%' }}>
             <DataTable style={{ backgroundColor }}>
                 <DataTable.Header>
+                    <DataTable.Title style={[datatableStyle.column]}>Nom</DataTable.Title>
+                    <DataTable.Title style={[datatableStyle.column]}>Code</DataTable.Title>
+                    <DataTable.Title style={[datatableStyle.column]}>Num Tél</DataTable.Title>
+                    <DataTable.Title style={[datatableStyle.column]}>Adresse</DataTable.Title>
+                    <DataTable.Title style={[datatableStyle.column]}>SIRET</DataTable.Title>
+                    <DataTable.Title style={[datatableStyle.column, datatableStyle.width80]}>Actions</DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>Nom</DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>Code</DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>Num Tél</DataTable.Title>
@@ -54,6 +66,17 @@ export default function CustomerListView() {
                 cancelButton={() => {
                     setDisplayConfirmationModal(false);
                 }} />
+            <ThemedConfirmationModal
+                visible={displayConfirmationModal}
+                title="Supprimer le client ?"
+                confirmButton={() => {
+                    deleteCustomer();
+                    setDisplayConfirmationModal(false);
+                }}
+                cancelButton={() => {
+                    setDisplayConfirmationModal(false);
+                }} />
         </ScrollView>
     );
 }
+

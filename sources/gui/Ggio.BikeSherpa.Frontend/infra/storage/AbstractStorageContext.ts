@@ -11,6 +11,7 @@ import { HateoasLinks, hateoasRel, Link } from "@/models/HateoasLink";
 import Storable from "@/models/Storable";
 import ServerError from "@/models/ServerError";
 import { EventRegister } from 'react-native-event-listeners';
+import { Platform } from 'react-native';
 
 
 export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks & Storable> implements IStorageContext<T> {
@@ -25,6 +26,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
     private readonly resourceName: string;
 
     private readonly onErrorEventType: string;
+    private networkStateInitialized: boolean = false;
 
     protected constructor(
         storeName: string,
@@ -40,13 +42,30 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         this.notificationService = notificationService;
         this.onErrorEventType = `${this.resourceName}StorageError`;
 
-        // Init canSync observable + connect to notification service if canSync
-        this.initNetworkState().catch((error) => {
-            this.logger.error('Failed to initialize network state', error);
-        });
+        // Defer network initialization to avoid accessing platform APIs during construction
+        // This prevents "window is not defined" errors on web platform during SSR/initial load
+        if (typeof window !== 'undefined' || Platform.OS !== 'web') {
+            // Safe to initialize immediately on native platforms or when window is available
+            this.initNetworkState().catch((error) => {
+                this.logger.error('Failed to initialize network state', error);
+            });
+        } else {
+            // On web, defer initialization until after mount
+            setTimeout(() => {
+                this.initNetworkState().catch((error) => {
+                    this.logger.error('Failed to initialize network state', error);
+                });
+            }, 0);
+        }
     }
 
     private async initNetworkState() {
+        if (this.networkStateInitialized) {
+            return;
+        }
+
+        this.networkStateInitialized = true;
+
         const networkState = await Network.getNetworkStateAsync();
         if (networkState.isInternetReachable) {
             if (this.notificationService) {
