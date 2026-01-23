@@ -1,86 +1,84 @@
-﻿using AutoFixture;
+﻿using System.Net;
+using System.Text.Json;
+using AutoFixture;
 using AwesomeAssertions;
-using FastEndpoints;
+using BackendTests.Services;
 using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
-using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Mediator;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using CustomerCrud = Ggio.BikeSherpa.Backend.Features.Customers.Model.CustomerCrud;
 
 namespace BackendTests.Features.Customers.GetAll;
 
-public class GetAllCustomersEndpointTests
+public class GetAllCustomersWebApplicationFactory() : TestWebApplicationFactory("read:customers", "read:customers") {}
+
+public class GetAllCustomersEndpointTests(
+     GetAllCustomersWebApplicationFactory factory,
+     ITestContextAccessor testContextAccessor) : IClassFixture<GetAllCustomersWebApplicationFactory>
 {
-     private readonly Mock<IMediator> _mockMediator = new();
-     private readonly Mock<ICustomerLinks> _mockLinksService = new();
+     private readonly HttpClient _client = factory.CreateClient();
+     private readonly Mock<IMediator> _mockMediator = factory.MockMediator;
      private readonly Fixture _fixture = new();
+     private readonly CancellationToken _cancellationToken = testContextAccessor.Current.CancellationToken;
+     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+     {
+          PropertyNameCaseInsensitive = false,
+          PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+     };
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenCustomersExist()
      {
-          // Arrange
+          // 
+          _mockMediator.Reset();
           var expectedCustomers = _fixture.Create<List<CustomerCrud>>();
-          var sut = CreateSut(expectedCustomers);
+
+          _mockMediator
+               .Setup(m => m.Send(
+                    It.IsAny<GetAllCustomersQuery>(),
+                    It.IsAny<CancellationToken>()))
+               .ReturnsAsync(expectedCustomers);
 
           // Act
-          await sut.HandleAsync(CancellationToken.None);
+          var response = await _client.GetAsync("/api/customers", _cancellationToken);
 
           // Assert
-          VerifyMediatorCalledOnce();
-          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-          sut.Response.Should().HaveCount(expectedCustomers.Count);
-          sut.Response.Select(x => x.Data).Should().BeEquivalentTo(expectedCustomers);
+          response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+          _mockMediator.Verify(
+               m => m.Send(It.IsAny<GetAllCustomersQuery>(), It.IsAny<CancellationToken>()),
+               Times.Once);
+
+          var responseBody = await response.Content.ReadAsStringAsync(_cancellationToken);
+          var responseArray = JsonSerializer.Deserialize<JsonElement>(responseBody, _jsonSerializerOptions);
+
+          responseArray.GetArrayLength().Should().Be(expectedCustomers.Count);
      }
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenNoCustomersExist()
      {
           // Arrange
-          var sut = CreateSut(new List<CustomerCrud>());
-
-          // Act
-          await sut.HandleAsync(CancellationToken.None);
-
-          // Assert
-          VerifyMediatorCalledOnce();
-          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-          sut.Response.Should().BeEmpty();
-     }
-
-     private GetAllCustomersEndpoint CreateSut(List<CustomerCrud> returnCustomers)
-     {
+          _mockMediator.Reset();
           _mockMediator
                .Setup(m => m.Send(
                     It.IsAny<GetAllCustomersQuery>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(returnCustomers);
+               .ReturnsAsync(new List<CustomerCrud>());
 
-          Factory.RegisterTestServices(s =>
-          {
-               s.AddSingleton(_mockMediator.Object);
-               s.AddSingleton(_mockLinksService.Object);
-          });
+          // Act
+          var response = await _client.GetAsync("/api/customers", _cancellationToken);
 
-          var endpoint = Factory.Create<GetAllCustomersEndpoint>(
-               ctx =>
-               {
-                    ctx.Request.Method = "GET";
-                    ctx.Request.Path = "/api/customers";
-               },
-               _mockMediator.Object,
-               _mockLinksService.Object
-          );
+          // Assert
+          response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-          return endpoint;
-     }
-
-     private void VerifyMediatorCalledOnce()
-     {
           _mockMediator.Verify(
                m => m.Send(It.IsAny<GetAllCustomersQuery>(), It.IsAny<CancellationToken>()),
-               Times.Once
-          );
+               Times.Once);
+
+          var responseBody = await response.Content.ReadAsStringAsync(_cancellationToken);
+          var responseArray = JsonSerializer.Deserialize<JsonElement>(responseBody, _jsonSerializerOptions);
+
+          responseArray.GetArrayLength().Should().Be(0);
      }
 }

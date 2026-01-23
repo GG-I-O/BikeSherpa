@@ -33,4 +33,9 @@
       <ProjectReference Include="..\..\Ggio.DddCore\Ggio.DddCore.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.8.0" />
+    </ItemGroup>
+
 </Project>
