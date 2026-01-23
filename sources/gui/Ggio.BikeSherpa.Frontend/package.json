@@ -11,6 +11,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "linter": "eslint .",
     "test": "jest --watchAll=false",
     "openAPI:web": "tsx ./infra/openAPI/generate.ts \"https://localhost:5287/swagger/v1/swagger.json\"",
     "openAPI:file": "tsx ./infra/openAPI/generate.ts"

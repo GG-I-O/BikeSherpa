@@ -1,5 +1,4 @@
 import Customer from "@/customers/models/Customer";
-import InputCustomer from "@/customers/models/InputCustomer";
 import NewCustomerFormViewModel from "@/customers/viewModels/NewCustomerFormViewModel";
 import { createRandomCustomer, createRandomInputCustomer, linkType } from "@/fixtures/customer-fixtures";
 import { ICustomerService } from "@/spi/CustomerSPI";

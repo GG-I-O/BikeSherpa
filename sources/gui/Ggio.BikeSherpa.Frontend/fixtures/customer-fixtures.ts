@@ -39,22 +39,19 @@ function generateLinks(fakeId: string, links: string): Link[] | undefined {
         href: "",
         rel: hateoasRel.update,
         method: ""
-      }]
-      break;
+      }];
     case "delete":
       return [{
         href: "",
         rel: hateoasRel.delete,
         method: ""
-      }]
-      break;
+      }];
     case "get":
       return [{
         href: `https://api.example.com/customers/${fakeId}`,
         rel: hateoasRel.get,
         method: "GET"
-      }]
-      break;
+      }];
     case "getAndUpdate":
       return [{
         href: `https://api.example.com/customers/${fakeId}`,
@@ -65,8 +62,7 @@ function generateLinks(fakeId: string, links: string): Link[] | undefined {
         href: "",
         rel: hateoasRel.update,
         method: ""
-      }]
-      break;
+      }];
     case "updateAndDelete":
       return [{
         href: "",
@@ -77,11 +73,9 @@ function generateLinks(fakeId: string, links: string): Link[] | undefined {
         href: "",
         rel: hateoasRel.delete,
         method: ""
-      }]
-      break;
+      }];
     default:
       return undefined;
-      break;
   }
 }
 
