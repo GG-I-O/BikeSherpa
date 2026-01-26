@@ -1,7 +1,9 @@
 # Initialisation
 
-## Prérequis
+## Prerequisites
+
 node & npm
+
 ```sh
 nvm install node --reinstall-packages-from=node
 nvm use node
@@ -11,7 +13,7 @@ or
 npm install -g npm@latest
 ```
 
-## Install
+## Installation
 
 ```sh
 # Create the project from scratch
@@ -32,25 +34,29 @@ npx expo start --clear
 ```
 
 #### HTTPS
+
 ##### Setup on PC
+
 ```sh
-# linux : Add to /etc/hosts
+# Linux: add to /etc/hosts
 127.0.0.1 dev.bike.local
 
-# windows : Add to C:\Windows\System32\drivers\etc\hosts
+# Windows: add to C:\Windows\System32\drivers\etc\hosts
 127.0.0.1 dev.bike.local
 ```
 
-##### Generate Certificate
+##### Generate a certificate
+
 ```sh
-# generate SSL certificate
-# Windows :
+# generate a SSL certificate
+# Windows:
 choco install mkcert
 mkcert dev.bike.local
 mkcert --install
 ```
 
 ##### Proxy
+
 ```sh
 # proxy from 8081 to 443
 npm run startHTTPS
@@ -64,7 +70,9 @@ npx expo run:android
 ```
 
 ## Release
-Follow the steps or run the command :  
+
+Follow the steps or run the command:
+
 ```sh
 npm run build:apk:windows
 or
@@ -73,44 +81,50 @@ npm run build:apk:linux
 
 ### Android
 
-#### Prérequis
-JDK 17  
-Android Studio  
-Variables d'environnement ANDROID_HOME  
+#### Android prerequisites
+
+JDK 17
+Android Studio
+Environement variables ANDROID_HOME
 
 #### Prebuild
+
 ```sh
 npx expo prebuild --platform android --clean
 ```
 
-#### Generate key
+#### Generate a key
+
 ```sh
 cd android/app
 keytool -genkeypair -v -storetype PKCS12 -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-#### Config
+#### Configuration
+
 android/gradle.properties
+
 ```sh
 MYAPP_RELEASE_STORE_FILE=my-release-key.keystore
 MYAPP_RELEASE_KEY_ALIAS=my-key-alias
 MYAPP_RELEASE_STORE_PASSWORD=your_keystore_password
 MYAPP_RELEASE_KEY_PASSWORD=your_key_password
-```  
+```
 
 android/app/build.gradle
+
 ```java
 android {
     // All config remain the same except those lines
     signingConfigs {
-	    // No changes there
+        // No changes there
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-	    // Add this here
+        // Add this here
         release {
             if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
                 storeFile file(project.property('MYAPP_RELEASE_STORE_FILE'))
@@ -129,28 +143,37 @@ android {
 }
 ```
 
-#### Build APK
+#### Build an APK
+
 ```sh
 cd android
 ./gradlew assembleRelease
 ```
 
 #### Enjoy
-APK file is in
+
+The APK file is stored in
+
 ```sh
 android/app/build/outputs/apk/release/app-release.apk
 ```
 
-# Authentication
-## Auth0
-### Setup on Auth0 dashboard
-Create a new application (SPA for web, Native for android)  
-Make one by environmnent
-### Setup on Expo
-Put infos of this tenant in .env.local (ex: .env.blank)
+## Authentication
 
-# Packages
-## Expo
+### Auth0
+
+#### Setup on Auth0 dashboard
+
+Create a new application (SPA for web, Native for android)
+Make one by environmnent
+
+#### Setup on Expo
+
+Put information of this tenant in .env.local (example: .env.blank)
+
+## Packages
+
+### Expo
 
 React native framework and its library
 
@@ -160,15 +183,18 @@ npx expo install expo-network
 npx expo install expo-secure-store
 ```
 
-## React native Auth0
+### React native Auth0
+
 Authentification with Auth0
 
 ```sh
 npm install react-native-auth0 --save
 ```
 
-### Config
+#### Authentication configuration
+
 Add and complete in .env.local ->
+
 ```sh
 # Authentification
 EXPO_PUBLIC_AUTH_DOMAIN=
@@ -177,26 +203,30 @@ EXPO_PUBLIC_AUTH_CLIENT_ANDROID=
 EXPO_PUBLIC_AUTH_SCOPE=openid profile email offline_access
 ```
 
-## React native logs
+### React native logs
+
 Log services interface
 
 ```sh
 npm install react-native-logs
 ```
 
-### Config
+#### Log configuration
+
 Docker compose [compose.yml](/infrastructure/logger/compose.yml)
+
 ```sh
 docker compose up
 ```
 
 Add and complete in .env.local ->
+
 ```sh
 # Logger
 EXPO_PUBLIC_LOKI_URL=
 ```
 
-## React native paper
+### React native paper
 
 graphic component with Material3 theme
 
@@ -204,7 +234,7 @@ graphic component with Material3 theme
 npm install react-native-paper react-native-paper-dropdown react-native-paper-dates
 ```
 
-## Axios
+### Axios
 
 API calls with interceptors
 
@@ -212,7 +242,7 @@ API calls with interceptors
 npm install axios
 ```
 
-## react-native-event-listeners
+### React-native-event-listeners
 
 Create an event listener
 
@@ -220,7 +250,7 @@ Create an event listener
 npm install react-native-event-listeners
 ```
 
-## Inversify
+### Inversify
 
 Dependency injection with @injectable / @inject
 Babel is needed to use decorator in typescript and expo project
@@ -230,7 +260,8 @@ npm install inversify reflect-metadata
 npm install --save-dev @babel/plugin-proposal-decorators babel-plugin-transform-typescript-metadata
 ```
 
-### Config
+#### Inversify configuration
+
 Add in tsconfig.json ->
 
 ```json
@@ -240,24 +271,24 @@ Add in tsconfig.json ->
 }
 ```
 
-## Zod
+### Zod
 
-Create validator schema
+Create validator schemas
 
 ```sh
 npm install zod
 ```
 
-## React hook form
+### React hook form
 
-Prérequis : Zod
+Prerequisite: Zod
 Validate form from a Zod schema
 
 ```sh
 npm install react-hook-form @hookform/resolvers
 ```
 
-## Legend app & MMKV
+### Legend app & MMKV
 
 Store data locally and update local data with API/notification when possible
 
@@ -266,9 +297,9 @@ npm install @legendapp/state@beta
 npx expo install react-native-mmkv react-native-nitro-modules
 ```
 
-## SignalR
+### SignalR
 
-Subscribe and receive notification
+Subscribe to and receive notifications
 
 ```sh
 npm install @microsoft/signalr
@@ -283,14 +314,16 @@ npm install --save-dev openapi-zod-client
 npm install @zodios/core
 ```
 
-If zodios have dependency errors  
+If zodios has dependency errors
+
 ```sh
 npm uninstall axios
 npm uninstall zod
 npm install @zodios/core zod axios
 ```
 
-Usage  
+Usage
+
 ```sh
 # To create an openAPI file from a swagger url
 npm run openAPI:web
@@ -298,11 +331,11 @@ npm run openAPI:web
 npm run openAPI:file
 ```
 
-## Jest
+### Jest
 
 Unit testing
 
-Warning : @testing-library/react-native need react-test-renderer, and react-test-renderer need to be at the EXACT same version as react
+Warning: @testing-library/react-native needs react-test-renderer, and react-test-renderer needs to be at the EXACT same version as react
 
 ```sh
 npx expo install jest-expo jest @types/jest --dev
@@ -311,7 +344,7 @@ npx expo install @testing-library/react-native --dev
 ```
 
 ```json
-Package.json :
+Package.json:
 "jest": {
     "preset": "jest-expo",
     "transformIgnorePatterns": [
@@ -328,4 +361,12 @@ Package.json :
         "!**/.expo/**"
     ]
 },
+```
+
+### Faker
+
+Generate massive amounts of fake (but realistic) data for testing and development
+
+```sh
+npm install --save-dev @faker-js/faker
 ```
