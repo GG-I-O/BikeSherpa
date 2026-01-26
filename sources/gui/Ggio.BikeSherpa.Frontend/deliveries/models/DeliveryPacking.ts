@@ -3,7 +3,5 @@ export enum DeliveryPacking {
     M,
     L,
     XL,
-    XXL,
-    XXXL,
-    XXXXL,
+    XXL
 }

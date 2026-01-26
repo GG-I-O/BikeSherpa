@@ -2,12 +2,12 @@ using System.Security.Claims;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Ggio.BikeSherpa.Backend.Domain;
-using Ggio.BikeSherpa.Backend.Features.Courses;
+using Ggio.BikeSherpa.Backend.Features.Deliveries;
 using Ggio.DddCore.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
-using Ggio.BikeSherpa.Backend.Features.Courses.Get;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
@@ -44,7 +44,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
 builder.Services.AddBackendInfrastructure(builder.Configuration);
 
 // Injection
-builder.Services.ConfigureCourseFeature();
+builder.Services.ConfigureDeliveryFeature();
 builder.Services.ConfigureCustomerFeature();
 builder.Services.AddBackendDomain();
 
@@ -62,7 +62,7 @@ builder.Services.AddDddInfrastructureServices();
 // Add Mediator for domain event dispatching
 builder.Services.AddMediator(options =>
 {
-     options.Assemblies = [typeof(GetCourseQuery).Assembly, typeof(EntityBase).Assembly, typeof(EfCoreDomainEntityAddedEventHandler)];
+     options.Assemblies = [typeof(GetDeliveryQuery).Assembly, typeof(EntityBase).Assembly, typeof(EfCoreDomainEntityAddedEventHandler)];
      options.ServiceLifetime = ServiceLifetime.Scoped;
 });
 

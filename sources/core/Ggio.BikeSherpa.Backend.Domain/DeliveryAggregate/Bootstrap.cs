@@ -1,14 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
+namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
 public static class Bootstrap
 {
      extension(IServiceCollection services)
      {
-          public IServiceCollection AddCourseAggregate()
+          public IServiceCollection AddDeliveryAggregate()
           {
-               services.AddScoped<ICourseFactory, CourseFactory>();
+               services.AddScoped<IDeliveryFactory, DeliveryFactory>();
                return services;
           }
           
