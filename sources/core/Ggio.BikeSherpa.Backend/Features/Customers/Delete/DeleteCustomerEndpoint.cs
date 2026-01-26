@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using Ggio.BikeSherpa.Backend.Extensions;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
@@ -19,13 +20,6 @@ public class DeleteCustomerEndpoint(IMediator mediator) : EndpointWithoutRequest
                Route<Guid>("customerId"));
           
           var result = await mediator.Send(command, ct);
-          if (result.IsSuccess)
-          {
-               await Send.OkAsync(cancellation: ct);
-          }
-          else
-          {
-               await Send.NotFoundAsync(cancellation: ct);
-          }
+          await Send.ToEndpointWithoutRequestResult(result, ct);
      }
 }

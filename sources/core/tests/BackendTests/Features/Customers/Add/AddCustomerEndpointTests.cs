@@ -1,81 +1,60 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
 using Ardalis.Result;
 using AutoFixture;
 using AwesomeAssertions;
-using FastEndpoints;
+using BackendTests.Services;
 using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Mediator;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 namespace BackendTests.Features.Customers.Add;
 
-public class AddCustomerEndpointTests(ITestContextAccessor testContextAccessor)
+public class AddCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers") {}
+
+public class AddCustomerEndpointTests(
+     AddCustomerWebApplicationFactory factory,
+     ITestContextAccessor testContextAccessor) : IClassFixture<AddCustomerWebApplicationFactory>
 {
-     private readonly Mock<IMediator> _mockMediator = new();
+     private readonly HttpClient _client = factory.CreateClient();
+     private readonly Mock<IMediator> _mockMediator = factory.MockMediator;
      private readonly Fixture _fixture = new();
      private readonly CancellationToken _cancellationToken = testContextAccessor.Current.CancellationToken;
+     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+     {
+          PropertyNameCaseInsensitive = false,
+          PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+     };
+
 
      [Fact]
      public async Task AddCustomer_ValidCustomer_ReturnsCreated()
      {
           // Arrange
+          _mockMediator.Reset();
           var customerCrud = _fixture.Create<CustomerCrud>();
           var expectedId = Guid.NewGuid();
-          var sut = CreateSut(expectedId);
+
+          _mockMediator
+               .Setup(m => m.Send(It.IsAny<AddCustomerCommand>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(new Result<Guid>(expectedId));
 
           // Act
-          await sut.HandleAsync(customerCrud, CancellationToken.None);
+          var response = await _client.PostAsJsonAsync("/api/customer", customerCrud, _cancellationToken);
 
           // Assert
-          VerifyMediatorCalledOnce();
-          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status201Created);
+          response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-          // Read the response body
-          sut.HttpContext.Response.Body.Position = 0;
-          using var reader = new StreamReader(sut.HttpContext.Response.Body);
-          var responseBody = await reader.ReadToEndAsync(_cancellationToken);
-          var responseObject = JsonSerializer.Deserialize<JsonElement>(responseBody);
+          _mockMediator.Verify(
+               m => m.Send(It.IsAny<AddCustomerCommand>(), It.IsAny<CancellationToken>()),
+               Times.Once);
+
+          var responseBody = await response.Content.ReadAsStringAsync(_cancellationToken);
+          var responseObject = JsonSerializer.Deserialize<JsonElement>(responseBody, _jsonSerializerOptions);
           var actualId = responseObject.GetProperty("id").GetGuid();
 
           actualId.Should().Be(expectedId);
-     }
-
-     private AddCustomerEndpoint CreateSut(Guid expectedId)
-     {
-          _mockMediator
-               .Setup(m => m.Send(
-                    It.IsAny<AddCustomerCommand>(),
-                    It.IsAny<CancellationToken>()))
-               .ReturnsAsync(new Result<Guid>(expectedId));
-
-          Factory.RegisterTestServices(s =>
-          {
-               s.AddSingleton(_mockMediator.Object);
-          });
-
-          var endpoint = Factory.Create<AddCustomerEndpoint>(
-               ctx =>
-               {
-                    ctx.Request.Method = "POST";
-                    ctx.Request.Path = "/api/customer";
-                    ctx.Response.Body = new MemoryStream();
-               },
-               _mockMediator.Object
-          );
-
-          return endpoint;
-     }
-
-     private void VerifyMediatorCalledOnce()
-     {
-          _mockMediator.Verify(
-               m => m.Send(
-                    It.IsAny<AddCustomerCommand>(),
-                    It.IsAny<CancellationToken>()),
-               Times.Once
-          );
      }
 }

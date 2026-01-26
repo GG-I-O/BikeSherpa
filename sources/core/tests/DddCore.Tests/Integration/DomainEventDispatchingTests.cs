@@ -13,10 +13,10 @@ public class DomainEventDispatchingTests(MediatorTestFixture fixture) : IClassFi
      {
           // Arrange
           var serviceCollection = fixture.GetServiceCollection();
-          
+
           serviceCollection.AddDddDbContext<TestDbContext>((_, option) => option.UseInMemoryDatabase("test"));
           serviceCollection.AddDddInfrastructureServices();
-          
+
           serviceCollection.AddLogging();
 
 
@@ -42,6 +42,6 @@ public class DomainEventDispatchingTests(MediatorTestFixture fixture) : IClassFi
           testTransactionalDispatcher.WasCalled.Should().BeTrue();
           testTransactionalDispatcher.HandleCount.Should().Be(1);
           var entity = await dbContext.MyAggregateRoots.FirstAsync(TestContext.Current.CancellationToken);
-          entity.Name.Should().Be("Wonderful");
+          entity.Data.Should().Be("Wonderful");
      }
 }

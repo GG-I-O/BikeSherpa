@@ -22,8 +22,10 @@ public class UpdateCustomerHandlerTests
      public UpdateCustomerHandlerTests()
      {
           _mockCommand = _fixture.Create<UpdateCustomerCommand>();
-          _mockCustomer = _fixture.Create<Customer>();
-          
+          _mockCustomer = _fixture.Build<Customer>()
+               .With(c => c.Id, _mockCommand.Id)
+               .Create();
+
           _mockRepository
                .Setup(x => x.FirstOrDefaultAsync(
                     It.IsAny<ISpecification<Customer>>(),
@@ -39,11 +41,27 @@ public class UpdateCustomerHandlerTests
 
      private void SetupRepositoryTestingIfCodeExists(bool doesCodeExist)
      {
-          _mockRepository
-               .Setup(x => x.AnyAsync(
-                    It.IsAny<ISpecification<Customer>>(),
-                    It.IsAny<CancellationToken>()))
-               .ReturnsAsync(doesCodeExist);
+          if (doesCodeExist)
+          {
+               var conflictingCustomer = _fixture.Build<Customer>()
+                    .With(c => c.Id, Guid.NewGuid()) // Different ID than _mockCommand.Id
+                    .With(c => c.Code, _mockCommand.Code)
+                    .Create();
+          
+               _mockRepository
+                    .Setup(x => x.FirstOrDefaultAsync(
+                         It.Is<ISpecification<Customer>>(spec => spec.GetType().Name == "CustomerByCodeSpecification"),
+                         It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(conflictingCustomer);
+          }
+          else
+          {
+               _mockRepository
+                    .Setup(x => x.FirstOrDefaultAsync(
+                         It.Is<ISpecification<Customer>>(spec => spec.GetType().Name == "CustomerByCodeSpecification"),
+                         It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(null as Customer);
+          }
      }
 
      private void VerifyTransactionCommittedOnce()
@@ -52,7 +70,7 @@ public class UpdateCustomerHandlerTests
      }
 
      [Fact]
-     public async Task Handle_ShouldUpdateCustomerAndReturnId_WhenCommandIsValid()
+     public async Task Handle_ShouldUpdateCustomerAndReturnOk_WhenCommandIsValid()
      {
           // Arrange
           SetupRepositoryTestingIfCodeExists(false);
@@ -64,12 +82,11 @@ public class UpdateCustomerHandlerTests
 
           // Assert
           result.IsSuccess.Should().BeTrue();
-          result.Value.Should().Be(_mockCommand.Id);
           VerifyTransactionCommittedOnce();
      }
 
      [Fact]
-     public async Task Handle_ShouldUpdateCustomerWithCorrectInfos()
+     public async Task Handle_ShouldUpdateCustomerWithCorrectInformation()
      {
           // Arrange
           SetupRepositoryTestingIfCodeExists(false);
@@ -85,7 +102,6 @@ public class UpdateCustomerHandlerTests
 
           // Assert
           result.IsSuccess.Should().BeTrue();
-          result.Value.Should().Be(_mockCommand.Id);
 
           // Verify the customer was updated with command values
           _mockCustomer.Name.Should().Be(_mockCommand.Name);
@@ -99,7 +115,7 @@ public class UpdateCustomerHandlerTests
           _mockCustomer.Code.Should().NotBe(originalCode);
           _mockCustomer.Email.Should().NotBe(originalEmail);
      }
-     
+
      [Fact]
      public async Task Handle_ShouldReturnNotFoundIfIdDoesNotExist()
      {
@@ -120,7 +136,7 @@ public class UpdateCustomerHandlerTests
           result.IsNotFound().Should().BeTrue();
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
      }
-     
+
      [Fact]
      public async Task Handle_ShouldThrowValidationException_WhenNameIsEmpty()
      {

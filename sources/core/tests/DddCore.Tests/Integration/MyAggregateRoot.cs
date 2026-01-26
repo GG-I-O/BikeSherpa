@@ -9,9 +9,12 @@ public class MyAggregateRoot : EntityBase<Guid>, IAggregateRoot
      [MaxLength(250)]
      public required string Name { get; set; }
 
+     [MaxLength(25)]
+     public string? Data { get; set; }
+
      public void MakeWonderful()
      {
           RegisterDomainEvent(new WonderfulEvent());
-          Name = "Wonderful";
+          Data = "Wonderful";
      }
 }

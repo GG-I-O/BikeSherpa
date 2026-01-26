@@ -1,68 +1,46 @@
 ﻿using Ardalis.Result;
 using AwesomeAssertions;
-using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Features.Customers.Delete;
 using Mediator;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
+using System.Net;
+using BackendTests.Services;
 using Moq;
 
 namespace BackendTests.Features.Customers.Delete;
 
-public class DeleteCustomerEndpointTests
+public class DeleteCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers") {}
+
+public class DeleteCustomerEndpointTests(
+     DeleteCustomerWebApplicationFactory factory,
+     ITestContextAccessor testContextAccessor) : IClassFixture<DeleteCustomerWebApplicationFactory>
 {
-     private readonly Mock<IMediator> _mockMediator = new();
-     
-     private DeleteCustomerEndpoint CreateSut(Guid expectedId)
-     {
-          _mockMediator
-               .Setup(m => m.Send(
-                    It.IsAny<DeleteCustomerCommand>(),
-                    It.IsAny<CancellationToken>()))
-               .ReturnsAsync(new Result<Guid>(expectedId));
-
-          Factory.RegisterTestServices(s =>
-          {
-               s.AddSingleton(_mockMediator.Object);
-          });
-
-          var endpoint = Factory.Create<DeleteCustomerEndpoint>(
-               ctx =>
-               {
-                    ctx.Request.Method = "DELETE";
-                    ctx.Request.Path = $"/api/customer/{expectedId}";
-                    ctx.Request.QueryString = new QueryString($"?customerId={expectedId}");
-                    ctx.Request.RouteValues["customerId"] = expectedId;
-                    ctx.Response.Body = new MemoryStream();
-               },
-               _mockMediator.Object
-          );
-
-          return endpoint;
-     }
-
-     private void VerifyMediatorCalledOnce()
-     {
-          _mockMediator.Verify(
-               m => m.Send(
-                    It.IsAny<DeleteCustomerCommand>(),
-                    It.IsAny<CancellationToken>()),
-               Times.Once
-          );
-     }
+     private readonly HttpClient _client = factory.CreateClient();
+     private readonly Mock<IMediator> _mockMediator = factory.MockMediator;
+     private readonly CancellationToken _cancellationToken = testContextAccessor.Current.CancellationToken;
 
      [Fact]
      public async Task DeleteCustomer_ReturnsOkOnSuccessfulDelete()
      {
           // Arrange
+          _mockMediator.Reset();
           var expectedId = Guid.NewGuid();
-          var sut = CreateSut(expectedId);
-          
-          //Act
-          await sut.HandleAsync(CancellationToken.None);
-          
+
+          _mockMediator
+               .Setup(m => m.Send(
+                    It.IsAny<DeleteCustomerCommand>(),
+                    It.IsAny<CancellationToken>()))
+               .ReturnsAsync(new Result());
+
+          // Act
+          var response = await _client.DeleteAsync($"/api/customer/{expectedId}", _cancellationToken);
+
           // Assert
-          VerifyMediatorCalledOnce();
-          sut.HttpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
+          response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+          _mockMediator.Verify(
+               m => m.Send(
+                    It.IsAny<DeleteCustomerCommand>(),
+                    It.IsAny<CancellationToken>()),
+               Times.Once);
      }
 }
