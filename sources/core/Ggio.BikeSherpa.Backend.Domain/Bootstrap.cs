@@ -1,4 +1,4 @@
-using Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +10,7 @@ public static class Bootstrap
      {
           public IServiceCollection AddBackendDomain()
           {
-               services.AddCourseAggregate();
+               services.AddDeliveryAggregate();
                services.AddCustomerAggregate();
                return services;
           }

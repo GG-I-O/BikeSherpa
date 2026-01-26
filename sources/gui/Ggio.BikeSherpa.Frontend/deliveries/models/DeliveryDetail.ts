@@ -1,3 +1,5 @@
+import * as zod from 'zod';
+
 export default class DeliveryDetail {
     public label: string;
     public price: number;
@@ -7,3 +9,10 @@ export default class DeliveryDetail {
         this.price = price;
     }
 }
+
+export const detailSchema = zod.object({
+    label: zod
+        .string(),
+    price: zod
+        .number(),
+});

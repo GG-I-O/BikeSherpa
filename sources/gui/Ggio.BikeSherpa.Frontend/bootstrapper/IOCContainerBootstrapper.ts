@@ -18,6 +18,11 @@ import { IAppSnackbarService } from "@/spi/AppSnackbarSPI";
 import AppSnackbarService from "@/snackbar/services/AppSnackbarService";
 import { IBackendClient } from "@/spi/BackendClientSPI";
 import { CustomerBackendClientFacade } from "@/customers/services/CustomerBackendClientFacade";
+import { Delivery } from "@/deliveries/models/Delivery";
+import { DeliveryBackendClientFacade } from "@/deliveries/services/DeliveryBackendClientFacade";
+import DeliveryStorageContext from "@/deliveries/services/DeliveryStorageContext";
+import { IDeliveryService } from "@/spi/DeliverySPI";
+import DeliveryServices from "@/deliveries/services/DeliveryServices";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -32,13 +37,19 @@ export default class IOCContainerBootstrapper {
 
         IOCContainerBootstrapper.bindCustomerStorageContext();
 
+        IOCContainerBootstrapper.bindDeliveryStorageContext();
+
         IOCContainerBootstrapper.bindCustomerServices();
+
+        IOCContainerBootstrapper.bindDeliveryServices();
 
         IOCContainerBootstrapper.bindAddressService();
 
         IOCContainerBootstrapper.bindAppSnackbarService();
 
         IOCContainerBootstrapper.bindCustomerBackendClientFacade();
+
+        IOCContainerBootstrapper.bindDeliveryBackendClientFacade();
 
     }
 
@@ -78,8 +89,17 @@ export default class IOCContainerBootstrapper {
         IOCContainer.bind<IStorageContext<Customer>>(ServicesIdentifiers.CustomerStorage).to(CustomerStorageContext).inSingletonScope();
     }
 
+    private static bindDeliveryStorageContext() {
+        IOCContainer.bind<IStorageContext<Delivery>>(ServicesIdentifiers.DeliveryStorage).to(DeliveryStorageContext).inSingletonScope();
+    }
+
+
     private static bindCustomerServices() {
         IOCContainer.bind<ICustomerService>(ServicesIdentifiers.CustomerServices).to(CustomerServices).inSingletonScope();
+    }
+
+    private static bindDeliveryServices() {
+        IOCContainer.bind<IDeliveryService>(ServicesIdentifiers.DeliveryServices).to(DeliveryServices).inSingletonScope();
     }
 
     private static bindAddressService() {
@@ -92,5 +112,9 @@ export default class IOCContainerBootstrapper {
 
     private static bindCustomerBackendClientFacade() {
         IOCContainer.bind<IBackendClient<Customer>>(ServicesIdentifiers.CustomerBackendClientFacade).to(CustomerBackendClientFacade).inSingletonScope();
+    }
+
+    private static bindDeliveryBackendClientFacade() {
+        IOCContainer.bind<IBackendClient<Delivery>>(ServicesIdentifiers.DeliveryBackendClientFacade).to(DeliveryBackendClientFacade).inSingletonScope();
     }
 }
