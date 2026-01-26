@@ -4,25 +4,26 @@ import { Step } from "@/steps/models/Step";
 import Customer from "@/customers/models/Customer";
 import DeliveryDetail from "./DeliveryDetail";
 import { DeliveryPacking } from "./DeliveryPacking";
+import { InputDelivery } from "./InputDelivery";
+import { Link } from "@/models/HateoasLink";
+import { z } from 'zod';
+import { schemas } from '@/infra/openAPI/client';
 
-export class Delivery implements Identifiable<string> {
+export class Delivery extends InputDelivery implements Identifiable<string> {
+    // Storable
     public readonly id: string;
-    public code: string;
-    public customer: Customer;
-    public totalPrice: number;
-    public reportId: string;
-    public steps: Step[];
-    public details: DeliveryDetail[];
-    public packing: DeliveryPacking;
+    public createdAt?: string;
+    public updatedAt?: string;
+    public operationId?: string;
+    public links?: Link[];
 
     public constructor(code: string, customer: Customer, totalPrice: number, reportId: string, packing: DeliveryPacking, steps: Step[] = [], details: DeliveryDetail[] = []) {
+        super(code, customer, totalPrice, reportId, packing, steps, details);
         this.id = Crypto.randomUUID();
-        this.code = code;
-        this.customer = customer;
-        this.totalPrice = totalPrice;
-        this.reportId = reportId;
-        this.packing = packing;
-        this.steps = steps;
-        this.details = details;
+        this.links = [];
     }
 }
+
+export type DeliveryCrud = z.infer<typeof schemas.DeliveryCrud>;
+
+export type DeliveryDto = z.infer<typeof schemas.DeliveryDto>;

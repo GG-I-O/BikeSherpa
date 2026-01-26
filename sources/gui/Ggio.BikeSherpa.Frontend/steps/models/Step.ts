@@ -1,7 +1,8 @@
-import { Address } from '@/models/Address';
+import { Address, addressSchema } from '@/models/Address';
 import { Identifiable } from '@/models/Identifiable';
 import * as Crypto from 'expo-crypto';
 import { StepType } from './StepType';
+import * as zod from 'zod';
 
 export class Step implements Identifiable<string> {
     readonly id: string;
@@ -37,10 +38,8 @@ export class Step implements Identifiable<string> {
         this.contractDate = contractDate;
         this.estimatedDate = estimatedDate;
         this.comment = comment;
-
         this.nbToDo = nbToDo;
         this.nbDone = 0;
-
         this.filesPath = filesPath;
     }
 
@@ -57,3 +56,17 @@ export class Step implements Identifiable<string> {
         return this.estimatedDate.toLocaleTimeString();
     }
 }
+
+export const stepSchema = zod.object({
+    id: zod.string(),
+    type: zod.nativeEnum(StepType),
+    addres: addressSchema,
+    distance: zod.number(),
+    price: zod.number(),
+    contractDate: zod.date(),
+    estimatedDate: zod.date(),
+    comment: zod.string(),
+    nbToDo: zod.number(),
+    nbDone: zod.number(),
+    filesPath: zod.array(zod.string()),
+}).partial({ comment: true })
