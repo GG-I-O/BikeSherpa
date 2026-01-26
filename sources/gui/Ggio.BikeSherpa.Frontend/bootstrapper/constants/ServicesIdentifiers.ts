@@ -7,12 +7,15 @@ export const ServicesIdentifiers = {
     CustomerStorage: Symbol.for('CustomerStorageContext'),
     DeliveryStorage: Symbol.for('DeliveryStorageContext'),
     CourierStorage: Symbol.for('CourierStorageContext'),
+    DeliveryStorage: Symbol.for('DeliveryStorageContext'),
     CustomerServices: Symbol.for('CustomerServices'),
     DeliveryServices: Symbol.for('DeliveryServices'),
     CourierServices: Symbol.for('CourierServices'),
+    DeliveryServices: Symbol.for('DeliveryServices'),
     AddressService: Symbol.for('AddressService'),
     AppSnackbarService: Symbol.for('AppSnackbarService'),
     CustomerBackendClientFacade: Symbol.for('CustomerBackendClientFacade'),
+    DeliveryBackendClientFacade: Symbol.for('DeliveryBackendClientFacade'),
     DeliveryBackendClientFacade: Symbol.for('DeliveryBackendClientFacade'),
     CourierBackendClientFacade: Symbol.for('CourierBackendClientFacade')
 };
