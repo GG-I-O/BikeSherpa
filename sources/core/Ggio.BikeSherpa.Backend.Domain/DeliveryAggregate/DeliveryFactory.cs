@@ -1,3 +1,4 @@
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.DddCore;
 using Mediator;
 
