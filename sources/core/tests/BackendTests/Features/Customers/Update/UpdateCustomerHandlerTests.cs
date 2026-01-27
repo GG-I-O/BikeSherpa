@@ -63,6 +63,56 @@ public class UpdateCustomerHandlerTests
                     .ReturnsAsync(null as Customer);
           }
      }
+     
+     private void SetupRepositoryTestingIfSiretExists(bool doesSiretExist)
+     {
+          if (doesSiretExist)
+          {
+               var conflictingCustomer = _fixture.Build<Customer>()
+                    .With(c => c.Id, Guid.NewGuid()) // Different ID than _mockCommand.Id
+                    .With(c => c.Siret, _mockCommand.Siret)
+                    .Create();
+          
+               _mockRepository
+                    .Setup(x => x.FirstOrDefaultAsync(
+                         It.Is<ISpecification<Customer>>(spec => spec.GetType().Name == "CustomerBySiretSpecification"),
+                         It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(conflictingCustomer);
+          }
+          else
+          {
+               _mockRepository
+                    .Setup(x => x.FirstOrDefaultAsync(
+                         It.Is<ISpecification<Customer>>(spec => spec.GetType().Name == "CustomerBySiretSpecification"),
+                         It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(null as Customer);
+          }
+     }
+     
+     private void SetupRepositoryTestingIfVatNumberExists(bool doesVatNumberExist)
+     {
+          if (doesVatNumberExist)
+          {
+               var conflictingCustomer = _fixture.Build<Customer>()
+                    .With(c => c.Id, Guid.NewGuid()) // Different ID than _mockCommand.Id
+                    .With(c => c.VatNumber, _mockCommand.VatNumber)
+                    .Create();
+          
+               _mockRepository
+                    .Setup(x => x.FirstOrDefaultAsync(
+                         It.Is<ISpecification<Customer>>(spec => spec.GetType().Name == "CustomerByVatNumberSpecification"),
+                         It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(conflictingCustomer);
+          }
+          else
+          {
+               _mockRepository
+                    .Setup(x => x.FirstOrDefaultAsync(
+                         It.Is<ISpecification<Customer>>(spec => spec.GetType().Name == "CustomerByVatNumberSpecification"),
+                         It.IsAny<CancellationToken>()))
+                    .ReturnsAsync(null as Customer);
+          }
+     }
 
      private void VerifyTransactionCommittedOnce()
      {
@@ -74,6 +124,8 @@ public class UpdateCustomerHandlerTests
      {
           // Arrange
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
 
           var sut = CreateSut();
 
@@ -90,6 +142,8 @@ public class UpdateCustomerHandlerTests
      {
           // Arrange
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
 
           var originalName = _mockCustomer.Name;
           var originalCode = _mockCustomer.Code;
@@ -121,6 +175,8 @@ public class UpdateCustomerHandlerTests
      {
           // Arrange
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           _mockRepository
                .Setup(x => x.FirstOrDefaultAsync(
                     It.IsAny<ISpecification<Customer>>(),
@@ -143,6 +199,8 @@ public class UpdateCustomerHandlerTests
           // Arrange
           var commandWithEmptyName = _mockCommand with { Name = "" };
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -158,6 +216,8 @@ public class UpdateCustomerHandlerTests
           // Arrange
           var commandWithEmptyCode = _mockCommand with { Code = "" };
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -173,6 +233,8 @@ public class UpdateCustomerHandlerTests
           // Arrange
           var commandWithEmptyEmail = _mockCommand with { Email = "" };
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -188,6 +250,8 @@ public class UpdateCustomerHandlerTests
           // Arrange
           var commandWithEmptyPhoneNumber = _mockCommand with { PhoneNumber = "" };
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -202,6 +266,38 @@ public class UpdateCustomerHandlerTests
      {
           // Arrange
           SetupRepositoryTestingIfCodeExists(true);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
+          var sut = CreateSut();
+
+          // Act & Assert
+          await Assert.ThrowsAsync<ValidationException>(() =>
+               sut.Handle(_mockCommand, CancellationToken.None).AsTask());
+
+          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+     }
+     
+     [Fact]
+     public async Task Handle_ShouldThrowValidationException_WhenSiretAlreadyExists()
+     {
+          // Arrange
+          SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(true);
+          var sut = CreateSut();
+
+          // Act & Assert
+          await Assert.ThrowsAsync<ValidationException>(() =>
+               sut.Handle(_mockCommand, CancellationToken.None).AsTask());
+
+          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+     }
+     
+     [Fact]
+     public async Task Handle_ShouldThrowValidationException_WhenVatNumberAlreadyExists()
+     {
+          // Arrange
+          SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfVatNumberExists(true);
           var sut = CreateSut();
 
           // Act & Assert

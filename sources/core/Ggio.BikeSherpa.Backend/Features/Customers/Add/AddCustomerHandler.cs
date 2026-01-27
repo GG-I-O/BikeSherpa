@@ -14,6 +14,7 @@ public record AddCustomerCommand(
      string Name,
      string Code,
      string? Siret,
+     string? VatNumber,
      string Email,
      string PhoneNumber,
      AddressCrud Address
@@ -26,12 +27,28 @@ public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
           RuleFor(x => x.Name).NotEmpty();
           RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
           {
-               var codeisValid = !await repository.AnyAsync(new CustomerByCodeSpecification(code), cancellationToken);
-               if (!codeisValid)
+               var codeIsValid = !await repository.AnyAsync(new CustomerByCodeSpecification(code), cancellationToken);
+               if (!codeIsValid)
                {
                     context.AddFailure("Code client déjà utilisé");
                }
           });
+          RuleFor(x => x.Siret).NotEmpty().CustomAsync(async (siret, context, cancellationToken) =>
+          {
+               var siretIsValid = !await repository.AnyAsync(new CustomerBySiretSpecification(siret!), cancellationToken);
+               if (!siretIsValid)
+               {
+                    context.AddFailure("Siret déjà utilisé pour un autre client");
+               }
+          }).When(x => x.Siret != null);
+          RuleFor(x => x.VatNumber).NotEmpty().CustomAsync(async (vatNumber, context, cancellationToken) =>
+          {
+               var vatNumberIsValid = !await repository.AnyAsync(new CustomerByVatNumberSpecification(vatNumber!), cancellationToken);
+               if (!vatNumberIsValid)
+               {
+                    context.AddFailure("Numéro de TVA déjà utilisé pour un autre client");
+               }
+          }).When(x => x.VatNumber != null);
           RuleFor(x => x.Email).NotEmpty();
           RuleFor(x => x.PhoneNumber).NotEmpty();
           RuleFor(x => x.Address).NotEmpty();
@@ -51,6 +68,7 @@ public class AddCustomerHandler(
                command.Name,
                command.Code,
                command.Siret,
+               command.VatNumber,
                command.Email,
                command.PhoneNumber,
                command.Address.ToSource<AddressCrud, Address>()
