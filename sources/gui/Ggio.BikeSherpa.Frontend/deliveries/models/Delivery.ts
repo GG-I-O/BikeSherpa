@@ -17,8 +17,8 @@ export class Delivery extends InputDelivery implements Identifiable<string> {
     public operationId?: string;
     public links?: Link[];
 
-    public constructor(code: string, customer: Customer, totalPrice: number, reportId: string, packing: DeliveryPacking, steps: Step[] = [], details: DeliveryDetail[] = []) {
-        super(code, customer, totalPrice, reportId, packing, steps, details);
+    public constructor(code: string, customer: Customer, totalPrice: number, reportId: string, steps: Step[] = [], details: DeliveryDetail[] = [], packing: DeliveryPacking) {
+        super(code, customer, totalPrice, reportId, steps, details, packing);
         this.id = Crypto.randomUUID();
         this.links = [];
     }

@@ -1,3 +1,4 @@
+import * as zod from 'zod';
 import * as Crypto from 'expo-crypto';
 
 export default class Courier {
@@ -23,3 +24,11 @@ export default class Courier {
         this.email = email;
     }
 }
+
+export const courierSchema = zod.object({
+    code: zod.string(),
+    firstName: zod.string(),
+    lastName: zod.string(),
+    phone: zod.string(),
+    email: zod.string(),
+});
