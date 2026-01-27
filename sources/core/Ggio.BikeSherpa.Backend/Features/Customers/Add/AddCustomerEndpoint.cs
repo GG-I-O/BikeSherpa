@@ -22,6 +22,7 @@ public class AddCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud, Ad
                req.Name,
                req.Code,
                req.Siret,
+               req.VatNumber,
                req.Email,
                req.PhoneNumber,
                req.Address
