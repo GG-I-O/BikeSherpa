@@ -61,11 +61,14 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("Siret")
+                    b.Property<string>("Siret")
                         .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("VatNumber")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
