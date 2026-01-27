@@ -11,8 +11,6 @@ export default class DeliveryDetail {
 }
 
 export const detailSchema = zod.object({
-    label: zod
-        .string(),
-    price: zod
-        .number(),
+    label: zod.string(),
+    price: zod.number(),
 });

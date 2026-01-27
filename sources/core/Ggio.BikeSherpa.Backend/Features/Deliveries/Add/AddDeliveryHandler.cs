@@ -1,18 +1,33 @@
 using Ardalis.Result;
 using FluentValidation;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.DddCore;
 using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 
-public record AddDeliveryCommand(DateTimeOffset StartDate) : ICommand<Result<Guid>>;
+public record AddDeliveryCommand(
+     string Code,
+     Customer Customer,
+     double TotalPrice,
+     string ReportId,
+     string[] Steps,
+     string[] Details,
+     string Packing
+     ) : ICommand<Result<Guid>>;
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
-     public AddDeliveryCommandValidator()
+     public AddDeliveryCommandValidator(IReadRepository<Delivery> repository)
      {
-          RuleFor(x => x.StartDate).NotEmpty().Must(x => x > DateTimeOffset.Now);
+          RuleFor(x => x.Code).NotEmpty();
+          RuleFor(x => x.Customer).NotNull();
+          RuleFor(x => x.TotalPrice).NotEmpty();
+          RuleFor(x => x.ReportId).NotEmpty();
+          RuleFor(x => x.Steps).NotEmpty();
+          RuleFor(x => x.Details).NotEmpty();
+          RuleFor(x => x.Packing).NotEmpty();
      }
 }
 
@@ -24,11 +39,18 @@ public class AddDeliveryHandler(
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
-          var delivery = await factory.CreateDeliveryAsync(command.StartDate);
           
-          //ajouter des données à la course
+          var delivery = await factory.CreateDeliveryAsync(
+               command.Code,
+               command.Customer,
+               command.TotalPrice,
+               command.ReportId,
+               command.Steps,
+               command.Details,
+               command.Packing
+               );
           
-          await transaction.CommitAsync(cancellationToken);
+         await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(delivery.Id);
      }
 }

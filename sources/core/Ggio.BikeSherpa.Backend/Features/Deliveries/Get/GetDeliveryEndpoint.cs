@@ -1,24 +1,33 @@
 using FastEndpoints;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
 using Mediator;
+using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 
-public class GetDeliveryEndpoint(IMediator mediator) : EndpointWithoutRequest<DeliveryCrud>
+public class GetDeliveryEndpoint(IMediator mediator, IDeliveryLinks deliveryLinks) : EndpointWithoutRequest<DeliveryCrud>
 {
      public override void Configure()
      {
-          Get("/api/delivery/{Id:guid}");
-          Permissions("read:deliveries");
+          Get("/delivery/{deliveryId:guid}");
+          Policies("read:deliveries");
+          Description(x => x.WithTags("delivery"));
      }
 
      public override async Task HandleAsync(CancellationToken ct)
      {
-          var entity = await mediator.Send(new GetDeliveryQuery(Query<Guid>("Id")), ct);
-          if (entity is null)
+          var delivery = await mediator.Send(new GetDeliveryQuery(Query<Guid>("deliveryId")), ct);
+          if (delivery is null)
           {
                await Send.NotFoundAsync(ct);
+               return;
           }
-
-          await Send.OkAsync(entity!, ct);
+          var deliveryDto = new DeliveryDto
+          {
+               Data = delivery,
+               Links = deliveryLinks.GenerateLinks(delivery.Id)
+          };
+          await Send.OkAsync(delivery!, ct);
      }
 }

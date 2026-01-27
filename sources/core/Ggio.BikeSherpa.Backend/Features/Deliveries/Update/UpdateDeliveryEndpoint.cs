@@ -1,24 +1,24 @@
-using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
+﻿using FastEndpoints;
+using Ggio.BikeSherpa.Backend.Extensions;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
-using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
-namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
+namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
-public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, AddResult<Guid>>
+public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
 {
      public override void Configure()
      {
-          Post("/delivery");
+          Put("/delivery/{deliveryId:guid}");
           Policies("write:deliveries");
           Description(x => x.WithTags("delivery"));
      }
 
      public override async Task HandleAsync(DeliveryCrud req, CancellationToken ct)
      {
-          var command = new AddDeliveryCommand(
+          var command = new UpdateDeliveryCommand(
+               Route<Guid>("deliveryId"),
                req.Code,
                req.Customer,
                req.TotalPrice,
@@ -26,10 +26,9 @@ public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, Ad
                req.Steps,
                req.Details,
                req.Packing
-               );
-          
+          );
+
           var result = await mediator.Send(command, ct);
-         
-          await Send.CreatedAtAsync<GetDeliveryEndpoint>(result.Value, new AddResult<Guid>(result.Value), cancellation: ct);
+          await Send.ToEndpointResult(result, ct);
      }
 }
