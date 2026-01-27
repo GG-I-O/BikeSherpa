@@ -9,6 +9,7 @@ describe("CustomerMapper", () => {
                 name: "Customer",
                 code: "CUS",
                 siret: null,
+                vatNumber: null,
                 email: "customer@gmail.com",
                 phoneNumber: "0609080544",
                 address: {
