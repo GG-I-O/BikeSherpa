@@ -44,8 +44,8 @@ export default class NewDeliveryFormViewModel {
                 .number(),
             reportId: zod
                 .string(),
-            steps: stepSchema,
-            details: detailSchema,
+            steps: zod.array(stepSchema),
+            details: zod.array(detailSchema),
             packing: zod.nativeEnum(DeliveryPacking),
         });
     }

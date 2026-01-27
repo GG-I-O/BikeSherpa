@@ -37,7 +37,7 @@ public class GetCustomerHandlerTests
           var guid = Guid.NewGuid();
           _mockCustomer.Id = guid;
           var sut = CreateSut(_mockCustomer);
-          var query = new GetClientQuery(guid);
+          var query = new GetCustomerQuery(guid);
           
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -61,7 +61,7 @@ public class GetCustomerHandlerTests
           var guidB = Guid.NewGuid();
           _mockCustomer.Id = guidA;
           var sut = CreateSut(emptyRepository ? null : _mockCustomer);
-          var query = new GetClientQuery(guidB);
+          var query = new GetCustomerQuery(guidB);
           
           // Act
           var result = await sut.Handle(query, CancellationToken.None);

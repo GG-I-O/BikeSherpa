@@ -2,9 +2,9 @@
 
 namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
 
-public class ClientByUpdatedAtSpecification: Specification<Customer>
+public class CustomerByUpdatedAtSpecification: Specification<Customer>
 {
-     public ClientByUpdatedAtSpecification(DateTimeOffset date)
+     public CustomerByUpdatedAtSpecification(DateTimeOffset date)
       {
            Query.Where(x => x.UpdatedAt >= date);
       }

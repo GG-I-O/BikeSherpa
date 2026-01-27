@@ -9,6 +9,7 @@ public static class Bootstrap
           public IServiceCollection AddDeliveryAggregate()
           {
                services.AddScoped<IDeliveryFactory, DeliveryFactory>();
+               services.AddScoped<IDeliveryDeleteEventHandler, DeliveryDeleteService>();
                return services;
           }
           
