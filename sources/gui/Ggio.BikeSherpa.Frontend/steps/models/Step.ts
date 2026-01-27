@@ -3,6 +3,7 @@ import { Identifiable } from '@/models/Identifiable';
 import * as Crypto from 'expo-crypto';
 import { StepType } from './StepType';
 import * as zod from 'zod';
+import Courier, { courierSchema } from '@/couriers/models/Courier';
 
 export class Step implements Identifiable<string> {
     readonly id: string;
@@ -11,10 +12,10 @@ export class Step implements Identifiable<string> {
     public distance: number;
     public price: number;
     public contractDate: Date;
-    public estimatedDate?: Date;
-    public realDate?: Date;
+    public estimatedDeliveryDate?: Date;
+    public realDeliveryDate?: Date;
     public comment?: string;
-    public courier?: string;
+    public courier?: Courier;
     public nbToDo: number;
     public nbDone: number;
     public filesPath: string[];
@@ -25,8 +26,9 @@ export class Step implements Identifiable<string> {
         distance: number,
         price: number,
         contractDate: Date,
-        estimatedDate?: Date,
+        estimatedDeliveryDate?: Date,
         comment?: string,
+        courier?: Courier,
         nbToDo: number = 0,
         filesPath: string[] = []
     ) {
@@ -36,8 +38,9 @@ export class Step implements Identifiable<string> {
         this.distance = distance;
         this.price = price;
         this.contractDate = contractDate;
-        this.estimatedDate = estimatedDate;
+        this.estimatedDeliveryDate = estimatedDeliveryDate;
         this.comment = comment;
+        this.courier = courier;
         this.nbToDo = nbToDo;
         this.nbDone = 0;
         this.filesPath = filesPath;
@@ -52,8 +55,8 @@ export class Step implements Identifiable<string> {
     }
 
     public getEstimatedTime(): string {
-        if (!this.estimatedDate) return '';
-        return this.estimatedDate.toLocaleTimeString();
+        if (!this.estimatedDeliveryDate) return '';
+        return this.estimatedDeliveryDate.toLocaleTimeString();
     }
 }
 
@@ -64,9 +67,10 @@ export const stepSchema = zod.object({
     distance: zod.number(),
     price: zod.number(),
     contractDate: zod.date(),
-    estimatedDate: zod.date(),
+    estimatedDeliveryDate: zod.date(),
     comment: zod.string(),
+    courier: courierSchema,
     nbToDo: zod.number(),
     nbDone: zod.number(),
     filesPath: zod.array(zod.string()),
-}).partial({ comment: true })
+}).partial({ comment: true, courier: true })
