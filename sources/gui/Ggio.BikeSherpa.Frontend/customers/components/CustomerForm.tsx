@@ -82,7 +82,6 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
                 error={errors.siret as FieldError | undefined}
                 label="Siret"
                 placeholder="12345678910123"
-                required
             />
             <ThemedInput
                 testID="customerFormVatNumberInput"
@@ -91,7 +90,6 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
                 error={errors.vatNumber as FieldError | undefined}
                 label="Numéro de TVA"
                 placeholder="FR12345678910"
-                required
             />
             <Button
                 testID="formButton"
