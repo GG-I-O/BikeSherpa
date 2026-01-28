@@ -1,6 +1,5 @@
 using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.DddCore;
 using Mediator;
@@ -9,7 +8,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 
 public record AddDeliveryCommand(
      string Code,
-     Customer Customer,
+     string CustomerId,
      double TotalPrice,
      string ReportId,
      string[] Steps,
@@ -22,7 +21,7 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
      public AddDeliveryCommandValidator(IReadRepository<Delivery> repository)
      {
           RuleFor(x => x.Code).NotEmpty();
-          RuleFor(x => x.Customer).NotNull();
+          RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Steps).NotEmpty();
@@ -42,7 +41,7 @@ public class AddDeliveryHandler(
           
           var delivery = await factory.CreateDeliveryAsync(
                command.Code,
-               command.Customer,
+               command.CustomerId,
                command.TotalPrice,
                command.ReportId,
                command.Steps,
