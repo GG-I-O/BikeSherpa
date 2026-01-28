@@ -50,8 +50,4 @@
       </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Features\Deliveries\Service\" />
-    </ItemGroup>
-
 </Project>
