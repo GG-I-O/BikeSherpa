@@ -5,7 +5,7 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Courses.Add;
 
-public class AddCourseEndpoint(IMediator mediator) : Endpoint<CourseCrud, AddResult<Guid>>
+public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, AddResult<Guid>>
 {
      public override void Configure()
      {
@@ -13,13 +13,13 @@ public class AddCourseEndpoint(IMediator mediator) : Endpoint<CourseCrud, AddRes
           Permissions("write:customers");
      }
 
-     public override async Task HandleAsync(CourseCrud req, CancellationToken ct)
+     public override async Task HandleAsync(DeliveryCrud req, CancellationToken ct)
      {
           var command = new AddCourseCommand(req.StartDate);
           var result = await mediator.Send(command, ct);
           if (result.IsSuccess)
           {
-               await Send.CreatedAtAsync<GetCourseEndpoint>(new AddResult<Guid>(result.Value), cancellation: ct);
+               await Send.CreatedAtAsync<GetDeliveryEndpoint>(new AddResult<Guid>(result.Value), cancellation: ct);
           }
          
      }

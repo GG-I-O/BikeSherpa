@@ -1,6 +1,6 @@
 using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain.CourseAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.DddCore;
 using Mediator;
 
@@ -16,7 +16,7 @@ public class AddCourseCommandValidator : AbstractValidator<AddCourseCommand>
      }
 }
 
-public class AddCourseHandler(
+public class AddDeliveryHandler(
      ICourseFactory factory,
      IValidator<AddCourseCommand> validator,
      IApplicationTransaction transaction) : ICommandHandler<AddCourseCommand, Result<Guid>>
