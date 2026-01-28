@@ -1,25 +1,28 @@
 import * as Crypto from 'expo-crypto';
+import InputCourier from "./InputCourier";
+import Storable from "@/models/Storable";
+import { Address } from "@/models/Address";
+import { HateoasLinks, Link } from "@/models/HateoasLink";
+import { z } from 'zod';
+import { schemas } from '@/infra/openAPI/client';
 
-export default class Courier {
+export default class Courier extends InputCourier implements Storable, HateoasLinks {
+    // Storable
     public readonly id: string;
-    public code: string;
-    public firstName: string;
-    public lastName: string;
-    public phone: string;
-    public email: string;
+    public createdAt?: string;
+    public updatedAt?: string;
+    public operationId?: string;
+    public links?: Link[];
 
     public constructor(
-        code: string,
-        firstName: string,
-        lastName: string,
-        phone: string,
-        email: string
+        firstName: string, lastName: string, code: string, phone: string, email: string, address: Address
     ) {
+        super(firstName, lastName, code, phone, email, address);
         this.id = Crypto.randomUUID();
-        this.code = code;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phone = phone;
-        this.email = email;
+        this.links = [];
     }
-}
+};
+
+export type CourierCrud = z.infer<typeof schemas.CourierCrud>;
+
+export type CourierDto = z.infer<typeof schemas.CourierDto>;
