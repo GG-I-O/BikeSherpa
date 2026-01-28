@@ -1,19 +1,14 @@
 import Customer from "@/customers/models/Customer";
-import InputCustomer from "@/customers/models/InputCustomer";
 import NewCustomerFormViewModel from "@/customers/viewModels/NewCustomerFormViewModel";
+import { createRandomCustomer, createRandomInputCustomer, linkType } from "@/fixtures/customer-fixtures";
 import { ICustomerService } from "@/spi/CustomerSPI";
+import { faker } from "@faker-js/faker";
 import { mock } from "ts-jest-mocker";
 
 const customerService = mock<ICustomerService>();
 
 describe("NewCustomerFormViewModel", () => {
-    const mockCustomer = new InputCustomer(
-        "Test Customer",
-        { name: "", fullAddress: "123 Test St", streetInfo: "123 Test St", postcode: "12345", city: "Test City" },
-        "TEST001",
-        "1234567890",
-        "test@example.com"
-    );
+    const mockCustomer = createRandomInputCustomer();
     customerService.createCustomer = jest.fn();
     const viewModel = new NewCustomerFormViewModel(customerService);
 
@@ -38,20 +33,15 @@ describe("NewCustomerFormViewModel", () => {
     })
 
     describe("getNewCustomerSchema", () => {
-        const existingCustomers = [
-            new Customer("1", { name: "Existing Customer", fullAddress: "", streetInfo: "", postcode: "", city: "" }, "EXI", "1111111111", "existing@test.com")
-        ];
+        const existingCustomers: Customer[] = faker.helpers.multiple(() => createRandomCustomer(true, linkType.none), {
+            count: 1
+        });
 
 
         let customerToValidate: Customer;
 
         beforeEach(() => {
-            customerToValidate = new Customer(
-                "Company",
-                { name: "New Customer", fullAddress: "10 rue de la Paix 75000 Paris", streetInfo: "10 rue de la Paix", postcode: "7500", city: "Paris" },
-                "EST",
-                "0606060606",
-                "new@test.com");
+            customerToValidate = createRandomCustomer(true, linkType.none);
         })
 
         it("validates name is required", () => {
@@ -102,7 +92,7 @@ describe("NewCustomerFormViewModel", () => {
         it("validates code uniqueness", () => {
             //arrange
             const schema = viewModel.getNewCustomerSchema(existingCustomers);
-            customerToValidate.code = "EXI";
+            customerToValidate.code = existingCustomers[0].code;
 
             //act
             const result = schema.safeParse(customerToValidate);

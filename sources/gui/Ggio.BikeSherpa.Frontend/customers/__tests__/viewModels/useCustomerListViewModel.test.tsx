@@ -83,4 +83,4 @@ describe("useCustomerListViewModel", () => {
 
         expect(result.current.customerList).toEqual([]);
     });
-}) 
+})

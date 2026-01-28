@@ -72,7 +72,7 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
                 control={control}
                 name="complement"
                 error={(errors.address as any)?.complement as FieldError | undefined}
-                label="Complément d'adresse"
+                label="Complément d’adresse"
                 placeholder="Bâtiment B"
             />
             <Button
