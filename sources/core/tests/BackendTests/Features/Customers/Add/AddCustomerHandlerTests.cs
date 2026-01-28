@@ -3,6 +3,7 @@ using AutoFixture;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.DddCore;
 using Moq;
@@ -31,6 +32,7 @@ public class AddCustomerHandlerTests
                     It.IsAny<string?>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
+                    It.IsAny<string>(),
                     It.IsAny<Address>()))
                .ReturnsAsync(_mockCustomer);
      }
@@ -45,9 +47,27 @@ public class AddCustomerHandlerTests
      {
           _mockRepository
                .Setup(x => x.AnyAsync(
-                    It.IsAny<ISpecification<Customer>>(),
+                    It.Is<ISpecification<Customer>>(s => s is CustomerByCodeSpecification),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(doesCodeExist);
+     }
+     
+     private void SetupRepositoryTestingIfSiretExists(bool doesSiretExist)
+     {
+          _mockRepository
+               .Setup(x => x.AnyAsync(
+                    It.Is<ISpecification<Customer>>(s => s is CustomerBySiretSpecification),
+                    It.IsAny<CancellationToken>()))
+               .ReturnsAsync(doesSiretExist);
+     }
+     
+     private void SetupRepositoryTestingIfVatNumberExists(bool doesVatNumberExist)
+     {
+          _mockRepository
+               .Setup(x => x.AnyAsync(
+                    It.Is<ISpecification<Customer>>(s => s is CustomerByVatNumberSpecification),
+                    It.IsAny<CancellationToken>()))
+               .ReturnsAsync(doesVatNumberExist);
      }
 
      private void VerifyFactoryCalledOnce()
@@ -57,6 +77,7 @@ public class AddCustomerHandlerTests
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string?>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<Address>()),
@@ -73,6 +94,8 @@ public class AddCustomerHandlerTests
      {
           // Arrange
           SetupRepositoryTestingIfCodeExists(false); // Tell the validator that the code does not exist
+          SetupRepositoryTestingIfSiretExists(false);  // Tell the validator that the Siret does not exist
+          SetupRepositoryTestingIfVatNumberExists(false);  // Tell the validator that the VAT number does not exist
           var sut = CreateSut();
 
           // Act
@@ -90,6 +113,8 @@ public class AddCustomerHandlerTests
      {
           // Arrange
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act
@@ -103,6 +128,7 @@ public class AddCustomerHandlerTests
                     _mockCommand.Name,
                     _mockCommand.Code,
                     _mockCommand.Siret,
+                    _mockCommand.VatNumber,
                     _mockCommand.Email,
                     _mockCommand.PhoneNumber,
                     It.IsAny<Address>()),
@@ -115,6 +141,8 @@ public class AddCustomerHandlerTests
           // Arrange
           var commandWithEmptyName = _mockCommand with { Name = "" };
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -126,6 +154,7 @@ public class AddCustomerHandlerTests
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string?>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<Address>()),
@@ -140,6 +169,8 @@ public class AddCustomerHandlerTests
           // Arrange
           var commandWithEmptyCode = _mockCommand with { Code = "" };
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -151,6 +182,7 @@ public class AddCustomerHandlerTests
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string?>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<Address>()),
@@ -165,6 +197,8 @@ public class AddCustomerHandlerTests
           // Arrange
           var commandWithEmptyEmail = _mockCommand with { Email = "" };
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -176,6 +210,7 @@ public class AddCustomerHandlerTests
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string?>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<Address>()),
@@ -190,6 +225,8 @@ public class AddCustomerHandlerTests
           // Arrange
           var commandWithEmptyPhoneNumber = _mockCommand with { PhoneNumber = "" };
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -203,6 +240,7 @@ public class AddCustomerHandlerTests
                     It.IsAny<string?>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
+                    It.IsAny<string>(),
                     It.IsAny<Address>()),
                Times.Never);
 
@@ -214,6 +252,8 @@ public class AddCustomerHandlerTests
      {
           // Arrange
           SetupRepositoryTestingIfCodeExists(true);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert
@@ -225,6 +265,63 @@ public class AddCustomerHandlerTests
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string?>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<Address>()),
+               Times.Never);
+
+          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+     }
+     
+     [Fact]
+     public async Task Handle_ShouldThrowValidationException_WhenSiretAlreadyExists()
+     {
+          // Arrange
+          var commandWithSiret = _mockCommand with { Siret = "12345678901234" };
+          SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(true);
+          SetupRepositoryTestingIfVatNumberExists(false);
+          var sut = CreateSut();
+
+          // Act & Assert
+          await Assert.ThrowsAsync<ValidationException>(() =>
+               sut.Handle(commandWithSiret, CancellationToken.None).AsTask());
+
+          _mockFactory.Verify(
+               x => x.CreateCustomerAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<Address>()),
+               Times.Never);
+
+          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+     }
+     
+     [Fact]
+     public async Task Handle_ShouldThrowValidationException_WhenVatNumberAlreadyExists()
+     {
+          // Arrange
+          var commandWithVatNumber = _mockCommand with { VatNumber = "VAT123456" };
+          SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(true);
+          var sut = CreateSut();
+
+          // Act & Assert
+          await Assert.ThrowsAsync<ValidationException>(() =>
+               sut.Handle(commandWithVatNumber, CancellationToken.None).AsTask());
+
+          _mockFactory.Verify(
+               x => x.CreateCustomerAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string?>(),
+                    It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<Address>()),
@@ -240,6 +337,8 @@ public class AddCustomerHandlerTests
           var cancellationTokenSource = new CancellationTokenSource();
           await cancellationTokenSource.CancelAsync();
           SetupRepositoryTestingIfCodeExists(false);
+          SetupRepositoryTestingIfSiretExists(false);
+          SetupRepositoryTestingIfVatNumberExists(false);
           var sut = CreateSut();
 
           // Act & Assert

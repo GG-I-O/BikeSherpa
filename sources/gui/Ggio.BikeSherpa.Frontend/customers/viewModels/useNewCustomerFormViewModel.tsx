@@ -40,6 +40,8 @@ export function useNewCustomerFormViewModel() {
                 postcode: '',
                 city: ''
             },
+            siret: '',
+            vatNumber: ''
         },
         resolver: zodResolver(newCustomerViewModel.getNewCustomerSchema(customerList))
     });

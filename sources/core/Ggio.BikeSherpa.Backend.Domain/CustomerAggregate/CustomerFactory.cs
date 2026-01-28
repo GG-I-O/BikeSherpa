@@ -9,6 +9,7 @@ public interface ICustomerFactory
           string name,
           string code,
           string? siret,
+          string? vatNumber,
           string email,
           string phoneNumber,
           Address address
@@ -17,13 +18,14 @@ public interface ICustomerFactory
 
 public class CustomerFactory(IMediator mediator) : FactoryBase(mediator), ICustomerFactory
 {
-     public async Task<Customer> CreateCustomerAsync(string name, string code, string? siret, string email, string phoneNumber, Address address)
+     public async Task<Customer> CreateCustomerAsync(string name, string code, string? siret, string? vatNumber, string email, string phoneNumber, Address address)
      {
           var customer = new Customer
           {
                Name = name,
                Code = code,
                Siret = siret,
+               VatNumber = vatNumber,
                Email = email,
                PhoneNumber = phoneNumber,
                Address = address

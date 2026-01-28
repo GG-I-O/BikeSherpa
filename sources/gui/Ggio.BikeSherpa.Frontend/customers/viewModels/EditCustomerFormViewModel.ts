@@ -51,10 +51,14 @@ export default class EditCustomerFormViewModel {
                 .string()
                 .min(14)
                 .max(14).nullable(),
+            vatNumber: zod
+                .string()
+                .min(13)
+                .max(13).nullable(),
             phoneNumber: zod
                 .string()
                 .trim()
                 .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
-        }).partial({ complement: true, siret: true });
+        }).partial({ complement: true, siret: true, vatNumber: true });
     }
 }

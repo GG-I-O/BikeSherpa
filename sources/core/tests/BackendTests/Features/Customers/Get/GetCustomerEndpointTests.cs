@@ -35,7 +35,7 @@ public class GetCustomerEndpointTests(
 
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<GetClientQuery>(),
+                    It.IsAny<GetCustomerQuery>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(expectedCustomer);
 
@@ -47,7 +47,7 @@ public class GetCustomerEndpointTests(
 
           _mockMediator.Verify(
                m => m.Send(
-                    It.IsAny<GetClientQuery>(),
+                    It.IsAny<GetCustomerQuery>(),
                     It.IsAny<CancellationToken>()),
                Times.Once);
 
@@ -67,7 +67,7 @@ public class GetCustomerEndpointTests(
 
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<GetClientQuery>(),
+                    It.IsAny<GetCustomerQuery>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync((CustomerCrud?)null);
 
@@ -79,7 +79,7 @@ public class GetCustomerEndpointTests(
 
           _mockMediator.Verify(
                m => m.Send(
-                    It.IsAny<GetClientQuery>(),
+                    It.IsAny<GetCustomerQuery>(),
                     It.IsAny<CancellationToken>()),
                Times.Once);
      }

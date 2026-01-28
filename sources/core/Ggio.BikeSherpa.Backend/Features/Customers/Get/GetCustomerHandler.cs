@@ -7,13 +7,13 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Get;
 
-public record GetClientQuery(Guid Id) : IQuery<CustomerCrud?>;
+public record GetCustomerQuery(Guid Id) : IQuery<CustomerCrud?>;
 
-public class GetCustomerHandler(IReadRepository<Customer> clientRepository): IQueryHandler<GetClientQuery, CustomerCrud?>
+public class GetCustomerHandler(IReadRepository<Customer> customerRepository): IQueryHandler<GetCustomerQuery, CustomerCrud?>
 {
-     public async ValueTask<CustomerCrud?> Handle(GetClientQuery query, CancellationToken ct)
+     public async ValueTask<CustomerCrud?> Handle(GetCustomerQuery query, CancellationToken ct)
      {
-          var entity = await clientRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(query.Id), ct);
+          var entity = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(query.Id), ct);
           return entity?.ToFacet<CustomerCrud>();
      }
 }

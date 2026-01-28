@@ -14,7 +14,7 @@ public class GetAllCustomersHandler(IReadRepository<Customer> repository): IQuer
      {
           var allCustomers = query.lastSync is null ?
                (await repository.ListAsync(cancellationToken)).SelectFacets<Customer, Model.CustomerCrud>() :
-               (await repository.ListAsync(new ClientByUpdatedAtSpecification(query.lastSync!.Value) ,cancellationToken)).SelectFacets<Customer, Model.CustomerCrud>();
+               (await repository.ListAsync(new CustomerByUpdatedAtSpecification(query.lastSync!.Value) ,cancellationToken)).SelectFacets<Customer, Model.CustomerCrud>();
           return allCustomers.ToList();
      }
 }

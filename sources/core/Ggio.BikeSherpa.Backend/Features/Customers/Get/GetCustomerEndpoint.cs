@@ -17,7 +17,7 @@ public class GetCustomerEndpoint(IMediator mediator, ICustomerLinks customerLink
 
      public override async Task HandleAsync(CancellationToken ct)
      {
-          var customer = await mediator.Send(new GetClientQuery(Route<Guid>("customerId")), ct);
+          var customer = await mediator.Send(new GetCustomerQuery(Route<Guid>("customerId")), ct);
           if (customer is null)
           {
                await Send.NotFoundAsync(ct);

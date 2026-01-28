@@ -25,6 +25,7 @@ export function createRandomCustomerDto(): CustomerDto {
       id: faker.string.uuid(),
       ...inputCustomer,
       siret: null,
+      vatNumber: null,
       createdAt: faker.date.past().toString(),
       updatedAt: faker.date.anytime().toString()
     },

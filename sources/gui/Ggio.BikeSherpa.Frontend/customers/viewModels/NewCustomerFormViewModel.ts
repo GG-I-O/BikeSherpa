@@ -50,12 +50,16 @@ export default class NewCustomerFormViewModel {
                 .email("Adresse e-mail non valide"),
             siret: zod
                 .string()
-                .min(14)
-                .max(14).nullable(),
+                .min(14, "Siret non valide")
+                .max(14, "Siret non valide").nullable(),
+            vatNumber: zod
+                .string()
+                .min(13, "Numéro de TVA non valide")
+                .max(13, "Numéro de TVA non valide").nullable(),
             phoneNumber: zod
                 .string()
                 .trim()
                 .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
-        }).partial({ complement: true, siret: true });
+        }).partial({ complement: true, siret: true, vatNumber: true });
     }
 }

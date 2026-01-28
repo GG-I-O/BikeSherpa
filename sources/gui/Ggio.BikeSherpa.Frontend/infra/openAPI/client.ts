@@ -12,6 +12,7 @@ const CustomerCrud = z.object({
   name: z.string(),
   code: z.string(),
   siret: z.string().nullable(),
+  vatNumber: z.string().nullable(),
   email: z.string(),
   phoneNumber: z.string(),
   address: AddressCrud,
