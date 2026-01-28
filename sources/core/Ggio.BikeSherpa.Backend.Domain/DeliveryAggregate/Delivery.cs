@@ -7,7 +7,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot
 {
      public required string Code { get; set; }
      
-     public required Customer Customer { get; set; }
+     public required string CustomerId { get; set; }
      
      public required double TotalPrice { get; set; }
      
