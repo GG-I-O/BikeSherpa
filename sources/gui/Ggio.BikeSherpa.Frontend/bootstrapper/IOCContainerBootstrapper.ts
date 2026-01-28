@@ -18,6 +18,8 @@ import { IAppSnackbarService } from "@/spi/AppSnackbarSPI";
 import AppSnackbarService from "@/snackbar/services/AppSnackbarService";
 import { IBackendClient } from "@/spi/BackendClientSPI";
 import { CustomerBackendClientFacade } from "@/customers/services/CustomerBackendClientFacade";
+import { CourierBackendClientFacade } from "@/couriers/services/CourierBackendClientFacade";
+import Courier from "@/couriers/models/Courier";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -39,6 +41,8 @@ export default class IOCContainerBootstrapper {
         IOCContainerBootstrapper.bindAppSnackbarService();
 
         IOCContainerBootstrapper.bindCustomerBackendClientFacade();
+
+        IOCContainerBootstrapper.bindCourierBackendClientFacade();
 
     }
 
@@ -92,5 +96,9 @@ export default class IOCContainerBootstrapper {
 
     private static bindCustomerBackendClientFacade() {
         IOCContainer.bind<IBackendClient<Customer>>(ServicesIdentifiers.CustomerBackendClientFacade).to(CustomerBackendClientFacade).inSingletonScope();
+    }
+
+    private static bindCourierBackendClientFacade() {
+        IOCContainer.bind<IBackendClient<Courier>>(ServicesIdentifiers.CourierBackendClientFacade).to(CourierBackendClientFacade).inSingletonScope();
     }
 }
