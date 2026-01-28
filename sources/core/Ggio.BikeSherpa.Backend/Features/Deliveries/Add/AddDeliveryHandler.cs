@@ -1,6 +1,5 @@
 using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.DddCore;
 using Mediator;
