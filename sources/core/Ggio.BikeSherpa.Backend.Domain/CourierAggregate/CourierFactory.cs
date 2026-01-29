@@ -9,7 +9,7 @@ public interface ICourierFactory
           string firstName,
           string lastName,
           string code,
-          string email,
+          string? email,
           string phoneNumber,
           Address address
      );
@@ -17,15 +17,15 @@ public interface ICourierFactory
 
 public class CourierFactory(IMediator mediator) : FactoryBase(mediator), ICourierFactory
 {
-     public async Task<Courier> CreateCourierAsync(string firstName, string lastName, string code,  string email, string phoneNumber, Address address)
+     public async Task<Courier> CreateCourierAsync(string firstName, string lastName, string code,  string? email, string phoneNumber, Address address)
      {
           var courier = new Courier
           {
-               LastName = lastName,
                FirstName = firstName,
+               LastName = lastName,
                Code = code,
-               Email = email,
                PhoneNumber = phoneNumber,
+               Email = email,
                Address = address
           };
 

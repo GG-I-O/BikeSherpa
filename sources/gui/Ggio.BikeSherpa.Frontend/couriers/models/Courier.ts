@@ -15,9 +15,9 @@ export default class Courier extends InputCourier implements Storable, HateoasLi
     public links?: Link[];
 
     public constructor(
-        firstName: string, lastName: string, code: string, phone: string, email: string, address: Address
+        firstName: string, lastName: string, code: string, phone: string, address: Address, email?: string
     ) {
-        super(firstName, lastName, code, phone, email, address);
+        super(firstName, lastName, code, phone, address, email);
         this.id = Crypto.randomUUID();
         this.links = [];
     }
