@@ -88,6 +88,8 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
      {
           options.AddPolicy("read:customers", policy => policy.RequireClaim("scope", "read:customers"));
           options.AddPolicy("write:customers", policy => policy.RequireClaim("scope", "write:customers"));
+          options.AddPolicy("read:couriers", policy => policy.RequireClaim("scope", "read:couriers"));
+          options.AddPolicy("write:couriers", policy => policy.RequireClaim("scope", "write:couriers"));
      });
 
      builder.Services.AddAuth0ApiAuthentication(options =>

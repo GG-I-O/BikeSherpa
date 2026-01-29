@@ -35,12 +35,12 @@ const CourseCrud = z.object({
   id: z.string(),
 });
 const CourierCrud = z.object({
-  firstName: z.string().nullable(),
-  lastName: z.string().nullable(),
-  code: z.string().nullable(),
-  email: z.string().nullable(),
-  phoneNumber: z.string().nullable(),
-  address: AddressCrud.nullable(),
+  firstName: z.string(),
+  lastName: z.string(),
+  code: z.string(),
+  email: z.string(),
+  phoneNumber: z.string(),
+  address: AddressCrud,
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
   id: z.string(),

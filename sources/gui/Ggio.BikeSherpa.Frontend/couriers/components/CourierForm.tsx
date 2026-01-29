@@ -47,7 +47,7 @@ export default function CourierForm<T extends FieldValues>(props: CourierFormPro
                 name="code"
                 error={errors.code as FieldError | undefined}
                 label="Code"
-                placeholder="MPS"
+                placeholder="JCD"
                 required
             />
             <ThemedInput
@@ -56,7 +56,7 @@ export default function CourierForm<T extends FieldValues>(props: CourierFormPro
                 name="email"
                 error={errors.email as FieldError | undefined}
                 label="E-mail"
-                placeholder="votre-nom@societe.fr"
+                placeholder="jean-claude-dusse@gmail.fr"
                 required
             />
             <ThemedInput
