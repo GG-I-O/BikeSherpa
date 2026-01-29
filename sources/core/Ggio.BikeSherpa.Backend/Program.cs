@@ -7,6 +7,7 @@ using Ggio.DddCore.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
+using Ggio.BikeSherpa.Backend.Features.Couriers;
 using Ggio.BikeSherpa.Backend.Features.Courses.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Infrastructure;
@@ -46,6 +47,7 @@ builder.Services.AddBackendInfrastructure(builder.Configuration);
 // Injection
 builder.Services.ConfigureCourseFeature();
 builder.Services.ConfigureCustomerFeature();
+builder.Services.ConfigureCourierFeature();
 builder.Services.AddBackendDomain();
 
 // Notification
