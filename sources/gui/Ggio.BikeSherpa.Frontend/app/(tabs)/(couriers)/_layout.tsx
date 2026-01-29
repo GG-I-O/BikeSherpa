@@ -32,6 +32,13 @@ export default function CourierLayout() {
                     title: "Nouveau livreur"
                 }}
             />
+            <Stack.Screen
+                name="edit"
+                options={{
+                    headerShown: true,
+                    title: "Modifier le livreur"
+                }}
+            />
         </Stack>
     )
 }
