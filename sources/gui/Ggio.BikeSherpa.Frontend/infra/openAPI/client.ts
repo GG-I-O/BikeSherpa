@@ -34,6 +34,21 @@ const CourseCrud = z.object({
   startDate: z.string().datetime({ offset: true }),
   id: z.string(),
 });
+const CourierCrud = z.object({
+  firstName: z.string().nullable(),
+  lastName: z.string().nullable(),
+  code: z.string().nullable(),
+  email: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
+  address: AddressCrud.nullable(),
+  createdAt: z.string().datetime({ offset: true }),
+  updatedAt: z.string().datetime({ offset: true }),
+  id: z.string(),
+});
+const CourierDto = z.object({
+  data: CourierCrud,
+  links: z.array(Link).nullable(),
+});
 
 export const schemas = {
   AddressCrud,
@@ -42,6 +57,8 @@ export const schemas = {
   CustomerDto,
   AddResultOfGuid,
   CourseCrud,
+  CourierCrud,
+  CourierDto,
 };
 
 const endpoints = makeApi([
@@ -103,6 +120,146 @@ const endpoints = makeApi([
     alias: "GetAllCoursesEndpoint",
     requestFormat: "json",
     response: z.array(CourseCrud),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "post",
+    path: "/courier",
+    alias: "AddCourierEndpoint",
+    tags: ["courier"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: CourierCrud,
+      },
+    ],
+    response: z.object({ id: z.string() }),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "put",
+    path: "/courier/:courierId",
+    alias: "UpdateCourierEndpoint",
+    tags: ["courier"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: CourierCrud,
+      },
+      {
+        name: "courierId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/courier/:courierId",
+    alias: "GetCourierEndpoint",
+    tags: ["courier"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "courierId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: CourierDto,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "delete",
+    path: "/courier/:courierId",
+    alias: "DeleteCourierEndpoint",
+    tags: ["courier"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "courierId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/couriers/:lastSync",
+    alias: "GetAllCouriersEndpoint",
+    tags: ["courier"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "lastSync",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.array(CourierDto),
     errors: [
       {
         status: 401,
