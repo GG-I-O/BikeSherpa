@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(BackendDbContext))]
-    [Migration("20260129090412_new-courier-entity")]
-    partial class newcourierentity
+    [Migration("20260129144504_CourierUpdate")]
+    partial class CourierUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("FirstName")

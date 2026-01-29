@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class newcourierentity : Migration
+    public partial class NewCourierEntity : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
