@@ -5,17 +5,17 @@ export default class InputCourier {
     public lastName: string;
     public code: string;
     public phoneNumber: string;
-    public email: string;
     public address: Address;
+    public email?: string | null;
 
     public constructor(
-        firstName: string, lastName: string, code: string, phone: string, email: string, address: Address
+        firstName: string, lastName: string, code: string, phone: string, address: Address, email?: string
     ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.code = code;
         this.phoneNumber = phone;
-        this.email = email;
         this.address = address;
+        this.email = email;
     }
 }

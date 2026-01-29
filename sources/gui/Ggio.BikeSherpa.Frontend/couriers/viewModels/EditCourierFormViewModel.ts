@@ -36,7 +36,8 @@ export default class EditCourierFormViewModel {
             address: addressSchema,
             complement: zod
                 .string()
-                .trim(),
+                .trim()
+                .nullable(),
             code: zod
                 .string()
                 .trim()
@@ -50,11 +51,12 @@ export default class EditCourierFormViewModel {
                 }, "Le code doit être unique"),
             email: zod
                 .string()
-                .email("Adresse e-mail non valide"),
+                .email("Adresse e-mail non valide")
+                .nullable(),
             phoneNumber: zod
                 .string()
                 .trim()
                 .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
-        }).partial({ complement: true });
+        }).partial({ complement: true, email: true });
     }
 }
