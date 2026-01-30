@@ -9,12 +9,12 @@ export default class InputCourier {
     public address: Address;
 
     public constructor(
-        firstName: string, lastName: string, code: string, phone: string, email: string, address: Address
+        firstName: string, lastName: string, code: string, phoneNumber: string, email: string, address: Address
     ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.code = code;
-        this.phoneNumber = phone;
+        this.phoneNumber = phoneNumber;
         this.email = email;
         this.address = address;
     }
