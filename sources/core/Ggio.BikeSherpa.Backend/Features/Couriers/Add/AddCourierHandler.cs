@@ -14,7 +14,7 @@ public record AddCourierCommand(
      string FirstName,
      string LastName,
      string Code,
-     string? Email,
+     string Email,
      string PhoneNumber,
      AddressCrud Address
 ) : ICommand<Result<Guid>>;
@@ -33,7 +33,7 @@ public class AddCourierCommandValidator : AbstractValidator<AddCourierCommand>
                     context.AddFailure("Code livreur déjà utilisé");
                }
           });
-          RuleFor(x => x.Email).NotEmpty().When(x => x.Email != null);
+          RuleFor(x => x.Email).NotEmpty();
           RuleFor(x => x.PhoneNumber).NotEmpty();
           RuleFor(x => x.Address).NotEmpty();
      }

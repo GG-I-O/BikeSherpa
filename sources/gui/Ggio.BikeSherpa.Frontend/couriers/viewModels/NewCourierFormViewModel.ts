@@ -52,12 +52,11 @@ export default class NewCourierFormViewModel {
                 .refine((value) => !courierList.some((courier) => courier.code === value), "Le code doit être unique"),
             email: zod
                 .string()
-                .email("Adresse e-mail non valide")
-                .nullable(),
+                .email("Adresse e-mail non valide"),
             phoneNumber: zod
                 .string()
                 .trim()
                 .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
-        }).partial({ complement: true, email: true });
+        }).partial({ complement: true });
     }
 }
