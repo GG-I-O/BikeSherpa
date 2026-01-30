@@ -4,6 +4,7 @@ import { addressSchema } from '@/models/Address';
 import { ICourierService } from "@/spi/CourierSPI";
 import { inject } from "inversify";
 import * as zod from 'zod';
+import NewCourierFormViewModel from "./NewCourierFormViewModel";
 
 export default class EditCourierFormViewModel {
     private courierServices: ICourierService;
@@ -21,23 +22,11 @@ export default class EditCourierFormViewModel {
 
     public getEditCourierSchema(courierToEdit: Courier, courierList: Courier[]) {
         const originalCode = courierToEdit.code;
+        const newCourierSchema = new NewCourierFormViewModel(this.courierServices).getNewCourierSchema(courierList);
         return zod.object({
             id: zod
                 .string()
                 .min(1),
-            firstName: zod
-                .string()
-                .trim()
-                .min(1, "Prénom requis"),
-            lastName: zod
-                .string()
-                .trim()
-                .min(1, "Nom requis"),
-            address: addressSchema,
-            complement: zod
-                .string()
-                .trim()
-                .nullable(),
             code: zod
                 .string()
                 .trim()
@@ -49,13 +38,11 @@ export default class EditCourierFormViewModel {
                     }
                     return !courierList.some((courier) => courier.code === value);
                 }, "Le code doit être unique"),
-            email: zod
-                .string()
-                .email("Adresse e-mail non valide"),
-            phoneNumber: zod
-                .string()
-                .trim()
-                .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
-        }).partial({ complement: true });
+            firstName: newCourierSchema.shape.firstName,
+            lastName: newCourierSchema.shape.lastName,
+            address: addressSchema,
+            email: newCourierSchema.shape.email,
+            phoneNumber: newCourierSchema.shape.phoneNumber
+        });
     }
 }
