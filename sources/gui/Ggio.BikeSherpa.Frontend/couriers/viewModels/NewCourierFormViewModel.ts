@@ -40,10 +40,6 @@ export default class NewCourierFormViewModel {
                 .trim()
                 .min(1, "Nom requis"),
             address: addressSchema,
-            complement: zod
-                .string()
-                .trim()
-                .nullable(),
             code: zod
                 .string()
                 .trim()
@@ -57,6 +53,6 @@ export default class NewCourierFormViewModel {
                 .string()
                 .trim()
                 .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
-        }).partial({ complement: true });
+        });
     }
 }
