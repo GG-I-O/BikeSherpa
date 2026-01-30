@@ -45,14 +45,14 @@ export default class NewCustomerFormViewModel {
             email: zod
                 .string()
                 .email("Adresse e-mail non valide"),
-            siret: zod
-                .string()
-                .min(14, "Siret non valide")
-                .max(14, "Siret non valide").nullable(),
-            vatNumber: zod
-                .string()
-                .min(13, "Numéro de TVA non valide")
-                .max(13, "Numéro de TVA non valide").nullable(),
+            siret: zod.string()
+                .transform(val => val === "" ? null : val)
+                .nullable()
+                .refine(val => val === null || val.length === 14, { message: "Siret non valide" }),
+            vatNumber: zod.string()
+                .transform(val => val === "" ? null : val)
+                .nullable()
+                .refine(val => val === null || val.length === 13, { message: "Numéro de TVA non valide" }),
             phoneNumber: zod
                 .string()
                 .trim()

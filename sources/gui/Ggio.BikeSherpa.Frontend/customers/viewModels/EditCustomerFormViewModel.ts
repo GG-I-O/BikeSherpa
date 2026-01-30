@@ -1,9 +1,9 @@
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import Customer from "../models/Customer";
-import { addressSchema } from '@/models/Address';
 import { ICustomerService } from "@/spi/CustomerSPI";
 import { inject } from "inversify";
 import * as zod from 'zod';
+import NewCustomerFormViewModel from "./NewCustomerFormViewModel";
 
 export default class EditCustomerFormViewModel {
     private customerServices: ICustomerService;
@@ -21,15 +21,12 @@ export default class EditCustomerFormViewModel {
 
     public getEditCustomerSchema(customerToEdit: Customer, customerList: Customer[]) {
         const originalCode = customerToEdit.code;
-        return zod.object({
+        const newCustomerViewModel = new NewCustomerFormViewModel(this.customerServices);
+        const getEditCustomerSchema = newCustomerViewModel.getNewCustomerSchema(customerList);
+        return {
             id: zod
                 .string()
                 .min(1),
-            name: zod
-                .string()
-                .trim()
-                .min(1, "Nom requis"),
-            address: addressSchema,
             code: zod
                 .string()
                 .trim()
@@ -41,21 +38,12 @@ export default class EditCustomerFormViewModel {
                     }
                     return !customerList.some((customer) => customer.code === value);
                 }, "Le code doit être unique"),
-            email: zod
-                .string()
-                .email("Adresse e-mail non valide"),
-            siret: zod
-                .string()
-                .min(14)
-                .max(14).nullable(),
-            vatNumber: zod
-                .string()
-                .min(13)
-                .max(13).nullable(),
-            phoneNumber: zod
-                .string()
-                .trim()
-                .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
-        }).partial({ siret: true, vatNumber: true });
+            name: getEditCustomerSchema.shape.name,
+            address: getEditCustomerSchema.shape.address,
+            vatNumer: getEditCustomerSchema.shape.vatNumber,
+            siret: getEditCustomerSchema.shape.siret,
+            email: getEditCustomerSchema.shape.email,
+            phoneNumber: getEditCustomerSchema.shape.phoneNumber
+        }
     }
 }
