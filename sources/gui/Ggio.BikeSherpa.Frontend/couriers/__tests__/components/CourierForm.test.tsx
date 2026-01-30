@@ -1,9 +1,9 @@
 import CourierForm from "@/couriers/components/CourierForm";
-import { render, renderHook, screen, userEvent } from '@testing-library/react-native';
+import { render, renderHook, screen, userEvent } from "@testing-library/react-native";
 import { useForm } from "react-hook-form";
-import { UserEventInstance } from '@testing-library/react-native/build/user-event/setup';
-import ThemedInputModule from '@/components/themed/ThemedInput';
-import ThemedAddressInputModule from '@/components/themed/ThemedAddressInput';
+import { UserEventInstance } from "@testing-library/react-native/build/user-event/setup";
+import ThemedInputModule from "@/components/themed/ThemedInput";
+import ThemedAddressInputModule from "@/components/themed/ThemedAddressInput";
 
 jest.mock('react-native-safe-area-context', () => ({
     useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 })
