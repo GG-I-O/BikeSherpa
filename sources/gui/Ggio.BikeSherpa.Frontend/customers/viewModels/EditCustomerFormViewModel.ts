@@ -23,7 +23,7 @@ export default class EditCustomerFormViewModel {
         const originalCode = customerToEdit.code;
         const newCustomerViewModel = new NewCustomerFormViewModel(this.customerServices);
         const getEditCustomerSchema = newCustomerViewModel.getNewCustomerSchema(customerList);
-        return {
+        return zod.object({
             id: zod
                 .string()
                 .min(1),
@@ -44,6 +44,6 @@ export default class EditCustomerFormViewModel {
             siret: getEditCustomerSchema.shape.siret,
             email: getEditCustomerSchema.shape.email,
             phoneNumber: getEditCustomerSchema.shape.phoneNumber
-        }
+        })
     }
 }
