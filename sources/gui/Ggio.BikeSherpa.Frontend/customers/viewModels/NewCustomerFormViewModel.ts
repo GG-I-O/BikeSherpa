@@ -47,15 +47,16 @@ export default class NewCustomerFormViewModel {
                 .refine((value) => !customerList.some((customer) => customer.code === value), "Le code doit être unique"),
             email: zod
                 .string()
-                .email("Adresse e-mail non valide"),
+                .min(1, "Adresse e-mail requise")
+                .email("Adresse e-mail invalide"),
             siret: zod.string()
                 .transform(val => val === "" ? null : val)
                 .nullable()
-                .refine(val => val === null || val.length === 14, { message: "Siret non valide" }),
+                .refine(val => val === null || val.length === 14, { message: "Siret invalide" }),
             vatNumber: zod.string()
                 .transform(val => val === "" ? null : val)
                 .nullable()
-                .refine(val => val === null || val.length === 13, { message: "Numéro de TVA non valide" }),
+                .refine(val => val === null || val.length === 13, { message: "Numéro de TVA invalide" }),
             phoneNumber: zod
                 .string()
                 .trim()

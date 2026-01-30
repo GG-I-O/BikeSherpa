@@ -10,12 +10,12 @@ export default class InputCustomer {
     public vatNumber?: string | null;
 
     public constructor(
-        name: string, address: Address, code: string, phone: string, email: string, siret?: string, vatNumber?: string
+        name: string, address: Address, code: string, phoneNumber: string, email: string, siret?: string, vatNumber?: string
     ) {
         this.name = name;
         this.address = address;
         this.code = code;
-        this.phoneNumber = phone;
+        this.phoneNumber = phoneNumber;
         this.email = email;
         this.siret = siret;
         this.vatNumber = vatNumber;

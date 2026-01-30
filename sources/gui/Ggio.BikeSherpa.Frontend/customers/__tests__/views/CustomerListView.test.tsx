@@ -67,7 +67,7 @@ describe("CustomerListView", () => {
             expect(screen.getByTestId("customerListView")).toBeOnTheScreen();
         });
         const customerListView = screen.getByTestId("customerListView");
-        const telTitle = screen.queryByText("Num Tél");
+        const telTitle = screen.queryByText("Téléphone");
         const customerData1 = screen.getByTestId("customerList0");
         const customerData2 = screen.getByTestId("customerList1");
         const customerOneName = screen.queryByText(mockCustomer1.name);

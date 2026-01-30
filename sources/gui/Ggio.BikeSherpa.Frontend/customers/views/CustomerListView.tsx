@@ -17,7 +17,7 @@ export default function CustomerListView() {
                 <DataTable.Header>
                     <DataTable.Title style={[datatableStyle.column]}>Nom</DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>Code</DataTable.Title>
-                    <DataTable.Title style={[datatableStyle.column]}>Num Tél</DataTable.Title>
+                    <DataTable.Title style={[datatableStyle.column]}>Téléphone</DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>Adresse</DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>SIRET</DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column, datatableStyle.width80]}>Actions</DataTable.Title>
