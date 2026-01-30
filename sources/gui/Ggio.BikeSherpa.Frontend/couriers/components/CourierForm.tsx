@@ -57,6 +57,7 @@ export default function CourierForm<T extends FieldValues>(props: CourierFormPro
                 error={errors.email as FieldError | undefined}
                 label="E-mail"
                 placeholder="jean-claude-dusse@gmail.fr"
+                required
             />
             <ThemedInput
                 testID="courierFormPhoneInput"
