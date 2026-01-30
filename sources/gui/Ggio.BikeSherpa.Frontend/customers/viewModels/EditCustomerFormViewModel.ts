@@ -24,7 +24,7 @@ export default class EditCustomerFormViewModel {
         const newCustomerSchema = new NewCustomerFormViewModel(this.customerServices).getNewCustomerSchema(customerList);
 
         return newCustomerSchema
-            .partial({ siret: true, vatNumber: true })
+            .partial({ complement: true, siret: true, vatNumber: true })
             .extend({
                 id: zod
                     .string()
