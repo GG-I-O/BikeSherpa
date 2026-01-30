@@ -36,9 +36,6 @@ export default class NewCustomerFormViewModel {
                 .trim()
                 .min(1, "Nom requis"),
             address: addressSchema,
-            complement: zod
-                .string()
-                .trim(),
             code: zod
                 .string()
                 .trim()
@@ -60,6 +57,6 @@ export default class NewCustomerFormViewModel {
                 .string()
                 .trim()
                 .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
-        }).partial({ complement: true, siret: true, vatNumber: true });
+        }).partial({ siret: true, vatNumber: true });
     }
 }
