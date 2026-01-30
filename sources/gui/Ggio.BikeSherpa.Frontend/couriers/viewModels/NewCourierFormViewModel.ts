@@ -51,9 +51,11 @@ export default class NewCourierFormViewModel {
                 .refine((value) => !courierList.some((courier) => courier.code === value), "Le code doit être unique"),
             email: zod
                 .string()
-                .email("Adresse e-mail non valide"),
+                .min(1, "Adresse e-mail requise")
+                .email("Adresse e-mail invalide"),
             phoneNumber: zod
                 .string()
+                .min(1, "Numéro de téléphone requis")
                 .trim()
                 .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
         }).partial({ complement: true });
