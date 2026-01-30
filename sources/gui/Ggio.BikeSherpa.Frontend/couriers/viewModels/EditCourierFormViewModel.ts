@@ -23,26 +23,24 @@ export default class EditCourierFormViewModel {
     public getEditCourierSchema(courierToEdit: Courier, courierList: Courier[]) {
         const originalCode = courierToEdit.code;
         const newCourierSchema = new NewCourierFormViewModel(this.courierServices).getNewCourierSchema(courierList);
-        return zod.object({
-            id: zod
-                .string()
-                .min(1),
-            code: zod
-                .string()
-                .trim()
-                .min(1, "Code requis")
-                .max(3, "Code trop long")
-                .refine((value) => {
-                    if (originalCode === value) {
-                        return true;
-                    }
-                    return !courierList.some((courier) => courier.code === value);
-                }, "Le code doit être unique"),
-            firstName: newCourierSchema.shape.firstName,
-            lastName: newCourierSchema.shape.lastName,
-            address: addressSchema,
-            email: newCourierSchema.shape.email,
-            phoneNumber: newCourierSchema.shape.phoneNumber
-        });
+
+        return newCourierSchema
+            .partial({ complement: true })
+            .extend({
+                id: zod
+                    .string()
+                    .min(1),
+                code: zod
+                    .string()
+                    .trim()
+                    .min(1, "Code requis")
+                    .max(3, "Code trop long")
+                    .refine((value) => {
+                        if (originalCode === value) {
+                            return true;
+                        }
+                        return !courierList.some((courier) => courier.code === value);
+                    }, "Le code doit être unique")
+            });
     }
 }
