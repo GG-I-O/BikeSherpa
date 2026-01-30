@@ -39,7 +39,6 @@ export class CourierBackendClientFacade implements IBackendClient<Courier> {
 
     async AddEndpoint(item: Courier): Promise<string> {
         // Zod needs a complete body, even for optional fields
-        item.email = item.email ?? "";
         item.address.complement = item.address.complement ?? "";
         const parsed = schemas.CourierCrud.safeParse(item);
         if (!parsed.success) {
@@ -62,7 +61,6 @@ export class CourierBackendClientFacade implements IBackendClient<Courier> {
 
     async UpdateEndpoint(item: Courier): Promise<void> {
         // Zod needs a complete body, even for optional fields
-        item.email = item.email ?? "";
         item.address.complement = item.address.complement ?? "";
         const parsed = schemas.CourierCrud.safeParse(item);
         if (!parsed.success) {

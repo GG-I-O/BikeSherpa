@@ -37,7 +37,7 @@ const CourierCrud = z.object({
   firstName: z.string(),
   lastName: z.string(),
   code: z.string(),
-  email: z.string().nullable(),
+  email: z.string(),
   phoneNumber: z.string(),
   address: AddressCrud,
   createdAt: z.string().datetime({ offset: true }),

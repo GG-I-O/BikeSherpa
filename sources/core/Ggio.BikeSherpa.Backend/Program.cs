@@ -19,6 +19,7 @@ using Ggio.DddCore.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using NJsonSchema.Generation;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 
@@ -34,6 +35,8 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                {
                     settings.Title = "Bike Sherpa API";
                     settings.Version = "v1";
+                    settings.SchemaSettings.DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
+                    settings.SchemaSettings.GenerateXmlObjects = true;
                };
 
                options.ShortSchemaNames = true;
