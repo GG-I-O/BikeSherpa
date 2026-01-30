@@ -46,7 +46,7 @@ describe("CourierForm", () => {
         const formButton = screen.getByTestId("formButton");
         const buttonName = screen.queryByTestId("buttonName");
 
-        // Check that ThemedInput is called 6 times (firsname, lastName, code, email, phone, complement)
+        // Check that ThemedInput is called 6 times (firsName, lastName, code, email, phoneNumber, complement)
         expect(ThemedInput).toHaveBeenCalledTimes(6);
 
         // Get the props from each call
