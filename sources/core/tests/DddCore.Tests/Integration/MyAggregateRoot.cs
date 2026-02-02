@@ -7,7 +7,7 @@ public class MyAggregateRoot : EntityBase<Guid>, IAggregateRoot
 {
      [Key]
      [MaxLength(250)]
-     public required string Name { get; set; }
+     public required string Name { get; init; }
 
      [MaxLength(25)]
      public string? Data { get; set; }

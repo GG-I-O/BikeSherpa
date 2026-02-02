@@ -2,6 +2,4 @@
 
 namespace Ggio.DddCore;
 
-public interface ITransactionalDomainEventHandler<in T> : INotificationHandler<T> where T : IDomainEvent
-{
-}
+public interface ITransactionalDomainEventHandler<in T> : INotificationHandler<T> where T : IDomainEvent;

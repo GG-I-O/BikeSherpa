@@ -1,8 +1,9 @@
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace DddCore.Tests.Integration;
 
 public class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
 {
-     public DbSet<MyAggregateRoot> MyAggregateRoots { get; set; }
+     public DbSet<MyAggregateRoot> MyAggregateRoots { get; [UsedImplicitly] set; }
 }
