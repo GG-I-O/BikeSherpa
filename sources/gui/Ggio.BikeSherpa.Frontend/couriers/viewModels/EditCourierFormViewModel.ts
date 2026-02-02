@@ -1,10 +1,9 @@
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import Courier from "../models/Courier";
-import { addressSchema } from '@/models/Address';
 import { ICourierService } from "@/spi/CourierSPI";
 import { inject } from "inversify";
 import * as zod from 'zod';
-import NewCourierFormViewModel from "./NewCourierFormViewModel";
+import { courierFormBaseSchema, getCourierFormSchemaPartial } from "./courierFormZodSchema/courierFormZodSchema";
 
 export default class EditCourierFormViewModel {
     private courierServices: ICourierService;
@@ -22,27 +21,19 @@ export default class EditCourierFormViewModel {
 
     public getEditCourierSchema(courierToEdit: Courier, courierList: Courier[]) {
         const originalCode = courierToEdit.code;
-        const newCourierViewModel = new NewCourierFormViewModel(this.courierServices);
-        const newCourierSchema = newCourierViewModel.getNewCourierSchema(courierList);
-        const newCourierSchemaPartial = newCourierViewModel.getNewCourierSchemaPartial;
 
-        return newCourierSchema
-            .partial(newCourierSchemaPartial)
+        return courierFormBaseSchema
             .extend({
                 id: zod
                     .string()
                     .min(1),
-                code: zod
-                    .string()
-                    .trim()
-                    .min(1, "Code requis")
-                    .max(3, "Code trop long")
-                    .refine((value) => {
-                        if (originalCode === value) {
-                            return true;
-                        }
-                        return !courierList.some((courier) => courier.code === value);
-                    }, "Le code doit être unique")
-            });
+                code: courierFormBaseSchema.shape.code.refine((value) => {
+                    if (originalCode === value) {
+                        return true;
+                    }
+                    return !courierList.some((courier) => courier.code === value);
+                }, "Le code doit être unique")
+            })
+            .partial(getCourierFormSchemaPartial());
     }
 }

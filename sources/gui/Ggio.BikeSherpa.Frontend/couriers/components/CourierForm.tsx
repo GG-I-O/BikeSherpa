@@ -36,7 +36,7 @@ export default function CourierForm<T extends FieldValues>(props: CourierFormPro
                 testID="courierFormLastNameInput"
                 control={control}
                 name="lastName"
-                error={errors.firstName as FieldError | undefined}
+                error={errors.lastName as FieldError | undefined}
                 label="Nom"
                 placeholder="Dusse"
                 required
