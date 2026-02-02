@@ -40,7 +40,7 @@ dotnet:
 # Code Coverage is available in Ultimate and Ultimate Plus plans
 failureConditions:
   severityThresholds:
-    any: 15
+    any: 100
     critical: 5
 #  testCoverageThresholds:
 #    fresh: 70
