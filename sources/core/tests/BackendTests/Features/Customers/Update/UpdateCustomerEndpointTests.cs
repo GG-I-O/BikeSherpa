@@ -7,10 +7,12 @@ using Mediator;
 using System.Net;
 using System.Net.Http.Json;
 using BackendTests.Services;
+using JetBrains.Annotations;
 using Moq;
 
 namespace BackendTests.Features.Customers.Update;
 
+[UsedImplicitly]
 public class UpdateCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers");
 
 public class UpdateCustomerEndpointTests(

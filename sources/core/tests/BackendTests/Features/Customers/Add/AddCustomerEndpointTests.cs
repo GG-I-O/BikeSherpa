@@ -7,11 +7,13 @@ using AwesomeAssertions;
 using BackendTests.Services;
 using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
+using JetBrains.Annotations;
 using Mediator;
 using Moq;
 
 namespace BackendTests.Features.Customers.Add;
 
+[UsedImplicitly]
 public class AddCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers");
 
 public class AddCustomerEndpointTests(

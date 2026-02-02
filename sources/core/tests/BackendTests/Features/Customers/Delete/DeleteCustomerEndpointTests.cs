@@ -4,10 +4,12 @@ using Ggio.BikeSherpa.Backend.Features.Customers.Delete;
 using Mediator;
 using System.Net;
 using BackendTests.Services;
+using JetBrains.Annotations;
 using Moq;
 
 namespace BackendTests.Features.Customers.Delete;
 
+[UsedImplicitly]
 public class DeleteCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers");
 
 public class DeleteCustomerEndpointTests(
