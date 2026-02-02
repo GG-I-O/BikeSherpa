@@ -20,11 +20,11 @@ public class CustomerLinksTests
           return new CustomerLinks(_mockHttpContextAccessor.Object, _mockHateoasService.Object);
      }
 
-     private void setupHttpContextScope(string scope)
+     private void SetupHttpContextScope(string scope)
      {
           var claims = new List<Claim>
           {
-               new Claim("scope", scope)
+               new("scope", scope)
           };
 
           var principal = new ClaimsPrincipal(new ClaimsIdentity(claims));
@@ -54,7 +54,7 @@ public class CustomerLinksTests
      public void GenerateLinks_ShouldCallHateoas_DependingOnScope(string scope)
      {
           // Arrange
-          setupHttpContextScope(scope);
+          SetupHttpContextScope(scope);
           var sut = CreateSut();
           var id = Guid.NewGuid();
 

@@ -12,7 +12,7 @@ using Moq;
 
 namespace BackendTests.Features.Customers.Add;
 
-public class AddCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers") {}
+public class AddCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers");
 
 public class AddCustomerEndpointTests(
      AddCustomerWebApplicationFactory factory,

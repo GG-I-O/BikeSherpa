@@ -10,7 +10,7 @@ using CustomerCrud = Ggio.BikeSherpa.Backend.Features.Customers.Model.CustomerCr
 
 namespace BackendTests.Features.Customers.Get;
 
-public class GetCustomerWebApplicationFactory() : TestWebApplicationFactory("read:customers", "read:customers") {}
+public class GetCustomerWebApplicationFactory() : TestWebApplicationFactory("read:customers", "read:customers");
 
 public class GetCustomerEndpointTests(
      GetCustomerWebApplicationFactory factory,

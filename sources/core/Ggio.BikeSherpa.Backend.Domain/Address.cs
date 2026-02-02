@@ -5,16 +5,16 @@ namespace Ggio.BikeSherpa.Backend.Domain;
 public class Address
 {
      [UsedImplicitly]
-     public required string name { get; set; }
+     public required string Name { get; set; }
      
      [UsedImplicitly]
-     public required string streetInfo { get; set; }
+     public required string StreetInfo { get; set; }
      
-     public string? complement { get; set; }
-     
-     [UsedImplicitly]
-     public required string postcode { get; set; }
+     public string? Complement { get; set; }
      
      [UsedImplicitly]
-     public required string city { get; set; }
+     public required string Postcode { get; set; }
+     
+     [UsedImplicitly]
+     public required string City { get; set; }
 }

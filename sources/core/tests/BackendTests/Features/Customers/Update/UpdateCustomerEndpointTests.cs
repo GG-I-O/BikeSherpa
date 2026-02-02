@@ -11,7 +11,7 @@ using Moq;
 
 namespace BackendTests.Features.Customers.Update;
 
-public class UpdateCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers") {}
+public class UpdateCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers");
 
 public class UpdateCustomerEndpointTests(
      UpdateCustomerWebApplicationFactory factory,

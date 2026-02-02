@@ -23,10 +23,10 @@ public class GetCustomerHandlerTests
           PhoneNumber = "0123456789",
           Address = new Address
           {
-               name = "Client A",
-               streetInfo = "123 rue des roses",
-               postcode = "12502",
-               city = "Obi-wan"
+               Name = "Client A",
+               StreetInfo = "123 rue des roses",
+               Postcode = "12502",
+               City = "Obi-wan"
           }
      };
 
@@ -47,7 +47,7 @@ public class GetCustomerHandlerTests
           result.Id.Should().Be(guid);
           result.Name.Should().Be("Client A");
           result.Code.Should().Be("AAA");
-          result.Address.streetInfo.Should().Be("123 rue des roses");
+          result.Address.StreetInfo.Should().Be("123 rue des roses");
           VerifyRepositoryCalledOnce();
      }
      

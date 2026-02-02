@@ -8,7 +8,7 @@ using Moq;
 
 namespace BackendTests.Features.Customers.Delete;
 
-public class DeleteCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers") {}
+public class DeleteCustomerWebApplicationFactory() : TestWebApplicationFactory("write:customers", "write:customers");
 
 public class DeleteCustomerEndpointTests(
      DeleteCustomerWebApplicationFactory factory,

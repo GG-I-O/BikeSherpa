@@ -20,10 +20,10 @@ public class GetAllCustomersHandlerTests
           PhoneNumber = "0123456789",
           Address = new Address
           {
-               name = "Client A",
-               streetInfo = "123 rue des roses",
-               postcode = "12502",
-               city = "Obi-wan"
+               Name = "Client A",
+               StreetInfo = "123 rue des roses",
+               Postcode = "12502",
+               City = "Obi-wan"
           }
      };
      private readonly Customer _mockCustomerB = new ()
@@ -36,10 +36,10 @@ public class GetAllCustomersHandlerTests
           PhoneNumber = "9876543210",
           Address = new Address
           {
-               name = "Client B",
-               streetInfo = "321 rue des roses",
-               postcode = "54855",
-               city = "Anakin"
+               Name = "Client B",
+               StreetInfo = "321 rue des roses",
+               Postcode = "54855",
+               City = "Anakin"
           }
      };
 

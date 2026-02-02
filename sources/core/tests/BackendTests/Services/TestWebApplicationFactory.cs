@@ -23,7 +23,7 @@ public abstract class TestWebApplicationFactory(string policyName, string scope)
           {
                services.AddFastEndpoints(config =>
                {
-                    config.Assemblies = new[] { typeof(Program).Assembly };
+                    config.Assemblies = [typeof(Program).Assembly];
                     config.SourceGeneratorDiscoveredTypes = [];
                     config.Filter = type => type.Assembly == typeof(Program).Assembly;
                });
