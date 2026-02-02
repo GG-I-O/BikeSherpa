@@ -22,10 +22,12 @@ export default class EditCourierFormViewModel {
 
     public getEditCourierSchema(courierToEdit: Courier, courierList: Courier[]) {
         const originalCode = courierToEdit.code;
-        const newCourierSchema = new NewCourierFormViewModel(this.courierServices).getNewCourierSchema(courierList);
+        const newCourierViewModel = new NewCourierFormViewModel(this.courierServices);
+        const newCourierSchema = newCourierViewModel.getNewCourierSchema(courierList);
+        const newCourierSchemaPartial = newCourierViewModel.getNewCourierSchemaPartial;
 
         return newCourierSchema
-            .partial({ complement: true })
+            .partial(newCourierSchemaPartial)
             .extend({
                 id: zod
                     .string()

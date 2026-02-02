@@ -7,6 +7,40 @@ import { UseFormReset } from "react-hook-form";
 import { addressSchema } from '@/models/Address';
 import Courier from "../models/Courier";
 
+const newCourierBaseSchema = zod.object({
+    firstName: zod
+        .string()
+        .trim()
+        .min(1, "Prénom requis"),
+    lastName: zod
+        .string()
+        .trim()
+        .min(1, "Nom requis"),
+    address: addressSchema,
+    complement: zod
+        .string()
+        .nullable(),
+    code: zod
+        .string()
+        .trim()
+        .min(1, "Code requis")
+        .max(3, "Code trop long"),
+    email: zod
+        .string()
+        .trim()
+        .min(1, "Adresse e-mail requise")
+        .email(),
+    phoneNumber: zod
+        .string()
+        .trim()
+        .min(1, "Numéro de téléphone requis")
+        .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide"),
+});
+
+type NewCourierSchema = zod.infer<typeof newCourierBaseSchema>;
+
+type NewCourierPartialShape = Partial<Record<keyof NewCourierSchema, true>>;
+
 export default class NewCourierFormViewModel {
     private courierServices: ICourierService;
     private resetCallback?: UseFormReset<InputCourier>;
@@ -29,35 +63,17 @@ export default class NewCourierFormViewModel {
         this.resetCallback = reset;
     }
 
+    public getNewCourierSchemaPartial(): NewCourierPartialShape {
+        return { complement: true };
+    }
+
     public getNewCourierSchema(courierList: Courier[]) {
-        return zod.object({
-            firstName: zod
-                .string()
-                .trim()
-                .min(1, "Prénom requis"),
-            lastName: zod
-                .string()
-                .trim()
-                .min(1, "Nom requis"),
-            address: addressSchema,
-            complement: zod
-                .string()
-                .nullable(),
-            code: zod
-                .string()
-                .trim()
-                .min(1, "Code requis")
-                .max(3, "Code trop long")
-                .refine((value) => !courierList.some((courier) => courier.code === value), "Le code doit être unique"),
-            email: zod
-                .string()
-                .min(1, "Adresse e-mail requise")
-                .email("Adresse e-mail invalide"),
-            phoneNumber: zod
-                .string()
-                .min(1, "Numéro de téléphone requis")
-                .trim()
-                .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
-        }).partial({ complement: true });
+        return newCourierBaseSchema.extend({
+            code: newCourierBaseSchema.shape.code.refine(
+                (value) => !courierList.some((c) => c.code === value),
+                "Le code doit être unique"
+            ),
+        })
+            .partial(this.getNewCourierSchemaPartial());
     }
 }
