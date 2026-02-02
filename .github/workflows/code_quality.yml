@@ -26,17 +26,6 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
-      # - name: Build and generated coverage
-      #   run: |
-      #     dotnet test sources/core/tests/BackendTests/BackendTests.csproj \
-      #     /p:CollectCoverage=true \
-      #     /p:CoverletOutputFormat=lcov \
-      #     /p:CoverletOutput=../../../.qodana/code-coverage/backend- || true
-
-      #     dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj \
-      #     /p:CollectCoverage=true \
-      #     /p:CoverletOutputFormat=lcov \
-      #     /p:CoverletOutput=../../../.qodana/code-coverage/dddcore- || true
       - name: Restore and build
         run: dotnet build Ggio.BikeSherpa.slnx --configuration Release
 
