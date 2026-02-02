@@ -16,14 +16,14 @@ const storage = mock<IStorageContext<Courier>>();
 describe("CourierServices", () => {
     let mockCourierStore$: Observable<Record<string, Courier>>;
     let courierService: ICourierService;
-    let mocCouriers: Courier[];
+    let mockCouriers: Courier[];
     beforeEach(() => {
-        mocCouriers = faker.helpers.multiple(() => createRandomCourier(true, linkType.none), {
+        mockCouriers = faker.helpers.multiple(() => createRandomCourier(true, linkType.none), {
             count: 2,
         });
         mockCourierStore$ = observable<Record<string, Courier>>({
-            [mocCouriers[0].id]: mocCouriers[0],
-            [mocCouriers[1].id]: mocCouriers[1]
+            [mockCouriers[0].id]: mockCouriers[0],
+            [mockCouriers[1].id]: mockCouriers[1]
         });
         storage.getStore.mockReturnValue(mockCourierStore$);
         logger.extend.mockReturnValue(logger);
@@ -45,11 +45,11 @@ describe("CourierServices", () => {
         //arrange
 
         //act
-        const courier = courierService.getCourier$(mocCouriers[0].id);
+        const courier = courierService.getCourier$(mockCouriers[0].id);
 
         //assert
         expect(courier).not.toBeNull();
-        expect(courier).toBe(mockCourierStore$[mocCouriers[0].id]);
+        expect(courier).toBe(mockCourierStore$[mockCouriers[0].id]);
     })
 
     it("deleteCourier throws an error when no link is present", () => {
@@ -58,24 +58,24 @@ describe("CourierServices", () => {
         //act
 
         //assert
-        expect(() => courierService.deleteCourier(mocCouriers[0].id)).toThrow(`Cannot delete the courier ${mocCouriers[0].id}`);
+        expect(() => courierService.deleteCourier(mockCouriers[0].id)).toThrow(`Cannot delete the courier ${mockCouriers[0].id}`);
     })
 
     it("deleteCourier deletes a courier when links exist", () => {
         //arrange
-        mockCourierStore$[mocCouriers[0].id].links.set([
+        mockCourierStore$[mockCouriers[0].id].links.set([
             {
                 rel: "delete",
-                href: `/api/couriers/${mocCouriers[0].id}`,
+                href: `/api/couriers/${mockCouriers[0].id}`,
                 method: "DELETE"
             }
         ])
 
         //act
-        courierService.deleteCourier(mocCouriers[0].id);
+        courierService.deleteCourier(mockCouriers[0].id);
 
         //assert
-        expect(mockCourierStore$.peek()[mocCouriers[0].id]).toBeUndefined();
+        expect(mockCourierStore$.peek()[mockCouriers[0].id]).toBeUndefined();
     })
 
     it("createCourier creates a courier", () => {
@@ -95,22 +95,22 @@ describe("CourierServices", () => {
 
     it("updateCourier updates a courier when links exist", () => {
         //arrange
-        mockCourierStore$[mocCouriers[0].id].links.set([
+        mockCourierStore$[mockCouriers[0].id].links.set([
             {
                 rel: "update",
-                href: `/api/couriers/${mocCouriers[0].id}`,
+                href: `/api/couriers/${mockCouriers[0].id}`,
                 method: "PUT"
             }
         ])
 
         const courierToUpdate: Courier = {
             ...createRandomCourier(true, linkType.none),
-            id: mocCouriers[0].id
+            id: mockCouriers[0].id
         };
 
         //act
         courierService.updateCourier(courierToUpdate);
-        const updatedCourierPeek = mockCourierStore$.peek()[mocCouriers[0].id];
+        const updatedCourierPeek = mockCourierStore$.peek()[mockCouriers[0].id];
 
         //assert
         expect(updatedCourierPeek.lastName).toBe(courierToUpdate.lastName);
@@ -121,7 +121,7 @@ describe("CourierServices", () => {
         //arrange
         const courierToUpdate: Courier = {
             ...createRandomCourier(true, linkType.none),
-            id: mocCouriers[0].id
+            id: mockCouriers[0].id
         };
         //act
 

@@ -1,10 +1,10 @@
-import * as Crypto from 'expo-crypto';
+import * as Crypto from "expo-crypto";
 import InputCourier from "./InputCourier";
 import Storable from "@/models/Storable";
 import { Address } from "@/models/Address";
 import { HateoasLinks, Link } from "@/models/HateoasLink";
-import { z } from 'zod';
-import { schemas } from '@/infra/openAPI/client';
+import { z } from "zod";
+import { schemas } from "@/infra/openAPI/client";
 
 export default class Courier extends InputCourier implements Storable, HateoasLinks {
     // Storable

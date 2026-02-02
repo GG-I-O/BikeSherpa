@@ -1,13 +1,13 @@
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import InputCourier from '../models/InputCourier';
-import { ICourierService } from '@/spi/CourierSPI';
-import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
-import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
-import { useEffect, useState } from 'react';
-import Courier from '../models/Courier';
-import { observe } from '@legendapp/state';
-import NewCourierFormViewModel from './NewCourierFormViewModel';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import InputCourier from "../models/InputCourier";
+import { ICourierService } from "@/spi/CourierSPI";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
+import { useEffect, useState } from "react";
+import Courier from "../models/Courier";
+import { observe } from "@legendapp/state";
+import NewCourierFormViewModel from "./NewCourierFormViewModel";
 
 export function useNewCourierFormViewModel() {
     const courierServices = IOCContainer.get<ICourierService>(ServicesIdentifiers.CourierServices);
@@ -29,17 +29,17 @@ export function useNewCourierFormViewModel() {
         reset
     } = useForm<InputCourier>({
         defaultValues: {
-            firstName: '',
-            lastName: '',
-            code: '',
-            phoneNumber: '',
-            email: '',
+            firstName: "",
+            lastName: "",
+            code: "",
+            phoneNumber: "",
+            email: "",
             address: {
-                name: '',
-                streetInfo: '',
-                complement: '',
-                postcode: '',
-                city: ''
+                name: "",
+                streetInfo: "",
+                complement: "",
+                postcode: "",
+                city: ""
             },
         },
         resolver: zodResolver(newCourierViewModel.getNewCourierSchema(courierList))
