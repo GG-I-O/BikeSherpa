@@ -9,14 +9,28 @@ export type Address = {
     city: string;
 }
 
-export const addressSchema = zod.object({
-    name: zod.string(),
-    fullAddress: zod.string()
-        .min(5, "Adresse non valide"),
-    streetInfo: zod
-        .string()
-        .min(5, "Veuillez rentrer une adresse valide"),
-    complement: zod.string().nullable(),
-    postcode: zod.string(),
-    city: zod.string(),
-}).partial({ complement: true })
+export const addressSchema = zod
+    .object({
+        name: zod
+            .string()
+            .min(1, "Adresse requise"),
+        fullAddress: zod
+            .string()
+            .min(5, "Adresse non valide"),
+        streetInfo: zod
+            .string()
+            .min(5, "Veuillez rentrer une adresse valide"),
+        complement: zod
+            .string()
+            .nullable(),
+        postcode: zod
+            .string()
+            .trim()
+            .min(1, "Code postal requis")
+            .max(5, "Code postal invalide"),
+        city: zod
+            .string()
+            .trim()
+            .min(1, "Nom de ville requis"),
+    })
+    .partial({ complement: true })
