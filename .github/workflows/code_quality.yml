@@ -20,31 +20,33 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-    
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
 
-      - name: Build and generated coverage
-        run : |
-          dotnet test sources/core/tests/BackendTests/BackendTests.csproj \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat=lcov \
-          /p:CoverletOutput=../../../.qodana/code-coverage/backend- || true
+      # - name: Build and generated coverage
+      #   run: |
+      #     dotnet test sources/core/tests/BackendTests/BackendTests.csproj \
+      #     /p:CollectCoverage=true \
+      #     /p:CoverletOutputFormat=lcov \
+      #     /p:CoverletOutput=../../../.qodana/code-coverage/backend- || true
 
-          dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj \
-          /p:CollectCoverage=true \
-          /p:CoverletOutputFormat=lcov \
-          /p:CoverletOutput=../../../.qodana/code-coverage/dddcore- || true
+      #     dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj \
+      #     /p:CollectCoverage=true \
+      #     /p:CoverletOutputFormat=lcov \
+      #     /p:CoverletOutput=../../../.qodana/code-coverage/dddcore- || true
+      - name: Restore and build
+        run: dotnet build Ggio.BikeSherpa.slnx --configuration Release
 
       - name: "Qodana Scan"
         uses: JetBrains/qodana-action@v2025.2
         with:
           pr-mode: false
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-          QODANA_ENDPOINT: "https://qodana.cloud"
+        # env:
+        #   QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        #   QODANA_ENDPOINT: "https://qodana.cloud"
 
   qodana_typescript:
     name: Qodana Scan TS
@@ -62,19 +64,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: sources/gui/Ggio.BikeSherpa.Frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
         working-directory: sources/gui/Ggio.BikeSherpa.Frontend
-        
+
       - name: "Qodana Scan"
         uses: JetBrains/qodana-action@v2025.2
         with:
           pr-mode: false
           args: --linter,qodana-js
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_TS }}
-          QODANA_ENDPOINT: "https://qodana.cloud"
+        # env:
+        #   QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_TS }}
+        #   QODANA_ENDPOINT: "https://qodana.cloud"
