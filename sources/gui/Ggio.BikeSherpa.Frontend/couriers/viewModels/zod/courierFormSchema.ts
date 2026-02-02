@@ -1,5 +1,5 @@
-import * as zod from 'zod';
-import { addressSchema } from '@/models/Address';
+import * as zod from "zod";
+import { addressSchema } from "@/models/Address";
 
 type CourierFormSchema = zod.infer<typeof courierFormBaseSchema>;
 
