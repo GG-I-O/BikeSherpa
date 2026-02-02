@@ -44,9 +44,9 @@ jobs:
         uses: JetBrains/qodana-action@v2025.2
         with:
           pr-mode: false
-        # env:
-        #   QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-        #   QODANA_ENDPOINT: "https://qodana.cloud"
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+          QODANA_ENDPOINT: "https://qodana.cloud"
 
   qodana_typescript:
     name: Qodana Scan TS
@@ -77,6 +77,6 @@ jobs:
         with:
           pr-mode: false
           args: --linter,qodana-js
-        # env:
-        #   QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_TS }}
-        #   QODANA_ENDPOINT: "https://qodana.cloud"
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_TS }}
+          QODANA_ENDPOINT: "https://qodana.cloud"
