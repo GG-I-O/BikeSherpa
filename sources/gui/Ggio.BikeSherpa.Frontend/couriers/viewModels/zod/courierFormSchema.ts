@@ -30,7 +30,7 @@ export const courierFormBaseSchema = zod
             .string()
             .trim()
             .min(1, "Adresse e-mail requise")
-            .email(),
+            .email("Adresse e-mail invalide"),
         phoneNumber: zod
             .string()
             .trim()
