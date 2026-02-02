@@ -10,7 +10,7 @@
 version: "1.0"
 
 #Specify IDE code to run analysis without container (Applied in CI/CD pipeline)
-linter: jetbrains/qodana-cdnet:2025.2
+linter: jetbrains/qodana-cdnet:latest
 
 #Specify inspection profile for code analysis
 profile:
