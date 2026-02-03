@@ -12,17 +12,19 @@ export type Address = {
 export const addressSchema = zod
     .object({
         name: zod
-            .string()
-            .min(1, "Adresse requise"),
+            .string(),
         fullAddress: zod
             .string()
+            .trim()
+            .min(1, "Adresse requise")
             .min(5, "Adresse non valide"),
         streetInfo: zod
             .string()
             .min(5, "Veuillez rentrer une adresse valide"),
         complement: zod
             .string()
-            .nullable(),
+            .nullable()
+            .optional(),
         postcode: zod
             .string()
             .trim()
@@ -33,4 +35,3 @@ export const addressSchema = zod
             .trim()
             .min(1, "Nom de ville requis"),
     })
-    .partial({ complement: true })

@@ -1,10 +1,6 @@
 import * as zod from "zod";
 import { addressSchema } from "@/models/Address";
 
-type CourierFormSchema = zod.infer<typeof courierFormBaseSchema>;
-
-type CourierFormPartialShape = Partial<Record<keyof CourierFormSchema, true>>;
-
 export const courierFormBaseSchema = zod
     .object({
         firstName: zod
@@ -20,7 +16,8 @@ export const courierFormBaseSchema = zod
         address: addressSchema,
         complement: zod
             .string()
-            .nullable(),
+            .nullable()
+            .optional(),
         code: zod
             .string()
             .trim()
@@ -37,7 +34,3 @@ export const courierFormBaseSchema = zod
             .min(1, "Numéro de téléphone requis")
             .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide"),
     });
-
-export function getCourierFormSchemaPartial(): CourierFormPartialShape {
-    return { complement: true };
-}

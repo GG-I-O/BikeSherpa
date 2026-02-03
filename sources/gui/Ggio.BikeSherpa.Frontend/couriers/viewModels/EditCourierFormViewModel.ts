@@ -3,7 +3,7 @@ import Courier from "../models/Courier";
 import { ICourierService } from "@/spi/CourierSPI";
 import { inject } from "inversify";
 import * as zod from "zod";
-import { courierFormBaseSchema, getCourierFormSchemaPartial } from "./zod/courierFormSchema";
+import { courierFormBaseSchema } from "./zod/courierFormBaseSchema";
 
 export default class EditCourierFormViewModel {
     private courierServices: ICourierService;
@@ -34,6 +34,5 @@ export default class EditCourierFormViewModel {
                     return !courierList.some((courier) => courier.code === value);
                 }, "Le code doit être unique")
             })
-            .partial(getCourierFormSchemaPartial());
     }
 }

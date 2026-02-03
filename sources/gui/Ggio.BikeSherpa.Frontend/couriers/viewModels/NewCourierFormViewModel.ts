@@ -4,7 +4,7 @@ import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifier
 import { inject } from "inversify";
 import { UseFormReset } from "react-hook-form";
 import Courier from "../models/Courier";
-import { courierFormBaseSchema, getCourierFormSchemaPartial } from "./zod/courierFormSchema";
+import { courierFormBaseSchema } from "./zod/courierFormBaseSchema";
 
 export default class NewCourierFormViewModel {
     private courierServices: ICourierService;
@@ -35,6 +35,5 @@ export default class NewCourierFormViewModel {
                 "Le code doit être unique"
             ),
         })
-            .partial(getCourierFormSchemaPartial());
     }
 }
