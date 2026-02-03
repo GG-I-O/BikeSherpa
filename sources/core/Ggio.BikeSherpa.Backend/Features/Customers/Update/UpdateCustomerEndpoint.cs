@@ -22,6 +22,7 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud>
                req.Name,
                req.Code,
                req.Siret,
+               req.VatNumber,
                req.Email,
                req.PhoneNumber,
                req.Address

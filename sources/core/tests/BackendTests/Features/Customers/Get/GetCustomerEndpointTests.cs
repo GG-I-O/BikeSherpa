@@ -4,13 +4,15 @@ using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
+using JetBrains.Annotations;
 using Mediator;
 using Moq;
 using CustomerCrud = Ggio.BikeSherpa.Backend.Features.Customers.Model.CustomerCrud;
 
 namespace BackendTests.Features.Customers.Get;
 
-public class GetCustomerWebApplicationFactory() : TestWebApplicationFactory("read:customers", "read:customers") {}
+[UsedImplicitly]
+public class GetCustomerWebApplicationFactory() : TestWebApplicationFactory("read:customers", "read:customers");
 
 public class GetCustomerEndpointTests(
      GetCustomerWebApplicationFactory factory,
@@ -35,7 +37,7 @@ public class GetCustomerEndpointTests(
 
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<GetClientQuery>(),
+                    It.IsAny<GetCustomerQuery>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(expectedCustomer);
 
@@ -47,7 +49,7 @@ public class GetCustomerEndpointTests(
 
           _mockMediator.Verify(
                m => m.Send(
-                    It.IsAny<GetClientQuery>(),
+                    It.IsAny<GetCustomerQuery>(),
                     It.IsAny<CancellationToken>()),
                Times.Once);
 
@@ -67,7 +69,7 @@ public class GetCustomerEndpointTests(
 
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<GetClientQuery>(),
+                    It.IsAny<GetCustomerQuery>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync((CustomerCrud?)null);
 
@@ -79,7 +81,7 @@ public class GetCustomerEndpointTests(
 
           _mockMediator.Verify(
                m => m.Send(
-                    It.IsAny<GetClientQuery>(),
+                    It.IsAny<GetCustomerQuery>(),
                     It.IsAny<CancellationToken>()),
                Times.Once);
      }

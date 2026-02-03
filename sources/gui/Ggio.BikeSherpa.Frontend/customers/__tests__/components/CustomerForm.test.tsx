@@ -46,8 +46,8 @@ describe("CustomerForm", () => {
         const formButton = screen.getByTestId("formButton");
         const buttonName = screen.queryByTestId("buttonName");
 
-        // Check that ThemedInput is called 5 times (name, code, email, phone, complement)
-        expect(ThemedInput).toHaveBeenCalledTimes(5);
+        // Check that ThemedInput is called 7 times (name, code, email, phoneNumber, complement, siret, VAT number)
+        expect(ThemedInput).toHaveBeenCalledTimes(7);
 
         // Get the props from each call
         const call1Props = ThemedInput.mock.calls[0][0];
@@ -55,6 +55,8 @@ describe("CustomerForm", () => {
         const call3Props = ThemedInput.mock.calls[2][0];
         const call4Props = ThemedInput.mock.calls[3][0];
         const call5Props = ThemedInput.mock.calls[4][0];
+        const call6Props = ThemedInput.mock.calls[5][0];
+        const call7Props = ThemedInput.mock.calls[6][0];
 
         // Check first call - Name input
         expect(call1Props.label).toBe("Nom");
@@ -90,6 +92,20 @@ describe("CustomerForm", () => {
         expect(call5Props.name).toBe("complement");
         expect(call5Props.required).toBeUndefined();
         expect(call5Props.testID).toBe("customerFormComplementInput");
+
+        // Check sifth call - Siret input (not required)
+        expect(call6Props.label).toBe("Siret");
+        expect(call6Props.placeholder).toBe("12345678910123");
+        expect(call6Props.name).toBe("siret");
+        expect(call6Props.required).toBeUndefined();
+        expect(call6Props.testID).toBe("customerFormSiretInput");
+
+        // Check seventh call - VAT Number input (not required)
+        expect(call7Props.label).toBe("Numéro de TVA");
+        expect(call7Props.placeholder).toBe("FR12345678910");
+        expect(call7Props.name).toBe("vatNumber");
+        expect(call7Props.required).toBeUndefined();
+        expect(call7Props.testID).toBe("customerFormVatNumberInput");
 
         // Check ThemedAddressInput is called once
         expect(ThemedAddressInput).toHaveBeenCalledTimes(1);

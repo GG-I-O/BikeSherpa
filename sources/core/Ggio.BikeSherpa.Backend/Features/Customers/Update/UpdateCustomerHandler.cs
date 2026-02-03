@@ -15,6 +15,7 @@ public record UpdateCustomerCommand(
      string Name,
      string Code,
      string? Siret,
+     string? VatNumber,
      string Email,
      string PhoneNumber,
      AddressCrud Address
@@ -36,6 +37,24 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
                     context.AddFailure("Code client déjà utilisé");
                }
           });
+          RuleFor(x => x.Siret).NotEmpty().CustomAsync(async (siret, context, cancellationToken) =>
+          {
+               var command = context.InstanceToValidate;
+               var existingCustomer = await repository.FirstOrDefaultAsync(new CustomerBySiretSpecification(siret!), cancellationToken);
+               if (existingCustomer != null && existingCustomer.Id != command.Id)
+               {
+                    context.AddFailure("Siret déjà utilisé pour un autre client");
+               }
+          }).When(x => x.Siret != null);
+          RuleFor(x => x.VatNumber).NotEmpty().CustomAsync(async (vatNumber, context, cancellationToken) =>
+          {
+               var command = context.InstanceToValidate;
+               var existingCustomer = await repository.FirstOrDefaultAsync(new CustomerByVatNumberSpecification(vatNumber!), cancellationToken);
+               if (existingCustomer != null && existingCustomer.Id != command.Id)
+               {
+                    context.AddFailure("Numéro de TVA déjà utilisé pour un autre client");
+               }
+          }).When(x => x.VatNumber != null);
           RuleFor(x => x.Email).NotEmpty();
           RuleFor(x => x.PhoneNumber).NotEmpty();
           RuleFor(x => x.Address).NotEmpty();
@@ -58,6 +77,7 @@ public class UpdateCustomerHandler(
           entity.Name = command.Name;
           entity.Code = command.Code;
           entity.Siret = command.Siret;
+          entity.VatNumber = command.VatNumber;
           entity.Email = command.Email;
           entity.PhoneNumber = command.PhoneNumber;
           entity.Address = command.Address.ToSource<AddressCrud, Address>();

@@ -4,13 +4,15 @@ using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
 using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
+using JetBrains.Annotations;
 using Mediator;
 using Moq;
 using CustomerCrud = Ggio.BikeSherpa.Backend.Features.Customers.Model.CustomerCrud;
 
 namespace BackendTests.Features.Customers.GetAll;
 
-public class GetAllCustomersWebApplicationFactory() : TestWebApplicationFactory("read:customers", "read:customers") {}
+[UsedImplicitly]
+public class GetAllCustomersWebApplicationFactory() : TestWebApplicationFactory("read:customers", "read:customers");
 
 public class GetAllCustomersEndpointTests(
      GetAllCustomersWebApplicationFactory factory,

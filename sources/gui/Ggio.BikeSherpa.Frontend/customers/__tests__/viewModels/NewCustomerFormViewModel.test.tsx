@@ -115,7 +115,7 @@ describe("NewCustomerFormViewModel", () => {
             //assert
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.issues[0].message).toBe("Adresse e-mail non valide");
+                expect(result.error.issues[0].message).toBe("Adresse e-mail invalide");
             }
         });
 

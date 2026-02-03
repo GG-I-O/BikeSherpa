@@ -40,6 +40,7 @@ export class CustomerBackendClientFacade implements IBackendClient<Customer> {
     async AddEndpoint(item: Customer): Promise<string> {
         // Zod needs a complete body, even for optional fields
         item.siret = item.siret ?? null;
+        item.vatNumber = item.vatNumber ?? null;
         item.address.complement = item.address.complement ?? "";
         const parsed = schemas.CustomerCrud.safeParse(item);
         if (!parsed.success) {
@@ -63,6 +64,7 @@ export class CustomerBackendClientFacade implements IBackendClient<Customer> {
     async UpdateEndpoint(item: Customer): Promise<void> {
         // Zod needs a complete body, even for optional fields
         item.siret = item.siret ?? null;
+        item.vatNumber = item.vatNumber ?? null;
         item.address.complement = item.address.complement ?? "";
         const parsed = schemas.CustomerCrud.safeParse(item);
         if (!parsed.success) {
