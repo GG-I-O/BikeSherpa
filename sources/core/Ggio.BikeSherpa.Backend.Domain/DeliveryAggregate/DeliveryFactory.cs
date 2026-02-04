@@ -6,34 +6,36 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 public interface IDeliveryFactory
 {
      Task<Delivery> CreateDeliveryAsync(
-               string code,
-               string customerId,
-               double totalPrice,
-               string reportId,
-               string[] stepIds,
-               string[] details,
-               string packing
-          );
+          DeliveryStatus status,
+          string code,
+          Guid customerId,
+          double totalPrice,
+          string reportId,
+          List<DeliveryStep> steps,
+          string[] details,
+          string packing
+     );
 }
 
 public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliveryFactory
 {
 
-     public async Task<Delivery> CreateDeliveryAsync(string code, string customerId, double totalPrice, string reportId, string[] stepIds, string[] details, string packing)
+     public async Task<Delivery> CreateDeliveryAsync(DeliveryStatus status, string code, Guid customerId, double totalPrice, string reportId, List<DeliveryStep> steps, string[] details, string packing)
      {
           var delivery = new Delivery
           {
+               Status = status,
                Code = code,
                CustomerId = customerId,
                TotalPrice = totalPrice,
                ReportId = reportId,
-               StepIds = stepIds,
                Details = details,
-               Packing = packing
+               Packing = packing,
+               Steps = steps
           };
-          
+
           await NotifyNewEntityAdded(delivery);
-          
+
           return delivery;
      }
 }
