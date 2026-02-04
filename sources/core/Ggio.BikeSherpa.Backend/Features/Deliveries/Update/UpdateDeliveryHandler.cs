@@ -14,7 +14,7 @@ public record UpdateDeliveryCommand(
      string CustomerId,
      double TotalPrice,
      string ReportId,
-     string[] Steps,
+     string[] StepIds,
      string[] Details,
      string Packing
 ) : ICommand<Result>;
@@ -28,7 +28,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
-          RuleFor(x => x.Steps).NotEmpty();
+          RuleFor(x => x.StepIds).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.Packing).NotEmpty();
      }
@@ -51,7 +51,7 @@ public class UpdateDeliveryHandler(
           entity.CustomerId = command.CustomerId;
           entity.TotalPrice = command.TotalPrice;
           entity.ReportId = command.ReportId;
-          entity.Steps = command.Steps;
+          entity.StepIds = command.StepIds;
           entity.Details = command.Details;
           entity.Packing = command.Packing;
           await transaction.CommitAsync(cancellationToken);

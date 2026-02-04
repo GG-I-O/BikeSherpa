@@ -1,14 +1,10 @@
-import * as zod from 'zod';
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { inject } from "inversify";
 import { UseFormReset } from "react-hook-form";
-import { IDeliveryService } from '@/spi/DeliverySPI';
-import { InputDelivery } from '../models/InputDelivery';
-import { Delivery } from '../models/Delivery';
-import { customerSchema } from '@/customers/models/Customer';
-import { detailSchema } from '../models/DeliveryDetail';
-import { stepSchema } from '@/steps/models/Step';
-import { DeliveryPacking } from '../models/DeliveryPacking';
+import { IDeliveryService } from "@/spi/DeliverySPI";
+import { InputDelivery } from "../models/InputDelivery";
+import { Delivery } from "../models/Delivery";
+import { deliveryFormBaseSchema } from "./zod/deliveryFormBaseSchema";
 
 export default class NewDeliveryFormViewModel {
     private deliveryServices: IDeliveryService;
@@ -32,21 +28,9 @@ export default class NewDeliveryFormViewModel {
     }
 
     public getNewDeliverySchema(deliveryList: Delivery[]) {
-        return zod.object({
-            code: zod
-                .string()
-                .trim()
-                .min(1, "Code requis")
-                .max(3, "Code trop long")
-                .refine((value) => !deliveryList.some((delivery) => delivery.code === value), "Le code doit être unique"),
-            customer: customerSchema,
-            totalPrice: zod
-                .number(),
-            reportId: zod
-                .string(),
-            steps: zod.array(stepSchema),
-            details: zod.array(detailSchema),
-            packing: zod.nativeEnum(DeliveryPacking),
-        });
+        return deliveryFormBaseSchema
+            .extend({
+                code: deliveryFormBaseSchema.shape.code.refine((value: string) => !deliveryList.some((delivery) => delivery.code === value), "Le code doit être unique")
+            });
     }
 }

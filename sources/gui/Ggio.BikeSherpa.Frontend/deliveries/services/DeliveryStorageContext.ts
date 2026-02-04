@@ -28,13 +28,13 @@ export default class DeliveryStorageContext extends AbstractStorageContext<Deliv
     }
 
     protected async getItem(id: string): Promise<Delivery | null> {
-        let customer: Delivery | null;
+        let delivery: Delivery | null;
         const link = this.getLinkHref(id, "self");
         if (link) {
             const response = await axios.get(link);
             const data = await response.data as DeliveryDto;
-            customer = DeliveryMapper.DeliveryrDtoToDelivery(data);
-            return customer;
+            delivery = DeliveryMapper.DeliveryDtoToDelivery(data);
+            return delivery;
         }
         else {
             return await this.backendClient.GetEndpoint(id);

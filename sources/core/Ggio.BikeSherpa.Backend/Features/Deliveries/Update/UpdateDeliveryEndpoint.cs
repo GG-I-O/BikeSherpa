@@ -23,7 +23,7 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
                req.CustomerId,
                req.TotalPrice,
                req.ReportId,
-               req.Steps,
+               req.StepIds,
                req.Details,
                req.Packing
           );

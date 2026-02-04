@@ -1,4 +1,3 @@
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.DddCore;
 using Mediator;
 
@@ -11,16 +10,16 @@ public interface IDeliveryFactory
                string customerId,
                double totalPrice,
                string reportId,
-               string[] steps,
+               string[] stepIds,
                string[] details,
-               string packing)
-          ;
+               string packing
+          );
 }
 
 public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliveryFactory
 {
 
-     public async Task<Delivery> CreateDeliveryAsync(string code, string customerId, double totalPrice, string reportId, string[] steps, string[] details, string packing)
+     public async Task<Delivery> CreateDeliveryAsync(string code, string customerId, double totalPrice, string reportId, string[] stepIds, string[] details, string packing)
      {
           var delivery = new Delivery
           {
@@ -28,7 +27,7 @@ public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliv
                CustomerId = customerId,
                TotalPrice = totalPrice,
                ReportId = reportId,
-               Steps = steps,
+               StepIds = stepIds,
                Details = details,
                Packing = packing
           };

@@ -1,7 +1,7 @@
 import { Delivery, DeliveryDto } from "../models/Delivery";
 
 class DeliveryMapper {
-    public static DeliveryrDtoToDelivery(deliveryDto: DeliveryDto) {
+    public static DeliveryDtoToDelivery(deliveryDto: DeliveryDto) {
         const deliveryCrud = deliveryDto.data;
         const address = deliveryCrud.address;
         let delivery: Delivery = {
