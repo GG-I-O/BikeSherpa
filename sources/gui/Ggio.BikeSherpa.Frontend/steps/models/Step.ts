@@ -1,9 +1,9 @@
-import { Address, addressSchema } from '@/models/Address';
-import { Identifiable } from '@/models/Identifiable';
-import * as Crypto from 'expo-crypto';
-import { StepType } from './StepType';
-import * as zod from 'zod';
-import Courier, { courierSchema } from '@/couriers/models/Courier';
+import { Address, addressSchema } from "@/models/Address";
+import { Identifiable } from "@/models/Identifiable";
+import * as Crypto from "expo-crypto";
+import { StepType } from "./StepType";
+import * as zod from "zod";
+import Courier, { courierSchema } from "@/couriers/models/Courier";
 
 export class Step implements Identifiable<string> {
     readonly id: string;
@@ -55,7 +55,7 @@ export class Step implements Identifiable<string> {
     }
 
     public getEstimatedTime(): string {
-        if (!this.estimatedDeliveryDate) return '';
+        if (!this.estimatedDeliveryDate) return "";
         return this.estimatedDeliveryDate.toLocaleTimeString();
     }
 }
