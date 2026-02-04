@@ -16,9 +16,9 @@ export class Step implements Identifiable<string> {
     public realDeliveryDate?: Date;
     public comment?: string;
     public courier?: Courier;
-    public nbToDo: number;
-    public nbDone: number;
-    public filesPath: string[];
+    public numberToDo: number;
+    public numberDone: number;
+    public filePaths: string[];
 
     public constructor(
         type: StepType,
@@ -29,8 +29,8 @@ export class Step implements Identifiable<string> {
         estimatedDeliveryDate?: Date,
         comment?: string,
         courier?: Courier,
-        nbToDo: number = 0,
-        filesPath: string[] = []
+        numberToDo: number = 0,
+        filePaths: string[] = []
     ) {
         this.id = Crypto.randomUUID();
         this.type = type;
@@ -41,9 +41,9 @@ export class Step implements Identifiable<string> {
         this.estimatedDeliveryDate = estimatedDeliveryDate;
         this.comment = comment;
         this.courier = courier;
-        this.nbToDo = nbToDo;
-        this.nbDone = 0;
-        this.filesPath = filesPath;
+        this.numberToDo = numberToDo;
+        this.numberDone = 0;
+        this.filePaths = filePaths;
     }
 
     public getContractDate(): string {
@@ -68,9 +68,9 @@ export const stepSchema = zod.object({
     price: zod.number(),
     contractDate: zod.date(),
     estimatedDeliveryDate: zod.date(),
-    comment: zod.string(),
-    courier: courierSchema,
+    comment: zod.string().optional(),
+    courier: courierSchema.optional(),
     nbToDo: zod.number(),
     nbDone: zod.number(),
-    filesPath: zod.array(zod.string()),
-}).partial({ comment: true, courier: true })
+    filePaths: zod.array(zod.string()),
+})

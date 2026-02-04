@@ -1,13 +1,13 @@
-import { Observable } from '@legendapp/state';
-import * as Crypto from 'expo-crypto';
-import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
-import { ILogger } from '@/spi/LogsSPI';
-import { Delivery } from '../models/Delivery';
-import { InputDelivery } from '../models/InputDelivery';
-import { inject, injectable } from 'inversify';
-import { IStorageContext } from '@/spi/StorageSPI';
-import { IDeliveryService } from '@/spi/DeliverySPI';
-import { hateoasRel } from '@/models/HateoasLink';
+import { Observable } from "@legendapp/state";
+import * as Crypto from "expo-crypto";
+import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import { ILogger } from "@/spi/LogsSPI";
+import { Delivery } from "../models/Delivery";
+import { InputDelivery } from "../models/InputDelivery";
+import { inject, injectable } from "inversify";
+import { IStorageContext } from "@/spi/StorageSPI";
+import { IDeliveryService } from "@/spi/DeliverySPI";
+import { hateoasRel } from "@/models/HateoasLink";
 
 @injectable()
 export default class DeliveryServices implements IDeliveryService {

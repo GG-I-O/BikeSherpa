@@ -13,13 +13,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot
      
      public required string ReportId { get; set; }
      
-     public required string[] Steps { get; set; }
+     public required string[] StepIds { get; set; }
      
      public required string[] Details { get; set; }
      
      public required string Packing { get; set; }
-     
-     public DateTimeOffset ContractDate { get; set; }
      
      public DateTimeOffset CreatedAt { get; set; }
      

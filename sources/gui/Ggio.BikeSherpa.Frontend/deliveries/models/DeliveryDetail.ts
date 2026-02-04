@@ -1,4 +1,4 @@
-import * as zod from 'zod';
+import * as zod from "zod";
 
 export default class DeliveryDetail {
     public label: string;

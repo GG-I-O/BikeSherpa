@@ -11,7 +11,7 @@ public record AddDeliveryCommand(
      string CustomerId,
      double TotalPrice,
      string ReportId,
-     string[] Steps,
+     string[] StepIds,
      string[] Details,
      string Packing
      ) : ICommand<Result<Guid>>;
@@ -24,7 +24,7 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
-          RuleFor(x => x.Steps).NotEmpty();
+          RuleFor(x => x.StepIds).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.Packing).NotEmpty();
      }
@@ -44,7 +44,7 @@ public class AddDeliveryHandler(
                command.CustomerId,
                command.TotalPrice,
                command.ReportId,
-               command.Steps,
+               command.StepIds,
                command.Details,
                command.Packing
                );
