@@ -10,7 +10,7 @@ public interface IDeliveryFactory
           string code,
           Guid customerId,
           double totalPrice,
-          string reportId,
+          Guid reportId,
           List<DeliveryStep> steps,
           string[] details,
           string packing
@@ -20,7 +20,7 @@ public interface IDeliveryFactory
 public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliveryFactory
 {
 
-     public async Task<Delivery> CreateDeliveryAsync(DeliveryStatus status, string code, Guid customerId, double totalPrice, string reportId, List<DeliveryStep> steps, string[] details, string packing)
+     public async Task<Delivery> CreateDeliveryAsync(DeliveryStatus status, string code, Guid customerId, double totalPrice, Guid reportId, List<DeliveryStep> steps, string[] details, string packing)
      {
           var delivery = new Delivery
           {

@@ -7,11 +7,12 @@ using Mediator;
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 
 public record AddDeliveryCommand(
+     DeliveryStatus Status,
      string Code,
-     string CustomerId,
+     Guid CustomerId,
      double TotalPrice,
-     string ReportId,
-     string[] StepIds,
+     Guid ReportId,
+     List<DeliveryStep> Steps,
      string[] Details,
      string Packing
      ) : ICommand<Result<Guid>>;
@@ -20,11 +21,12 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
      public AddDeliveryCommandValidator(IReadRepository<Delivery> repository)
      {
+          RuleFor(x => x.Status).NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
-          RuleFor(x => x.StepIds).NotEmpty();
+          RuleFor(x => x.Steps).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.Packing).NotEmpty();
      }
@@ -40,11 +42,12 @@ public class AddDeliveryHandler(
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           
           var delivery = await factory.CreateDeliveryAsync(
+               command.Status,
                command.Code,
                command.CustomerId,
                command.TotalPrice,
                command.ReportId,
-               command.StepIds,
+               command.Steps,
                command.Details,
                command.Packing
                );

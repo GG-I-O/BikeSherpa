@@ -10,11 +10,12 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
 public record UpdateDeliveryCommand(
      Guid Id,
+     DeliveryStatus Status,
      string Code,
-     string CustomerId,
+     Guid CustomerId,
      double TotalPrice,
-     string ReportId,
-     string[] StepIds,
+     Guid ReportId,
+     List<DeliveryStep> Steps,
      string[] Details,
      string Packing
 ) : ICommand<Result>;
@@ -28,7 +29,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
-          RuleFor(x => x.StepIds).NotEmpty();
+          RuleFor(x => x.Steps).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.Packing).NotEmpty();
      }
@@ -47,11 +48,12 @@ public class UpdateDeliveryHandler(
           if (entity is null)
                return Result.NotFound();
          
+          entity.Status = command.Status;
           entity.Code = command.Code;
           entity.CustomerId = command.CustomerId;
           entity.TotalPrice = command.TotalPrice;
           entity.ReportId = command.ReportId;
-          entity.StepIds = command.StepIds;
+          entity.Steps = command.Steps;
           entity.Details = command.Details;
           entity.Packing = command.Packing;
           await transaction.CommitAsync(cancellationToken);
