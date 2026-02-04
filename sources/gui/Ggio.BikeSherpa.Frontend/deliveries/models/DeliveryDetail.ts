@@ -14,3 +14,8 @@ export const detailSchema = zod.object({
     label: zod.string(),
     price: zod.number(),
 });
+
+export const detailSchema = zod.object({
+    label: zod.string(),
+    price: zod.number(),
+});

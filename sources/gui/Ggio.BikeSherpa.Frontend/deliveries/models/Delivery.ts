@@ -9,7 +9,13 @@ import { schemas } from "@/infra/openAPI/client";
 
 export class Delivery extends InputDelivery implements Identifiable<string> {
     // Storable
+export class Delivery extends InputDelivery implements Identifiable<string> {
+    // Storable
     public readonly id: string;
+    public createdAt?: string;
+    public updatedAt?: string;
+    public operationId?: string;
+    public links?: Link[];
     public createdAt?: string;
     public updatedAt?: string;
     public operationId?: string;
@@ -18,6 +24,13 @@ export class Delivery extends InputDelivery implements Identifiable<string> {
     public constructor(code: string, customerId: string, totalPrice: number, reportId: string, stepIds: string[] = [], details: DeliveryDetail[] = [], packing: DeliveryPacking) {
         super(code, customerId, totalPrice, reportId, stepIds, details, packing);
         this.id = Crypto.randomUUID();
+        this.links = [];
+    }
+}
+
+export type DeliveryCrud = z.infer<typeof schemas.DeliveryCrud>;
+
+export type DeliveryDto = z.infer<typeof schemas.DeliveryDto>;
         this.links = [];
     }
 }

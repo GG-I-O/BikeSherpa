@@ -1,7 +1,10 @@
 import { Address, addressSchema } from '@/models/Address';
+import { Address, addressSchema } from '@/models/Address';
 import { Identifiable } from '@/models/Identifiable';
 import * as Crypto from 'expo-crypto';
 import { StepType } from './StepType';
+import * as zod from 'zod';
+import Courier, { courierSchema } from '@/couriers/models/Courier';
 import * as zod from 'zod';
 import Courier, { courierSchema } from '@/couriers/models/Courier';
 
@@ -12,6 +15,8 @@ export class Step implements Identifiable<string> {
     public distance: number;
     public price: number;
     public contractDate: Date;
+    public estimatedDeliveryDate?: Date;
+    public realDeliveryDate?: Date;
     public estimatedDeliveryDate?: Date;
     public realDeliveryDate?: Date;
     public comment?: string;
@@ -27,6 +32,7 @@ export class Step implements Identifiable<string> {
         price: number,
         contractDate: Date,
         estimatedDeliveryDate?: Date,
+        estimatedDeliveryDate?: Date,
         comment?: string,
         courier?: Courier,
         numberToDo: number = 0,
@@ -38,6 +44,7 @@ export class Step implements Identifiable<string> {
         this.distance = distance;
         this.price = price;
         this.contractDate = contractDate;
+        this.estimatedDeliveryDate = estimatedDeliveryDate;
         this.estimatedDeliveryDate = estimatedDeliveryDate;
         this.comment = comment;
         this.courier = courier;
@@ -55,6 +62,8 @@ export class Step implements Identifiable<string> {
     }
 
     public getEstimatedTime(): string {
+        if (!this.estimatedDeliveryDate) return '';
+        return this.estimatedDeliveryDate.toLocaleTimeString();
         if (!this.estimatedDeliveryDate) return '';
         return this.estimatedDeliveryDate.toLocaleTimeString();
     }
