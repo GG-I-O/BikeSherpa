@@ -25,7 +25,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                steps.Property(s => s.Id).ValueGeneratedNever();
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();
                steps.Property(s => s.Order).IsRequired();
-               steps.Property(s => s.Address).IsRequired();
+               steps.Property(s => s.DropoffAddress).IsRequired();
                steps.Property(s => s.Price).IsRequired();
                steps.Property(s => s.Distance).IsRequired();
                steps.Property(s => s.CourierId).IsRequired();
