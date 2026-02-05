@@ -2,7 +2,7 @@ import * as zod from "zod";
 import { customerSchema } from "@/customers/models/Customer";
 import { stepSchema } from "@/steps/models/Step";
 import { detailSchema } from "@/deliveries/models/DeliveryDetail";
-import { DeliveryPacking } from "@/deliveries/models/DeliveryPacking";
+import { PackageSize } from "@/deliveries/models/PackageSize";
 
 export const deliveryFormBaseSchema = zod
     .object({
@@ -18,5 +18,5 @@ export const deliveryFormBaseSchema = zod
             .string(),
         steps: zod.array(stepSchema),
         details: zod.array(detailSchema),
-        packing: zod.nativeEnum(DeliveryPacking),
+        packing: zod.nativeEnum(PackageSize),
     });

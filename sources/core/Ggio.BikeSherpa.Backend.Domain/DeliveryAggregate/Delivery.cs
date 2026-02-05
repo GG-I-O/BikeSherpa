@@ -1,3 +1,4 @@
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.DddCore;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
@@ -5,6 +6,7 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 {
      public required DeliveryStatus Status { get; set; }
+     public required Address PickupAddress { get; set; }
      public required string Code { get; set; }
      public required Guid CustomerId { get; set; }
      public required double TotalPrice { get; set; }

@@ -1,4 +1,4 @@
-export enum DeliveryPacking {
+export enum PackageSize {
     S,
     M,
     L,
