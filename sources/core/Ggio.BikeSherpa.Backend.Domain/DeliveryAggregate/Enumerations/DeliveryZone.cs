@@ -3,19 +3,45 @@
 public sealed class DeliveryZone : Enumeration
 {
      private HashSet<string> Cities { get; }
+     public double TourPrice { get; }
      public double Price { get; }
 
-     public readonly static DeliveryZone Grenoble = new(id: 1, name: "Grenoble", cities: ["Grenoble"], price: 1);
+     public readonly static DeliveryZone Grenoble = new(
+          id: 1,
+          name: "Grenoble",
+          cities: ["Grenoble"],
+          tourPrice: 1,
+          price: 5
+          );
 
-     public readonly static DeliveryZone Limitrophe = new(id: 2, name: "Limitrophe", cities: ["Échirolles", "Eybens", "Fontaine", "La Tronche", "Poisat", "Saint-Martin-d’Hères", "Saint-Martin-le-Vinoux", "Seyssinet-Pariset", "Seyssins"], price: 2.5);
+     public readonly static DeliveryZone Border = new(
+          id: 2,
+          name: "Limitrophe",
+          cities: ["Échirolles", "Eybens", "Fontaine", "La Tronche", "Poisat", "Saint-Martin-d’Hères", "Saint-Martin-le-Vinoux", "Seyssinet-Pariset", "Seyssins"],
+          tourPrice: 2.5,
+          price: 8
+          );
 
-     public readonly static DeliveryZone Periphery = new(id: 3, name: "Périphérie", cities: [], price: 5.5);
+     public readonly static DeliveryZone Periphery = new(
+          id: 3,
+          name: "Périphérie",
+          cities: [],
+          tourPrice: 5.5,
+          price: 0 // Unavailable
+          );
 
-     public readonly static DeliveryZone Outside = new(id: 4, name: "Extérieur", cities: [], price: 11);
+     public readonly static DeliveryZone Outside = new(
+          id: 4,
+          name: "Extérieur",
+          cities: [],
+          tourPrice: 11,
+          price: 0 // Unavailable
+          );
 
-     private DeliveryZone(int id, string name, IEnumerable<string> cities, double price) : base(id, name)
+     private DeliveryZone(int id, string name, IEnumerable<string> cities, double tourPrice, double price) : base(id, name)
      {
           Cities = new HashSet<string>(cities, StringComparer.OrdinalIgnoreCase);
+          TourPrice = tourPrice;
           Price = price;
      }
 

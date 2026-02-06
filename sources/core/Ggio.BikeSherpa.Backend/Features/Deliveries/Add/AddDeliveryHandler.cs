@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using FluentValidation;
+using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.DddCore;
@@ -15,7 +16,10 @@ public record AddDeliveryCommand(
      Guid ReportId,
      List<DeliveryStep> Steps,
      string[] Details,
-     string Packing
+     Packing Packing,
+     Urgency Urgency,
+     DateTimeOffset ContractDate,
+     DateTimeOffset StartDate
      ) : ICommand<Result<Guid>>;
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
@@ -30,6 +34,9 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.Steps).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.Packing).NotEmpty();
+          RuleFor(x => x.Urgency).NotNull();
+          RuleFor(x => x.ContractDate).NotEmpty();
+          RuleFor(x => x.StartDate).NotEmpty();
      }
 }
 
@@ -50,7 +57,10 @@ public class AddDeliveryHandler(
                command.ReportId,
                command.Steps,
                command.Details,
-               command.Packing
+               command.Packing,
+               command.Urgency,
+               command.ContractDate,
+               command.StartDate
                );
           
          await transaction.CommitAsync(cancellationToken);

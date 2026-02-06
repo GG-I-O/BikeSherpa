@@ -26,12 +26,11 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();
                steps.Property(s => s.Order).IsRequired();
                steps.Property(s => s.DropoffAddress).IsRequired();
-               steps.Property(s => s.Price).IsRequired();
+               steps.Property(s => s.DropoffZone).IsRequired();
                steps.Property(s => s.Distance).IsRequired();
                steps.Property(s => s.CourierId).IsRequired();
                steps.Property(s => s.Comment).IsRequired();
                steps.Property(s => s.FilePaths).IsRequired();
-               steps.Property(s => s.ContractDate).IsRequired();
                steps.Property(s => s.EstimatedDeliveryDate).IsRequired();
                steps.Property(s => s.RealDeliveryDate).IsRequired();
                steps.ToTable("DeliverySteps");

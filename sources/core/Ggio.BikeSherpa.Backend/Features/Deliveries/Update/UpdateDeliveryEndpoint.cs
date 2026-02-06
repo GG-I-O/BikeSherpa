@@ -26,7 +26,10 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
                req.ReportId,
                req.Steps,
                req.Details,
-               req.Packing
+               req.Packing,
+               req.Urgency,
+               req.ContractDate,
+               req.StartDate
           );
 
           var result = await mediator.Send(command, ct);
