@@ -14,14 +14,17 @@ public interface IDeliveryFactory
           Guid reportId,
           List<DeliveryStep> steps,
           string[] details,
-          string packing
+          Packing packing,
+          Urgency urgency,
+          DateTimeOffset contractDate,
+          DateTimeOffset startDate
      );
 }
 
 public class DeliveryFactory(IMediator mediator, IReadRepository<Customer> customerRepository) : FactoryBase(mediator), IDeliveryFactory
 {
 
-     public async Task<Delivery> CreateDeliveryAsync(DeliveryStatus status, string code, Guid customerId, double totalPrice, Guid reportId, List<DeliveryStep> steps, string[] details, string packing)
+     public async Task<Delivery> CreateDeliveryAsync(DeliveryStatus status, string code, Guid customerId, double totalPrice, Guid reportId, List<DeliveryStep> steps, string[] details, Packing packing, Urgency urgency, DateTimeOffset contractDate, DateTimeOffset startDate)
      {
           var customer = await customerRepository.SingleOrDefaultAsync(
                new CustomerByIdSpecification(customerId));
@@ -35,13 +38,17 @@ public class DeliveryFactory(IMediator mediator, IReadRepository<Customer> custo
           {
                Status = status,
                PickupAddress = customer.Address,
+               PickupZone = DeliveryZone.FromAddress(customer.Address.City),
                Code = code,
                CustomerId = customerId,
+               Urgency = urgency,
                TotalPrice = totalPrice,
                ReportId = reportId,
+               Steps = steps,
                Details = details,
                Packing = packing,
-               Steps = steps
+               ContractDate = contractDate,
+               StartDate = startDate
           };
 
           await NotifyNewEntityAdded(delivery);
