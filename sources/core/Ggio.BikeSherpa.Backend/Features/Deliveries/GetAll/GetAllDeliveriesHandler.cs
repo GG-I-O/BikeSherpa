@@ -1,7 +1,6 @@
 using Facet.Extensions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Features.Deliveries;
 using Ggio.DddCore;
 using Mediator;
 

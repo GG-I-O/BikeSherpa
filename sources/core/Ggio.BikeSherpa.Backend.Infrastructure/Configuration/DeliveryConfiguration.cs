@@ -17,7 +17,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           builder.Property(d => d.Packing).IsRequired();
           builder.Property(d => d.Details).IsRequired();
           builder.ToTable("Deliveries");
-          
+
           builder.OwnsMany(d => d.Steps, steps =>
           {
                steps.WithOwner().HasForeignKey("DeliveryId");
@@ -25,8 +25,8 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                steps.Property(s => s.Id).ValueGeneratedNever();
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();
                steps.Property(s => s.Order).IsRequired();
-               steps.Property(s => s.DropoffAddress).IsRequired();
-               steps.Property(s => s.DropoffZone).IsRequired();
+               steps.Property(s => s.StepAddress).IsRequired();
+               steps.Property(s => s.StepZone).IsRequired();
                steps.Property(s => s.Distance).IsRequired();
                steps.Property(s => s.CourierId).IsRequired();
                steps.Property(s => s.Comment).IsRequired();

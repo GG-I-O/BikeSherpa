@@ -19,6 +19,7 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
      {
           var command = new UpdateDeliveryCommand(
                Route<Guid>("deliveryId"),
+               req.PricingStrategy,
                req.Status,
                req.Code,
                req.CustomerId,
@@ -26,6 +27,8 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
                req.ReportId,
                req.Steps,
                req.Details,
+               req.Weight,
+               req.Length,
                req.Packing,
                req.Urgency,
                req.ContractDate,

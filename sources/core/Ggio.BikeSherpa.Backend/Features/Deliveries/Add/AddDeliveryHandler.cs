@@ -9,13 +9,16 @@ using Mediator;
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 
 public record AddDeliveryCommand(
+     PricingStrategy PricingStrategy,
      DeliveryStatus Status,
      string Code,
-     Guid CustomerId,
      double TotalPrice,
+     Guid CustomerId,
      Guid ReportId,
      List<DeliveryStep> Steps,
      string[] Details,
+     double Weight,
+     int Length,
      Packing Packing,
      Urgency Urgency,
      DateTimeOffset ContractDate,
@@ -26,6 +29,7 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
      public AddDeliveryCommandValidator(IReadRepository<Delivery> repository)
      {
+          RuleFor(x => x.PricingStrategy).NotEmpty();
           RuleFor(x => x.Status).NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
@@ -33,6 +37,8 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Steps).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
+          RuleFor(x => x.Weight).NotEmpty();
+          RuleFor(x => x.Length).NotEmpty();
           RuleFor(x => x.Packing).NotEmpty();
           RuleFor(x => x.Urgency).NotNull();
           RuleFor(x => x.ContractDate).NotEmpty();
@@ -50,13 +56,16 @@ public class AddDeliveryHandler(
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           
           var delivery = await factory.CreateDeliveryAsync(
+               command.PricingStrategy,
                command.Status,
                command.Code,
-               command.CustomerId,
                command.TotalPrice,
+               command.CustomerId,
                command.ReportId,
                command.Steps,
                command.Details,
+               command.Weight,
+               command.Length,
                command.Packing,
                command.Urgency,
                command.ContractDate,

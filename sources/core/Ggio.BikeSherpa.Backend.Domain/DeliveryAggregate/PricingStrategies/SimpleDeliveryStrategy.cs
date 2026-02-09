@@ -2,7 +2,7 @@
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
-public class SimpleDeliveryStrategy
+public class SimpleDeliveryStrategy : IPricingStrategy
 {
      private readonly double _stepPriceInGrenoble;
      private readonly double _stepPriceInBorder;
@@ -16,7 +16,7 @@ public class SimpleDeliveryStrategy
           _stepPriceInPeriphery = DeliveryZone.Periphery.Price;
           _stepPriceOutside = DeliveryZone.Outside.Price;
      }
-     
+
      public double CalculatePrice(Delivery delivery)
      {
           int stepsInGrenoble = 0;
@@ -29,10 +29,10 @@ public class SimpleDeliveryStrategy
           {
                totalDistance += step.Distance;
           }
-          
+
           foreach (DeliveryStep step in delivery.Steps)
           {
-               switch (step.DropoffZone.Name)
+               switch (step.StepZone.Name)
                {
                     case "Grenoble":
                          stepsInGrenoble++;
@@ -48,18 +48,20 @@ public class SimpleDeliveryStrategy
                          break;
                }
           }
-          
+
           return stepsInGrenoble * _stepPriceInGrenoble +
                  stepsInBorder * _stepPriceInBorder +
                  stepsInPeriphery * _stepPriceInPeriphery +
                  stepsOutside * _stepPriceOutside +
                  delivery.Packing.Size.Price +
-                 delivery.Urgency.CalculatePrice(totalDistance);
+                 delivery.Urgency.CalculatePrice(totalDistance) +
+                 CalculateOverweightPrice(delivery);
      }
 
-     public int CaclulateOverweightPrice(Delivery delivery)
+     private double CalculateOverweightPrice(Delivery delivery)
      {
-          int overweightPrice = 0; // TODO
+          double overweightPrice = 0;
+          overweightPrice = Math.Ceiling((delivery.Weight - 30) / 10) * 2;
           return overweightPrice;
      }
 }
