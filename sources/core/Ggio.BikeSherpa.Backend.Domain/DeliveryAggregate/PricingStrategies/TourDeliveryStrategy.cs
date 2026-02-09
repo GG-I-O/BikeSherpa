@@ -1,5 +1,4 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
@@ -27,7 +26,7 @@ public class TourDeliveryStrategy : IPricingStrategy
           int dropoffsInBorder = 0;
           int dropoffsInPeriphery = 0;
           int dropoffsOutside = 0;
-          
+
           foreach (DeliveryStep step in delivery.Steps)
           {
                switch (step.StepType.Name)
@@ -35,21 +34,21 @@ public class TourDeliveryStrategy : IPricingStrategy
                     case "Collecte":
                          pickups++;
                          break;
-                    case "Dépôt" when step.DropoffZone.Name == "Grenoble":
+                    case "Dépôt" when step.StepZone.Name == "Grenoble":
                          dropoffsInGrenoble++;
                          break;
-                    case "Dépôt" when step.DropoffZone.Name == "Limitrophe":
+                    case "Dépôt" when step.StepZone.Name == "Limitrophe":
                          dropoffsInBorder++;
                          break;
-                    case "Dépôt" when step.DropoffZone.Name == "Périphérie":
+                    case "Dépôt" when step.StepZone.Name == "Périphérie":
                          dropoffsInPeriphery++;
                          break;
-                    case "Dépôt" when step.DropoffZone.Name == "Extérieur":
+                    case "Dépôt" when step.StepZone.Name == "Extérieur":
                          dropoffsOutside++;
                          break;
                }
           }
-          
+
           return pickups * _pickupBasePrice +
                  CalculateDelayPrice(delivery) +
                  delivery.Packing.Size.TourPrice +
@@ -58,7 +57,7 @@ public class TourDeliveryStrategy : IPricingStrategy
                  dropoffsInPeriphery * _stepPriceInPeriphery +
                  dropoffsOutside * _stepPriceOutside;
      }
-     
+
      private double CalculateDelayPrice(Delivery delivery)
      {
           return delivery.StartDate.Date == delivery.ContractDate.Date ? 2 : 0;
