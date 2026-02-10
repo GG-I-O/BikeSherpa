@@ -1,4 +1,5 @@
-﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
@@ -61,5 +62,27 @@ public class TourDeliveryStrategy : IPricingStrategy
      private double CalculateDelayPrice(Delivery delivery)
      {
           return delivery.StartDate.Date == delivery.ContractDate.Date ? 2 : 0;
+     }
+     
+     public List<DeliveryStep> AddDeliverySteps(Delivery delivery, Customer customer)
+     {
+          double pickupNumber = Math.Ceiling(delivery.Weight / 40);
+          List<DeliveryStep> pickupSteps = [];
+
+          for (int i = 0; i < pickupNumber; i++)
+          {
+               DeliveryStep step = new(
+                    StepType.Pickup,
+                    i+1,
+                    customer!.Address,
+                    0,
+                    delivery.StartDate
+               );
+          
+               pickupSteps.Add(step);
+
+          }
+          
+          return pickupSteps;
      }
 }

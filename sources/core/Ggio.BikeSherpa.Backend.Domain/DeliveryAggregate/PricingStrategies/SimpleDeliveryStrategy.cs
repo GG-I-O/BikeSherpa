@@ -1,4 +1,5 @@
-﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
@@ -63,5 +64,28 @@ public class SimpleDeliveryStrategy : IPricingStrategy
           double overweightPrice = 0;
           overweightPrice = Math.Ceiling((delivery.Weight - 30) / 10) * 2;
           return overweightPrice;
+     }
+     
+     public List<DeliveryStep> AddDeliverySteps(Delivery delivery, Customer customer)
+     {
+          double pickupNumber = Math.Ceiling(delivery.Weight / 60);
+
+          List<DeliveryStep> pickupSteps = [];
+
+          for (int i = 0; i < pickupNumber; i++)
+          {
+               DeliveryStep step = new(
+                    StepType.Pickup,
+                    i+1,
+                    customer!.Address,
+                    0,
+                    delivery.StartDate
+               );
+          
+               pickupSteps.Add(step);
+
+          }
+          
+          return pickupSteps;
      }
 }

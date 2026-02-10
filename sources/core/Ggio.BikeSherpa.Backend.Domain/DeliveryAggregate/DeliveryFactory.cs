@@ -10,15 +10,15 @@ public interface IDeliveryFactory
           PricingStrategy pricingStrategy,
           DeliveryStatus status,
           string code,
-          double? totalPrice,
           Guid customerId,
+          Urgency urgency,
+          double? totalPrice,
           Guid reportId,
           List<DeliveryStep> steps,
           string[] details,
           double weight,
           int length,
           Packing packing,
-          Urgency urgency,
           DateTimeOffset contractDate,
           DateTimeOffset startDate
      );
@@ -26,7 +26,7 @@ public interface IDeliveryFactory
 
 public class DeliveryFactory(IMediator mediator, IReadRepository<Customer> customerRepository) : FactoryBase(mediator), IDeliveryFactory
 {
-     public async Task<Delivery> CreateDeliveryAsync(PricingStrategy pricingStrategy, DeliveryStatus status, string code, double? totalPrice, Guid customerId, Guid reportId, List<DeliveryStep> steps, string[] details, double weight, int length, Packing packing, Urgency urgency, DateTimeOffset contractDate, DateTimeOffset startDate)
+     public async Task<Delivery> CreateDeliveryAsync(PricingStrategy pricingStrategy, DeliveryStatus status, string code, Guid customerId, Urgency urgency, double? totalPrice, Guid reportId, List<DeliveryStep> steps, string[] details, double weight, int length, Packing packing, DateTimeOffset contractDate, DateTimeOffset startDate)
      {
           var customer = await customerRepository.SingleOrDefaultAsync(
                new CustomerByIdSpecification(customerId));
@@ -40,9 +40,9 @@ public class DeliveryFactory(IMediator mediator, IReadRepository<Customer> custo
           {
                PricingStrategy = pricingStrategy,
                Status = status,
+               Code = code,
                PickupAddress = customer.Address,
                PickupZone = DeliveryZone.FromAddress(customer.Address.City),
-               Code = code,
                CustomerId = customerId,
                Urgency = urgency,
                TotalPrice = totalPrice ?? 0,
@@ -55,22 +55,23 @@ public class DeliveryFactory(IMediator mediator, IReadRepository<Customer> custo
                ContractDate = contractDate,
                StartDate = startDate
           };
-          
+
+          delivery.Steps = ChoosePricingStrategy(pricingStrategy).AddDeliverySteps(delivery, customer);
           delivery.TotalPrice = ChoosePricingStrategy(pricingStrategy).CalculatePrice(delivery);
 
           await NotifyNewEntityAdded(delivery);
 
           return delivery;
      }
-     
+
      private IPricingStrategy ChoosePricingStrategy(PricingStrategy pricingStrategy)
      {
           if (pricingStrategy == PricingStrategy.CustomStrategy)
                return new CustomStrategy();
-          
+
           if (pricingStrategy == PricingStrategy.SimpleDeliveryStrategy)
                return new SimpleDeliveryStrategy();
-          
+
           if (pricingStrategy == PricingStrategy.TourDeliveryStrategy)
                return new TourDeliveryStrategy();
 

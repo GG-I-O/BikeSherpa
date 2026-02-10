@@ -7,9 +7,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 {
      public required PricingStrategy PricingStrategy { get; set; }
      public required DeliveryStatus Status { get; set; }
+     public required string Code { get; set; }
      public Address? PickupAddress { get; set; }
      public DeliveryZone? PickupZone { get; set; }
-     public required string Code { get; set; }
      public required Guid CustomerId { get; set; }
      public required Urgency Urgency { get; set; }
      public required double TotalPrice { get; set; }
