@@ -15,6 +15,7 @@ public record UpdateDeliveryCommand(
      DeliveryStatus Status,
      string Code,
      Guid CustomerId,
+     Urgency Urgency,
      double TotalPrice,
      Guid ReportId,
      List<DeliveryStep> Steps,
@@ -22,7 +23,6 @@ public record UpdateDeliveryCommand(
      double Weight,
      int Length,
      Packing Packing,
-     Urgency Urgency,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
 ) : ICommand<Result>;
@@ -36,6 +36,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
           RuleFor(x => x.Status).NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
+          RuleFor(x => x.Urgency).NotNull();
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Steps).NotEmpty();
@@ -43,7 +44,6 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
           RuleFor(x => x.Weight).NotEmpty();
           RuleFor(x => x.Length).NotEmpty();
           RuleFor(x => x.Packing).NotEmpty();
-          RuleFor(x => x.Urgency).NotNull();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -66,6 +66,7 @@ public class UpdateDeliveryHandler(
           entity.Status = command.Status;
           entity.Code = command.Code;
           entity.CustomerId = command.CustomerId;
+          entity.Urgency = command.Urgency;
           entity.TotalPrice = command.TotalPrice;
           entity.ReportId = command.ReportId;
           entity.Steps = command.Steps;
@@ -73,7 +74,6 @@ public class UpdateDeliveryHandler(
           entity.Weight = command.Weight;
           entity.Length = command.Length;
           entity.Packing = command.Packing;
-          entity.Urgency = command.Urgency;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
           await transaction.CommitAsync(cancellationToken);

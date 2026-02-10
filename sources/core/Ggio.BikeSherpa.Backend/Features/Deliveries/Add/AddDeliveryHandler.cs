@@ -12,15 +12,15 @@ public record AddDeliveryCommand(
      PricingStrategy PricingStrategy,
      DeliveryStatus Status,
      string Code,
-     double TotalPrice,
      Guid CustomerId,
+     Urgency Urgency,
+     double TotalPrice,
      Guid ReportId,
      List<DeliveryStep> Steps,
      string[] Details,
      double Weight,
      int Length,
      Packing Packing,
-     Urgency Urgency,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
      ) : ICommand<Result<Guid>>;
@@ -33,6 +33,7 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.Status).NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
+          RuleFor(x => x.Urgency).NotNull();
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Steps).NotEmpty();
@@ -40,7 +41,6 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.Weight).NotEmpty();
           RuleFor(x => x.Length).NotEmpty();
           RuleFor(x => x.Packing).NotEmpty();
-          RuleFor(x => x.Urgency).NotNull();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -59,15 +59,15 @@ public class AddDeliveryHandler(
                command.PricingStrategy,
                command.Status,
                command.Code,
-               command.TotalPrice,
                command.CustomerId,
+               command.Urgency,
+               command.TotalPrice,
                command.ReportId,
                command.Steps,
                command.Details,
                command.Weight,
                command.Length,
                command.Packing,
-               command.Urgency,
                command.ContractDate,
                command.StartDate
                );

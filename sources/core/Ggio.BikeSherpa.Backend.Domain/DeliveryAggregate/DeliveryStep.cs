@@ -5,22 +5,22 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
 public class DeliveryStep : EntityBase<Guid>, IAuditEntity
 {
-     public required StepType StepType { get; set; }
-     public required int Order { get; set; }
-     public required Address StepAddress { get; set; }
-     public required DeliveryZone StepZone { get; set; }
-     public required double Distance { get; set; }
+     public StepType StepType { get; set; }
+     public int Order { get; set; }
+     public Address StepAddress { get; set; }
+     public DeliveryZone StepZone { get; set; }
+     public double Distance { get; set; }
      public Guid? CourierId { get; set; }
      public string? Comment { get; set; }
      public string[]? FilePaths { get; set; }
-     public required DateTimeOffset EstimatedDeliveryDate { get; set; }
+     public DateTimeOffset EstimatedDeliveryDate { get; set; }
      public DateTimeOffset? RealDeliveryDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
 
      private DeliveryStep() { }
 
-     public DeliveryStep(StepType stepType, int order, Address stepAddress, double distance, Urgency urgency, double price, DateTimeOffset contractDate, DateTimeOffset estimatedDeliveryDate)
+     public DeliveryStep(StepType stepType, int order, Address stepAddress, double distance, DateTimeOffset estimatedDeliveryDate)
      {
           StepType = stepType;
           Order = order;

@@ -2,8 +2,8 @@
 
 public sealed class StepType : Enumeration
 {
-     private readonly static StepType Pickup = new(1, "Collecte");
-     private readonly static StepType Dropoff = new(2, "Dépôt");
+     public readonly static StepType Pickup = new(1, "Collecte");
+     public readonly static StepType Dropoff = new(2, "Dépôt");
 
      private StepType(int id, string name) : base(id, name) { }
 

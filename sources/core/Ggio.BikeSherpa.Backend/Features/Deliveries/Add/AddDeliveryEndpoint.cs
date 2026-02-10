@@ -22,15 +22,15 @@ public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, Ad
                req.PricingStrategy,
                req.Status,
                req.Code,
-               req.TotalPrice,
                req.CustomerId,
+               req.Urgency,
+               req.TotalPrice,
                req.ReportId,
                req.Steps,
                req.Details,
                req.Weight,
                req.Length,
                req.Packing,
-               req.Urgency,
                req.ContractDate,
                req.StartDate
                );
