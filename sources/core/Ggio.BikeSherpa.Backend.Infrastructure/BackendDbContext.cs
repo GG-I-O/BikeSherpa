@@ -8,6 +8,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure;
 public class BackendDbContext(DbContextOptions<BackendDbContext> options) : DbContext(options)
 {
      public virtual DbSet<Delivery> Deliveries { get; set; }
+     public virtual DbSet<Delivery> Deliveries { get; set; }
      public virtual DbSet<Customer> Customers { get; set; }
      public virtual DbSet<Courier> Couriers { get; set; }
 
