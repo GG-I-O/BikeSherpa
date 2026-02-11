@@ -1,7 +1,7 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
-
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
+
 
 public class SimpleDeliveryStrategy : IPricingStrategy
 {
@@ -12,10 +12,10 @@ public class SimpleDeliveryStrategy : IPricingStrategy
 
      public SimpleDeliveryStrategy()
      {
-          _stepPriceInGrenoble = DeliveryZone.Grenoble.Price;
-          _stepPriceInBorder = DeliveryZone.Border.Price;
-          _stepPriceInPeriphery = DeliveryZone.Periphery.Price;
-          _stepPriceOutside = DeliveryZone.Outside.Price;
+          _stepPriceInGrenoble = DeliveryZoneEnum.Grenoble.Price;
+          _stepPriceInBorder = DeliveryZoneEnum.Border.Price;
+          _stepPriceInPeriphery = DeliveryZoneEnum.Periphery.Price;
+          _stepPriceOutside = DeliveryZoneEnum.Outside.Price;
      }
 
      public double CalculatePrice(Delivery delivery)
@@ -54,28 +54,27 @@ public class SimpleDeliveryStrategy : IPricingStrategy
                  stepsInBorder * _stepPriceInBorder +
                  stepsInPeriphery * _stepPriceInPeriphery +
                  stepsOutside * _stepPriceOutside +
-                 delivery.Packing.Size.Price +
+                 delivery.Size.Price +
                  delivery.Urgency.CalculatePrice(totalDistance) +
                  CalculateOverweightPrice(delivery);
      }
 
      private double CalculateOverweightPrice(Delivery delivery)
      {
-          double overweightPrice = 0;
-          overweightPrice = Math.Ceiling((delivery.Weight - 30) / 10) * 2;
+          var overweightPrice = Math.Ceiling((delivery.TotalWeight - 30) / 10) * 2;
           return overweightPrice;
      }
      
      public List<DeliveryStep> AddDeliverySteps(Delivery delivery, Customer customer)
      {
-          double pickupNumber = Math.Ceiling(delivery.Weight / 60);
+          double pickupNumber = Math.Ceiling(delivery.TotalWeight / 60);
 
           List<DeliveryStep> pickupSteps = [];
 
           for (int i = 0; i < pickupNumber; i++)
           {
                DeliveryStep step = new(
-                    StepType.Pickup,
+                    StepTypeEnum.Pickup,
                     i+1,
                     customer!.Address,
                     0,

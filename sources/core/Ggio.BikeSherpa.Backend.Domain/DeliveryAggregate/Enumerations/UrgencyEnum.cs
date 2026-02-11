@@ -1,14 +1,14 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 
-public sealed class Urgency : Enumeration
+public sealed class UrgencyEnum : Enumeration
 {
      public double PriceCoefficient { get; }
 
-     private readonly static Urgency Eco = new(1, "Eco", 0.75);
-     private readonly static Urgency Standard = new(2, "Standard", 1.25);
-     private readonly static Urgency Urgent = new(3, "Urgent", 2);
+     private readonly static UrgencyEnum Eco = new(1, "Eco", 0.75);
+     private readonly static UrgencyEnum Standard = new(2, "Standard", 1.25);
+     private readonly static UrgencyEnum Urgent = new(3, "Urgent", 2);
 
-     private Urgency(int id, string name, double priceCoefficient) : base(id, name)
+     private UrgencyEnum(int id, string name, double priceCoefficient) : base(id, name)
      {
           PriceCoefficient = priceCoefficient;
      }

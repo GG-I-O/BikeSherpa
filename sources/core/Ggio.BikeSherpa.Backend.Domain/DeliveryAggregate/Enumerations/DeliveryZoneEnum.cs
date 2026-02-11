@@ -1,12 +1,12 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 
-public sealed class DeliveryZone : Enumeration
+public sealed class DeliveryZoneEnum : Enumeration
 {
      private HashSet<string> Cities { get; }
      public double TourPrice { get; }
      public double Price { get; }
 
-     public readonly static DeliveryZone Grenoble = new(
+     public readonly static DeliveryZoneEnum Grenoble = new(
           id: 1,
           name: "Grenoble",
           cities: ["Grenoble"],
@@ -14,7 +14,7 @@ public sealed class DeliveryZone : Enumeration
           price: 5
           );
 
-     public readonly static DeliveryZone Border = new(
+     public readonly static DeliveryZoneEnum Border = new(
           id: 2,
           name: "Limitrophe",
           cities: ["Échirolles", "Eybens", "Fontaine", "La Tronche", "Poisat", "Saint-Martin-d’Hères", "Saint-Martin-le-Vinoux", "Seyssinet-Pariset", "Seyssins"],
@@ -22,7 +22,7 @@ public sealed class DeliveryZone : Enumeration
           price: 8
           );
 
-     public readonly static DeliveryZone Periphery = new(
+     public readonly static DeliveryZoneEnum Periphery = new(
           id: 3,
           name: "Périphérie",
           cities: [],
@@ -30,7 +30,7 @@ public sealed class DeliveryZone : Enumeration
           price: 0 // Unavailable
           );
 
-     public readonly static DeliveryZone Outside = new(
+     public readonly static DeliveryZoneEnum Outside = new(
           id: 4,
           name: "Extérieur",
           cities: [],
@@ -38,7 +38,7 @@ public sealed class DeliveryZone : Enumeration
           price: 0 // Unavailable
           );
 
-     private DeliveryZone(int id, string name, IEnumerable<string> cities, double tourPrice, double price) : base(id, name)
+     private DeliveryZoneEnum(int id, string name, IEnumerable<string> cities, double tourPrice, double price) : base(id, name)
      {
           Cities = new HashSet<string>(cities, StringComparer.OrdinalIgnoreCase);
           TourPrice = tourPrice;
@@ -50,9 +50,9 @@ public sealed class DeliveryZone : Enumeration
           return !string.IsNullOrWhiteSpace(city) && Cities.Contains(city);
      }
 
-     public static DeliveryZone FromAddress(string city)
+     public static DeliveryZoneEnum FromAddress(string city)
      {
-          return GetAll<DeliveryZone>()
+          return GetAll<DeliveryZoneEnum>()
                       .FirstOrDefault(zone => zone.Matches(city))
                  ?? throw new Exception("L’adresse ne se trouve pas dans les zones couvertes.");
      }

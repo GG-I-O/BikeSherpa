@@ -17,13 +17,13 @@ public class CustomStrategy : IPricingStrategy
 
      public List<DeliveryStep> AddDeliverySteps(Delivery delivery, Customer customer)
      {
-          double pickupNumber = Math.Ceiling(delivery.Weight / 30);
+          double pickupNumber = Math.Ceiling(delivery.TotalWeight / 30);
           List<DeliveryStep> pickupSteps = [];
 
           for (int i = 0; i < pickupNumber; i++)
           {
                DeliveryStep step = new(
-                    StepType.Pickup,
+                    StepTypeEnum.Pickup,
                     i+1,
                     customer!.Address,
                     0,
