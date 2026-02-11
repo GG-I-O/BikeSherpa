@@ -41,7 +41,7 @@ export default class AddressService implements IAddressService {
 
     public async fetchAddress(text: string): Promise<Address[] | null> {
         try {
-            const response = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${text}&limit=5`);
+            const response = await fetch(`https://data.geopf.fr/geocodage/search/?q=${text}&limit=5`);
             if (response.status !== 200) {
                 this.logger.error("Aucune adresse trouvée");
                 return null;

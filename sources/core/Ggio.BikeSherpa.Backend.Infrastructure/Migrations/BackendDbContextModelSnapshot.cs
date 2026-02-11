@@ -22,6 +22,43 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Couriers");
+                });
+
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CourseAggregate.Course", b =>
                 {
                     b.Property<Guid>("Id")
@@ -75,6 +112,44 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier", b =>
+                {
+                    b.OwnsOne("Ggio.BikeSherpa.Backend.Domain.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("CourierId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Complement")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Postcode")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("StreetInfo")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("CourierId");
+
+                            b1.ToTable("Couriers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CourierId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer", b =>
                 {
                     b.OwnsOne("Ggio.BikeSherpa.Backend.Domain.Address", "Address", b1 =>
@@ -82,22 +157,22 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             b1.Property<Guid>("CustomerId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<string>("city")
+                            b1.Property<string>("City")
                                 .IsRequired()
                                 .HasColumnType("text");
 
-                            b1.Property<string>("complement")
+                            b1.Property<string>("Complement")
                                 .HasColumnType("text");
 
-                            b1.Property<string>("name")
+                            b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasColumnType("text");
 
-                            b1.Property<string>("postcode")
+                            b1.Property<string>("Postcode")
                                 .IsRequired()
                                 .HasColumnType("text");
 
-                            b1.Property<string>("streetInfo")
+                            b1.Property<string>("StreetInfo")
                                 .IsRequired()
                                 .HasColumnType("text");
 

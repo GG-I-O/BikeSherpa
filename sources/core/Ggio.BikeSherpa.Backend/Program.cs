@@ -7,6 +7,7 @@ using Ggio.DddCore.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
+using Ggio.BikeSherpa.Backend.Features.Couriers;
 using Ggio.BikeSherpa.Backend.Features.Courses.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Infrastructure;
@@ -18,6 +19,7 @@ using Ggio.DddCore.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using NJsonSchema.Generation;
 using Serilog;
 using Serilog.Sinks.Grafana.Loki;
 
@@ -33,6 +35,8 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                {
                     settings.Title = "Bike Sherpa API";
                     settings.Version = "v1";
+                    settings.SchemaSettings.DefaultReferenceTypeNullHandling = ReferenceTypeNullHandling.NotNull;
+                    settings.SchemaSettings.GenerateXmlObjects = true;
                };
 
                options.ShortSchemaNames = true;
@@ -46,6 +50,7 @@ builder.Services.AddBackendInfrastructure(builder.Configuration);
 // Injection
 builder.Services.ConfigureCourseFeature();
 builder.Services.ConfigureCustomerFeature();
+builder.Services.ConfigureCourierFeature();
 builder.Services.AddBackendDomain();
 
 // Notification
@@ -86,6 +91,8 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
      {
           options.AddPolicy("read:customers", policy => policy.RequireClaim("scope", "read:customers"));
           options.AddPolicy("write:customers", policy => policy.RequireClaim("scope", "write:customers"));
+          options.AddPolicy("read:couriers", policy => policy.RequireClaim("scope", "read:couriers"));
+          options.AddPolicy("write:couriers", policy => policy.RequireClaim("scope", "write:couriers"));
      });
 
      builder.Services.AddAuth0ApiAuthentication(options =>
