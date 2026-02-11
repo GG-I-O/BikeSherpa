@@ -19,18 +19,15 @@ public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, Ad
      public override async Task HandleAsync(DeliveryCrud req, CancellationToken ct)
      {
           var command = new AddDeliveryCommand(
-               req.PricingStrategy,
-               req.Status,
+               req.PricingStrategyEnum,
+               req.StatusEnum,
                req.Code,
                req.CustomerId,
-               req.Urgency,
                req.TotalPrice,
                req.ReportId,
-               req.Steps,
                req.Details,
-               req.Weight,
-               req.Length,
-               req.Packing,
+               req.TotalWeight,
+               req.HighestLength,
                req.ContractDate,
                req.StartDate
                );

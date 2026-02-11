@@ -14,10 +14,10 @@ public class TourDeliveryStrategy : IPricingStrategy
      public TourDeliveryStrategy()
      {
           _pickupBasePrice = 14;
-          _stepPriceInGrenoble = DeliveryZone.Grenoble.TourPrice;
-          _stepPriceInBorder = DeliveryZone.Border.TourPrice;
-          _stepPriceInPeriphery = DeliveryZone.Periphery.TourPrice;
-          _stepPriceOutside = DeliveryZone.Outside.TourPrice;
+          _stepPriceInGrenoble = DeliveryZoneEnum.Grenoble.TourPrice;
+          _stepPriceInBorder = DeliveryZoneEnum.Border.TourPrice;
+          _stepPriceInPeriphery = DeliveryZoneEnum.Periphery.TourPrice;
+          _stepPriceOutside = DeliveryZoneEnum.Outside.TourPrice;
      }
 
      public double CalculatePrice(Delivery delivery)
@@ -30,7 +30,7 @@ public class TourDeliveryStrategy : IPricingStrategy
 
           foreach (DeliveryStep step in delivery.Steps)
           {
-               switch (step.StepType.Name)
+               switch (step.StepTypeEnum.Name)
                {
                     case "Collecte":
                          pickups++;
@@ -52,7 +52,7 @@ public class TourDeliveryStrategy : IPricingStrategy
 
           return pickups * _pickupBasePrice +
                  CalculateDelayPrice(delivery) +
-                 delivery.Packing.Size.TourPrice +
+                 delivery.Size.TourPrice +
                  dropoffsInGrenoble * _stepPriceInGrenoble +
                  dropoffsInBorder * _stepPriceInBorder +
                  dropoffsInPeriphery * _stepPriceInPeriphery +
@@ -66,13 +66,13 @@ public class TourDeliveryStrategy : IPricingStrategy
      
      public List<DeliveryStep> AddDeliverySteps(Delivery delivery, Customer customer)
      {
-          double pickupNumber = Math.Ceiling(delivery.Weight / 40);
+          double pickupNumber = Math.Ceiling(delivery.TotalWeight / 40);
           List<DeliveryStep> pickupSteps = [];
 
           for (int i = 0; i < pickupNumber; i++)
           {
                DeliveryStep step = new(
-                    StepType.Pickup,
+                    StepTypeEnum.Pickup,
                     i+1,
                     customer!.Address,
                     0,

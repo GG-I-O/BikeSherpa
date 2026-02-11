@@ -1,6 +1,6 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 
-public sealed class PackingSize : Enumeration
+public sealed class PackingSizeEnum : Enumeration
 {
      private int MaxWeight { get; }
      private int TourMaxLength { get; }
@@ -8,7 +8,7 @@ public sealed class PackingSize : Enumeration
      public int TourPrice { get; }
      public int Price { get; }
 
-     private readonly static PackingSize S = new(
+     private readonly static PackingSizeEnum S = new(
           1,
           "S",
           3,
@@ -17,7 +17,7 @@ public sealed class PackingSize : Enumeration
           0,
           3
           );
-     private readonly static PackingSize M = new(
+     private readonly static PackingSizeEnum M = new(
           2,
           "M",
           10,
@@ -26,7 +26,7 @@ public sealed class PackingSize : Enumeration
           2,
           5
           );
-     private readonly static PackingSize L = new(
+     private readonly static PackingSizeEnum L = new(
           3,
           "L",
           20,
@@ -35,7 +35,7 @@ public sealed class PackingSize : Enumeration
           4,
           7
           );
-     private readonly static PackingSize Xl = new(
+     private readonly static PackingSizeEnum Xl = new(
           4,
           "XL",
           30,
@@ -44,7 +44,7 @@ public sealed class PackingSize : Enumeration
           6,
           9
           );
-     private readonly static PackingSize Xxl = new(
+     private readonly static PackingSizeEnum Xxl = new(
           5,
           "XXL",
           40,
@@ -54,7 +54,7 @@ public sealed class PackingSize : Enumeration
           11
           );
 
-     private PackingSize(int id, string name, int maxWeight, int tourMaxLength, int maxLength, int tourPrice, int price) : base(id, name)
+     private PackingSizeEnum(int id, string name, int maxWeight, int tourMaxLength, int maxLength, int tourPrice, int price) : base(id, name)
      {
           MaxWeight = maxWeight;
           TourMaxLength = tourMaxLength;
@@ -63,9 +63,10 @@ public sealed class PackingSize : Enumeration
           Price = price;
      }
 
-     public static PackingSize? FromMeasurements(double weight, int length)
+     public static PackingSizeEnum FromMeasurements(double weight, int length)
      {
-          return GetAll<PackingSize>()
+          var size = GetAll<PackingSizeEnum>()
                .FirstOrDefault(size => weight <= size.MaxWeight && length <= size.MaxLength);
+          return size ?? PackingSizeEnum.Xxl;
      }
 }

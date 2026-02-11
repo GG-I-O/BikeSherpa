@@ -11,18 +11,18 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
 public record UpdateDeliveryCommand(
      Guid Id,
-     PricingStrategy PricingStrategy,
-     DeliveryStatus Status,
+     PricingStrategyEnum PricingStrategyEnum,
+     DeliveryStatusEnum StatusEnum,
      string Code,
      Guid CustomerId,
-     Urgency Urgency,
+     UrgencyEnum UrgencyEnum,
      double TotalPrice,
      Guid ReportId,
      List<DeliveryStep> Steps,
      string[] Details,
      double Weight,
      int Length,
-     Packing Packing,
+     PackingSizeEnum SizeEnum,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
 ) : ICommand<Result>;
@@ -32,18 +32,18 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
      public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository)
      {
           RuleFor(x => x.Id).NotEmpty();
-          RuleFor(x => x.PricingStrategy).NotEmpty();
-          RuleFor(x => x.Status).NotEmpty();
+          RuleFor(x => x.PricingStrategyEnum).NotEmpty();
+          RuleFor(x => x.StatusEnum).NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
-          RuleFor(x => x.Urgency).NotNull();
+          RuleFor(x => x.UrgencyEnum).NotNull();
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Steps).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.Weight).NotEmpty();
           RuleFor(x => x.Length).NotEmpty();
-          RuleFor(x => x.Packing).NotEmpty();
+          RuleFor(x => x.SizeEnum).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -62,18 +62,18 @@ public class UpdateDeliveryHandler(
           if (entity is null)
                return Result.NotFound();
          
-          entity.PricingStrategy = command.PricingStrategy;
-          entity.Status = command.Status;
+          entity.PricingStrategyEnum = command.PricingStrategyEnum;
+          entity.StatusEnum = command.StatusEnum;
           entity.Code = command.Code;
           entity.CustomerId = command.CustomerId;
-          entity.Urgency = command.Urgency;
+          entity.Urgency = command.UrgencyEnum;
           entity.TotalPrice = command.TotalPrice;
           entity.ReportId = command.ReportId;
           entity.Steps = command.Steps;
           entity.Details = command.Details;
-          entity.Weight = command.Weight;
-          entity.Length = command.Length;
-          entity.Packing = command.Packing;
+          entity.TotalWeight = command.Weight;
+          entity.HighestLength = command.Length;
+          entity.Size = command.SizeEnum;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
           await transaction.CommitAsync(cancellationToken);

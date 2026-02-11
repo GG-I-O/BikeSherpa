@@ -1,15 +1,15 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 
-public sealed class DeliveryStatus : Enumeration
+public sealed class DeliveryStatusEnum : Enumeration
 {
-     private readonly static DeliveryStatus Pending = new(1, "En attente");
-     private readonly static DeliveryStatus Started = new(2, "Commencée");
-     private readonly static DeliveryStatus Completed = new(3, "Terminée");
-     private readonly static DeliveryStatus Canceled = new(4, "Annulée");
+     private readonly static DeliveryStatusEnum Pending = new(1, "En attente");
+     private readonly static DeliveryStatusEnum Started = new(2, "Commencée");
+     private readonly static DeliveryStatusEnum Completed = new(3, "Terminée");
+     private readonly static DeliveryStatusEnum Canceled = new(4, "Annulée");
 
-     private DeliveryStatus(int id, string name) : base(id, name) { }
+     private DeliveryStatusEnum(int id, string name) : base(id, name) { }
 
-     public bool CanTransitionTo(DeliveryStatus next)
+     public bool CanTransitionTo(DeliveryStatusEnum next)
      {
           return (this, next) switch
           {
