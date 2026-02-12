@@ -1,8 +1,8 @@
 using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Services.Catalogs;
 using Ggio.DddCore;
 using Mediator;
 
@@ -17,7 +17,8 @@ public record AddDeliveryCommand(
      Guid ReportId,
      string[] Details,
      double TotalWeight,
-     int HighestLength,
+     int HighestPackageLength,
+     PackingSize Size,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
      ) : ICommand<Result<Guid>>;
@@ -34,7 +35,8 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.TotalWeight).NotEmpty();
-          RuleFor(x => x.HighestLength).NotEmpty();
+          RuleFor(x => x.HighestPackageLength).NotEmpty();
+          RuleFor(x => x.Size).NotNull();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -43,12 +45,14 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 public class AddDeliveryHandler(
      IDeliveryFactory factory,
      IValidator<AddDeliveryCommand> validator,
-     IApplicationTransaction transaction) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
+     IApplicationTransaction transaction, IPackingSizeCatalog packingSizes) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {
+          PackingSize size = packingSizes.FromMeasurements(command.TotalWeight, command.HighestPackageLength);
+
           await validator.ValidateAndThrowAsync(command, cancellationToken);
-          
+
           var delivery = await factory.CreateDeliveryAsync(
                command.PricingStrategyEnum,
                command.StatusEnum,
@@ -58,12 +62,13 @@ public class AddDeliveryHandler(
                command.ReportId,
                command.Details,
                command.TotalWeight,
-               command.HighestLength,
+               command.HighestPackageLength,
+               command.Size,
                command.ContractDate,
                command.StartDate
                );
-          
-         await transaction.CommitAsync(cancellationToken);
+
+          await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(delivery.Id);
      }
 }

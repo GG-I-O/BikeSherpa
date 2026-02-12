@@ -11,14 +11,14 @@ public class TourDeliveryStrategy : IPricingStrategy
      private readonly double _stepPriceInPeriphery;
      private readonly double _stepPriceOutside;
 
-     public TourDeliveryStrategy()
-     {
-          _pickupBasePrice = 14;
-          _stepPriceInGrenoble = DeliveryZoneEnum.Grenoble.TourPrice;
-          _stepPriceInBorder = DeliveryZoneEnum.Border.TourPrice;
-          _stepPriceInPeriphery = DeliveryZoneEnum.Periphery.TourPrice;
-          _stepPriceOutside = DeliveryZoneEnum.Outside.TourPrice;
-     }
+     // public TourDeliveryStrategy()
+     // {
+     //      _pickupBasePrice = 14;
+     //      _stepPriceInGrenoble = DeliveryZoneEnum.Grenoble.TourPrice;
+     //      _stepPriceInBorder = DeliveryZoneEnum.Border.TourPrice;
+     //      _stepPriceInPeriphery = DeliveryZoneEnum.Periphery.TourPrice;
+     //      _stepPriceOutside = DeliveryZoneEnum.Outside.TourPrice;
+     // }
 
      public double CalculatePrice(Delivery delivery)
      {
@@ -63,26 +63,26 @@ public class TourDeliveryStrategy : IPricingStrategy
      {
           return delivery.StartDate.Date == delivery.ContractDate.Date ? 2 : 0;
      }
-     
+
      public List<DeliveryStep> AddDeliverySteps(Delivery delivery, Customer customer)
      {
           double pickupNumber = Math.Ceiling(delivery.TotalWeight / 40);
           List<DeliveryStep> pickupSteps = [];
 
-          for (int i = 0; i < pickupNumber; i++)
-          {
-               DeliveryStep step = new(
-                    StepTypeEnum.Pickup,
-                    i+1,
-                    customer!.Address,
-                    0,
-                    delivery.StartDate
-               );
-          
-               pickupSteps.Add(step);
+          // for (int i = 0; i < pickupNumber; i++)
+          // {
+          //      DeliveryStep step = new(
+          //           StepTypeEnum.Pickup,
+          //           i+1,
+          //           customer!.Address,
+          //           0,
+          //           delivery.StartDate
+          //      );
 
-          }
-          
+          //      pickupSteps.Add(step);
+
+          // }
+
           return pickupSteps;
      }
 }

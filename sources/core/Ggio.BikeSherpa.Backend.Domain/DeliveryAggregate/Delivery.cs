@@ -15,28 +15,23 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public List<DeliveryStep> Steps { get; set; } = [];
      public required string[] Details { get; set; }
      public required double TotalWeight { get; set; }
-     public required int HighestLength { get; set; }
-     public PackingSizeEnum? Size { get; set; }
+     public required int HighestPackageLength { get; set; }
+     public required PackingSize Size { get; set; }
      public required DateTimeOffset ContractDate { get; set; }
      public required DateTimeOffset StartDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
 
-     public DeliveryStep AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, double distance, DateTimeOffset estimatedDeliveryDate)
+     public DeliveryStep AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
      {
-          var step = new DeliveryStep(stepTypeEnum, Steps.Count + 1, stepAddress, distance, estimatedDeliveryDate);
+          var step = new DeliveryStep(stepTypeEnum, Steps.Count + 1, stepAddress, deliveryZone, distance, estimatedDeliveryDate);
           Steps.Add(step);
           return step;
      }
-     
+
      public void DeleteStep(DeliveryStep step)
      {
           Steps.Remove(step);
-     }
-
-     public PackingSizeEnum GetPackingSize(double weight, int length)
-     {
-          return PackingSizeEnum.FromMeasurements(weight, length);
      }
 
      public double CalculateDeliveryPrice()

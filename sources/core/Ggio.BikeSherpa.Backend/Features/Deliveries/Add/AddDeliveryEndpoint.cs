@@ -27,13 +27,14 @@ public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, Ad
                req.ReportId,
                req.Details,
                req.TotalWeight,
-               req.HighestLength,
+               req.HighestPackageLength,
+               req.Size,
                req.ContractDate,
                req.StartDate
                );
-          
+
           var result = await mediator.Send(command, ct);
-         
+
           await Send.CreatedAtAsync<GetDeliveryEndpoint>(result.Value, new AddResult<Guid>(result.Value), cancellation: ct);
      }
 }

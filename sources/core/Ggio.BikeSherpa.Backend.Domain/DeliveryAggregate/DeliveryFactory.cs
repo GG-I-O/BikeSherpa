@@ -16,6 +16,7 @@ public interface IDeliveryFactory
           string[] details,
           double totalWeight,
           int highestLength,
+          PackingSize size,
           DateTimeOffset contractDate,
           DateTimeOffset startDate
      );
@@ -23,7 +24,7 @@ public interface IDeliveryFactory
 
 public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliveryFactory
 {
-     public async Task<Delivery> CreateDeliveryAsync(PricingStrategyEnum pricingStrategyEnum, DeliveryStatusEnum statusEnum, string code, Guid customerId, double? totalPrice, Guid reportId, string[] details, double totalWeight, int highestLength, DateTimeOffset contractDate, DateTimeOffset startDate)
+     public async Task<Delivery> CreateDeliveryAsync(PricingStrategyEnum pricingStrategyEnum, DeliveryStatusEnum statusEnum, string code, Guid customerId, double? totalPrice, Guid reportId, string[] details, double totalWeight, int highestLength, PackingSize size, DateTimeOffset contractDate, DateTimeOffset startDate)
      {
           var delivery = new Delivery
           {
@@ -37,8 +38,8 @@ public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliv
                Steps = [],
                Details = details,
                TotalWeight = totalWeight,
-               HighestLength = highestLength,
-               Size = null,
+               HighestPackageLength = highestLength,
+               Size = size,
                ContractDate = contractDate,
                StartDate = startDate
           };

@@ -5,6 +5,6 @@ public record PackingSize(
      int MaxWeight,
      int TourMaxLength,
      int MaxLength,
-     int TourPrice,
-     int Price
+     double TourPrice,
+     double Price
      );

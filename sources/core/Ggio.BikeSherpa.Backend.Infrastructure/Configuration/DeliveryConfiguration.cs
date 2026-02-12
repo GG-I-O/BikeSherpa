@@ -18,7 +18,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           builder.Property(d => d.ReportId).IsRequired();
           builder.Property(d => d.Details).IsRequired();
           builder.Property(d => d.TotalWeight).IsRequired();
-          builder.Property(d => d.HighestLength).IsRequired();
+          builder.Property(d => d.HighestPackageLength).IsRequired();
           builder.Property(d => d.Size).IsRequired();
           builder.Property(d => d.ContractDate).IsRequired();
           builder.Property(d => d.StartDate).IsRequired();

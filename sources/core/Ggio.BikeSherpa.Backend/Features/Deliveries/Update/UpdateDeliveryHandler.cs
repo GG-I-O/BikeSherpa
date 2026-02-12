@@ -1,9 +1,9 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Services.Catalogs;
 using Ggio.DddCore;
 using Mediator;
 
@@ -20,9 +20,9 @@ public record UpdateDeliveryCommand(
      Guid ReportId,
      List<DeliveryStep> Steps,
      string[] Details,
-     double Weight,
-     int Length,
-     PackingSizeEnum SizeEnum,
+     double TotalWeight,
+     int HighestPackageLength,
+     PackingSize Size,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
 ) : ICommand<Result>;
@@ -41,9 +41,9 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Steps).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.Weight).NotEmpty();
-          RuleFor(x => x.Length).NotEmpty();
-          RuleFor(x => x.SizeEnum).NotEmpty();
+          RuleFor(x => x.TotalWeight).NotEmpty();
+          RuleFor(x => x.HighestPackageLength).NotEmpty();
+          RuleFor(x => x.Size).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -52,7 +52,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
 public class UpdateDeliveryHandler(
      IReadRepository<Delivery> repository,
      IValidator<UpdateDeliveryCommand> validator,
-     IApplicationTransaction transaction
+     IApplicationTransaction transaction, IDeliveryZoneCatalog deliveryZones
 ) : ICommandHandler<UpdateDeliveryCommand, Result>
 {
      public async ValueTask<Result> Handle(UpdateDeliveryCommand command, CancellationToken cancellationToken)
@@ -61,7 +61,7 @@ public class UpdateDeliveryHandler(
           var entity = await repository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.Id), cancellationToken);
           if (entity is null)
                return Result.NotFound();
-         
+
           entity.PricingStrategyEnum = command.PricingStrategyEnum;
           entity.StatusEnum = command.StatusEnum;
           entity.Code = command.Code;
@@ -71,11 +71,17 @@ public class UpdateDeliveryHandler(
           entity.ReportId = command.ReportId;
           entity.Steps = command.Steps;
           entity.Details = command.Details;
-          entity.TotalWeight = command.Weight;
-          entity.HighestLength = command.Length;
-          entity.Size = command.SizeEnum;
+          entity.TotalWeight = command.TotalWeight;
+          entity.HighestPackageLength = command.HighestPackageLength;
+          entity.Size = command.Size;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
+
+          foreach (var step in entity.Steps)
+          {
+               step.StepZone = deliveryZones.FromAddress(step.StepAddress.City);
+          }
+
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
      }

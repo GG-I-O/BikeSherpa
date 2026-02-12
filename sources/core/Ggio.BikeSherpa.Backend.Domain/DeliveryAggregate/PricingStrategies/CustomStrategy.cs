@@ -20,20 +20,20 @@ public class CustomStrategy : IPricingStrategy
           double pickupNumber = Math.Ceiling(delivery.TotalWeight / 30);
           List<DeliveryStep> pickupSteps = [];
 
-          for (int i = 0; i < pickupNumber; i++)
-          {
-               DeliveryStep step = new(
-                    StepTypeEnum.Pickup,
-                    i+1,
-                    customer!.Address,
-                    0,
-                    delivery.StartDate
-               );
-          
-               pickupSteps.Add(step);
+          // for (int i = 0; i < pickupNumber; i++)
+          // {
+          //      DeliveryStep step = new(
+          //           StepTypeEnum.Pickup,
+          //           i+1,
+          //           customer!.Address,
+          //           0,
+          //           delivery.StartDate
+          //      );
 
-          }
-          
+          //      pickupSteps.Add(step);
+
+          // }
+
           return pickupSteps;
      }
 }

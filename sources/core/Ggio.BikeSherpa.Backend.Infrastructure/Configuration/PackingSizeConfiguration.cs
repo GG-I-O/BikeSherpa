@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using PackingSize = System.Reflection.Emit.PackingSize;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Configuration;
 
@@ -9,14 +8,14 @@ public class PackingSizeConfiguration : IEntityTypeConfiguration<PackingSizeEnti
      public void Configure(EntityTypeBuilder<PackingSizeEntity> builder)
      {
           builder.HasKey(p => p.Id);
-          
-          builder.Property(p => p.Name).IsRequired();
+
+          builder.Property(p => p.Name).HasMaxLength(100).IsRequired();
           builder.Property(p => p.MaxWeight).IsRequired();
           builder.Property(p => p.TourMaxLength).IsRequired();
           builder.Property(p => p.MaxLength).IsRequired();
           builder.Property(p => p.TourPrice).IsRequired();
           builder.Property(p => p.Price).IsRequired();
-          
+
           builder.HasData(
                new PackingSizeEntity
                {
@@ -70,7 +69,7 @@ public class PackingSizeConfiguration : IEntityTypeConfiguration<PackingSizeEnti
                }
           );
 
-          
+
           builder.ToTable("PackingSizes");
      }
 }

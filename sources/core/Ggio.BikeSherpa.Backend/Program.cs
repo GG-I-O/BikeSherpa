@@ -11,6 +11,7 @@ using Ggio.BikeSherpa.Backend.Features.Couriers;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Infrastructure;
+using Ggio.BikeSherpa.Backend.Services.Catalogs;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Middleware;
 using Ggio.BikeSherpa.Backend.Services.Notification;
@@ -70,6 +71,16 @@ builder.Services.AddMediator(options =>
      options.Assemblies = [typeof(GetDeliveryQuery).Assembly, typeof(EntityBase).Assembly, typeof(EfCoreDomainEntityAddedEventHandler)];
      options.ServiceLifetime = ServiceLifetime.Scoped;
 });
+
+// Add PackingSizeCatalog
+builder.Services.AddSingleton<IPackingSizeCatalog>(sp =>
+{
+     var db = sp.GetRequiredService<BackendDbContext>();
+     var entities = db.PackingSizes.ToList();
+
+     return new PackingSizeCatalog(entities);
+});
+
 
 // Cors
 var allowedOrigins = (builder.Configuration["CORS:AllowedOrigins"] ?? "").Split(',');

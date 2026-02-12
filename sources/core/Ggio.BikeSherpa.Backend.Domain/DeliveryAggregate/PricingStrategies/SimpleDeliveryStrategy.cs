@@ -10,13 +10,13 @@ public class SimpleDeliveryStrategy : IPricingStrategy
      private readonly double _stepPriceInPeriphery;
      private readonly double _stepPriceOutside;
 
-     public SimpleDeliveryStrategy()
-     {
-          _stepPriceInGrenoble = DeliveryZoneEnum.Grenoble.Price;
-          _stepPriceInBorder = DeliveryZoneEnum.Border.Price;
-          _stepPriceInPeriphery = DeliveryZoneEnum.Periphery.Price;
-          _stepPriceOutside = DeliveryZoneEnum.Outside.Price;
-     }
+     // public SimpleDeliveryStrategy()
+     // {
+     //      _stepPriceInGrenoble = DeliveryZoneEnum.Grenoble.Price;
+     //      _stepPriceInBorder = DeliveryZoneEnum.Border.Price;
+     //      _stepPriceInPeriphery = DeliveryZoneEnum.Periphery.Price;
+     //      _stepPriceOutside = DeliveryZoneEnum.Outside.Price;
+     // }
 
      public double CalculatePrice(Delivery delivery)
      {
@@ -64,27 +64,27 @@ public class SimpleDeliveryStrategy : IPricingStrategy
           var overweightPrice = Math.Ceiling((delivery.TotalWeight - 30) / 10) * 2;
           return overweightPrice;
      }
-     
+
      public List<DeliveryStep> AddDeliverySteps(Delivery delivery, Customer customer)
      {
           double pickupNumber = Math.Ceiling(delivery.TotalWeight / 60);
 
           List<DeliveryStep> pickupSteps = [];
 
-          for (int i = 0; i < pickupNumber; i++)
-          {
-               DeliveryStep step = new(
-                    StepTypeEnum.Pickup,
-                    i+1,
-                    customer!.Address,
-                    0,
-                    delivery.StartDate
-               );
-          
-               pickupSteps.Add(step);
+          // for (int i = 0; i < pickupNumber; i++)
+          // {
+          //      DeliveryStep step = new(
+          //           StepTypeEnum.Pickup,
+          //           i+1,
+          //           customer!.Address,
+          //           0,
+          //           delivery.StartDate
+          //      );
 
-          }
-          
+          //      pickupSteps.Add(step);
+
+          // }
+
           return pickupSteps;
      }
 }

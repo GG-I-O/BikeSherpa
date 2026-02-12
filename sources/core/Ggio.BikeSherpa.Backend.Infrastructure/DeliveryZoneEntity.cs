@@ -1,12 +1,10 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Infrastructure;
 
-public class PackingSizeEntity
+public class DeliveryZoneEntity
 {
      public int Id { get; set; }
      public string Name { get; set; } = null!;
-     public int MaxWeight { get; set; }
-     public int TourMaxLength { get; set; }
-     public int MaxLength { get; set; }
+     public HashSet<string> Cities { get; set; } = null!;
      public double TourPrice { get; set; }
      public double Price { get; set; }
 }
