@@ -62,8 +62,8 @@ public class PackingSizeConfiguration : IEntityTypeConfiguration<PackingSizeEnti
                     Id = 5,
                     Name = "Xxl",
                     MaxWeight = 40,
-                    TourMaxLength = 5000,
-                    MaxLength = 5000,
+                    TourMaxLength = 105,
+                    MaxLength = 115,
                     TourPrice = 8,
                     Price = 11
                }

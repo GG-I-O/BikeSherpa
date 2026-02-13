@@ -81,6 +81,23 @@ builder.Services.AddSingleton<IPackingSizeCatalog>(sp =>
      return new PackingSizeCatalog(entities);
 });
 
+// Add DeliveryZoneCatalog
+builder.Services.AddSingleton<IDeliveryZoneCatalog>(sp =>
+{
+     var db = sp.GetRequiredService<BackendDbContext>();
+     var entities = db.DeliveryZones.ToList();
+
+     return new DeliveryZoneCatalog(entities);
+});
+
+// Add UrgencyCatalog
+builder.Services.AddSingleton<IUrgencyCatalog>(sp =>
+{
+     var db = sp.GetRequiredService<BackendDbContext>();
+     var entities = db.Urgencies.ToList();
+
+     return new UrgencyCatalog(entities);
+});
 
 // Cors
 var allowedOrigins = (builder.Configuration["CORS:AllowedOrigins"] ?? "").Split(',');

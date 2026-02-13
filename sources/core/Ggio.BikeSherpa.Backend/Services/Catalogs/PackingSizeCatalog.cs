@@ -1,4 +1,5 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 
 namespace Ggio.BikeSherpa.Backend.Services.Catalogs;
@@ -20,7 +21,32 @@ public class PackingSizeCatalog : IPackingSizeCatalog
                .ToList();
      }
 
-     public PackingSize FromMeasurements(double weight, int length) =>
-          PackingSizes.FirstOrDefault(s => weight <= s.MaxWeight && length <= s.MaxLength)
-          ?? PackingSizes.Single(s => s.Name == "XXL");
+     public PackingSize FromMeasurements(PricingStrategyEnum pricingStrategy, double totalWeight, int highestPakageLength)
+     {
+          switch (pricingStrategy)
+          {
+               case PricingStrategyEnum.SimpleDeliveryStrategy:
+                    if (highestPakageLength < PackingSizes.Single(s => s.Name == "XXL").MaxLength)
+                    {
+                         return PackingSizes.FirstOrDefault(s => totalWeight <= s.MaxWeight && highestPakageLength <= s.MaxLength) ?? PackingSizes.Single(s => s.Name == "XXL");
+                    }
+                    else
+                    {
+                         throw new Exception("Colis trop volumineux pour une prise en charge à vélo.");
+                    }
+                    break;
+               case PricingStrategyEnum.TourDeliveryStrategy:
+                    if (highestPakageLength < PackingSizes.Single(s => s.Name == "XXL").TourMaxLength)
+                    {
+                         return PackingSizes.FirstOrDefault(s => totalWeight <= s.MaxWeight && highestPakageLength <= s.TourMaxLength) ?? PackingSizes.Single(s => s.Name == "XXL");
+                    }
+                    else
+                    {
+                         throw new Exception("Colis trop volumineux pour une prise en charge à vélo.");
+                    }
+                    break;
+               default:
+                    return PackingSizes.Single(s => s.Name == "XXL");
+          }
+     }
 }

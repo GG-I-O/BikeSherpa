@@ -13,30 +13,30 @@ public record AddDeliveryCommand(
      DeliveryStatusEnum StatusEnum,
      string Code,
      Guid CustomerId,
+     string Urgency,
      double TotalPrice,
      Guid ReportId,
      string[] Details,
      double TotalWeight,
      int HighestPackageLength,
-     PackingSize Size,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
      ) : ICommand<Result<Guid>>;
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
-     public AddDeliveryCommandValidator(IReadRepository<Delivery> repository)
+     public AddDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyCatalog urgencies)
      {
           RuleFor(x => x.PricingStrategyEnum).NotEmpty();
           RuleFor(x => x.StatusEnum).NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
+          RuleFor(x => x.Urgency).NotEmpty().Must(urgency => urgencies.Urgencies.Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase))).WithMessage("Valeur d'urgence saisie invalide.");
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.TotalWeight).NotEmpty();
           RuleFor(x => x.HighestPackageLength).NotEmpty();
-          RuleFor(x => x.Size).NotNull();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -45,28 +45,32 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 public class AddDeliveryHandler(
      IDeliveryFactory factory,
      IValidator<AddDeliveryCommand> validator,
-     IApplicationTransaction transaction, IPackingSizeCatalog packingSizes) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
+     IApplicationTransaction transaction,
+     IPackingSizeCatalog packingSizes,
+     IUrgencyCatalog urgencies,
+     IDeliveryZoneCatalog deliveryZones) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {
-          PackingSize size = packingSizes.FromMeasurements(command.TotalWeight, command.HighestPackageLength);
+          var packingSize = packingSizes.FromMeasurements(command.PricingStrategyEnum, command.TotalWeight, command.HighestPackageLength);
+          var urgencyStrategy = urgencies.GetUrgency(command.Urgency);
 
           await validator.ValidateAndThrowAsync(command, cancellationToken);
 
           var delivery = await factory.CreateDeliveryAsync(
                command.PricingStrategyEnum,
-               command.StatusEnum,
                command.Code,
                command.CustomerId,
-               command.TotalPrice,
+               command.Urgency,
                command.ReportId,
-               command.Details,
                command.TotalWeight,
                command.HighestPackageLength,
-               command.Size,
                command.ContractDate,
                command.StartDate
                );
+
+          delivery.AssignSize(packingSize);
+          delivery.CalculateDeliveryPrice(packingSize, urgencyStrategy);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(delivery.Id);

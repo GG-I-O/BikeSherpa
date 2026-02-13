@@ -1,5 +1,4 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
@@ -30,7 +29,7 @@ public class TourDeliveryStrategy : IPricingStrategy
 
           foreach (DeliveryStep step in delivery.Steps)
           {
-               switch (step.StepTypeEnum.Name)
+               switch (step.StepType.Name)
                {
                     case "Collecte":
                          pickups++;
@@ -52,7 +51,7 @@ public class TourDeliveryStrategy : IPricingStrategy
 
           return pickups * _pickupBasePrice +
                  CalculateDelayPrice(delivery) +
-                 delivery.Size.TourPrice +
+                 //delivery.PackingSize.TourPrice +
                  dropoffsInGrenoble * _stepPriceInGrenoble +
                  dropoffsInBorder * _stepPriceInBorder +
                  dropoffsInPeriphery * _stepPriceInPeriphery +

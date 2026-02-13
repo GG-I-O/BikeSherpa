@@ -15,35 +15,44 @@ public record UpdateDeliveryCommand(
      DeliveryStatusEnum StatusEnum,
      string Code,
      Guid CustomerId,
-     UrgencyEnum UrgencyEnum,
+     string Urgency,
      double TotalPrice,
      Guid ReportId,
      List<DeliveryStep> Steps,
      string[] Details,
      double TotalWeight,
      int HighestPackageLength,
-     PackingSize Size,
+     string PackingSize,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
 ) : ICommand<Result>;
 
 public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCommand>
 {
-     public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository)
+     public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyCatalog urgencies)
      {
           RuleFor(x => x.Id).NotEmpty();
           RuleFor(x => x.PricingStrategyEnum).NotEmpty();
           RuleFor(x => x.StatusEnum).NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
-          RuleFor(x => x.UrgencyEnum).NotNull();
+          RuleFor(x => x.Urgency)
+               .NotEmpty()
+               .Must(urgency => urgencies.Urgencies.Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
+               .WithMessage("Valeur d'urgence saisie invalide.");
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
-          RuleFor(x => x.Steps).NotEmpty();
+          RuleForEach(x => x.Steps)
+               .ChildRules(step =>
+               {
+                    step.RuleFor(s => s.StepAddress).NotNull();
+                    step.RuleFor(s => s.StepType).IsInEnum().WithMessage("Type d'étape invalide.");
+                    step.RuleFor(s => s.EstimatedDeliveryDate).NotEmpty();
+               });
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.TotalWeight).NotEmpty();
           RuleFor(x => x.HighestPackageLength).NotEmpty();
-          RuleFor(x => x.Size).NotEmpty();
+          RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -62,24 +71,30 @@ public class UpdateDeliveryHandler(
           if (entity is null)
                return Result.NotFound();
 
-          entity.PricingStrategyEnum = command.PricingStrategyEnum;
-          entity.StatusEnum = command.StatusEnum;
+          entity.PricingStrategy = command.PricingStrategyEnum;
+          entity.Status = command.StatusEnum;
           entity.Code = command.Code;
           entity.CustomerId = command.CustomerId;
-          entity.Urgency = command.UrgencyEnum;
+          entity.Urgency = command.Urgency;
           entity.TotalPrice = command.TotalPrice;
           entity.ReportId = command.ReportId;
-          entity.Steps = command.Steps;
           entity.Details = command.Details;
           entity.TotalWeight = command.TotalWeight;
           entity.HighestPackageLength = command.HighestPackageLength;
-          entity.Size = command.Size;
+          entity.PackingSize = command.PackingSize;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
 
-          foreach (var step in entity.Steps)
+          foreach (var step in command.Steps)
           {
-               step.StepZone = deliveryZones.FromAddress(step.StepAddress.City);
+               var zone = deliveryZones.FromAddress(step.StepAddress.City);
+
+               if (step.Id == Guid.Empty)
+               {
+                    entity.AddStep(step.StepType, step.StepAddress, zone, step.Distance, step.EstimatedDeliveryDate);
+               }
+               else entity.UpdateStep(step.Id, step.StepType, step.Order, step.StepAddress, zone, step.Distance, step.EstimatedDeliveryDate);
+
           }
 
           await transaction.CommitAsync(cancellationToken);

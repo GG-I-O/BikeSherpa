@@ -18,22 +18,22 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
      public override async Task HandleAsync(DeliveryCrud req, CancellationToken ct)
      {
           var command = new UpdateDeliveryCommand(
-               Route<Guid>("deliveryId"),
-               req.PricingStrategyEnum,
-               req.StatusEnum,
-               req.Code,
-               req.CustomerId,
-               req.Urgency,
-               req.TotalPrice,
-               req.ReportId,
-               req.Steps,
-               req.Details,
-               req.TotalWeight,
-               req.HighestPackageLength,
-               req.Size,
-               req.ContractDate,
-               req.StartDate
-          );
+                Route<Guid>("deliveryId"),
+                req.PricingStrategy,
+                req.Status,
+                req.Code,
+                req.CustomerId,
+                req.Urgency,
+                req.TotalPrice,
+                req.ReportId,
+                req.Steps,
+                req.Details,
+                req.TotalWeight,
+                req.HighestPackageLength,
+                req.PackingSize,
+                req.ContractDate,
+                req.StartDate
+           );
 
           var result = await mediator.Send(command, ct);
           await Send.ToEndpointResult(result, ct);

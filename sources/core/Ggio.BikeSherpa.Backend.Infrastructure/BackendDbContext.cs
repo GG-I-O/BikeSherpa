@@ -12,6 +12,7 @@ public class BackendDbContext(DbContextOptions<BackendDbContext> options) : DbCo
      public virtual DbSet<Courier> Couriers { get; set; }
      public virtual DbSet<PackingSizeEntity> PackingSizes { get; set; }
      public virtual DbSet<DeliveryZoneEntity> DeliveryZones { get; set; }
+     public virtual DbSet<UrgencyEntity> Urgencies { get; set; }
 
      override protected void OnModelCreating(ModelBuilder modelBuilder)
      {

@@ -1,5 +1,5 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
 
@@ -54,8 +54,8 @@ public class SimpleDeliveryStrategy : IPricingStrategy
                  stepsInBorder * _stepPriceInBorder +
                  stepsInPeriphery * _stepPriceInPeriphery +
                  stepsOutside * _stepPriceOutside +
-                 delivery.Size.Price +
-                 delivery.Urgency.CalculatePrice(totalDistance) +
+                 //delivery.PackingSize.Price +
+                 //delivery.Urgency.CalculatePrice(totalDistance) +
                  CalculateOverweightPrice(delivery);
      }
 
