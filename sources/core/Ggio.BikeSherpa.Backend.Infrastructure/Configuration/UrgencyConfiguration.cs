@@ -12,24 +12,9 @@ public class UrgencyConfiguration : IEntityTypeConfiguration<UrgencyEntity>
           builder.Property(p => p.Name).HasMaxLength(100).IsRequired();
           builder.Property(p => p.PriceCoefficient).IsRequired();
           builder.HasData(
-               new UrgencyEntity
-               {
-                    Id = 1,
-                    Name = "Eco",
-                    PriceCoefficient = 2.75
-               },
-               new UrgencyEntity
-               {
-                    Id = 2,
-                    Name = "Standard",
-                    PriceCoefficient = 1.25
-               },
-               new UrgencyEntity
-               {
-                    Id = 2,
-                    Name = "Urgent",
-                    PriceCoefficient = 2
-               }
+               new UrgencyEntity { Id = 1, Name = "Eco", PriceCoefficient = 2.75 },
+               new UrgencyEntity { Id = 2, Name = "Standard", PriceCoefficient = 1.25 },
+               new UrgencyEntity { Id = 2, Name = "Urgent", PriceCoefficient = 2 }
           );
      }
 }

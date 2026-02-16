@@ -4,6 +4,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Services.Catalogs;
+using Ggio.BikeSherpa.Backend.Services.Repositories;
 using Ggio.DddCore;
 using Mediator;
 
@@ -29,11 +30,11 @@ public record UpdateDeliveryCommand(
 
 public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCommand>
 {
-     public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyCatalog urgencies)
+     public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies)
      {
           RuleFor(x => x.Id).NotEmpty();
-          RuleFor(x => x.PricingStrategyEnum).NotEmpty();
-          RuleFor(x => x.StatusEnum).NotEmpty();
+          RuleFor(x => x.PricingStrategyEnum).IsInEnum().NotEmpty();
+          RuleFor(x => x.StatusEnum).IsInEnum().NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.Urgency)
@@ -61,7 +62,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
 public class UpdateDeliveryHandler(
      IReadRepository<Delivery> repository,
      IValidator<UpdateDeliveryCommand> validator,
-     IApplicationTransaction transaction, IDeliveryZoneCatalog deliveryZones
+     IApplicationTransaction transaction, IDeliveryZoneRepository deliveryZones
 ) : ICommandHandler<UpdateDeliveryCommand, Result>
 {
      public async ValueTask<Result> Handle(UpdateDeliveryCommand command, CancellationToken cancellationToken)

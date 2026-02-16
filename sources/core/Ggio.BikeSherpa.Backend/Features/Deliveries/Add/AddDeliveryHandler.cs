@@ -3,6 +3,7 @@ using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Services.Catalogs;
+using Ggio.BikeSherpa.Backend.Services.Repositories;
 using Ggio.DddCore;
 using Mediator;
 
@@ -25,13 +26,16 @@ public record AddDeliveryCommand(
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
-     public AddDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyCatalog urgencies)
+     public AddDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies)
      {
-          RuleFor(x => x.PricingStrategyEnum).NotEmpty();
-          RuleFor(x => x.StatusEnum).NotEmpty();
+          RuleFor(x => x.PricingStrategyEnum).IsInEnum().NotEmpty();
+          RuleFor(x => x.StatusEnum).IsInEnum().NotEmpty();
           RuleFor(x => x.Code).NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
-          RuleFor(x => x.Urgency).NotEmpty().Must(urgency => urgencies.Urgencies.Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase))).WithMessage("Valeur d'urgence saisie invalide.");
+          RuleFor(x => x.Urgency)
+               .NotEmpty().
+               Must(urgency => urgencies.Urgencies.Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
+               .WithMessage("Valeur d'urgence saisie invalide.");
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
@@ -46,9 +50,9 @@ public class AddDeliveryHandler(
      IDeliveryFactory factory,
      IValidator<AddDeliveryCommand> validator,
      IApplicationTransaction transaction,
-     IPackingSizeCatalog packingSizes,
-     IUrgencyCatalog urgencies,
-     IDeliveryZoneCatalog deliveryZones) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
+     IPackingSizeRepository packingSizes,
+     IUrgencyRepository urgencies,
+     IDeliveryZoneRepository deliveryZones) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {
@@ -69,8 +73,8 @@ public class AddDeliveryHandler(
                command.StartDate
                );
 
-          delivery.AssignSize(packingSize);
-          delivery.CalculateDeliveryPrice(packingSize, urgencyStrategy);
+          delivery.SetSize(packingSize);
+          delivery.SetDeliveryPrice(0);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(delivery.Id);

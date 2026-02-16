@@ -1,26 +1,26 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Infrastructure;
+using Ggio.BikeSherpa.Backend.Services.Catalogs;
 
-namespace Ggio.BikeSherpa.Backend.Services.Catalogs;
+namespace Ggio.BikeSherpa.Backend.Services.Repositories;
 
-public class DeliveryZoneCatalog : IDeliveryZoneCatalog
+public class DeliveryZoneRepository : IDeliveryZoneRepository
 {
      public IReadOnlyList<DeliveryZone> DeliveryZones { get; }
 
-     public DeliveryZoneCatalog(IEnumerable<DeliveryZoneEntity> entities)
+     public DeliveryZoneRepository(IEnumerable<DeliveryZoneEntity> entities)
      {
           DeliveryZones = entities
                .Select(e => new DeliveryZone(
                     e.Name,
-                    e.Cities,
-                    e.TourPrice,
-                    e.Price))
+                    e.Cities.Select(c => new City(c.Name)).ToList()
+                    ))
                .ToList();
      }
 
      public DeliveryZone FromAddress(string city)
      {
-          return DeliveryZones.FirstOrDefault(zone => zone.Cities.Contains(city))
+          return DeliveryZones.FirstOrDefault(zone => zone.Cities.Any(c => c.Name == city))
           ?? throw new Exception("L’adresse ne se trouve pas dans les zones couvertes.");
      }
 }

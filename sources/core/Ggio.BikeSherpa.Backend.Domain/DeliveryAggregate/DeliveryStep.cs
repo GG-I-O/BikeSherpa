@@ -6,6 +6,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
 {
      public StepTypeEnum StepType { get; set; }
      public int Order { get; set; }
+     public bool Completed { get; set; } = false;
      public Address StepAddress { get; set; }
      public DeliveryZone StepZone { get; set; }
      public double Distance { get; set; }
@@ -32,6 +33,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      public void Update(
           StepTypeEnum stepType,
           int order,
+          bool completed,
           Address stepAddress,
           DeliveryZone deliveryZone,
           double distance,
@@ -39,9 +41,18 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      {
           StepType = stepType;
           Order = order;
+          Completed = completed;
           StepAddress = stepAddress;
           StepZone = deliveryZone;
           Distance = distance;
           EstimatedDeliveryDate = estimatedDeliveryDate;
      }
+     
+     public void UpdateOrder(int order) { Order = order; }
+     
+     public void UpdateCourier(Guid courierId) { CourierId = courierId; }
+     
+     public void UpdateDeliveryTime(DateTimeOffset deliveryTime) { EstimatedDeliveryDate = deliveryTime; }
+     
+     public void UpdateCompleted(bool completed) { Completed = completed; }
 }

@@ -2,7 +2,5 @@
 
 public record DeliveryZone(
      string Name,
-     HashSet<string> Cities,
-     double TourPrice,
-     double Price
+     IReadOnlyCollection<City> Cities
      );

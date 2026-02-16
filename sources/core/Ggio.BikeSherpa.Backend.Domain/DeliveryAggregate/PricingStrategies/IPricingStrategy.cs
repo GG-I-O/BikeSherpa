@@ -1,9 +1,20 @@
-﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-
-namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
+﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
 public interface IPricingStrategy
 {
-     double CalculatePrice(Delivery delivery);
-     List<DeliveryStep> AddDeliverySteps(Delivery delivery, Customer customer);
+     string Name { get; }
+
+     double CalculateDeliveryPriceWithoutVat(
+          DateTimeOffset startDate,
+          DateTimeOffset contractDate,
+          int pickupNumber,
+          int dropoffStepsInGronoble,
+          int dropoffStepsInBorder,
+          int dropoffStepsInPeriphery,
+          int dropoffStepsOutside,
+          PackingSize packingSize,
+          double urgencyPriceCoefficient,
+          double totalDistance,
+          double totalWeight
+          );
 }

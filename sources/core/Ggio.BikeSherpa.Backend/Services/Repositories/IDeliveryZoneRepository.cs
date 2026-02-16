@@ -2,7 +2,7 @@
 
 namespace Ggio.BikeSherpa.Backend.Services.Catalogs;
 
-public interface IDeliveryZoneCatalog
+public interface IDeliveryZoneRepository
 {
      IReadOnlyList<DeliveryZone> DeliveryZones { get; }
      DeliveryZone FromAddress(string city);

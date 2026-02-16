@@ -8,6 +8,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
 {
      public void Configure(EntityTypeBuilder<Delivery> builder)
      {
+          builder.ToTable("Deliveries");
           builder.HasKey(d => d.Id);
           builder.Property(d => d.PricingStrategy).HasConversion<int>().IsRequired();
           builder.Property(d => d.Status).HasConversion<int>().IsRequired();
@@ -22,8 +23,6 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           builder.Property(d => d.PackingSize).IsRequired();
           builder.Property(d => d.ContractDate).IsRequired();
           builder.Property(d => d.StartDate).IsRequired();
-          builder.ToTable("Deliveries");
-
           builder.OwnsMany(d => d.Steps, steps =>
           {
                steps.WithOwner().HasForeignKey("DeliveryId");

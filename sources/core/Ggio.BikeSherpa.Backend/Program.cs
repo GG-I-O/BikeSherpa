@@ -15,6 +15,7 @@ using Ggio.BikeSherpa.Backend.Services.Catalogs;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Middleware;
 using Ggio.BikeSherpa.Backend.Services.Notification;
+using Ggio.BikeSherpa.Backend.Services.Repositories;
 using Ggio.DddCore;
 using Ggio.DddCore.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -72,31 +73,31 @@ builder.Services.AddMediator(options =>
      options.ServiceLifetime = ServiceLifetime.Scoped;
 });
 
-// Add PackingSizeCatalog
-builder.Services.AddSingleton<IPackingSizeCatalog>(sp =>
+// Add PackingSizeRepository
+builder.Services.AddSingleton<IPackingSizeRepository>(sp =>
 {
      var db = sp.GetRequiredService<BackendDbContext>();
      var entities = db.PackingSizes.ToList();
 
-     return new PackingSizeCatalog(entities);
+     return new PackingSizeRepository(entities);
 });
 
-// Add DeliveryZoneCatalog
-builder.Services.AddSingleton<IDeliveryZoneCatalog>(sp =>
+// Add DeliveryZoneRepository
+builder.Services.AddSingleton<IDeliveryZoneRepository>(sp =>
 {
      var db = sp.GetRequiredService<BackendDbContext>();
      var entities = db.DeliveryZones.ToList();
 
-     return new DeliveryZoneCatalog(entities);
+     return new DeliveryZoneRepository(entities);
 });
 
-// Add UrgencyCatalog
-builder.Services.AddSingleton<IUrgencyCatalog>(sp =>
+// Add UrgencyRepository
+builder.Services.AddSingleton<IUrgencyRepository>(sp =>
 {
      var db = sp.GetRequiredService<BackendDbContext>();
      var entities = db.Urgencies.ToList();
 
-     return new UrgencyCatalog(entities);
+     return new UrgencyRepository(entities);
 });
 
 // Cors

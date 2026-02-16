@@ -1,8 +1,7 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Infrastructure;
 
-public class DeliveryZoneEntity
+public class CityEntity
 {
      public int Id { get; set; }
      public string Name { get; set; } = null!;
-     public List<CityEntity> Cities { get; set; } = [];
 }

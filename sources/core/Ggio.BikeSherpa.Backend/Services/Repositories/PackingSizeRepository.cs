@@ -1,14 +1,15 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Infrastructure;
+using Ggio.BikeSherpa.Backend.Services.Repositories;
 
 namespace Ggio.BikeSherpa.Backend.Services.Catalogs;
 
-public class PackingSizeCatalog : IPackingSizeCatalog
+public class PackingSizeRepository : IPackingSizeRepository
 {
      public IReadOnlyList<PackingSize> PackingSizes { get; }
 
-     public PackingSizeCatalog(IEnumerable<PackingSizeEntity> entities)
+     public PackingSizeRepository(IEnumerable<PackingSizeEntity> entities)
      {
           PackingSizes = entities
                .Select(e => new PackingSize(
@@ -34,7 +35,6 @@ public class PackingSizeCatalog : IPackingSizeCatalog
                     {
                          throw new Exception("Colis trop volumineux pour une prise en charge à vélo.");
                     }
-                    break;
                case PricingStrategyEnum.TourDeliveryStrategy:
                     if (highestPakageLength < PackingSizes.Single(s => s.Name == "XXL").TourMaxLength)
                     {
@@ -44,7 +44,6 @@ public class PackingSizeCatalog : IPackingSizeCatalog
                     {
                          throw new Exception("Colis trop volumineux pour une prise en charge à vélo.");
                     }
-                    break;
                default:
                     return PackingSizes.Single(s => s.Name == "XXL");
           }

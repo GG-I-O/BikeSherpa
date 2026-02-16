@@ -1,90 +1,40 @@
-﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-
-namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
-
+﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
 public class SimpleDeliveryStrategy : IPricingStrategy
 {
-     private readonly double _stepPriceInGrenoble;
-     private readonly double _stepPriceInBorder;
-     private readonly double _stepPriceInPeriphery;
-     private readonly double _stepPriceOutside;
+     private readonly double _stepPriceInGrenoble = 1;
+     private readonly double _stepPriceInBorder = 2.5;
+     private readonly double _stepPriceInPeriphery = 5.5;
+     private readonly double _stepPriceOutside = 11;
+     
+     public string Name => "SimpleDelivery";
 
-     // public SimpleDeliveryStrategy()
-     // {
-     //      _stepPriceInGrenoble = DeliveryZoneEnum.Grenoble.Price;
-     //      _stepPriceInBorder = DeliveryZoneEnum.Border.Price;
-     //      _stepPriceInPeriphery = DeliveryZoneEnum.Periphery.Price;
-     //      _stepPriceOutside = DeliveryZoneEnum.Outside.Price;
-     // }
-
-     public double CalculatePrice(Delivery delivery)
+     public double CalculateDeliveryPriceWithoutVat(
+          DateTimeOffset startDate,
+          DateTimeOffset contractDate,
+          int pickupNumber,
+          int dropoffStepsInGronoble,
+          int dropoffStepsInBorder,
+          int dropoffStepsInPeriphery,
+          int dropoffStepsOutside,
+          PackingSize packingSize,
+          double urgencyPriceCoefficient,
+          double totalDistance,
+          double totalWeight)
      {
-          int stepsInGrenoble = 0;
-          int stepsInBorder = 0;
-          int stepsInPeriphery = 0;
-          int stepsOutside = 0;
-          double totalDistance = 0;
 
-          foreach (DeliveryStep step in delivery.Steps)
-          {
-               totalDistance += step.Distance;
-          }
-
-          foreach (DeliveryStep step in delivery.Steps)
-          {
-               switch (step.StepZone.Name)
-               {
-                    case "Grenoble":
-                         stepsInGrenoble++;
-                         break;
-                    case "Limitrophe":
-                         stepsInBorder++;
-                         break;
-                    case "Périphérie":
-                         stepsInPeriphery++;
-                         break;
-                    case "Extérieur":
-                         stepsOutside++;
-                         break;
-               }
-          }
-
-          return stepsInGrenoble * _stepPriceInGrenoble +
-                 stepsInBorder * _stepPriceInBorder +
-                 stepsInPeriphery * _stepPriceInPeriphery +
-                 stepsOutside * _stepPriceOutside +
-                 //delivery.PackingSize.Price +
-                 //delivery.Urgency.CalculatePrice(totalDistance) +
-                 CalculateOverweightPrice(delivery);
+          return dropoffStepsInGronoble * _stepPriceInGrenoble +
+                 dropoffStepsInBorder * _stepPriceInBorder +
+                 dropoffStepsInPeriphery * _stepPriceInPeriphery +
+                 dropoffStepsOutside * _stepPriceOutside +
+                 packingSize.Price +
+                 urgencyPriceCoefficient * totalDistance +
+                 CalculateOverweightPrice(totalWeight);
      }
 
-     private double CalculateOverweightPrice(Delivery delivery)
+     private static double CalculateOverweightPrice(double totalWeight)
      {
-          var overweightPrice = Math.Ceiling((delivery.TotalWeight - 30) / 10) * 2;
+          var overweightPrice = Math.Ceiling((totalWeight - 30) / 10) * 2;
           return overweightPrice;
-     }
-
-     public List<DeliveryStep> AddDeliverySteps(Delivery delivery, Customer customer)
-     {
-          double pickupNumber = Math.Ceiling(delivery.TotalWeight / 60);
-
-          List<DeliveryStep> pickupSteps = [];
-
-          // for (int i = 0; i < pickupNumber; i++)
-          // {
-          //      DeliveryStep step = new(
-          //           StepTypeEnum.Pickup,
-          //           i+1,
-          //           customer!.Address,
-          //           0,
-          //           delivery.StartDate
-          //      );
-
-          //      pickupSteps.Add(step);
-
-          // }
-
-          return pickupSteps;
      }
 }
