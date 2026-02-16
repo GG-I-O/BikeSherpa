@@ -87,15 +87,10 @@ public class UpdateDeliveryHandler(
 
           foreach (var step in command.Steps)
           {
-               var zone = deliveryZones.FromAddress(step.StepAddress.City);
-
-               if (step.Id == Guid.Empty)
-               {
-                    entity.AddStep(step.StepType, step.StepAddress, zone, step.Distance, step.EstimatedDeliveryDate);
-               }
-               else entity.UpdateStep(step.Id, step.StepType, step.Order, step.StepAddress, zone, step.Distance, step.EstimatedDeliveryDate);
-
+               step.StepZone = deliveryZones.FromAddress(step.StepAddress.City);
           }
+          
+          entity.ManageSteps(command.Steps);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

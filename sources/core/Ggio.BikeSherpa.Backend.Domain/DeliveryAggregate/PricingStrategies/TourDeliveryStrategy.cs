@@ -1,4 +1,5 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
@@ -29,21 +30,21 @@ public class TourDeliveryStrategy : IPricingStrategy
 
           foreach (DeliveryStep step in delivery.Steps)
           {
-               switch (step.StepType.Name)
+               switch (step.StepType)
                {
-                    case "Collecte":
+                    case StepTypeEnum.Pickup:
                          pickups++;
                          break;
-                    case "Dépôt" when step.StepZone.Name == "Grenoble":
+                    case StepTypeEnum.Dropoff when step.StepZone.Name == "Grenoble":
                          dropoffsInGrenoble++;
                          break;
-                    case "Dépôt" when step.StepZone.Name == "Limitrophe":
+                    case StepTypeEnum.Dropoff when step.StepZone.Name == "Limitrophe":
                          dropoffsInBorder++;
                          break;
-                    case "Dépôt" when step.StepZone.Name == "Périphérie":
+                    case StepTypeEnum.Dropoff when step.StepZone.Name == "Périphérie":
                          dropoffsInPeriphery++;
                          break;
-                    case "Dépôt" when step.StepZone.Name == "Extérieur":
+                    case StepTypeEnum.Dropoff when step.StepZone.Name == "Extérieur":
                          dropoffsOutside++;
                          break;
                }

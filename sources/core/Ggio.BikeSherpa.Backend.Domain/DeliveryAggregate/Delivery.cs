@@ -22,19 +22,44 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
 
-     public void AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
+     public void ManageSteps(List<DeliveryStep> steps)
+     {
+          var stepIds = Steps.Select(s => s.Id).ToList();
+          
+          for (int index = 0; index < steps.Count; index++)
+          {
+               if (steps[index].Id == Guid.Empty && StepCanFollow(steps[index-1].StepType, steps[index].StepType))
+               {
+                    AddStep(steps[index].StepType, steps[index].StepAddress, steps[index].StepZone, steps[index].Distance, steps[index].EstimatedDeliveryDate);
+               }
+               else if (StepCanFollow(steps[index-1].StepType, steps[index].StepType))
+               {
+                    UpdateStep(steps[index].Id, steps[index].StepType, steps[index].Order, steps[index].StepAddress, steps[index].StepZone, steps[index].Distance, steps[index].EstimatedDeliveryDate);
+               }
+               else if (!stepIds.Contains(steps[index].Id))
+               {
+                    DeleteStep(steps[index].Id);
+               }
+          }
+     }
+     
+     private void AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
      {
           var step = new DeliveryStep(stepTypeEnum, Steps.Count + 1, stepAddress, deliveryZone, distance, estimatedDeliveryDate);
           Steps.Add(step);
      }
 
-     public void UpdateStep(Guid id, StepTypeEnum stepType, int order, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
+     private void UpdateStep(Guid id, StepTypeEnum stepType, int order, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
      {
           var existingStep = Steps.Single(s => s.Id == id);
           existingStep.Update(stepType, order, stepAddress, deliveryZone, distance, estimatedDeliveryDate);
      }
+     
+     private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
+          previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
+          || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;
 
-     public void DeleteStep(Guid id)
+     private void DeleteStep(Guid id)
      {
           var step = Steps.Single(s => s.Id == id);
           Steps.Remove(step);
@@ -42,16 +67,33 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public double CalculateDeliveryPrice(PackingSize packingSize, Urgency urgencyStrategy)
      {
+          double pickupBasePrice = 14;
+          double stepPriceInGrenoble;
+          double stepPriceInBorder;
+          double stepPriceInPeriphery;
+          double stepPriceOutside;
+          
           switch (PricingStrategy)
           {
                case PricingStrategyEnum.SimpleDeliveryStrategy:
+               {
                     return 1;
+               }
                case PricingStrategyEnum.CustomStrategy:
+               {
                     return 2;
+               }
                case PricingStrategyEnum.TourDeliveryStrategy:
-                    return 3;
+               {
+                    // stepPriceInGrenoble = DeliveryZoneEnum.Grenoble.TourPrice;
+                    // stepPriceInBorder = DeliveryZoneEnum.Border.TourPrice;
+                    // stepPriceInPeriphery = DeliveryZoneEnum.Periphery.TourPrice;
+                    // stepPriceOutside = DeliveryZoneEnum.Outside.TourPrice;
+               }
                default:
+               {
                     throw new Exception("Erreur de calcul du prix de livraison.");
+               }
           }
      }
 
