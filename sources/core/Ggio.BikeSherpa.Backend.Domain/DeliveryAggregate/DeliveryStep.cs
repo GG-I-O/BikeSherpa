@@ -50,9 +50,9 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      
      public void UpdateOrder(int order) { Order = order; }
      
-     public void UpdateCourier(Guid courierId) { CourierId = courierId; }
+     public void AssignCourier(Guid courierId) { CourierId = courierId; }
      
      public void UpdateDeliveryTime(DateTimeOffset deliveryTime) { EstimatedDeliveryDate = deliveryTime; }
      
-     public void UpdateCompleted(bool completed) { Completed = completed; }
+     public void UpdateCompletion(bool completed) { Completed = completed; }
 }

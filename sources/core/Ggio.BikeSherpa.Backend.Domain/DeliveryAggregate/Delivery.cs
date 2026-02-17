@@ -15,6 +15,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required List<DeliveryStep> Steps { get; set; } = [];
      public string[]? Details { get; set; } = [];
      public required string PackingSize { get; set; }
+     public required bool InsulatedBox { get; set; }
+     public required bool ExactTime { get; set; }
+     public required bool ReturnJourney { get; set; }
      public required DateTimeOffset ContractDate { get; set; }
      public required DateTimeOffset StartDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
@@ -62,7 +65,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      private void UpdateStepCourier(Guid stepId, Guid courierId)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.UpdateCourier(courierId);
+          existingStep.AssignCourier(courierId);
      }
      
      private void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset estimatedDeliveryDate)
@@ -71,10 +74,10 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           existingStep.UpdateDeliveryTime(estimatedDeliveryDate);
      }
 
-     private void UpdateCompletedStep(Guid stepId, bool completed)
+     private void UpdateStepCompletion(Guid stepId, bool completed)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.UpdateCompleted(completed);
+          existingStep.UpdateCompletion(completed);
      }
      
      private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
@@ -90,11 +93,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public void SetDeliveryPrice(double deliveryPrice)
      {
           TotalPrice = deliveryPrice;
-     }
-
-     public void SetSize(PackingSize packingSize)
-     {
-          PackingSize = packingSize.Name ?? throw new Exception("La taille ne peut pas être nulle.");
      }
 }
 

@@ -22,6 +22,9 @@ public record UpdateDeliveryCommand(
      List<DeliveryStep> Steps,
      string[] Details,
      string PackingSize,
+     bool InsulatedBox,
+     bool ExactTime,
+     bool ReturnJourney,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
 ) : ICommand<Result>;
@@ -49,6 +52,9 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                     step.RuleFor(s => s.EstimatedDeliveryDate).NotEmpty();
                });
           RuleFor(x => x.PackingSize).NotEmpty();
+          RuleFor(x => x.InsulatedBox).NotEmpty();
+          RuleFor(x => x.ExactTime).NotEmpty();
+          RuleFor(x => x.ReturnJourney).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
@@ -78,6 +84,9 @@ public class UpdateDeliveryHandler(
           entity.ReportId = command.ReportId;
           entity.Details = command.Details;
           entity.PackingSize = command.PackingSize;
+          entity.InsulatedBox = command.InsulatedBox;
+          entity.ExactTime = command.ExactTime;
+          entity.ReturnJourney = command.ReturnJourney;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
 
