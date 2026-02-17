@@ -23,6 +23,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
      
+     // Methods allowing to change the delivery status
      public void Start()
      {
           var statusMachine = new DeliveryStatusMachine(this);
@@ -41,12 +42,24 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           statusMachine.Fire(DeliveryStatusTrigger.Cancel);
      }
      
+     // Methods allowing to change delivery properties
+     public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime)
+     {
+          StartDate = deliveryDateTime;
+     }
+     
+     public void SetDeliveryPrice(double deliveryPrice)
+     {
+          TotalPrice = deliveryPrice;
+     }
+     
      private void AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
      {
           var step = new DeliveryStep(stepTypeEnum, Steps.Count + 1, stepAddress, deliveryZone, distance, estimatedDeliveryDate);
           Steps.Add(step);
      }
      
+     // Methods allowing to update delivery steps
      private void UpdateStepOrder(Guid stepId, int order)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
@@ -79,11 +92,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      {
           var step = Steps.Single(s => s.Id == stepId);
           Steps.Remove(step);
-     }
-
-     public void SetDeliveryPrice(double deliveryPrice)
-     {
-          TotalPrice = deliveryPrice;
      }
 }
 
