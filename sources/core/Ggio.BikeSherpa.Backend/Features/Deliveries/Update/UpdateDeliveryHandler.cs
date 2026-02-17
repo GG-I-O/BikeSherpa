@@ -94,8 +94,6 @@ public class UpdateDeliveryHandler(
           {
                step.StepZone = deliveryZones.FromAddress(step.StepAddress.City);
           }
-          
-          entity.ManageSteps(command.Steps);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
