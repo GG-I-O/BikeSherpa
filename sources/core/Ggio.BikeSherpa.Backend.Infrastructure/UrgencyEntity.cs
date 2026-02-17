@@ -1,8 +1,10 @@
-﻿namespace Ggio.BikeSherpa.Backend.Infrastructure;
+﻿using Facet;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-public class UrgencyEntity
+namespace Ggio.BikeSherpa.Backend.Infrastructure;
+
+[Facet(typeof(Urgency))]
+public partial class UrgencyEntity
 {
      public int Id { get; set; }
-     public string Name { get; set; } = null!;
-     public double PriceCoefficient { get; set; }
 }

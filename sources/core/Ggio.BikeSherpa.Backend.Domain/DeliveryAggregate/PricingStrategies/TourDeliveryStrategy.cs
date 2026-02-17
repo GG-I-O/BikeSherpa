@@ -20,8 +20,7 @@ public class TourDeliveryStrategy : IPricingStrategy
           int dropoffStepsOutside,
           PackingSize packingSize,
           double urgencyPriceCoefficient,
-          double totalDistance,
-          double totalWeight)
+          double totalDistance)
      {
           return pickupNumber * _pickupBasePrice +
                  CalculateDelayPrice(startDate, contractDate) +

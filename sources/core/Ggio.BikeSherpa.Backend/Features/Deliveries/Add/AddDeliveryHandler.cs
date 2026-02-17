@@ -18,8 +18,7 @@ public record AddDeliveryCommand(
      double TotalPrice,
      Guid ReportId,
      string[] Details,
-     double TotalWeight,
-     int HighestPackageLength,
+     string PackingSize,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
      ) : ICommand<Result<Guid>>;
@@ -39,8 +38,7 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.TotalWeight).NotEmpty();
-          RuleFor(x => x.HighestPackageLength).NotEmpty();
+          RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -56,9 +54,6 @@ public class AddDeliveryHandler(
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {
-          var packingSize = packingSizes.FromMeasurements(command.PricingStrategyEnum, command.TotalWeight, command.HighestPackageLength);
-          var urgencyStrategy = urgencies.GetUrgency(command.Urgency);
-
           await validator.ValidateAndThrowAsync(command, cancellationToken);
 
           var delivery = await factory.CreateDeliveryAsync(
@@ -67,14 +62,10 @@ public class AddDeliveryHandler(
                command.CustomerId,
                command.Urgency,
                command.ReportId,
-               command.TotalWeight,
-               command.HighestPackageLength,
+               command.PackingSize,
                command.ContractDate,
                command.StartDate
                );
-
-          delivery.SetSize(packingSize);
-          delivery.SetDeliveryPrice(0);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(delivery.Id);

@@ -14,7 +14,7 @@ public class PricingStrategyService(
      public double CalculateDeliveryPriceWithoutVat(Delivery delivery)
      {
           var strategy = strategies.Single(s => s.Name == delivery.PricingStrategy.ToString());
-          var packingSize = packingSizes.FromMeasurements(delivery.PricingStrategy, delivery.TotalWeight, delivery.HighestPackageLength);
+          var packingSize = packingSizes.FromName(delivery.PackingSize);
           var urgencyPriceCoefficient = urgencies.GetUrgency(delivery.Urgency).PriceCoefficient;
           var pickupCount = delivery.Steps.Count(s => s.StepType == StepTypeEnum.Pickup);
           var dropoffsInGrenoble = delivery.Steps.Count(s => s.StepZone.Name == "Grenoble");
@@ -35,8 +35,7 @@ public class PricingStrategyService(
                     dropoffsOutside,
                     packingSize,
                     urgencyPriceCoefficient,
-                    totalDistance,
-                    delivery.TotalWeight
+                    totalDistance
                );               
           }
           else

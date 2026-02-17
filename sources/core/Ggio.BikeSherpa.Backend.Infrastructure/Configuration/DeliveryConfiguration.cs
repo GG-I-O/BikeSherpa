@@ -18,8 +18,6 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           builder.Property(d => d.TotalPrice).IsRequired();
           builder.Property(d => d.ReportId).IsRequired();
           builder.Property(d => d.Details).IsRequired();
-          builder.Property(d => d.TotalWeight).IsRequired();
-          builder.Property(d => d.HighestPackageLength).IsRequired();
           builder.Property(d => d.PackingSize).IsRequired();
           builder.Property(d => d.ContractDate).IsRequired();
           builder.Property(d => d.StartDate).IsRequired();
@@ -30,6 +28,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                steps.Property(s => s.Id).ValueGeneratedNever();
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();
                steps.Property(s => s.Order).IsRequired();
+               steps.Property(s => s.Completed).IsRequired();
                steps.Property(s => s.StepAddress).IsRequired();
                steps.Property(s => s.StepZone).IsRequired();
                steps.Property(s => s.Distance).IsRequired();

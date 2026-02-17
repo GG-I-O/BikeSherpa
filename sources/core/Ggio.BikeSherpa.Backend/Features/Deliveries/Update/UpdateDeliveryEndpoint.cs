@@ -28,8 +28,6 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
                 req.ReportId,
                 req.Steps,
                 req.Details,
-                req.TotalWeight,
-                req.HighestPackageLength,
                 req.PackingSize,
                 req.ContractDate,
                 req.StartDate

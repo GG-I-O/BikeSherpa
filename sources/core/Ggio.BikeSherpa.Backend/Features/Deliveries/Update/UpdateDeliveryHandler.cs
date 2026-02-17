@@ -21,8 +21,6 @@ public record UpdateDeliveryCommand(
      Guid ReportId,
      List<DeliveryStep> Steps,
      string[] Details,
-     double TotalWeight,
-     int HighestPackageLength,
      string PackingSize,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
@@ -50,9 +48,8 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                     step.RuleFor(s => s.StepType).IsInEnum().WithMessage("Type d'étape invalide.");
                     step.RuleFor(s => s.EstimatedDeliveryDate).NotEmpty();
                });
+          RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.TotalWeight).NotEmpty();
-          RuleFor(x => x.HighestPackageLength).NotEmpty();
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
@@ -80,8 +77,6 @@ public class UpdateDeliveryHandler(
           entity.TotalPrice = command.TotalPrice;
           entity.ReportId = command.ReportId;
           entity.Details = command.Details;
-          entity.TotalWeight = command.TotalWeight;
-          entity.HighestPackageLength = command.HighestPackageLength;
           entity.PackingSize = command.PackingSize;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;

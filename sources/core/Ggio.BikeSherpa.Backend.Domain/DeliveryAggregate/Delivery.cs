@@ -14,9 +14,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required Guid ReportId { get; set; }
      public required List<DeliveryStep> Steps { get; set; } = [];
      public string[]? Details { get; set; } = [];
-     public required double TotalWeight { get; set; }
-     public required int HighestPackageLength { get; set; }
-     public string? PackingSize { get; set; }
+     public required string PackingSize { get; set; }
      public required DateTimeOffset ContractDate { get; set; }
      public required DateTimeOffset StartDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }

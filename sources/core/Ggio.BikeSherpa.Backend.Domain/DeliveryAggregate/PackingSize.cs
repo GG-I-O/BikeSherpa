@@ -3,8 +3,7 @@
 public record PackingSize(
      string Name,
      int MaxWeight,
-     int TourMaxLength,
-     int MaxLength,
+     int MaxPackageLength,
      double TourPrice,
      double Price
      );

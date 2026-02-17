@@ -19,8 +19,7 @@ public class SimpleDeliveryStrategy : IPricingStrategy
           int dropoffStepsOutside,
           PackingSize packingSize,
           double urgencyPriceCoefficient,
-          double totalDistance,
-          double totalWeight)
+          double totalDistance)
      {
 
           return dropoffStepsInGronoble * _stepPriceInGrenoble +
@@ -28,13 +27,6 @@ public class SimpleDeliveryStrategy : IPricingStrategy
                  dropoffStepsInPeriphery * _stepPriceInPeriphery +
                  dropoffStepsOutside * _stepPriceOutside +
                  packingSize.Price +
-                 urgencyPriceCoefficient * totalDistance +
-                 CalculateOverweightPrice(totalWeight);
-     }
-
-     private static double CalculateOverweightPrice(double totalWeight)
-     {
-          var overweightPrice = Math.Ceiling((totalWeight - 30) / 10) * 2;
-          return overweightPrice;
+                 urgencyPriceCoefficient * totalDistance;
      }
 }

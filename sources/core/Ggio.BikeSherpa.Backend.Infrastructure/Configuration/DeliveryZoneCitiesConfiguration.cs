@@ -22,9 +22,14 @@ public class DeliveryZoneCitiesConfiguration : IEntityTypeConfiguration<CityEnti
                new { Id = 7, DeliveryZoneId = 2, Name = "Saint-Martin-d’Hères" },
                new { Id = 8, DeliveryZoneId = 2, Name = "Saint-Martin-le-Vinoux" },
                new { Id = 9, DeliveryZoneId = 2, Name = "Seyssinet-Pariset" },
-               new { Id = 10, DeliveryZoneId = 2, Name = "Seyssins" }
+               new { Id = 10, DeliveryZoneId = 2, Name = "Seyssins" },
                // Cities in Periphery zone
-               // Cities in Outside zone
+               new { Id = 11, DeliveryZoneId = 3, Name = "Sassenage" },
+               new { Id = 12, DeliveryZoneId = 3, Name = "Saint-Égrève" },
+               new { Id = 13, DeliveryZoneId = 3, Name = "Meylan" },
+               new { Id = 14, DeliveryZoneId = 3, Name = "Gières" },
+               new { Id = 15, DeliveryZoneId = 3, Name = "Bresson" },
+               new { Id = 16, DeliveryZoneId = 3, Name = "Le Pont-de-Claix" }
           );
      }
 }

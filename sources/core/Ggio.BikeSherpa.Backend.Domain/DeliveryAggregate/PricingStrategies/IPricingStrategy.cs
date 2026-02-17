@@ -14,7 +14,6 @@ public interface IPricingStrategy
           int dropoffStepsOutside,
           PackingSize packingSize,
           double urgencyPriceCoefficient,
-          double totalDistance,
-          double totalWeight
+          double totalDistance
           );
 }

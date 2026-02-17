@@ -1,7 +1,10 @@
-﻿namespace Ggio.BikeSherpa.Backend.Infrastructure;
+﻿using Facet;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-public class CityEntity
+namespace Ggio.BikeSherpa.Backend.Infrastructure;
+
+[Facet(typeof(City))]
+public partial class CityEntity
 {
      public int Id { get; set; }
-     public string Name { get; set; } = null!;
 }
