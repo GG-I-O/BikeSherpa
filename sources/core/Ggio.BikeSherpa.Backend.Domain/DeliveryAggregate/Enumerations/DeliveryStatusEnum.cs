@@ -5,5 +5,12 @@ public enum DeliveryStatusEnum
      Pending,
      Started,
      Completed,
-     Canceled
+     Cancelled
+}
+
+public enum DeliveryStatusTrigger
+{
+     Start,
+     Complete,
+     Cancel
 }

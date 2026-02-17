@@ -6,7 +6,7 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 {
      public required PricingStrategyEnum PricingStrategy { get; set; }
-     public DeliveryStatusEnum Status { get; set; }
+     public DeliveryStatusEnum Status { get; set; } = DeliveryStatusEnum.Pending;
      public required string Code { get; set; }
      public required Guid CustomerId { get; set; }
      public required string Urgency { get; set; }
@@ -22,6 +22,24 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required DateTimeOffset StartDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
+     
+     public void Start()
+     {
+          var statusMachine = new DeliveryStatusMachine(this);
+          statusMachine.Fire(DeliveryStatusTrigger.Start);
+     }
+
+     public void Complete()
+     {
+          var statusMachine = new DeliveryStatusMachine(this);
+          statusMachine.Fire(DeliveryStatusTrigger.Complete);
+     }
+     
+     public void Cancel()
+     {
+          var statusMachine = new DeliveryStatusMachine(this);
+          statusMachine.Fire(DeliveryStatusTrigger.Cancel);
+     }
      
      private void AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
      {
