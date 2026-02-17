@@ -1,5 +1,4 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Services.Catalogs;
 
 namespace Ggio.BikeSherpa.Backend.Services.Repositories;
@@ -8,13 +7,10 @@ public class DeliveryZoneRepository : IDeliveryZoneRepository
 {
      public IReadOnlyList<DeliveryZone> DeliveryZones { get; }
 
-     public DeliveryZoneRepository(IEnumerable<DeliveryZoneEntity> entities)
+     public DeliveryZoneRepository(IEnumerable<DeliveryZone> entities)
      {
           DeliveryZones = entities
-               .Select(e => new DeliveryZone(
-                    e.Name,
-                    e.Cities.Select(c => new City(c.Name)).ToList()
-                    ))
+               .Select(e => e with { Cities = e.Cities.Select(c => new City(c.Id, c.Name)).ToList() })
                .ToList();
      }
 

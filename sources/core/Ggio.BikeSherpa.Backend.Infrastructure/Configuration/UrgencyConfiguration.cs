@@ -1,20 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Configuration;
 
-public class UrgencyConfiguration : IEntityTypeConfiguration<UrgencyEntity>
+public class UrgencyConfiguration : IEntityTypeConfiguration<Urgency>
 {
-     public void Configure(EntityTypeBuilder<UrgencyEntity> builder)
+     public void Configure(EntityTypeBuilder<Urgency> builder)
      {
           builder.ToTable("Urgencies");
-          builder.HasKey(p => p.Id);
-          builder.Property(p => p.Name).HasMaxLength(100).IsRequired();
-          builder.Property(p => p.PriceCoefficient).IsRequired();
+          builder.HasKey(u => u.Id);
+          builder.Property(u => u.Id).ValueGeneratedOnAdd();
+          builder.Property(u => u.Name).HasMaxLength(100).IsRequired();
+          builder.Property(u => u.PriceCoefficient).IsRequired();
           builder.HasData(
-               new UrgencyEntity { Id = 1, Name = "Eco", PriceCoefficient = 2.75 },
-               new UrgencyEntity { Id = 2, Name = "Standard", PriceCoefficient = 1.25 },
-               new UrgencyEntity { Id = 2, Name = "Urgent", PriceCoefficient = 2 }
+               new { Name = "Eco", PriceCoefficient = 0.75 },
+               new { Name = "Standard", PriceCoefficient = 1.25 },
+               new { Name = "Urgent", PriceCoefficient = 2 }
           );
      }
 }

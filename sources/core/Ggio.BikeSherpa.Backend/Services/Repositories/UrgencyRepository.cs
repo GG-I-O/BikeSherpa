@@ -1,5 +1,4 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Infrastructure;
 
 namespace Ggio.BikeSherpa.Backend.Services.Repositories;
 
@@ -7,9 +6,9 @@ public class UrgencyRepository : IUrgencyRepository
 {
      public IReadOnlyList<Urgency> Urgencies { get; }
 
-     public UrgencyRepository(IEnumerable<UrgencyEntity> entities)
+     public UrgencyRepository(IEnumerable<Urgency> entities)
      {
-          Urgencies = entities.Select(e => new Urgency(e.Name, e.PriceCoefficient)).ToList();
+          Urgencies = entities.Select(e => new Urgency(e.Id, e.Name, e.PriceCoefficient)).ToList();
      }
 
      public Urgency GetUrgency(string name)

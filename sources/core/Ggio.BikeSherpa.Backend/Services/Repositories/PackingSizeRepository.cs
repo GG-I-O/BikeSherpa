@@ -1,5 +1,4 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Infrastructure;
 
 namespace Ggio.BikeSherpa.Backend.Services.Repositories;
 
@@ -7,10 +6,11 @@ public class PackingSizeRepository : IPackingSizeRepository
 {
      public IReadOnlyList<PackingSize> PackingSizes { get; }
 
-     public PackingSizeRepository(IEnumerable<PackingSizeEntity> entities)
+     public PackingSizeRepository(IEnumerable<PackingSize> entities)
      {
           PackingSizes = entities
                .Select(e => new PackingSize(
+                    e.Id,
                     e.Name,
                     e.MaxWeight,
                     e.MaxPackageLength,

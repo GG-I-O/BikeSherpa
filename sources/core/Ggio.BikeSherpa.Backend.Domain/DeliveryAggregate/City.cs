@@ -1,3 +1,6 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-public record City(string Name);
+public record City(
+     int Id,
+     string Name
+     );

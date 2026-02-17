@@ -10,9 +10,9 @@ public class BackendDbContext(DbContextOptions<BackendDbContext> options) : DbCo
      public virtual DbSet<Delivery> Deliveries { get; set; }
      public virtual DbSet<Customer> Customers { get; set; }
      public virtual DbSet<Courier> Couriers { get; set; }
-     public virtual DbSet<PackingSizeEntity> PackingSizes { get; set; }
-     public virtual DbSet<DeliveryZoneEntity> DeliveryZones { get; set; }
-     public virtual DbSet<UrgencyEntity> Urgencies { get; set; }
+     public virtual DbSet<PackingSize> PackingSizes { get; set; }
+     public virtual DbSet<DeliveryZone> DeliveryZones { get; set; }
+     public virtual DbSet<Urgency> Urgencies { get; set; }
 
      override protected void OnModelCreating(ModelBuilder modelBuilder)
      {
