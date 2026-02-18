@@ -1,5 +1,6 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.DddCore;
+using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
@@ -24,21 +25,21 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public DateTimeOffset UpdatedAt { get; set; }
      
      // Methods allowing to change the delivery status
-     public void Start()
+     public void Start(IMediator mediator)
      {
-          var statusMachine = new DeliveryStatusMachine(this);
+          var statusMachine = new DeliveryStatusMachine(mediator, this);
           statusMachine.Fire(DeliveryStatusTrigger.Start);
      }
 
-     public void Complete()
+     public void Complete(IMediator mediator)
      {
-          var statusMachine = new DeliveryStatusMachine(this);
+          var statusMachine = new DeliveryStatusMachine(mediator, this);
           statusMachine.Fire(DeliveryStatusTrigger.Complete);
      }
      
-     public void Cancel()
+     public void Cancel(IMediator mediator)
      {
-          var statusMachine = new DeliveryStatusMachine(this);
+          var statusMachine = new DeliveryStatusMachine(mediator, this);
           statusMachine.Fire(DeliveryStatusTrigger.Cancel);
      }
      
