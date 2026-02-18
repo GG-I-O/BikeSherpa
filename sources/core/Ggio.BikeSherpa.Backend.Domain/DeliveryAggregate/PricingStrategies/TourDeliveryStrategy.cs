@@ -23,7 +23,8 @@ public class TourDeliveryStrategy : IPricingStrategy
           double totalDistance)
      {
           return pickupNumber * _pickupBasePrice +
-                 CalculateDelayPrice(startDate, contractDate) +
+                 CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
+                 CalculateDelayCost(startDate, contractDate) +
                  packingSize.TourPrice +
                  dropoffStepsInGronoble * _stepPriceInGrenoble +
                  dropoffStepsInBorder * _stepPriceInBorder +
@@ -32,8 +33,20 @@ public class TourDeliveryStrategy : IPricingStrategy
      }
 
      // Check if there is an extra cost for a delivery on the same day as the contract
-     private static double CalculateDelayPrice(DateTimeOffset startDate, DateTimeOffset contractDate)
+     private static double CalculateSameDayDeliveryExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate)
      {
           return startDate.Date == contractDate.Date ? 2 : 0;
+     }
+     
+     // Check if the delivery delay generates a discount or an extra cost
+     private static double CalculateDelayCost(DateTimeOffset startDate, DateTimeOffset contractDate)
+     {
+          var delayInHours = (contractDate - startDate).TotalHours;
+          return delayInHours switch
+          {
+               > 18 => -2,
+               <= 2 => 3,
+               _ => 0
+          };
      }
 }

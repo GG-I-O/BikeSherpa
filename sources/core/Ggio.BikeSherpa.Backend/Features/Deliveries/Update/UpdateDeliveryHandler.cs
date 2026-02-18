@@ -17,14 +17,14 @@ public record UpdateDeliveryCommand(
      string Code,
      Guid CustomerId,
      string Urgency,
-     double TotalPrice,
+     double? TotalPrice,
+     double? Discount,
      Guid ReportId,
      List<DeliveryStep> Steps,
      string[] Details,
      string PackingSize,
      bool InsulatedBox,
      bool ExactTime,
-     bool ReturnJourney,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
 ) : ICommand<Result>;
@@ -43,6 +43,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                .Must(urgency => urgencies.Urgencies.Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
                .WithMessage("Valeur d'urgence saisie invalide.");
           RuleFor(x => x.TotalPrice).NotEmpty();
+          RuleFor(x => x.Discount).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
           RuleForEach(x => x.Steps)
                .ChildRules(step =>
@@ -54,7 +55,6 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.InsulatedBox).NotEmpty();
           RuleFor(x => x.ExactTime).NotEmpty();
-          RuleFor(x => x.ReturnJourney).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
@@ -81,12 +81,12 @@ public class UpdateDeliveryHandler(
           entity.CustomerId = command.CustomerId;
           entity.Urgency = command.Urgency;
           entity.TotalPrice = command.TotalPrice;
+          entity.Discount = command.Discount;
           entity.ReportId = command.ReportId;
           entity.Details = command.Details;
           entity.PackingSize = command.PackingSize;
           entity.InsulatedBox = command.InsulatedBox;
           entity.ExactTime = command.ExactTime;
-          entity.ReturnJourney = command.ReturnJourney;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
 

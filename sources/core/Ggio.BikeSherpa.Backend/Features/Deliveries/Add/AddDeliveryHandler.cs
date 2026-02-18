@@ -15,13 +15,13 @@ public record AddDeliveryCommand(
      string Code,
      Guid CustomerId,
      string Urgency,
-     double TotalPrice,
+     double? TotalPrice,
+     double? Discount,
      Guid ReportId,
      string[] Details,
      string PackingSize,
      bool InsulatedBox,
      bool ExactTime,
-     bool ReturnJourney,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
      ) : ICommand<Result<Guid>>;
@@ -44,7 +44,6 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.InsulatedBox).NotEmpty();
           RuleFor(x => x.ExactTime).NotEmpty();
-          RuleFor(x => x.ReturnJourney).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -67,11 +66,12 @@ public class AddDeliveryHandler(
                command.Code,
                command.CustomerId,
                command.Urgency,
+               command.TotalPrice,
+               command.Discount,
                command.ReportId,
                command.PackingSize,
                command.InsulatedBox,
                command.ExactTime,
-               command.ReturnJourney,
                command.ContractDate,
                command.StartDate
                );

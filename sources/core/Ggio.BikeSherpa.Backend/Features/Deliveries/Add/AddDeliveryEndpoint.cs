@@ -25,12 +25,12 @@ public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, Ad
                req.CustomerId,
                req.Urgency,
                req.TotalPrice,
+               req.Discount,
                req.ReportId,
                req.Details,
                req.PackingSize,
                req.InsulatedBox,
                req.ExactTime,
-               req.ReturnJourney,
                req.ContractDate,
                req.StartDate
                );

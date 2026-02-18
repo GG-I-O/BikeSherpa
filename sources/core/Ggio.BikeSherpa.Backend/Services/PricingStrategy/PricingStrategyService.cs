@@ -40,7 +40,7 @@ public class PricingStrategyService(
           }
           else
           {
-               return delivery.TotalPrice;
+               return (double)delivery.TotalPrice!;
           }
      }
 }

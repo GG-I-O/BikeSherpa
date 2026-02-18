@@ -17,6 +17,6 @@ public class DeliveryZoneRepository : IDeliveryZoneRepository
      public DeliveryZone FromAddress(string city)
      {
           return DeliveryZones.FirstOrDefault(zone => zone.Cities.Any(c => c.Name == city))
-          ?? throw new Exception("L’adresse ne se trouve pas dans les zones couvertes.");
+          ?? DeliveryZones.First(zone => zone.Name == "Extérieur");
      }
 }

@@ -10,14 +10,14 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required string Code { get; set; }
      public required Guid CustomerId { get; set; }
      public required string Urgency { get; set; }
-     public double TotalPrice { get; set; }
+     public double? TotalPrice { get; set; }
+     public double? Discount { get; set; }
      public required Guid ReportId { get; set; }
      public required List<DeliveryStep> Steps { get; set; } = [];
      public string[]? Details { get; set; } = [];
      public required string PackingSize { get; set; }
      public required bool InsulatedBox { get; set; }
      public required bool ExactTime { get; set; }
-     public required bool ReturnJourney { get; set; }
      public required DateTimeOffset ContractDate { get; set; }
      public required DateTimeOffset StartDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
