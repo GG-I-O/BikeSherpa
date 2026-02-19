@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Folder Include="DeliveryAggregate\Services\" />
+        <PackageReference Include="Stateless" Version="5.20.1" />
   </ItemGroup>
 
 </Project>

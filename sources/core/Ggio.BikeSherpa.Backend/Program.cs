@@ -14,6 +14,7 @@ using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Middleware;
 using Ggio.BikeSherpa.Backend.Services.Notification;
+using Ggio.BikeSherpa.Backend.Services.Repositories;
 using Ggio.DddCore;
 using Ggio.DddCore.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -69,6 +70,33 @@ builder.Services.AddMediator(options =>
 {
      options.Assemblies = [typeof(GetDeliveryQuery).Assembly, typeof(EntityBase).Assembly, typeof(EfCoreDomainEntityAddedEventHandler)];
      options.ServiceLifetime = ServiceLifetime.Scoped;
+});
+
+// Add PackingSizeRepository
+builder.Services.AddSingleton<IPackingSizeRepository>(sp =>
+{
+     var db = sp.GetRequiredService<BackendDbContext>();
+     var entities = db.PackingSizes.ToList();
+
+     return new PackingSizeRepository(entities);
+});
+
+// Add DeliveryZoneRepository
+builder.Services.AddSingleton<IDeliveryZoneRepository>(sp =>
+{
+     var db = sp.GetRequiredService<BackendDbContext>();
+     var entities = db.DeliveryZones.ToList();
+
+     return new DeliveryZoneRepository(entities);
+});
+
+// Add UrgencyRepository
+builder.Services.AddSingleton<IUrgencyRepository>(sp =>
+{
+     var db = sp.GetRequiredService<BackendDbContext>();
+     var entities = db.Urgencies.ToList();
+
+     return new UrgencyRepository(entities);
 });
 
 // Cors
