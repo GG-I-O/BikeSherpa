@@ -38,4 +38,8 @@
         <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.8.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Features\Deliveries\Update\" />
+    </ItemGroup>
+
 </Project>
