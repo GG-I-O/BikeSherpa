@@ -2,14 +2,14 @@
 using Ggio.DddCore;
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-public class DeliveryStep(StepTypeEnum stepType, int order, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
+public class DeliveryStep(StepTypeEnum stepType, int order, Address stepAddress, DeliveryZone stepZone, double distance, DateTimeOffset estimatedDeliveryDate)
      : EntityBase<Guid>, IAuditEntity
 {
      public StepTypeEnum StepType { get; set; } = stepType;
      public int Order { get; set; } = order;
      public bool Completed { get; set; }
      public Address StepAddress { get; set; } = stepAddress;
-     public DeliveryZone StepZone { get; set; } = deliveryZone;
+     public DeliveryZone StepZone { get; set; } = stepZone;
      public double Distance { get; set; } = distance;
      public Guid? CourierId { get; set; }
      public string? Comment { get; set; }

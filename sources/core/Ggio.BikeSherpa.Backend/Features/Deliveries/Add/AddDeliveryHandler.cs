@@ -2,6 +2,7 @@ using Ardalis.Result;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Services.Repositories;
 using Ggio.DddCore;
 using Mediator;
@@ -31,7 +32,14 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
      {
           RuleFor(x => x.PricingStrategyEnum).IsInEnum().NotEmpty();
           RuleFor(x => x.StatusEnum).IsInEnum().NotEmpty();
-          RuleFor(x => x.Code).NotEmpty();
+          RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
+          {
+               var codeIsValid = !await repository.AnyAsync(new DeliveryByCodeSpecification(code), cancellationToken);
+               if (!codeIsValid)
+               {
+                    context.AddFailure("Code de course déjà utilisé");
+               }
+          });
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.Urgency)
                .NotEmpty().
@@ -40,8 +48,6 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.PackingSize).NotEmpty();
-          RuleFor(x => x.InsulatedBox).NotEmpty();
           RuleFor(x => x.ExactTime).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
