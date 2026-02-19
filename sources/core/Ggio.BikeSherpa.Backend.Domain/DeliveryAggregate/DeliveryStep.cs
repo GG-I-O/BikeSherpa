@@ -6,7 +6,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
 {
      public StepTypeEnum StepType { get; set; }
      public int Order { get; set; }
-     public bool Completed { get; set; } = false;
+     public bool Completed { get; set; }
      public Address StepAddress { get; set; }
      public DeliveryZone StepZone { get; set; }
      public double Distance { get; set; }

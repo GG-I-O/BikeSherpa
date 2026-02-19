@@ -51,10 +51,8 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 public class AddDeliveryHandler(
      IDeliveryFactory factory,
      IValidator<AddDeliveryCommand> validator,
-     IApplicationTransaction transaction,
-     IPackingSizeRepository packingSizes,
-     IUrgencyRepository urgencies,
-     IDeliveryZoneRepository deliveryZones) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
+     IApplicationTransaction transaction
+     ) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {

@@ -1,5 +1,4 @@
 using Ardalis.Specification;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 
