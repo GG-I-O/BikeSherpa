@@ -11,7 +11,7 @@ public class GetAllDeliveriesEndpoint(IMediator mediator, IDeliveryLinks deliver
      public override void Configure()
      {
           Get("/deliveries/{lastSync?}");
-          Policies("scope", "read:deliveries");
+          Policies("read:deliveries");
           Description(x => x.WithTags("delivery"));
      }
 

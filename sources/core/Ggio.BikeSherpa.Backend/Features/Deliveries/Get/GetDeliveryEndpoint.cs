@@ -17,7 +17,7 @@ public class GetDeliveryEndpoint(IMediator mediator, IDeliveryLinks deliveryLink
 
      public override async Task HandleAsync(CancellationToken ct)
      {
-          var delivery = await mediator.Send(new GetDeliveryQuery(Query<Guid>("deliveryId")), ct);
+          var delivery = await mediator.Send(new GetDeliveryQuery(Route<Guid>("deliveryId")), ct);
           if (delivery is null)
           {
                await Send.NotFoundAsync(ct);
