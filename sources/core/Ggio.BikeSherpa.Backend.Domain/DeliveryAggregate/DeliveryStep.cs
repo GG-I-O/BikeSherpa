@@ -20,12 +20,12 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
 
      private DeliveryStep() { }
 
-     public DeliveryStep(StepTypeEnum stepType, int order, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
+     public DeliveryStep(StepTypeEnum stepType, int order, Address stepAddress, DeliveryZone stepZone, double distance, DateTimeOffset estimatedDeliveryDate)
      {
           StepType = stepType;
           Order = order;
           StepAddress = stepAddress;
-          StepZone = deliveryZone;
+          StepZone = stepZone;
           Distance = distance;
           EstimatedDeliveryDate = estimatedDeliveryDate;
      }
@@ -47,12 +47,12 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           Distance = distance;
           EstimatedDeliveryDate = estimatedDeliveryDate;
      }
-     
+
      public void UpdateOrder(int order) { Order = order; }
-     
+
      public void AssignCourier(Guid courierId) { CourierId = courierId; }
-     
+
      public void UpdateDeliveryTime(DateTimeOffset deliveryTime) { EstimatedDeliveryDate = deliveryTime; }
-     
+
      public void UpdateCompletion(bool completed) { Completed = completed; }
 }
