@@ -2,33 +2,22 @@
 using Ggio.DddCore;
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-public class DeliveryStep : EntityBase<Guid>, IAuditEntity
+public class DeliveryStep(StepTypeEnum stepType, int order, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
+     : EntityBase<Guid>, IAuditEntity
 {
-     public StepTypeEnum StepType { get; set; }
-     public int Order { get; set; }
+     public StepTypeEnum StepType { get; set; } = stepType;
+     public int Order { get; set; } = order;
      public bool Completed { get; set; }
-     public Address StepAddress { get; set; }
-     public DeliveryZone StepZone { get; set; }
-     public double Distance { get; set; }
+     public Address StepAddress { get; set; } = stepAddress;
+     public DeliveryZone StepZone { get; set; } = deliveryZone;
+     public double Distance { get; set; } = distance;
      public Guid? CourierId { get; set; }
      public string? Comment { get; set; }
      public string[]? AttachmentFilePaths { get; set; }
-     public DateTimeOffset EstimatedDeliveryDate { get; set; }
+     public DateTimeOffset EstimatedDeliveryDate { get; set; } = estimatedDeliveryDate;
      public DateTimeOffset? RealDeliveryDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
-
-     private DeliveryStep() { }
-
-     public DeliveryStep(StepTypeEnum stepType, int order, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
-     {
-          StepType = stepType;
-          Order = order;
-          StepAddress = stepAddress;
-          StepZone = deliveryZone;
-          Distance = distance;
-          EstimatedDeliveryDate = estimatedDeliveryDate;
-     }
 
      public void Update(
           StepTypeEnum stepType,
