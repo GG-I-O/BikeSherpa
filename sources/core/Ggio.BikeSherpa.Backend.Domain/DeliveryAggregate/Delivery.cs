@@ -68,165 +68,68 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      private void Start()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Start);
-          RegisterDomainEvent(new DeliveryStartedEvent(Id));
+          await _mediator.Publish(new DeliveryStartedEvent(this));
      }
 
      private void Complete()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Complete);
-          RegisterDomainEvent(new DeliveryCompletedEvent(Id));
+          await _mediator.Publish(new DeliveryCompletedEvent(this));
      }
-
-     public void Cancel()
+     
+     public async Task Cancel()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Cancel);
-          RegisterDomainEvent(new DeliveryCancelledEvent(Id));
+          await _mediator.Publish(new DeliveryCancelledEvent(this));
      }
-
-     public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime, IPricingStrategyService pricingStrategyService)
+     
+     // Methods allowing to change delivery properties
+     public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime)
      {
           StartDate = deliveryDateTime;
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
-
-     public void ReorderSteps(Guid movedStepId, int newOrder)
+     
+     public void SetDeliveryPrice(double deliveryPrice)
      {
-          var movedStep = Steps.Single(s => s.Id == movedStepId);
-          Steps.Remove(movedStep);
-          Steps.Insert(newOrder - 1, movedStep);
-          var order = 1;
-          foreach (var step in Steps)
-          {
-               step.Order = order++;
-          }
+          TotalPrice = deliveryPrice;
      }
-
-     private void ReorderStepsOnDeletion()
+     
+     private void AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
      {
-          var order = 1;
-          foreach (var step in Steps.OrderBy(s => s.Order))
-          {
-               step.Order = order++;
-          }
+          var step = new DeliveryStep(stepTypeEnum, Steps.Count + 1, stepAddress, deliveryZone, distance, estimatedDeliveryDate);
+          Steps.Add(step);
      }
-
-     public void UpdateStepCourier(Guid stepId, Guid courierId)
+     
+     // Methods allowing to update delivery steps
+     private void UpdateStepOrder(Guid stepId, int order)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.CourierId = courierId;
      }
-
-     public void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset updatedDeliveryDate)
+     
+     private void UpdateStepCourier(Guid stepId, Guid courierId)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          var timeOffset = updatedDeliveryDate - existingStep.EstimatedDeliveryDate;
-          existingStep.EstimatedDeliveryDate = updatedDeliveryDate;
-          foreach (var step in Steps.Where(s => s.Order > existingStep.Order))
-          {
-               step.EstimatedDeliveryDate += timeOffset;
-          }
+          existingStep.AssignCourier(courierId);
      }
-
-     public void UpdateStepCompletion(Guid stepId, bool completed)
+     
+     private void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset estimatedDeliveryDate)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.Completed = completed;
-          if (completed)
-          {
-               existingStep.RealDeliveryDate = DateTimeOffset.UtcNow;
-          }
-          UpdateStatus();
+          existingStep.UpdateDeliveryTime(estimatedDeliveryDate);
      }
 
-     public DeliveryStep AddStep(
-          StepType stepType,
-          Address stepAddress,
-          double distance,
-          IDeliveryZoneRepository deliveryZones,
-          IPricingStrategyService pricingStrategyService)
+     private void UpdateStepCompletion(Guid stepId, bool completed)
      {
-          var newStep = new DeliveryStep(
-               stepType,
-               Steps.Count + 1,
-               stepAddress,
-               distance)
-          {
-               Id = Guid.NewGuid(),
-               StepAddress = stepAddress,
-               StepZone = deliveryZones.GetByAddress(stepAddress.City)
-          };
-
-          if (Steps.Count >= 1)
-          {
-               var previousStep = Steps.Where(s => s.Order == newStep.Order - 1);
-               newStep.EstimatedDeliveryDate = previousStep.Single().EstimatedDeliveryDate + TimeSpan.FromMinutes(15);
-          }
-          else
-          {
-               newStep.EstimatedDeliveryDate = StartDate;
-          }
-
-          Steps.Add(newStep);
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
-
-          return newStep;
+          var existingStep = Steps.Single(s => s.Id == stepId);
+          existingStep.UpdateCompletion(completed);
      }
+     
+     private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
+          previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
+          || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;
 
-     public void DeleteStep(
-          DeliveryStep removedStep,
-          IPricingStrategyService pricingStrategyService)
-     {
-          var nextStep = Steps.FirstOrDefault((s => s.Order == removedStep.Order + 1));
-          var timeOffset = CalculateDeliveryTimeOffset(removedStep, nextStep);
-          Steps.Remove(removedStep);
-          ReorderStepsOnDeletion();
-          UpdateStepDeliveryTimeOnDelete(removedStep.Order, timeOffset);
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
-     }
-
-     private TimeSpan CalculateDeliveryTimeOffset(DeliveryStep removedStep, DeliveryStep? nextStep)
-     {
-          return nextStep is null ? TimeSpan.Zero : nextStep.EstimatedDeliveryDate - removedStep.EstimatedDeliveryDate;
-     }
-
-     private void UpdateStepDeliveryTimeOnDelete(int stepOrder, TimeSpan timeOffset)
-     {
-          foreach (var step in Steps.Where(s => s.Order >= stepOrder))
-          {
-               step.EstimatedDeliveryDate += timeOffset;
-          }
-     }
-
-     public void UpdateSteps(List<DeliveryStep> steps, IDeliveryZoneRepository deliveryZones, IPricingStrategyService pricingStrategyService)
-     {
-          foreach (var step in steps)
-          {
-               var existing = Steps.FirstOrDefault(s => s.Id == step.Id);
-
-               if (existing is null)
-               {
-                    step.StepZone = deliveryZones.GetByAddress(step.StepAddress.City);
-                    Steps.Add(step);
-               }
-
-               else
-               {
-                    existing.Update(
-                         step.StepType,
-                         step.Order,
-                         step.Completed,
-                         step.StepAddress,
-                         deliveryZones.GetByAddress(step.StepAddress.City),
-                         step.Distance,
-                         step.EstimatedDeliveryDate);
-               }
-          }
-
-          DeleteOldSteps(steps);
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
-     }
-
-     private void DeleteOldSteps(List<DeliveryStep> steps)
+     private void DeleteStep(Guid stepId)
      {
           var incomingIds = steps.Select(s => s.Id).ToHashSet();
           Steps.RemoveAll(s => !incomingIds.Contains(s.Id));

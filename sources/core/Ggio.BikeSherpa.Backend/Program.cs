@@ -73,31 +73,13 @@ builder.Services.AddMediator(options =>
 });
 
 // Add PackingSizeRepository
-builder.Services.AddSingleton<IPackingSizeRepository>(sp =>
-{
-     var db = sp.GetRequiredService<BackendDbContext>();
-     var entities = db.PackingSizes.ToList();
-
-     return new PackingSizeRepository(entities);
-});
+builder.Services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
 
 // Add DeliveryZoneRepository
-builder.Services.AddSingleton<IDeliveryZoneRepository>(sp =>
-{
-     var db = sp.GetRequiredService<BackendDbContext>();
-     var entities = db.DeliveryZones.ToList();
-
-     return new DeliveryZoneRepository(entities);
-});
+builder.Services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
 
 // Add UrgencyRepository
-builder.Services.AddSingleton<IUrgencyRepository>(sp =>
-{
-     var db = sp.GetRequiredService<BackendDbContext>();
-     var entities = db.Urgencies.ToList();
-
-     return new UrgencyRepository(entities);
-});
+builder.Services.AddScoped<IUrgencyRepository, UrgencyRepository>();
 
 // Cors
 var allowedOrigins = (builder.Configuration["CORS:AllowedOrigins"] ?? "").Split(',');
