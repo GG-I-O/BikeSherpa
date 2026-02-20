@@ -7,6 +7,12 @@ public class TourDeliveryStrategy : IPricingStrategy
      private readonly double _stepPriceInBorder = 8;
      private readonly double _stepPriceInPeriphery = 0;
      private readonly double _stepPriceOutside = 0;
+     private const double SameDayDeliveryExtraCost = 2;
+     private const double EarlyOrderLimit = 18;
+     private const double LastMinuteOrderLimit = 2;
+     private const double EarlyOrderDiscount = -2;
+     private const double LastMinuteOrderExtraCost = 3;
+     private const double StandardCost = 0;
      
      public string Name => "TourDelivery";
 
@@ -35,7 +41,7 @@ public class TourDeliveryStrategy : IPricingStrategy
      // Check if there is an extra cost for a delivery on the same day as the contract
      private static double CalculateSameDayDeliveryExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate)
      {
-          return startDate.Date == contractDate.Date ? 2 : 0;
+          return startDate.Date == contractDate.Date ? SameDayDeliveryExtraCost : StandardCost;
      }
      
      // Check if the delivery delay generates a discount or an extra cost
@@ -44,9 +50,9 @@ public class TourDeliveryStrategy : IPricingStrategy
           var delayInHours = (contractDate - startDate).TotalHours;
           return delayInHours switch
           {
-               > 18 => -2,
-               <= 2 => 3,
-               _ => 0
+               > EarlyOrderLimit => EarlyOrderDiscount,
+               <= LastMinuteOrderLimit => LastMinuteOrderExtraCost,
+               _ => StandardCost
           };
      }
 }

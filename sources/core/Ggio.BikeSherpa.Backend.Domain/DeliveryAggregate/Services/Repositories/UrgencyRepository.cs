@@ -1,6 +1,4 @@
-﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-
-namespace Ggio.BikeSherpa.Backend.Services.Repositories;
+﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 
 public class UrgencyRepository : IUrgencyRepository
 {

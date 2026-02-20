@@ -1,9 +1,8 @@
-﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
-using Ggio.BikeSherpa.Backend.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 
-namespace Ggio.BikeSherpa.Backend.Services.PricingStrategy;
+namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 
 public class PricingStrategyService(
      IEnumerable<IPricingStrategy> strategies,

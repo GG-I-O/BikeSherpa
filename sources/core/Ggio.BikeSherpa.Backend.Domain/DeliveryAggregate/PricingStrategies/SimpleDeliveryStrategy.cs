@@ -2,11 +2,17 @@
 
 public class SimpleDeliveryStrategy : IPricingStrategy
 {
-     private readonly double _stepPriceInGrenoble = 1;
-     private readonly double _stepPriceInBorder = 2.5;
-     private readonly double _stepPriceInPeriphery = 5.5;
-     private readonly double _stepPriceOutside = 11;
-     
+     private const double StepPriceInGrenoble = 1;
+     private const double StepPriceInBorder = 2.5;
+     private const double StepPriceInPeriphery = 5.5;
+     private const double StepPriceOutside = 11;
+     private const double SameDayDeliveryExtraCost = 2;
+     private const double EarlyOrderLimit = 18;
+     private const double LastMinuteOrderLimit = 2;
+     private const double EarlyOrderDiscount = -2;
+     private const double LastMinuteOrderExtraCost = 3;
+     private const double StandardCost = 0;
+
      public string Name => "SimpleDelivery";
 
      public double CalculateDeliveryPriceWithoutVat(
@@ -24,10 +30,10 @@ public class SimpleDeliveryStrategy : IPricingStrategy
 
           return CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
                  CalculateDelayCost(startDate, contractDate) +
-                 dropoffStepsInGronoble * _stepPriceInGrenoble +
-                 dropoffStepsInBorder * _stepPriceInBorder +
-                 dropoffStepsInPeriphery * _stepPriceInPeriphery +
-                 dropoffStepsOutside * _stepPriceOutside +
+                 dropoffStepsInGronoble * StepPriceInGrenoble +
+                 dropoffStepsInBorder * StepPriceInBorder +
+                 dropoffStepsInPeriphery * StepPriceInPeriphery +
+                 dropoffStepsOutside * StepPriceOutside +
                  packingSize.Price +
                  urgencyPriceCoefficient * totalDistance;
      }
@@ -35,7 +41,7 @@ public class SimpleDeliveryStrategy : IPricingStrategy
      // Check if there is an extra cost for a delivery on the same day as the contract
      private static double CalculateSameDayDeliveryExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate)
      {
-          return startDate.Date == contractDate.Date ? 2 : 0;
+          return startDate.Date == contractDate.Date ? SameDayDeliveryExtraCost : StandardCost;
      }
      
      // Check if the delivery delay generates a discount or an extra cost
@@ -44,9 +50,9 @@ public class SimpleDeliveryStrategy : IPricingStrategy
           var delayInHours = (contractDate - startDate).TotalHours;
           return delayInHours switch
           {
-               > 18 => -2,
-               <= 2 => 3,
-               _ => 0
+               > EarlyOrderLimit => EarlyOrderDiscount,
+               <= LastMinuteOrderLimit => LastMinuteOrderExtraCost,
+               _ => StandardCost
           };
      }
 }
