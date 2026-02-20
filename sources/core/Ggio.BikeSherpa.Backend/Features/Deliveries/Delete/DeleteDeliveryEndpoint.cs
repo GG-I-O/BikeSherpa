@@ -18,7 +18,7 @@ public class DeleteDeliveryEndpoint(IMediator mediator) : EndpointWithoutRequest
      {
           var command = new DeleteDeliveryCommand(
                Route<Guid>("deliveryId"));
-          
+
           var result = await mediator.Send(command, ct);
           await Send.ToEndpointWithoutRequestResult(result, ct);
      }

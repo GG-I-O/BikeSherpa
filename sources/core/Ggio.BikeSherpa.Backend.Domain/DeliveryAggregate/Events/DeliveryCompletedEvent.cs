@@ -2,4 +2,4 @@
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 
-public record DeliveryCompletedEvent(object NewEntity) : DomainEventBase;
+public record DeliveryCompletedEvent(Guid DeliveryId) : DomainEventBase;

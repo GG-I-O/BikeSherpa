@@ -37,13 +37,13 @@ public class SimpleDeliveryStrategy : IPricingStrategy
                  packingSize.Price +
                  urgencyPriceCoefficient * totalDistance;
      }
-     
+
      // Check if there is an extra cost for a delivery on the same day as the contract
      private static double CalculateSameDayDeliveryExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate)
      {
           return startDate.Date == contractDate.Date ? SameDayDeliveryExtraCost : StandardCost;
      }
-     
+
      // Check if the delivery delay generates a discount or an extra cost
      private static double CalculateDelayCost(DateTimeOffset startDate, DateTimeOffset contractDate)
      {

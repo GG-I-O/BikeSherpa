@@ -13,7 +13,7 @@ public class TourDeliveryStrategy : IPricingStrategy
      private const double EarlyOrderDiscount = -2;
      private const double LastMinuteOrderExtraCost = 3;
      private const double StandardCost = 0;
-     
+
      public string Name => "TourDelivery";
 
      public double CalculateDeliveryPriceWithoutVat(
@@ -43,7 +43,7 @@ public class TourDeliveryStrategy : IPricingStrategy
      {
           return startDate.Date == contractDate.Date ? SameDayDeliveryExtraCost : StandardCost;
      }
-     
+
      // Check if the delivery delay generates a discount or an extra cost
      private static double CalculateDelayCost(DateTimeOffset startDate, DateTimeOffset contractDate)
      {

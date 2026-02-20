@@ -16,7 +16,7 @@ public class PackingSizeRepository : IPackingSizeRepository
                     e.Price))
                .ToList();
      }
-     
+
      public PackingSize FromName(string name)
      {
           return PackingSizes.Single(s => s.Name == name);

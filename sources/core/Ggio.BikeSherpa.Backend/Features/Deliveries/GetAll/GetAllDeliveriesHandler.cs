@@ -6,7 +6,7 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 
-public record GetAllDeliveriesQuery(DateTimeOffset? LastSync): IQuery<List<Model.DeliveryCrud>>;
+public record GetAllDeliveriesQuery(DateTimeOffset? LastSync) : IQuery<List<Model.DeliveryCrud>>;
 
 public class GetAllDeliveriesHandler(IReadRepository<Delivery> repository) : IQueryHandler<GetAllDeliveriesQuery, List<Model.DeliveryCrud>>
 {
@@ -14,7 +14,7 @@ public class GetAllDeliveriesHandler(IReadRepository<Delivery> repository) : IQu
      {
           var allDeliveries = query.LastSync is null ?
                (await repository.ListAsync(cancellationToken)).SelectFacets<Delivery, Model.DeliveryCrud>() :
-               (await repository.ListAsync(new DeliveryByUpdatedAtSpecification(query.LastSync!.Value) ,cancellationToken)).SelectFacets<Delivery, Model.DeliveryCrud>();
+               (await repository.ListAsync(new DeliveryByUpdatedAtSpecification(query.LastSync!.Value), cancellationToken)).SelectFacets<Delivery, Model.DeliveryCrud>();
           return allDeliveries.ToList();
      }
 }

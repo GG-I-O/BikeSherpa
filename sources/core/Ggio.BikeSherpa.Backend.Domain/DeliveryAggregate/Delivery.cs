@@ -24,7 +24,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required DateTimeOffset StartDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
-     
+
      private readonly DeliveryStatusMachine _statusMachine;
      private readonly IMediator _mediator;
 
@@ -33,56 +33,56 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           _statusMachine = new DeliveryStatusMachine(this);
           _mediator = mediator;
      }
-     
+
      // Methods allowing to change the delivery status
      public async Task Start()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Start);
-          await _mediator.Publish(new DeliveryStartedEvent(this));
+          await _mediator.Publish(new DeliveryStartedEvent(Id));
      }
 
      public async Task Complete()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Complete);
-          await _mediator.Publish(new DeliveryCompletedEvent(this));
+          await _mediator.Publish(new DeliveryCompletedEvent(Id));
      }
-     
+
      public async Task Cancel()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Cancel);
-          await _mediator.Publish(new DeliveryCancelledEvent(this));
+          await _mediator.Publish(new DeliveryCancelledEvent(Id));
      }
-     
+
      // Methods allowing to change delivery properties
      public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime)
      {
           StartDate = deliveryDateTime;
      }
-     
+
      public void SetDeliveryPrice(double deliveryPrice)
      {
           TotalPrice = deliveryPrice;
      }
-     
+
      private void AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
      {
           var step = new DeliveryStep(stepTypeEnum, Steps.Count + 1, stepAddress, deliveryZone, distance, estimatedDeliveryDate);
           Steps.Add(step);
      }
-     
+
      // Methods allowing to update delivery steps
      private void UpdateStepOrder(Guid stepId, int order)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.UpdateOrder(order);
      }
-     
+
      private void UpdateStepCourier(Guid stepId, Guid courierId)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.AssignCourier(courierId);
      }
-     
+
      private void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset estimatedDeliveryDate)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
@@ -94,7 +94,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.UpdateCompletion(completed);
      }
-     
+
      private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
           previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
           || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;

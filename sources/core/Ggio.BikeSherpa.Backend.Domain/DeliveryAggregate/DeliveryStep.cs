@@ -36,12 +36,12 @@ public class DeliveryStep(StepTypeEnum stepType, int order, Address stepAddress,
           Distance = distance;
           EstimatedDeliveryDate = estimatedDeliveryDate;
      }
-     
+
      public void UpdateOrder(int order) { Order = order; }
-     
+
      public void AssignCourier(Guid courierId) { CourierId = courierId; }
-     
+
      public void UpdateDeliveryTime(DateTimeOffset deliveryTime) { EstimatedDeliveryDate = deliveryTime; }
-     
+
      public void UpdateCompletion(bool completed) { Completed = completed; }
 }

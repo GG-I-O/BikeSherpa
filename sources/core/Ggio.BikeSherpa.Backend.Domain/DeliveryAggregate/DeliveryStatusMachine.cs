@@ -3,7 +3,8 @@ using Stateless;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-public class DeliveryStatusMachine {
+public class DeliveryStatusMachine
+{
      private readonly StateMachine<DeliveryStatusEnum, DeliveryStatusTrigger> _statusMachine;
 
      public DeliveryStatusMachine(Delivery delivery)
@@ -21,7 +22,7 @@ public class DeliveryStatusMachine {
           _statusMachine.Configure(DeliveryStatusEnum.Completed)
                .Ignore(DeliveryStatusTrigger.Complete)
                .Ignore(DeliveryStatusTrigger.Start);
-          
+
           _statusMachine.Configure(DeliveryStatusEnum.Cancelled)
                .Ignore(DeliveryStatusTrigger.Complete)
                .Ignore(DeliveryStatusTrigger.Cancel);

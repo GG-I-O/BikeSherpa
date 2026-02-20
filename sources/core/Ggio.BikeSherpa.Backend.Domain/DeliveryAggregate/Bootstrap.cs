@@ -12,6 +12,6 @@ public static class Bootstrap
                services.AddScoped<IDeliveryDeleteEventHandler, DeliveryDeleteService>();
                return services;
           }
-          
+
      }
 }

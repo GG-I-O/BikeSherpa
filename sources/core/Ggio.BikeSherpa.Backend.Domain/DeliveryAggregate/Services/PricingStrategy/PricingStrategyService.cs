@@ -35,7 +35,7 @@ public class PricingStrategyService(
                     packingSize,
                     urgencyPriceCoefficient,
                     totalDistance
-               );               
+               );
           }
           else
           {

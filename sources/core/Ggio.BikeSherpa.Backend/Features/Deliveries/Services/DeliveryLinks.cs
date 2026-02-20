@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
 
-public class DeliveryLinks(IHttpContextAccessor httpContextAccessor, IHateoasService hateoasService): IDeliveryLinks
+public class DeliveryLinks(IHttpContextAccessor httpContextAccessor, IHateoasService hateoasService) : IDeliveryLinks
 {
      public List<Link> GenerateLinks(Guid id)
      {
@@ -20,7 +20,7 @@ public class DeliveryLinks(IHttpContextAccessor httpContextAccessor, IHateoasSer
                .SelectMany(c => c.Value.Split(' '))
                .Distinct()
                .ToList();
-          
+
           var canRead = scopes.Contains("read:deliveries");
           var canWrite = scopes.Contains("write:deliveries");
           if (!canRead && !canWrite)
