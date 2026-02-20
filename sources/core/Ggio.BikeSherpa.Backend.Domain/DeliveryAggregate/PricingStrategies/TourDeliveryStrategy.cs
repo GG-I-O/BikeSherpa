@@ -8,8 +8,8 @@ public class TourDeliveryStrategy : IPricingStrategy
      private readonly double _stepPriceInPeriphery = 0;
      private readonly double _stepPriceOutside = 0;
      private const double SameDayDeliveryExtraCost = 2;
-     private const double EarlyOrderLimit = 18;
-     private const double LastMinuteOrderLimit = 2;
+     private const double EarlyOrderLimitInHours = 18;
+     private const double LastMinuteOrderLimitInHours = 2;
      private const double EarlyOrderDiscount = -2;
      private const double LastMinuteOrderExtraCost = 3;
      private const double StandardCost = 0;
@@ -50,8 +50,8 @@ public class TourDeliveryStrategy : IPricingStrategy
           var delayInHours = (contractDate - startDate).TotalHours;
           return delayInHours switch
           {
-               > EarlyOrderLimit => EarlyOrderDiscount,
-               <= LastMinuteOrderLimit => LastMinuteOrderExtraCost,
+               > EarlyOrderLimitInHours => EarlyOrderDiscount,
+               <= LastMinuteOrderLimitInHours => LastMinuteOrderExtraCost,
                _ => StandardCost
           };
      }

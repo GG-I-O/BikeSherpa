@@ -7,8 +7,8 @@ public class SimpleDeliveryStrategy : IPricingStrategy
      private const double StepPriceInPeriphery = 5.5;
      private const double StepPriceOutside = 11;
      private const double SameDayDeliveryExtraCost = 2;
-     private const double EarlyOrderLimit = 18;
-     private const double LastMinuteOrderLimit = 2;
+     private const double EarlyOrderLimitInHours = 18;
+     private const double LastMinuteOrderLimitInHours = 2;
      private const double EarlyOrderDiscount = -2;
      private const double LastMinuteOrderExtraCost = 3;
      private const double StandardCost = 0;
@@ -50,8 +50,8 @@ public class SimpleDeliveryStrategy : IPricingStrategy
           var delayInHours = (contractDate - startDate).TotalHours;
           return delayInHours switch
           {
-               > EarlyOrderLimit => EarlyOrderDiscount,
-               <= LastMinuteOrderLimit => LastMinuteOrderExtraCost,
+               > EarlyOrderLimitInHours => EarlyOrderDiscount,
+               <= LastMinuteOrderLimitInHours => LastMinuteOrderExtraCost,
                _ => StandardCost
           };
      }

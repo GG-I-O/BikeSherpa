@@ -19,7 +19,6 @@
 
     <ItemGroup>
       <Folder Include="DeliveryAggregate\Services\" />
-      <Folder Include="Domain.Tests\" />
     </ItemGroup>
 
 </Project>
