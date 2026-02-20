@@ -2,13 +2,14 @@ using System.Security.Claims;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Ggio.BikeSherpa.Backend.Domain;
-using Ggio.BikeSherpa.Backend.Features.Courses;
+using Ggio.BikeSherpa.Backend.Features.Deliveries;
 using Ggio.DddCore.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Features.Couriers;
-using Ggio.BikeSherpa.Backend.Features.Courses.Get;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
@@ -48,7 +49,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
 builder.Services.AddBackendInfrastructure(builder.Configuration);
 
 // Injection
-builder.Services.ConfigureCourseFeature();
+builder.Services.ConfigureDeliveryFeature();
 builder.Services.ConfigureCustomerFeature();
 builder.Services.ConfigureCourierFeature();
 builder.Services.AddBackendDomain();
@@ -67,9 +68,18 @@ builder.Services.AddDddInfrastructureServices();
 // Add Mediator for domain event dispatching
 builder.Services.AddMediator(options =>
 {
-     options.Assemblies = [typeof(GetCourseQuery).Assembly, typeof(EntityBase).Assembly, typeof(EfCoreDomainEntityAddedEventHandler)];
+     options.Assemblies = [typeof(GetDeliveryQuery).Assembly, typeof(EntityBase).Assembly, typeof(EfCoreDomainEntityAddedEventHandler)];
      options.ServiceLifetime = ServiceLifetime.Scoped;
 });
+
+// Add PackingSizeRepository
+builder.Services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
+
+// Add DeliveryZoneRepository
+builder.Services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
+
+// Add UrgencyRepository
+builder.Services.AddScoped<IUrgencyRepository, UrgencyRepository>();
 
 // Cors
 var allowedOrigins = (builder.Configuration["CORS:AllowedOrigins"] ?? "").Split(',');
@@ -93,6 +103,8 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
           options.AddPolicy("write:customers", policy => policy.RequireClaim("scope", "write:customers"));
           options.AddPolicy("read:couriers", policy => policy.RequireClaim("scope", "read:couriers"));
           options.AddPolicy("write:couriers", policy => policy.RequireClaim("scope", "write:couriers"));
+          options.AddPolicy("read:deliveries", policy => policy.RequireClaim("scope", "read:deliveries"));
+          options.AddPolicy("write:deliveries", policy => policy.RequireClaim("scope", "write:deliveries"));
      });
 
      builder.Services.AddAuth0ApiAuthentication(options =>

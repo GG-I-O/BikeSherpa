@@ -14,6 +14,11 @@
     <ItemGroup>
         <PackageReference Include="Ardalis.Specification" Version="9.3.1"/>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+        <PackageReference Include="Stateless" Version="5.20.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="DeliveryAggregate\Services\" />
     </ItemGroup>
 
 </Project>
