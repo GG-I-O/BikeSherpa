@@ -1,4 +1,5 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 using Ggio.DddCore;
 using Mediator;
 
@@ -24,23 +25,32 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
      
-     // Methods allowing to change the delivery status
-     public void Start(IMediator mediator)
-     {
-          var statusMachine = new DeliveryStatusMachine(mediator, this);
-          statusMachine.Fire(DeliveryStatusTrigger.Start);
-     }
+     private readonly DeliveryStatusMachine _statusMachine;
+     private readonly IMediator _mediator;
 
-     public void Complete(IMediator mediator)
+     public Delivery(IMediator mediator)
      {
-          var statusMachine = new DeliveryStatusMachine(mediator, this);
-          statusMachine.Fire(DeliveryStatusTrigger.Complete);
+          _statusMachine = new DeliveryStatusMachine(this);
+          _mediator = mediator;
      }
      
-     public void Cancel(IMediator mediator)
+     // Methods allowing to change the delivery status
+     public async Task Start()
      {
-          var statusMachine = new DeliveryStatusMachine(mediator, this);
-          statusMachine.Fire(DeliveryStatusTrigger.Cancel);
+          _statusMachine.Fire(DeliveryStatusTrigger.Start);
+          await _mediator.Publish(new DeliveryStartedEvent(this));
+     }
+
+     public async Task Complete()
+     {
+          _statusMachine.Fire(DeliveryStatusTrigger.Complete);
+          await _mediator.Publish(new DeliveryCompletedEvent(this));
+     }
+     
+     public async Task Cancel()
+     {
+          _statusMachine.Fire(DeliveryStatusTrigger.Cancel);
+          await _mediator.Publish(new DeliveryCancelledEvent(this));
      }
      
      // Methods allowing to change delivery properties

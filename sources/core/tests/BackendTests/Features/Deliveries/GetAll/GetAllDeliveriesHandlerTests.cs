@@ -2,6 +2,7 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 using Ggio.DddCore;
+using Mediator;
 using Moq;
 
 namespace BackendTests.Features.Deliveries.GetAll;
@@ -9,38 +10,45 @@ namespace BackendTests.Features.Deliveries.GetAll;
 public class GetAllDeliveriesHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
+     private readonly Mock<IMediator> _mockMediator = new();
 
-     private readonly Delivery _mockDeliveryA = new()
+     private readonly Delivery _mockDeliveryA;
+     private readonly Delivery _mockDeliveryB;
+
+     public GetAllDeliveriesHandlerTests()
      {
-          Id = Guid.NewGuid(),
-          Code = "AAA",
-          CustomerId = Guid.NewGuid(),
-          PackingSize = "Xxl",
-          PricingStrategy = PricingStrategyEnum.CustomStrategy,
-          Urgency = "Standard",
-          ReportId = Guid.NewGuid(),
-          Steps = [],
-          InsulatedBox = true,
-          ExactTime = false,
-          ContractDate = new DateTimeOffset(2026, 01, 01, 0, 0, 0, TimeSpan.Zero),
-          StartDate = new DateTimeOffset(2026, 01, 01, 2, 10, 0, TimeSpan.Zero)
-     };
-     
-     private readonly Delivery _mockDeliveryB = new ()
-     {
-          Id = Guid.NewGuid(),
-          Code = "BBB",
-          CustomerId = Guid.NewGuid(),
-          PackingSize = "Xl",
-          PricingStrategy = PricingStrategyEnum.CustomStrategy,
-          Urgency = "Urgent",
-          ReportId = Guid.NewGuid(),
-          Steps = [],
-          InsulatedBox = true,
-          ExactTime = false,
-          ContractDate = new DateTimeOffset(2026, 02, 03, 0, 0, 0, TimeSpan.Zero),
-          StartDate = new DateTimeOffset(2026, 02, 04, 2, 5, 0, TimeSpan.Zero)
-     };
+          _mockDeliveryA = new(_mockMediator.Object)
+          {
+               Id = Guid.NewGuid(),
+               Code = "AAA",
+               CustomerId = Guid.NewGuid(),
+               PackingSize = "Xxl",
+               PricingStrategy = PricingStrategyEnum.CustomStrategy,
+               Urgency = "Standard",
+               ReportId = Guid.NewGuid(),
+               Steps = [],
+               InsulatedBox = true,
+               ExactTime = false,
+               ContractDate = new DateTimeOffset(2026, 01, 01, 0, 0, 0, TimeSpan.Zero),
+               StartDate = new DateTimeOffset(2026, 01, 01, 2, 10, 0, TimeSpan.Zero)
+          };
+
+          _mockDeliveryB = new(_mockMediator.Object)
+          {
+               Id = Guid.NewGuid(),
+               Code = "BBB",
+               CustomerId = Guid.NewGuid(),
+               PackingSize = "Xl",
+               PricingStrategy = PricingStrategyEnum.CustomStrategy,
+               Urgency = "Urgent",
+               ReportId = Guid.NewGuid(),
+               Steps = [],
+               InsulatedBox = true,
+               ExactTime = false,
+               ContractDate = new DateTimeOffset(2026, 02, 03, 0, 0, 0, TimeSpan.Zero),
+               StartDate = new DateTimeOffset(2026, 02, 04, 2, 5, 0, TimeSpan.Zero)
+          };
+     }
 
      [Fact]
      public async Task Handle_ShouldReturnAllDeliveries_WhenDeliveriesExist()

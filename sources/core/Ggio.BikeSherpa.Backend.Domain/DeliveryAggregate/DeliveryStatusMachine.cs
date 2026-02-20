@@ -1,6 +1,4 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
-using Ggio.DddCore;
-using Mediator;
 using Stateless;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
@@ -8,7 +6,7 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 public class DeliveryStatusMachine {
      private readonly StateMachine<DeliveryStatusEnum, DeliveryStatusTrigger> _statusMachine;
 
-     public DeliveryStatusMachine(IMediator mediator, Delivery delivery)
+     public DeliveryStatusMachine(Delivery delivery)
      {
           _statusMachine = new StateMachine<DeliveryStatusEnum, DeliveryStatusTrigger>(() => delivery.Status, status => delivery.Status = status);
 
@@ -17,17 +15,14 @@ public class DeliveryStatusMachine {
                .Permit(DeliveryStatusTrigger.Cancel, DeliveryStatusEnum.Cancelled);
 
           _statusMachine.Configure(DeliveryStatusEnum.Started)
-               .OnEntryAsync(async _ => await mediator.Publish(new DeliveryStartedEvent(delivery)))
                .PermitIf(DeliveryStatusTrigger.Complete, DeliveryStatusEnum.Completed, () => delivery.Steps.All(s => s.Completed))
                .Permit(DeliveryStatusTrigger.Cancel, DeliveryStatusEnum.Cancelled);
 
           _statusMachine.Configure(DeliveryStatusEnum.Completed)
-               .OnEntryAsync(async _ => await mediator.Publish(new DeliveryCompletedEvent(delivery)))
                .Ignore(DeliveryStatusTrigger.Complete)
                .Ignore(DeliveryStatusTrigger.Start);
           
           _statusMachine.Configure(DeliveryStatusEnum.Cancelled)
-               .OnEntryAsync(async _ => await mediator.Publish(new DeliveryCancelledEvent(delivery)))
                .Ignore(DeliveryStatusTrigger.Complete)
                .Ignore(DeliveryStatusTrigger.Cancel);
      }

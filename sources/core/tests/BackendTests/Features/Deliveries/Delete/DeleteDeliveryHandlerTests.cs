@@ -1,6 +1,7 @@
-﻿using Ardalis.Result;
-using Ardalis.Specification;
+﻿using Ardalis.Specification;
 using AutoFixture;
+using AutoFixture.AutoMoq;
+using Ardalis.Result;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Delete;
@@ -14,7 +15,7 @@ public class DeleteDeliveryHandlerTests
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly Mock<IDeliveryDeleteEventHandler> _mockDeleteEventHandler = new();
-     private readonly Fixture _fixture = new();
+     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly DeleteDeliveryCommand _mockCommand;
 

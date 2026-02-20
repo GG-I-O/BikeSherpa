@@ -5,6 +5,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.DddCore;
+using Mediator;
 using Moq;
 
 namespace BackendTests.Features.Deliveries.Get;
@@ -12,22 +13,28 @@ namespace BackendTests.Features.Deliveries.Get;
 public class GetDeliveryHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
+     private readonly Mock<IMediator> _mockMediator = new();
 
-     private readonly Delivery _mockDelivery = new()
+     private readonly Delivery _mockDelivery;
+
+     public GetDeliveryHandlerTests()
      {
-          Id = Guid.NewGuid(),
-          Code = "AAA",
-          PricingStrategy = PricingStrategyEnum.CustomStrategy,
-          CustomerId = Guid.Empty,
-          Urgency = "Standard",
-          ReportId = Guid.Empty,
-          Steps = [],
-          PackingSize = "Xl",
-          InsulatedBox = false,
-          ExactTime = false,
-          ContractDate = DateTimeOffset.Now,
-          StartDate = DateTimeOffset.Now + TimeSpan.FromDays(1)
-     };
+          _mockDelivery = new(_mockMediator.Object)
+          {
+               Id = Guid.NewGuid(),
+               Code = "AAA",
+               PricingStrategy = PricingStrategyEnum.CustomStrategy,
+               CustomerId = Guid.Empty,
+               Urgency = "Standard",
+               ReportId = Guid.Empty,
+               Steps = [],
+               PackingSize = "Xl",
+               InsulatedBox = false,
+               ExactTime = false,
+               ContractDate = DateTimeOffset.Now,
+               StartDate = DateTimeOffset.Now + TimeSpan.FromDays(1)
+          };
+     }
 
      [Fact]
      public async Task Handle_ShouldReturnOneDelivery_WhenDeliveryExists()
@@ -37,10 +44,10 @@ public class GetDeliveryHandlerTests
           _mockDelivery.Id = guid;
           var sut = CreateSut(_mockDelivery);
           var query = new GetDeliveryQuery(guid);
-          
+
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
-          
+
           // Assert
           result.Should().NotBeNull();
           result.Id.Should().Be(guid);
@@ -49,7 +56,7 @@ public class GetDeliveryHandlerTests
           result.PackingSize.Should().Be("Xl");
           VerifyRepositoryCalledOnce();
      }
-     
+
      [Theory]
      [InlineData(true)]
      [InlineData(false)]
@@ -61,10 +68,10 @@ public class GetDeliveryHandlerTests
           _mockDelivery.Id = guidA;
           var sut = CreateSut(emptyRepository ? null : _mockDelivery);
           var query = new GetDeliveryQuery(guidB);
-          
+
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
-          
+
           // Assert
           result.Should().BeNull();
           VerifyRepositoryCalledOnce();
@@ -74,7 +81,7 @@ public class GetDeliveryHandlerTests
      {
           _mockRepository
                .Setup(repo => repo.FirstOrDefaultAsync(
-                    It.Is<ISpecification<Delivery>>(s => s is DeliveryByIdSpecification && existingDelivery != null && s.IsSatisfiedBy(existingDelivery)), 
+                    It.Is<ISpecification<Delivery>>(s => s is DeliveryByIdSpecification && existingDelivery != null && s.IsSatisfiedBy(existingDelivery)),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(existingDelivery);
           return new GetDeliveryHandler(_mockRepository.Object);
@@ -83,7 +90,7 @@ public class GetDeliveryHandlerTests
      private void VerifyRepositoryCalledOnce()
      {
           _mockRepository.Verify(repo => repo.FirstOrDefaultAsync(
-               It.IsAny<ISpecification<Delivery>>(), 
+               It.IsAny<ISpecification<Delivery>>(),
                It.IsAny<CancellationToken>()),
                Times.Once
           );

@@ -1,5 +1,6 @@
 ﻿using Ardalis.Specification;
 using AutoFixture;
+using AutoFixture.AutoMoq;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
@@ -15,7 +16,7 @@ public class AddDeliveryHandlerTests{
      private readonly Mock<IDeliveryFactory> _mockFactory = new();
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
-     private readonly Fixture _fixture = new();
+     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
 
      private readonly AddDeliveryCommand _mockCommand;

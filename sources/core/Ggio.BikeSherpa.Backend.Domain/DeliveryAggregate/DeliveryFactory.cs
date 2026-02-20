@@ -26,7 +26,7 @@ public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliv
 {
      public async Task<Delivery> CreateDeliveryAsync(PricingStrategyEnum pricingStrategyEnum, string code, Guid customerId, string urgency, double? totalPrice, double? discount, Guid reportId, string packingSize, bool insulatedBox, bool exactTime, DateTimeOffset contractDate, DateTimeOffset startDate)
      {
-          var delivery = new Delivery
+          var delivery = new Delivery(mediator)
           {
                PricingStrategy = pricingStrategyEnum,
                Code = code,
