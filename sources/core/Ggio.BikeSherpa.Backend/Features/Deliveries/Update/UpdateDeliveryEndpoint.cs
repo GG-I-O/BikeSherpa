@@ -31,7 +31,6 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
                req.Details,
                req.PackingSize,
                req.InsulatedBox,
-               req.ExactTime,
                req.ContractDate,
                req.StartDate
           );

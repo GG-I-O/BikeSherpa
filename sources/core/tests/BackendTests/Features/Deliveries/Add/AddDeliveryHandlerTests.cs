@@ -55,7 +55,6 @@ public class AddDeliveryHandlerTests
                     It.IsAny<string[]>(),
                     It.IsAny<string>(),
                     It.IsAny<bool>(),
-                    It.IsAny<bool>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>()
                     ))
@@ -89,7 +88,6 @@ public class AddDeliveryHandlerTests
                     It.IsAny<double>(),
                     It.IsAny<string[]>(),
                     It.IsAny<string>(),
-                    It.IsAny<bool>(),
                     It.IsAny<bool>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>()),
@@ -142,7 +140,6 @@ public class AddDeliveryHandlerTests
                     It.IsAny<string[]>(),
                     It.IsAny<string>(),
                     It.IsAny<bool>(),
-                    It.IsAny<bool>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>()),
                Times.Once);
@@ -170,7 +167,6 @@ public class AddDeliveryHandlerTests
                     It.IsAny<double>(),
                     It.IsAny<string[]>(),
                     It.IsAny<string>(),
-                    It.IsAny<bool>(),
                     It.IsAny<bool>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>()),
@@ -200,7 +196,6 @@ public class AddDeliveryHandlerTests
                     It.IsAny<double>(),
                     It.IsAny<string[]>(),
                     It.IsAny<string>(),
-                    It.IsAny<bool>(),
                     It.IsAny<bool>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>()),

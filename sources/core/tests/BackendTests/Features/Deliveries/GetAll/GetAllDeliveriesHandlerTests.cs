@@ -27,7 +27,6 @@ public class GetAllDeliveriesHandlerTests
                Urgency = "Standard",
                Steps = [],
                InsulatedBox = true,
-               ExactTime = false,
                ContractDate = new DateTimeOffset(2026, 01, 01, 0, 0, 0, TimeSpan.Zero),
                StartDate = new DateTimeOffset(2026, 01, 01, 2, 10, 0, TimeSpan.Zero)
           };
@@ -42,7 +41,6 @@ public class GetAllDeliveriesHandlerTests
                Urgency = "Urgent",
                Steps = [],
                InsulatedBox = true,
-               ExactTime = false,
                ContractDate = new DateTimeOffset(2026, 02, 03, 0, 0, 0, TimeSpan.Zero),
                StartDate = new DateTimeOffset(2026, 02, 04, 2, 5, 0, TimeSpan.Zero)
           };

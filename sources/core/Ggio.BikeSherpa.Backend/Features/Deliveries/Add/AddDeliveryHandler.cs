@@ -24,7 +24,6 @@ public record AddDeliveryCommand(
      string[] Details,
      string PackingSize,
      bool InsulatedBox,
-     bool ExactTime,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
      ) : ICommand<Result<Guid>>;
@@ -79,7 +78,6 @@ public class AddDeliveryHandler(
                command.Details,
                command.PackingSize,
                command.InsulatedBox,
-               command.ExactTime,
                command.ContractDate,
                command.StartDate
                );

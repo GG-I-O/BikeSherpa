@@ -29,7 +29,6 @@ public class GetDeliveryHandlerTests
                Steps = [],
                PackingSize = "Xl",
                InsulatedBox = false,
-               ExactTime = false,
                ContractDate = DateTimeOffset.Now,
                StartDate = DateTimeOffset.Now + TimeSpan.FromDays(1)
           };
