@@ -26,7 +26,6 @@ public class GetDeliveryHandlerTests
                PricingStrategy = PricingStrategyEnum.CustomStrategy,
                CustomerId = Guid.Empty,
                Urgency = "Standard",
-               ReportId = Guid.Empty,
                Steps = [],
                PackingSize = "Xl",
                InsulatedBox = false,

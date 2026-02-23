@@ -13,7 +13,7 @@ public interface IDeliveryFactory
           string urgency,
           double? totalPrice,
           double? discount,
-          Guid reportId,
+          string[] details,
           string packingSize,
           bool insulatedBox,
           bool exactTime,
@@ -24,7 +24,7 @@ public interface IDeliveryFactory
 
 public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliveryFactory
 {
-     public async Task<Delivery> CreateDeliveryAsync(PricingStrategyEnum pricingStrategyEnum, string code, Guid customerId, string urgency, double? totalPrice, double? discount, Guid reportId, string packingSize, bool insulatedBox, bool exactTime, DateTimeOffset contractDate, DateTimeOffset startDate)
+     public async Task<Delivery> CreateDeliveryAsync(PricingStrategyEnum pricingStrategyEnum, string code, Guid customerId, string urgency, double? totalPrice, double? discount, string[] details, string packingSize, bool insulatedBox, bool exactTime, DateTimeOffset contractDate, DateTimeOffset startDate)
      {
           var delivery = new Delivery(mediator)
           {
@@ -34,7 +34,7 @@ public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliv
                Urgency = urgency,
                TotalPrice = totalPrice,
                Discount = discount,
-               ReportId = reportId,
+               Details = details,
                Steps = [],
                PackingSize = packingSize,
                InsulatedBox = insulatedBox,

@@ -2,8 +2,10 @@
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using FluentValidation;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
@@ -12,9 +14,12 @@ using Moq;
 
 namespace BackendTests.Features.Deliveries.Add;
 
-public class AddDeliveryHandlerTests{
+public class AddDeliveryHandlerTests
+{
      private readonly Mock<IDeliveryFactory> _mockFactory = new();
-     private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
+     private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
+     private readonly Mock<IReadRepository<Customer>> _mockCustomerRepository = new();
+     private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
@@ -25,7 +30,10 @@ public class AddDeliveryHandlerTests{
      public AddDeliveryHandlerTests()
      {
           _mockCommand = _fixture.Create<AddDeliveryCommand>();
+          var mockCustomer = _fixture.Create<Customer>();
           _mockDelivery = _fixture.Create<Delivery>();
+          _mockDelivery.ReportId = _mockDelivery.GenerateReportId(mockCustomer);
+          _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
 
           _mockUrgencyRepository
                .Setup(x => x.Urgencies)
@@ -44,7 +52,7 @@ public class AddDeliveryHandlerTests{
                     It.IsAny<string>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
-                    It.IsAny<Guid>(),
+                    It.IsAny<string[]>(),
                     It.IsAny<string>(),
                     It.IsAny<bool>(),
                     It.IsAny<bool>(),
@@ -56,13 +64,13 @@ public class AddDeliveryHandlerTests{
 
      private AddDeliveryHandler CreateSut()
      {
-          var validator = new AddDeliveryCommandValidator(_mockRepository.Object, _mockUrgencyRepository.Object);
-          return new AddDeliveryHandler(_mockFactory.Object, validator, _mockTransaction.Object);
+          var validator = new AddDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object);
+          return new AddDeliveryHandler(_mockFactory.Object, validator, _mockTransaction.Object, _mockCustomerRepository.Object, _mockPricingStrategyService.Object);
      }
 
      private void SetupRepositoryTestingIfCodeExists(bool doesCodeExist)
      {
-          _mockRepository
+          _mockDeliveryRepository
                .Setup(x => x.AnyAsync(
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryByCodeSpecification),
                     It.IsAny<CancellationToken>()))
@@ -79,7 +87,7 @@ public class AddDeliveryHandlerTests{
                     It.IsAny<string>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
-                    It.IsAny<Guid>(),
+                    It.IsAny<string[]>(),
                     It.IsAny<string>(),
                     It.IsAny<bool>(),
                     It.IsAny<bool>(),
@@ -131,7 +139,7 @@ public class AddDeliveryHandlerTests{
                     It.IsAny<string>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
-                    It.IsAny<Guid>(),
+                    It.IsAny<string[]>(),
                     It.IsAny<string>(),
                     It.IsAny<bool>(),
                     It.IsAny<bool>(),
@@ -139,7 +147,7 @@ public class AddDeliveryHandlerTests{
                     It.IsAny<DateTimeOffset>()),
                Times.Once);
      }
-    
+
      [Fact]
      public async Task Handle_ShouldThrowValidationException_WhenCodeIsEmpty()
      {
@@ -160,7 +168,7 @@ public class AddDeliveryHandlerTests{
                     It.IsAny<string>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
-                    It.IsAny<Guid>(),
+                    It.IsAny<string[]>(),
                     It.IsAny<string>(),
                     It.IsAny<bool>(),
                     It.IsAny<bool>(),
@@ -190,7 +198,7 @@ public class AddDeliveryHandlerTests{
                     It.IsAny<string>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
-                    It.IsAny<Guid>(),
+                    It.IsAny<string[]>(),
                     It.IsAny<string>(),
                     It.IsAny<bool>(),
                     It.IsAny<bool>(),

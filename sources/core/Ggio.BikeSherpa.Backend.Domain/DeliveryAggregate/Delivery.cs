@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices.JavaScript;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 using Ggio.DddCore;
@@ -14,9 +16,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required string Urgency { get; set; }
      public double? TotalPrice { get; set; }
      public double? Discount { get; set; }
-     public required Guid ReportId { get; set; }
+     public string? ReportId { get; set; }
      public required List<DeliveryStep> Steps { get; set; } = [];
-     public string[]? Details { get; set; } = [];
+     public string[] Details { get; set; } = [];
      public required string PackingSize { get; set; }
      public required bool InsulatedBox { get; set; }
      public required bool ExactTime { get; set; }
@@ -32,6 +34,12 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      {
           _statusMachine = new DeliveryStatusMachine(this);
           _mediator = mediator;
+     }
+
+     public string GenerateReportId(Customer customer)
+     {
+          var reportId = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
+          return reportId;
      }
 
      // Methods allowing to change the delivery status

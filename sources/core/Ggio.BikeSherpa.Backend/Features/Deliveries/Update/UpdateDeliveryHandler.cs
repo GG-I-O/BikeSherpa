@@ -18,7 +18,7 @@ public record UpdateDeliveryCommand(
      string Urgency,
      double? TotalPrice,
      double? Discount,
-     Guid ReportId,
+     string ReportId,
      List<DeliveryStep> Steps,
      string[] Details,
      string PackingSize,

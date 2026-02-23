@@ -26,7 +26,6 @@ public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, Ad
                req.Urgency,
                req.TotalPrice,
                req.Discount,
-               req.ReportId,
                req.Details,
                req.PackingSize,
                req.InsulatedBox,

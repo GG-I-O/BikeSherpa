@@ -1,7 +1,11 @@
 using Ardalis.Result;
 using FluentValidation;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
@@ -17,7 +21,6 @@ public record AddDeliveryCommand(
      string Urgency,
      double? TotalPrice,
      double? Discount,
-     Guid ReportId,
      string[] Details,
      string PackingSize,
      bool InsulatedBox,
@@ -46,7 +49,6 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
                Must(urgency => urgencies.Urgencies.Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
                .WithMessage("Valeur d'urgence saisie invalide.");
           RuleFor(x => x.TotalPrice).NotEmpty();
-          RuleFor(x => x.ReportId).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
@@ -56,12 +58,16 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 public class AddDeliveryHandler(
      IDeliveryFactory factory,
      IValidator<AddDeliveryCommand> validator,
-     IApplicationTransaction transaction
+     IApplicationTransaction transaction,
+     IReadRepository<Customer> customerRepository,
+     IPricingStrategyService pricingStrategyService
      ) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
+
+          var customer = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.CustomerId), cancellationToken);
 
           var delivery = await factory.CreateDeliveryAsync(
                command.PricingStrategyEnum,
@@ -70,13 +76,20 @@ public class AddDeliveryHandler(
                command.Urgency,
                command.TotalPrice,
                command.Discount,
-               command.ReportId,
+               command.Details,
                command.PackingSize,
                command.InsulatedBox,
                command.ExactTime,
                command.ContractDate,
                command.StartDate
                );
+
+          if (customer is not null)
+          {
+               delivery.ReportId = delivery.GenerateReportId(customer);
+          }
+
+          delivery.TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(delivery.Id);
