@@ -25,9 +25,12 @@ public class DeliveryZoneRepositoryTests
 
     [Theory]
     [InlineData("Grenoble", "Grenoble")]
+    [InlineData("grenoble", "Grenoble")]
     [InlineData("Echirolles", "Limitrophe")]
+    [InlineData("EchiRolles", "Limitrophe")]
     [InlineData("Meylan", "Limitrophe")]
-    public void FromAddress_WhenCityIsKnown_ReturnsItsZone(string city, string expectedZone)
+    [InlineData("MEYLAN", "Limitrophe")]
+    public void FromAddress_WhenCityIsKnown_ReturnsItsZone_AndIgnoresCase(string city, string expectedZone)
     {
         var sut = MakeSut();
 
