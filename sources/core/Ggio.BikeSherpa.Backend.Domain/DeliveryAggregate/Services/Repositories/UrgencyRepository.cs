@@ -11,6 +11,13 @@ public class UrgencyRepository : IUrgencyRepository
 
      public Urgency GetUrgency(string name)
      {
-          return Urgencies.SingleOrDefault(u => u.Name == name)!;
+          if (name == "")
+          {
+               throw new ArgumentException("Veuillez indiquer une urgence.");
+          }
+          else
+          {
+               return Urgencies.SingleOrDefault(u => string.Equals(u.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Urgence inconnue.");
+          }
      }
 }
