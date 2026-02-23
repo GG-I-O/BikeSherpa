@@ -39,6 +39,12 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           ReportId = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
      }
 
+     public string GenerateReportId(Customer customer)
+     {
+          var reportId = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
+          return reportId;
+     }
+
      // Methods allowing to change the delivery status
      private void UpdateStatus()
      {

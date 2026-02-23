@@ -1,7 +1,11 @@
 using Ardalis.Result;
 using FluentValidation;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
@@ -55,12 +59,16 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 public class AddDeliveryHandler(
      IDeliveryFactory factory,
      IValidator<AddDeliveryCommand> validator,
-     IApplicationTransaction transaction
+     IApplicationTransaction transaction,
+     IReadRepository<Customer> customerRepository,
+     IPricingStrategyService pricingStrategyService
      ) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
+
+          var customer = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.CustomerId), cancellationToken);
 
           var delivery = await factory.CreateDeliveryAsync(
                command.PricingStrategy,
@@ -75,6 +83,13 @@ public class AddDeliveryHandler(
                command.ContractDate,
                command.StartDate
                );
+
+          if (customer is not null)
+          {
+               delivery.ReportId = delivery.GenerateReportId(customer);
+          }
+
+          delivery.TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(delivery.Id);
