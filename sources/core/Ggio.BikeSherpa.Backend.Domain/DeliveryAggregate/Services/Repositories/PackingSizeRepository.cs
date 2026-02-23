@@ -25,7 +25,7 @@ public class PackingSizeRepository : IPackingSizeRepository
           }
           else
           {
-               return PackingSizes.Single(s => string.Equals(s.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Taille de colis inconnue.");
+               return PackingSizes.SingleOrDefault(s => string.Equals(s.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Taille de colis inconnue.");
           }
      }
 }
