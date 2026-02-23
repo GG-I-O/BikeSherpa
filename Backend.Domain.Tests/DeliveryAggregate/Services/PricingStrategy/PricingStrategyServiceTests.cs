@@ -12,24 +12,54 @@ namespace Backend.Domain.Tests.DeliveryAggregate.Services.PricingStrategy;
 
 public class PricingStrategyServiceTests
 {
-    private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
-    private readonly static DateTimeOffset ContractDate = new(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
-    private readonly static PackingSize DefaultPackingSize = new(1, "Standard", 10, 50, 0, 0);
-    private readonly static Urgency DefaultUrgency = new(1, "Normal", PriceCoefficient: 0);
-    private readonly static DeliveryZone GrenobleZone = new(1, "Grenoble", []);
-    private readonly static DeliveryZone BorderZone = new(2, "Limitrophe", []);
-    private readonly static DeliveryZone PeripheryZone = new(3, "Périphérie", []);
-    private readonly static DeliveryZone OutsideZone = new(4, "Extérieur", []);
+    private static readonly DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset ContractDate = new(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
+    private static readonly PackingSize DefaultPackingSize = new(1, "Standard", 10, 50, 0, 0);
+    private static readonly Urgency DefaultUrgency = new(1, "Normal", PriceCoefficient: 0);
+    private static readonly DeliveryZone GrenobleZone = new(1, "Grenoble", []);
+    private static readonly DeliveryZone BorderZone = new(2, "Limitrophe", []);
+    private static readonly DeliveryZone PeripheryZone = new(3, "Périphérie", []);
+    private static readonly DeliveryZone OutsideZone = new(4, "Extérieur", []);
+    private static readonly Address DefaultAddress = new()
+    { Name = "Test", StreetInfo = "1 rue Test", Postcode = "38000", City = "Grenoble" };
 
-    private readonly static Address DefaultAddress = new()
+    private record StrategyArgs(
+        DateTimeOffset StartDate, DateTimeOffset ContractDate,
+        int Pickups, int Grenoble, int Border, int Periphery, int Outside,
+        PackingSize PackingSize, double Coefficient, double Distance);
+
+    private readonly Mock<IPricingStrategy> _strategyMock;
+    private readonly Mock<IUrgencyRepository> _urgenciesMock;
+    private readonly Mock<IPackingSizeRepository> _packingSizesMock;
+    private readonly PricingStrategyService _sut;
+    private StrategyArgs? _capturedArgs;
+
+    public PricingStrategyServiceTests()
     {
-        Name = "Test",
-        StreetInfo = "1 rue Test",
-        Postcode = "38000",
-        City = "Grenoble"
-    };
+        _strategyMock = new Mock<IPricingStrategy>();
+        _strategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
+        _strategyMock
+            .Setup(s => s.CalculateDeliveryPriceWithoutVat(
+                It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+                It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+                It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()))
+            .Callback((DateTimeOffset sd, DateTimeOffset cd,
+                       int pickups, int g, int b, int p, int o,
+                       PackingSize ps, double coeff, double dist) =>
+                _capturedArgs = new(sd, cd, pickups, g, b, p, o, ps, coeff, dist))
+            .Returns(0);
 
-    private static Delivery MakeDelivery(
+        _urgenciesMock = new Mock<IUrgencyRepository>();
+        _urgenciesMock.Setup(r => r.GetUrgency(It.IsAny<string>())).Returns(DefaultUrgency);
+
+        _packingSizesMock = new Mock<IPackingSizeRepository>();
+        _packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
+
+        _sut = new PricingStrategyService(
+            [_strategyMock.Object], _urgenciesMock.Object, _packingSizesMock.Object);
+    }
+
+    private Delivery MakeDelivery(
         PricingStrategyEnum pricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
         List<DeliveryStep>? steps = null,
         double? totalPrice = null,
@@ -45,7 +75,6 @@ public class PricingStrategyServiceTests
             Urgency = urgency,
             PackingSize = packingSize,
             InsulatedBox = false,
-            ExactTime = false,
             ContractDate = ContractDate,
             StartDate = StartDate,
             Steps = steps ?? [],
@@ -56,142 +85,90 @@ public class PricingStrategyServiceTests
     private static DeliveryStep MakeStep(StepTypeEnum type, DeliveryZone zone, double distance = 0) =>
         new(type, 1, DefaultAddress, zone, distance, ContractDate);
 
+    private PricingStrategyService MakeSutWith(
+        IUrgencyRepository? urgencies = null,
+        IPackingSizeRepository? packingSizes = null,
+        params IPricingStrategy[] strategies) =>
+        new(strategies, urgencies ?? _urgenciesMock.Object, packingSizes ?? _packingSizesMock.Object);
+
     [Fact]
     public void CalculatePrice_DelegatesToMatchingStrategy_AndNotToOthers()
     {
-        // Arrange
-        var matchingStrategyMock = new Mock<IPricingStrategy>();
-        matchingStrategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
-        matchingStrategyMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
+        var matchingMock = new Mock<IPricingStrategy>();
+        matchingMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
+        matchingMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        )).Returns(42.0);
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>())).Returns(42.0);
 
-        var otherStrategyMock = new Mock<IPricingStrategy>();
-        otherStrategyMock.Setup(s => s.Name).Returns("TourDeliveryStrategy");
-        otherStrategyMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
+        var otherMock = new Mock<IPricingStrategy>();
+        otherMock.Setup(s => s.Name).Returns("TourDeliveryStrategy");
+        otherMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        )).Returns(99.0); // deliberately different — ensures we're not returning this
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>())).Returns(99.0);
 
-        var urgenciesMock = new Mock<IUrgencyRepository>();
-        urgenciesMock.Setup(r => r.GetUrgency(It.IsAny<string>())).Returns(DefaultUrgency);
-        var packingSizesMock = new Mock<IPackingSizeRepository>();
-        packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
+        var sut = MakeSutWith(strategies: [matchingMock.Object, otherMock.Object]);
+        var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
-        var sut = new PricingStrategyService(
-            [matchingStrategyMock.Object, otherStrategyMock.Object],
-            urgenciesMock.Object,
-            packingSizesMock.Object);
-        var delivery = MakeDelivery(PricingStrategyEnum.SimpleDeliveryStrategy);
-
-        // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(delivery);
-
-        // Assert
-        result.Should().Be(42.0); // returns the matching strategy's result, not the other's (99.0)
-        matchingStrategyMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+        result.Should().Be(42.0);
+        matchingMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        ), Times.Once);
-        otherStrategyMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()), Times.Once);
+        otherMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        ), Times.Never);
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()), Times.Never);
     }
 
     [Fact]
-    public void CalculatePrice_WhenCustomStrategy_ReturnsTotalPrice()
+    public void CalculatePrice_WhenCustomStrategy_ReturnsTotalPriceWithoutCallingStrategy()
     {
-        // Arrange
-        var strategyMock = new Mock<IPricingStrategy>();
-        strategyMock.Setup(s => s.Name).Returns("CustomStrategy");
+        var customMock = new Mock<IPricingStrategy>();
+        customMock.Setup(s => s.Name).Returns("CustomStrategy");
+        var sut = MakeSutWith(strategies: [customMock.Object]);
 
-        var urgenciesMock = new Mock<IUrgencyRepository>();
-        urgenciesMock.Setup(r => r.GetUrgency(It.IsAny<string>())).Returns(DefaultUrgency);
-        var packingSizesMock = new Mock<IPackingSizeRepository>();
-        packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
+        var result = sut.CalculateDeliveryPriceWithoutVat(
+            MakeDelivery(PricingStrategyEnum.CustomStrategy, totalPrice: 99.5));
 
-        var sut = new PricingStrategyService([strategyMock.Object], urgenciesMock.Object, packingSizesMock.Object);
-        var delivery = MakeDelivery(PricingStrategyEnum.CustomStrategy, totalPrice: 99.5);
-
-        // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(delivery);
-
-        // Assert
         result.Should().Be(99.5);
-        strategyMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+        customMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        ), Times.Never);
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()), Times.Never);
+    }
+
+    [Fact]
+    public void CalculatePrice_WhenNoStrategyMatches_Throws()
+    {
+        var tourMock = new Mock<IPricingStrategy>();
+        tourMock.Setup(s => s.Name).Returns("TourDeliveryStrategy");
+        var sut = MakeSutWith(strategies: [tourMock.Object]);
+
+        var act = () => sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(PricingStrategyEnum.SimpleDeliveryStrategy));
+
+        act.Should().Throw<InvalidOperationException>();
     }
 
     [Fact]
     public void CalculatePrice_CountsOnlyPickupStepsAsPickups()
     {
-        // Arrange
-        int capturedPickupCount = -1;
-        var strategyMock = new Mock<IPricingStrategy>();
-        strategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
-        strategyMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
-            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
-            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        )).Callback((DateTimeOffset _, DateTimeOffset _, int pickups, int _, int _, int _, int _, PackingSize _, double _, double _) =>
-        {
-            capturedPickupCount = pickups;
-        }).Returns(0);
-
-        var urgenciesMock = new Mock<IUrgencyRepository>();
-        urgenciesMock.Setup(r => r.GetUrgency(It.IsAny<string>())).Returns(DefaultUrgency);
-        var packingSizesMock = new Mock<IPackingSizeRepository>();
-        packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
-
         var steps = new List<DeliveryStep>
         {
             MakeStep(StepTypeEnum.Pickup, GrenobleZone),
             MakeStep(StepTypeEnum.Pickup, GrenobleZone),
             MakeStep(StepTypeEnum.Dropoff, GrenobleZone),
         };
-        var sut = new PricingStrategyService([strategyMock.Object], urgenciesMock.Object, packingSizesMock.Object);
-        var delivery = MakeDelivery(steps: steps);
 
-        // Act
-        sut.CalculateDeliveryPriceWithoutVat(delivery);
+        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
-        // Assert
-        capturedPickupCount.Should().Be(2);
+        _capturedArgs!.Pickups.Should().Be(2);
     }
 
     [Fact]
     public void CalculatePrice_CountsDropoffStepsPerZone()
     {
-        // Arrange
-        int capturedGrenoble = -1, capturedBorder = -1, capturedPeriphery = -1, capturedOutside = -1;
-        var strategyMock = new Mock<IPricingStrategy>();
-        strategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
-        strategyMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
-            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
-            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        )).Callback((DateTimeOffset _, DateTimeOffset _, int _, int g, int b, int p, int o, PackingSize _, double _, double _) =>
-        {
-            capturedGrenoble = g;
-            capturedBorder = b;
-            capturedPeriphery = p;
-            capturedOutside = o;
-        }).Returns(0);
-
-        var urgenciesMock = new Mock<IUrgencyRepository>();
-        urgenciesMock.Setup(r => r.GetUrgency(It.IsAny<string>())).Returns(DefaultUrgency);
-        var packingSizesMock = new Mock<IPackingSizeRepository>();
-        packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
-
         var steps = new List<DeliveryStep>
         {
             MakeStep(StepTypeEnum.Dropoff, GrenobleZone),
@@ -201,138 +178,49 @@ public class PricingStrategyServiceTests
             MakeStep(StepTypeEnum.Dropoff, OutsideZone),
             MakeStep(StepTypeEnum.Dropoff, OutsideZone),
         };
-        var sut = new PricingStrategyService([strategyMock.Object], urgenciesMock.Object, packingSizesMock.Object);
-        var delivery = MakeDelivery(steps: steps);
 
-        // Act
-        sut.CalculateDeliveryPriceWithoutVat(delivery);
+        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
-        // Assert
-        capturedGrenoble.Should().Be(2);
-        capturedBorder.Should().Be(1);
-        capturedPeriphery.Should().Be(1);
-        capturedOutside.Should().Be(2);
+        _capturedArgs!.Grenoble.Should().Be(2);
+        _capturedArgs.Border.Should().Be(1);
+        _capturedArgs.Periphery.Should().Be(1);
+        _capturedArgs.Outside.Should().Be(2);
     }
 
     [Fact]
     public void CalculatePrice_SumsDistanceAcrossAllSteps()
     {
-        // Arrange
-        double capturedDistance = -1;
-        var strategyMock = new Mock<IPricingStrategy>();
-        strategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
-        strategyMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
-            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
-            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        )).Callback((DateTimeOffset _, DateTimeOffset _, int _, int _, int _, int _, int _, PackingSize _, double _, double d) =>
-        {
-            capturedDistance = d;
-        }).Returns(0);
-
-        var urgenciesMock = new Mock<IUrgencyRepository>();
-        urgenciesMock.Setup(r => r.GetUrgency(It.IsAny<string>())).Returns(DefaultUrgency);
-        var packingSizesMock = new Mock<IPackingSizeRepository>();
-        packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
-
         var steps = new List<DeliveryStep>
         {
             MakeStep(StepTypeEnum.Pickup, GrenobleZone, distance: 3.5),
             MakeStep(StepTypeEnum.Dropoff, GrenobleZone, distance: 6.0),
         };
-        var sut = new PricingStrategyService([strategyMock.Object], urgenciesMock.Object, packingSizesMock.Object);
-        var delivery = MakeDelivery(steps: steps);
 
-        // Act
-        sut.CalculateDeliveryPriceWithoutVat(delivery);
+        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
-        // Assert
-        capturedDistance.Should().Be(9.5);
+        _capturedArgs!.Distance.Should().Be(9.5);
     }
 
     [Fact]
     public void CalculatePrice_PassesUrgencyCoefficientFromRepository()
     {
-        // Arrange
-        double capturedCoefficient = -1;
-        var urgency = new Urgency(2, "Express", PriceCoefficient: 1.5);
-        var strategyMock = new Mock<IPricingStrategy>();
-        strategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
-        strategyMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
-            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
-            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        )).Callback((DateTimeOffset _, DateTimeOffset _, int _, int _, int _, int _, int _, PackingSize _, double coeff, double _) =>
-        {
-            capturedCoefficient = coeff;
-        }).Returns(0);
+        var express = new Urgency(2, "Express", PriceCoefficient: 1.5);
+        _urgenciesMock.Setup(r => r.GetUrgency("Express")).Returns(express);
 
-        var urgenciesMock = new Mock<IUrgencyRepository>();
-        urgenciesMock.Setup(r => r.GetUrgency("Express")).Returns(urgency);
-        var packingSizesMock = new Mock<IPackingSizeRepository>();
-        packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
+        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(urgency: "Express"));
 
-        var sut = new PricingStrategyService([strategyMock.Object], urgenciesMock.Object, packingSizesMock.Object);
-        var delivery = MakeDelivery(urgency: "Express");
-
-        // Act
-        sut.CalculateDeliveryPriceWithoutVat(delivery);
-
-        // Assert
-        capturedCoefficient.Should().Be(1.5);
+        _capturedArgs!.Coefficient.Should().Be(1.5);
     }
 
     [Fact]
     public void CalculatePrice_PassesPackingSizeFromRepository()
     {
-        // Arrange
-        PackingSize? capturedPackingSize = null;
-        var packingSize = new PackingSize(2, "Large", 30, 80, 5, 8);
-        var strategyMock = new Mock<IPricingStrategy>();
-        strategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
-        strategyMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
-            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
-            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
-            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()
-        )).Callback((DateTimeOffset _, DateTimeOffset _, int _, int _, int _, int _, int _, PackingSize ps, double _, double _) =>
-        {
-            capturedPackingSize = ps;
-        }).Returns(0);
+        var large = new PackingSize(2, "Large", 30, 80, 5, 8);
+        _packingSizesMock.Setup(r => r.FromName("Large")).Returns(large);
 
-        var urgenciesMock = new Mock<IUrgencyRepository>();
-        urgenciesMock.Setup(r => r.GetUrgency(It.IsAny<string>())).Returns(DefaultUrgency);
-        var packingSizesMock = new Mock<IPackingSizeRepository>();
-        packingSizesMock.Setup(r => r.FromName("Large")).Returns(packingSize);
+        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(packingSize: "Large"));
 
-        var sut = new PricingStrategyService([strategyMock.Object], urgenciesMock.Object, packingSizesMock.Object);
-        var delivery = MakeDelivery(packingSize: "Large");
-
-        // Act
-        sut.CalculateDeliveryPriceWithoutVat(delivery);
-
-        // Assert
-        capturedPackingSize.Should().Be(packingSize);
-    }
-
-    [Fact]
-    public void CalculatePrice_WhenNoStrategyMatches_Throws()
-    {
-        // Arrange
-        var strategyMock = new Mock<IPricingStrategy>();
-        strategyMock.Setup(s => s.Name).Returns("TourDeliveryStrategy");
-
-        var urgenciesMock = new Mock<IUrgencyRepository>();
-        urgenciesMock.Setup(r => r.GetUrgency(It.IsAny<string>())).Returns(DefaultUrgency);
-        var packingSizesMock = new Mock<IPackingSizeRepository>();
-        packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
-
-        var sut = new PricingStrategyService([strategyMock.Object], urgenciesMock.Object, packingSizesMock.Object);
-        var delivery = MakeDelivery(PricingStrategyEnum.SimpleDeliveryStrategy);
-
-        // Act
-        var act = () => sut.CalculateDeliveryPriceWithoutVat(delivery);
-
-        // Assert
-        act.Should().Throw<InvalidOperationException>();
+        _capturedArgs!.PackingSize.Should().Be(large);
     }
 }
+
