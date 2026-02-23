@@ -13,7 +13,14 @@ public class DeliveryZoneRepository : IDeliveryZoneRepository
 
      public DeliveryZone FromAddress(string city)
      {
-          return DeliveryZones.FirstOrDefault(zone => zone.Cities.Any(c => c.Name == city))
-                 ?? DeliveryZones.First(zone => zone.Name == "Extérieur");
+          if (city == "")
+          {
+               throw new ArgumentException("Veuillez indiquer une ville.");
+          }
+          else
+          {
+               return DeliveryZones.FirstOrDefault(zone => zone.Cities.Any(c => string.Equals(c.Name, city, StringComparison.CurrentCultureIgnoreCase)))
+                      ?? DeliveryZones.First(zone => zone.Name == "Extérieur");
+          }
      }
 }

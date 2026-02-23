@@ -19,6 +19,13 @@ public class PackingSizeRepository : IPackingSizeRepository
 
      public PackingSize FromName(string name)
      {
-          return PackingSizes.Single(s => s.Name == name);
+          if (name == "")
+          {
+               throw new ArgumentException("Veuillez indiquer une taille de colis.");
+          }
+          else
+          {
+               return PackingSizes.Single(s => string.Equals(s.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Taille de colis inconnue.");
+          }
      }
 }
