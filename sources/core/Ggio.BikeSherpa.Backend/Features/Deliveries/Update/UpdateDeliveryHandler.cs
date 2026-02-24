@@ -29,12 +29,19 @@ public record UpdateDeliveryCommand(
 
 public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCommand>
 {
-     public UpdateDeliveryCommandValidator(IUrgencyRepository urgencies)
+     public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies)
      {
           RuleFor(x => x.Id).NotEmpty();
           RuleFor(x => x.PricingStrategyEnum).IsInEnum().NotEmpty();
           RuleFor(x => x.StatusEnum).IsInEnum().NotEmpty();
-          RuleFor(x => x.Code).NotEmpty();
+          RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
+          {
+               var codeIsValid = !await repository.AnyAsync(new DeliveryByCodeSpecification(code), cancellationToken);
+               if (!codeIsValid)
+               {
+                    context.AddFailure("Code de course déjà utilisé");
+               }
+          });
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.Urgency)
                .NotEmpty()
@@ -42,7 +49,14 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                .WithMessage("Valeur d'urgence saisie invalide.");
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.Discount).NotEmpty();
-          RuleFor(x => x.ReportId).NotEmpty();
+          RuleFor(x => x.ReportId).NotEmpty().CustomAsync(async (reportId, context, cancellationToken) =>
+          {
+               var reportIdIsValid = !await repository.AnyAsync(new DeliveryByReportIdSpecification(reportId), cancellationToken);
+               if (!reportIdIsValid)
+               {
+                    context.AddFailure("Numéro de rapport déjà utilisé");
+               }
+          });
           RuleForEach(x => x.Steps)
                .ChildRules(step =>
                {
@@ -51,7 +65,6 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                     step.RuleFor(s => s.EstimatedDeliveryDate).NotEmpty();
                });
           RuleFor(x => x.PackingSize).NotEmpty();
-          RuleFor(x => x.InsulatedBox).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
@@ -90,6 +103,8 @@ public class UpdateDeliveryHandler(
           {
                step.StepZone = deliveryZones.FromAddress(step.StepAddress.City);
           }
+
+          entity.Steps = command.Steps;
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
