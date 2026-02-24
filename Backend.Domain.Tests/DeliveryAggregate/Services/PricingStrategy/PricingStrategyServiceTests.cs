@@ -145,7 +145,7 @@ public class PricingStrategyServiceTests
         tourMock.Setup(s => s.Name).Returns("TourDeliveryStrategy");
         var sut = MakeSutWith(strategies: [tourMock.Object]);
 
-        var act = () => sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(PricingStrategyEnum.SimpleDeliveryStrategy));
+        var act = () => sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
         act.Should().Throw<InvalidOperationException>();
     }

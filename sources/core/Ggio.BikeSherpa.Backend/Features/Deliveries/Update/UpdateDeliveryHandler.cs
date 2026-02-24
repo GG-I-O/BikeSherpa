@@ -29,7 +29,7 @@ public record UpdateDeliveryCommand(
 
 public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCommand>
 {
-     public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies)
+     public UpdateDeliveryCommandValidator(IUrgencyRepository urgencies)
      {
           RuleFor(x => x.Id).NotEmpty();
           RuleFor(x => x.PricingStrategyEnum).IsInEnum().NotEmpty();
