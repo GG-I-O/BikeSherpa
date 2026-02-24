@@ -106,7 +106,9 @@ public class UpdateDeliveryHandler(
 
           entity.UpdateSteps(command.Steps, deliveryZones, pricingStrategyService);
 
-          entity.Steps = command.Steps;
+          // Remove steps that are not in the request
+          var incomingIds = command.Steps.Select(s => s.Id).ToHashSet();
+          entity.Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

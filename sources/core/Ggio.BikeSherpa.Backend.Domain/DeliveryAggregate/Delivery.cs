@@ -135,7 +135,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
           || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;
 
-     private void DeleteStep(Guid stepId)
+     public void DeleteStep(Guid stepId)
      {
           var incomingIds = steps.Select(s => s.Id).ToHashSet();
           Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
