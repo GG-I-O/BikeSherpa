@@ -37,7 +37,6 @@ public class DeliveryFactoryTests
         string[]? details = null,
         string packingSize = "Standard",
         bool insulatedBox = false,
-        bool exactTime = false,
         DateTimeOffset? contractDate = null,
         DateTimeOffset? startDate = null) =>
         _sut.CreateDeliveryAsync(
@@ -60,7 +59,6 @@ public class DeliveryFactoryTests
             details: details,
             packingSize: "Large",
             insulatedBox: true,
-            exactTime: true,
             contractDate: ContractDate,
             startDate: StartDate);
 
