@@ -12,23 +12,22 @@ namespace Backend.Domain.Tests.DeliveryAggregate.Services.PricingStrategy;
 
 public class PricingStrategyServiceTests
 {
-    private static readonly DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
-    private static readonly DateTimeOffset ContractDate = new(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
-    private static readonly PackingSize DefaultPackingSize = new(1, "Standard", 10, 50, 0, 0);
-    private static readonly Urgency DefaultUrgency = new(1, "Normal", PriceCoefficient: 0);
-    private static readonly DeliveryZone GrenobleZone = new(1, "Grenoble", []);
-    private static readonly DeliveryZone BorderZone = new(2, "Limitrophe", []);
-    private static readonly DeliveryZone PeripheryZone = new(3, "Périphérie", []);
-    private static readonly DeliveryZone OutsideZone = new(4, "Extérieur", []);
-    private static readonly Address DefaultAddress = new()
+    private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+    private readonly static DateTimeOffset ContractDate = new(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
+    private readonly static PackingSize DefaultPackingSize = new(1, "Standard", 10, 50, 0, 0);
+    private readonly static Urgency DefaultUrgency = new(1, "Normal", PriceCoefficient: 0);
+    private readonly static DeliveryZone GrenobleZone = new(1, "Grenoble", []);
+    private readonly static DeliveryZone BorderZone = new(2, "Limitrophe", []);
+    private readonly static DeliveryZone PeripheryZone = new(3, "Périphérie", []);
+    private readonly static DeliveryZone OutsideZone = new(4, "Extérieur", []);
+    private readonly static Address DefaultAddress = new()
     { Name = "Test", StreetInfo = "1 rue Test", Postcode = "38000", City = "Grenoble" };
 
     private record StrategyArgs(
-        DateTimeOffset StartDate, DateTimeOffset ContractDate,
+        DateTimeOffset ArgStartDate, DateTimeOffset ArgContractDate,
         int Pickups, int Grenoble, int Border, int Periphery, int Outside,
         PackingSize PackingSize, double Coefficient, double Distance);
 
-    private readonly Mock<IPricingStrategy> _strategyMock;
     private readonly Mock<IUrgencyRepository> _urgenciesMock;
     private readonly Mock<IPackingSizeRepository> _packingSizesMock;
     private readonly PricingStrategyService _sut;
@@ -36,9 +35,9 @@ public class PricingStrategyServiceTests
 
     public PricingStrategyServiceTests()
     {
-        _strategyMock = new Mock<IPricingStrategy>();
-        _strategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
-        _strategyMock
+        var strategyMock = new Mock<IPricingStrategy>();
+        strategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
+        strategyMock
             .Setup(s => s.CalculateDeliveryPriceWithoutVat(
                 It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
                 It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
@@ -56,7 +55,7 @@ public class PricingStrategyServiceTests
         _packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
 
         _sut = new PricingStrategyService(
-            [_strategyMock.Object], _urgenciesMock.Object, _packingSizesMock.Object);
+            [strategyMock.Object], _urgenciesMock.Object, _packingSizesMock.Object);
     }
 
     private Delivery MakeDelivery(
