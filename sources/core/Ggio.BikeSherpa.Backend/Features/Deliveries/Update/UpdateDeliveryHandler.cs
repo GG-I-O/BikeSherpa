@@ -99,12 +99,34 @@ public class UpdateDeliveryHandler(
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
 
-          foreach (var step in command.Steps)
+          foreach (var stepDto in command.Steps)
           {
-               step.StepZone = deliveryZones.FromAddress(step.StepAddress.City);
+               var existing = entity.Steps.FirstOrDefault(s => s.Id == stepDto.Id);
+
+               // Add new steps
+               if (existing is null)
+               {
+                    stepDto.StepZone = deliveryZones.FromAddress(stepDto.StepAddress.City);
+                    entity.Steps.Add(stepDto);
+               }
+
+               // Update existing steps
+               else
+               {
+                    existing.Update(
+                         stepDto.StepType,
+                         stepDto.Order,
+                         stepDto.Completed,
+                         stepDto.StepAddress,
+                         deliveryZones.FromAddress(stepDto.StepAddress.City),
+                         stepDto.Distance,
+                         stepDto.EstimatedDeliveryDate);
+               }
           }
 
-          entity.Steps = command.Steps;
+          // Remove steps that are not in the request
+          var incomingIds = command.Steps.Select(s => s.Id).ToHashSet();
+          entity.Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

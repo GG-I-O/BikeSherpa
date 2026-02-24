@@ -105,7 +105,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
           || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;
 
-     private void DeleteStep(Guid stepId)
+     public void DeleteStep(Guid stepId)
      {
           var step = Steps.Single(s => s.Id == stepId);
           Steps.Remove(step);
