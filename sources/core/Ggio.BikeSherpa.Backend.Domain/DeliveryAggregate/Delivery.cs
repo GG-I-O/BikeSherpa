@@ -39,12 +39,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           ReportId = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
      }
 
-     public string GenerateReportId(Customer customer)
-     {
-          var reportId = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
-          return reportId;
-     }
-
      // Methods allowing to change the delivery status
      private void UpdateStatus()
      {
@@ -74,68 +68,165 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      private void Start()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Start);
-          await _mediator.Publish(new DeliveryStartedEvent(this));
+          RegisterDomainEvent(new DeliveryStartedEvent(Id));
      }
 
      private void Complete()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Complete);
-          await _mediator.Publish(new DeliveryCompletedEvent(this));
+          RegisterDomainEvent(new DeliveryCompletedEvent(Id));
      }
-     
-     public async Task Cancel()
+
+     public void Cancel()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Cancel);
-          await _mediator.Publish(new DeliveryCancelledEvent(this));
+          RegisterDomainEvent(new DeliveryCancelledEvent(Id));
      }
-     
-     // Methods allowing to change delivery properties
-     public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime)
+
+     public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime, IPricingStrategyService pricingStrategyService)
      {
           StartDate = deliveryDateTime;
+          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
-     
-     public void SetDeliveryPrice(double deliveryPrice)
+
+     public void ReorderSteps(Guid movedStepId, int newOrder)
      {
-          TotalPrice = deliveryPrice;
+          var movedStep = Steps.Single(s => s.Id == movedStepId);
+          Steps.Remove(movedStep);
+          Steps.Insert(newOrder - 1, movedStep);
+          var order = 1;
+          foreach (var step in Steps)
+          {
+               step.Order = order++;
+          }
      }
-     
-     private void AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
+
+     private void ReorderStepsOnDeletion()
      {
-          var step = new DeliveryStep(stepTypeEnum, Steps.Count + 1, stepAddress, deliveryZone, distance, estimatedDeliveryDate);
-          Steps.Add(step);
+          var order = 1;
+          foreach (var step in Steps.OrderBy(s => s.Order))
+          {
+               step.Order = order++;
+          }
      }
-     
-     // Methods allowing to update delivery steps
-     private void UpdateStepOrder(Guid stepId, int order)
+
+     public void UpdateStepCourier(Guid stepId, Guid courierId)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.CourierId = courierId;
      }
-     
-     private void UpdateStepCourier(Guid stepId, Guid courierId)
+
+     public void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset updatedDeliveryDate)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.AssignCourier(courierId);
-     }
-     
-     private void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset estimatedDeliveryDate)
-     {
-          var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.UpdateDeliveryTime(estimatedDeliveryDate);
+          var timeOffset = updatedDeliveryDate - existingStep.EstimatedDeliveryDate;
+          existingStep.EstimatedDeliveryDate = updatedDeliveryDate;
+          foreach (var step in Steps.Where(s => s.Order > existingStep.Order))
+          {
+               step.EstimatedDeliveryDate += timeOffset;
+          }
      }
 
-     private void UpdateStepCompletion(Guid stepId, bool completed)
+     public void UpdateStepCompletion(Guid stepId, bool completed)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.UpdateCompletion(completed);
+          existingStep.Completed = completed;
+          if (completed)
+          {
+               existingStep.RealDeliveryDate = DateTimeOffset.UtcNow;
+          }
+          UpdateStatus();
      }
-     
-     private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
-          previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
-          || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;
 
-     public void DeleteStep(Guid stepId)
+     public DeliveryStep AddStep(
+          StepType stepType,
+          Address stepAddress,
+          double distance,
+          IDeliveryZoneRepository deliveryZones,
+          IPricingStrategyService pricingStrategyService)
+     {
+          var newStep = new DeliveryStep(
+               stepType,
+               Steps.Count + 1,
+               stepAddress,
+               distance)
+          {
+               Id = Guid.NewGuid(),
+               StepAddress = stepAddress,
+               StepZone = deliveryZones.GetByAddress(stepAddress.City)
+          };
+
+          if (Steps.Count >= 1)
+          {
+               var previousStep = Steps.Where(s => s.Order == newStep.Order - 1);
+               newStep.EstimatedDeliveryDate = previousStep.Single().EstimatedDeliveryDate + TimeSpan.FromMinutes(15);
+          }
+          else
+          {
+               newStep.EstimatedDeliveryDate = StartDate;
+          }
+
+          Steps.Add(newStep);
+          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+
+          return newStep;
+     }
+
+     public void DeleteStep(
+          DeliveryStep removedStep,
+          IPricingStrategyService pricingStrategyService)
+     {
+          var nextStep = Steps.FirstOrDefault((s => s.Order == removedStep.Order + 1));
+          var timeOffset = CalculateDeliveryTimeOffset(removedStep, nextStep);
+          Steps.Remove(removedStep);
+          ReorderStepsOnDeletion();
+          UpdateStepDeliveryTimeOnDelete(removedStep.Order, timeOffset);
+          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+     }
+
+     private TimeSpan CalculateDeliveryTimeOffset(DeliveryStep removedStep, DeliveryStep? nextStep)
+     {
+          return nextStep is null ? TimeSpan.Zero : nextStep.EstimatedDeliveryDate - removedStep.EstimatedDeliveryDate;
+     }
+
+     private void UpdateStepDeliveryTimeOnDelete(int stepOrder, TimeSpan timeOffset)
+     {
+          foreach (var step in Steps.Where(s => s.Order >= stepOrder))
+          {
+               step.EstimatedDeliveryDate += timeOffset;
+          }
+     }
+
+     public void UpdateSteps(List<DeliveryStep> steps, IDeliveryZoneRepository deliveryZones, IPricingStrategyService pricingStrategyService)
+     {
+          foreach (var step in steps)
+          {
+               var existing = Steps.FirstOrDefault(s => s.Id == step.Id);
+
+               if (existing is null)
+               {
+                    step.StepZone = deliveryZones.GetByAddress(step.StepAddress.City);
+                    Steps.Add(step);
+               }
+
+               else
+               {
+                    existing.Update(
+                         step.StepType,
+                         step.Order,
+                         step.Completed,
+                         step.StepAddress,
+                         deliveryZones.GetByAddress(step.StepAddress.City),
+                         step.Distance,
+                         step.EstimatedDeliveryDate);
+               }
+          }
+
+          DeleteOldSteps(steps);
+          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+     }
+
+     private void DeleteOldSteps(List<DeliveryStep> steps)
      {
           var incomingIds = steps.Select(s => s.Id).ToHashSet();
           Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
