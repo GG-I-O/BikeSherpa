@@ -26,7 +26,7 @@ public class DeleteDeliveryStepHandler(
                return Result.NotFound();
           }
 
-          entity.DeleteStep(command.StepId);
+          entity.Steps.Remove(step);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

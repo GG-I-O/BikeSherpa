@@ -70,12 +70,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           TotalPrice = deliveryPrice;
      }
 
-     private void AddStep(StepTypeEnum stepTypeEnum, Address stepAddress, DeliveryZone deliveryZone, double distance, DateTimeOffset estimatedDeliveryDate)
-     {
-          var step = new DeliveryStep(stepTypeEnum, Steps.Count + 1, stepAddress, deliveryZone, distance, estimatedDeliveryDate);
-          Steps.Add(step);
-     }
-
      // Methods allowing to update delivery steps
      private void UpdateStepOrder(Guid stepId, int order)
      {
@@ -104,10 +98,4 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
           previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
           || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;
-
-     public void DeleteStep(Guid stepId)
-     {
-          var step = Steps.Single(s => s.Id == stepId);
-          Steps.Remove(step);
-     }
 }

@@ -9,7 +9,7 @@ namespace Backend.Domain.Tests.DeliveryAggregate;
 
 public class DeliveryStatusMachineTests
 {
-    private static readonly Address SomeAddress = new()
+    private readonly static Address SomeAddress = new()
     {
         Name = "Test",
         StreetInfo = "1 rue Test",
@@ -17,7 +17,7 @@ public class DeliveryStatusMachineTests
         City = "Paris"
     };
 
-    private static readonly DeliveryZone SomeZone = new(1, "Zone 1", []);
+    private readonly static DeliveryZone SomeZone = new(1, "Zone 1", []);
 
     private static Delivery CreateDelivery(
         DeliveryStatusEnum status = DeliveryStatusEnum.Pending,
