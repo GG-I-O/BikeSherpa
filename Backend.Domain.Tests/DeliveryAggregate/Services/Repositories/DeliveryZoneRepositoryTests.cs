@@ -6,12 +6,12 @@ namespace Backend.Domain.Tests.DeliveryAggregate.Services.Repositories;
 
 public class DeliveryZoneRepositoryTests
 {
-    private static readonly City Grenoble = new(1, "Grenoble");
-    private static readonly City Meylan = new(2, "Meylan");
-    private static readonly City Echirolles = new(3, "Echirolles");
-    private static readonly DeliveryZone ZoneGrenoble = new(1, "Grenoble", [Grenoble]);
-    private static readonly DeliveryZone ZoneLimitrophe = new(2, "Limitrophe", [Echirolles, Meylan]);
-    private static readonly DeliveryZone ZoneExterieur = new(4, "Extérieur", []);
+    private readonly static City Grenoble = new(1, "Grenoble");
+    private readonly static City Meylan = new(2, "Meylan");
+    private readonly static City Echirolles = new(3, "Echirolles");
+    private readonly static DeliveryZone ZoneGrenoble = new(1, "Grenoble", [Grenoble]);
+    private readonly static DeliveryZone ZoneLimitrophe = new(2, "Limitrophe", [Echirolles, Meylan]);
+    private readonly static DeliveryZone ZoneExterieur = new(4, "Extérieur", []);
     private static DeliveryZoneRepository MakeSut(IEnumerable<DeliveryZone>? zones = null) =>
         new(zones ?? [ZoneGrenoble, ZoneLimitrophe, ZoneExterieur]);
 
