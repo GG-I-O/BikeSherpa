@@ -8,7 +8,6 @@ public class TourDeliveryStrategyTests
 {
     private static readonly PackingSize DefaultPackingSize = new(1, "Standard", 10, 50, 0, 0);
     private static readonly DateTimeOffset BaseDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
-
     private static TourDeliveryStrategy MakeSut() => new();
 
     [Fact]
@@ -25,101 +24,84 @@ public class TourDeliveryStrategyTests
     [InlineData(3, 42.0)]
     public void CalculatePrice_PickupNumber_IsMultipliedByBasePrice(int pickupNumber, double expectedPickupCost)
     {
-        // Arrange
         var sut = MakeSut();
-        
-        var startDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
-        var contractDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
+        var contractDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+        var startDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
 
-        // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, pickupNumber, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
 
-        // Assert
         result.Should().Be(2 + expectedPickupCost);
     }
 
     [Fact]
-    public void CalculatePrice_WhenDeliveryIsOnSameDayAsContract_AddsExtraCost()
+    public void CalculatePrice_WhenDeliveryIsOnSameDayAsContractDate_AddsExtraCost()
     {
-        // Arrange
         var sut = MakeSut();
-        var contractDate = BaseDate.AddHours(5); // same day, 5h delay → standard
+        var contractDate = BaseDate;
+        var startDate = BaseDate.AddHours(5);
 
-        // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(BaseDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
 
-        // Assert
         result.Should().Be(2);
     }
 
     [Fact]
-    public void CalculatePrice_WhenDeliveryIsOnDifferentDay_NoSameDayCost()
+    public void CalculatePrice_WhenOrderIsAfter5PM_AndDeliveryIsNextDay_AddsSameDayCost()
     {
-        // Arrange
         var sut = MakeSut();
-        var contractDate = BaseDate.AddHours(25);
+        var contractDate = new DateTimeOffset(2026, 1, 15, 18, 0, 0, TimeSpan.Zero);
+        var startDate = new DateTimeOffset(2026, 1, 16, 10, 0, 0, TimeSpan.Zero);
 
-        // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(BaseDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
-
-        // Assert
-        result.Should().Be(-2);
-    }
-
-    [Fact]
-    public void CalculatePrice_WhenDelayIsMoreThan18Hours_AppliesEarlyOrderDiscount()
-    {
-        // Arrange
-        var sut = MakeSut();
-        var startDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
-        var contractDate = new DateTimeOffset(2026, 1, 15, 12, 0, 0, TimeSpan.Zero); // 26h, different day
-
-        // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
 
-        // Assert
+        result.Should().Be(2);
+    }
+
+    [Fact]
+    public void CalculatePrice_WhenDeliveryIsOnDifferentDay_AppliesEarlyOrderDiscountAndNoSameDayCost()
+    {
+        var sut = MakeSut();
+        var contractDate = BaseDate;
+        var startDate = BaseDate.AddHours(25);
+
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+
         result.Should().Be(-2);
     }
 
     [Fact]
-    public void CalculatePrice_WhenDelayIsAtMost2Hours_AppliesLastMinuteExtraCost()
+    public void CalculatePrice_WhenDelayIsAtMost2Hours_AppliesLastMinuteExtraCostAndSameDayCost()
     {
-        // Arrange
         var sut = MakeSut();
-        var contractDate = BaseDate.AddHours(1);
+        var contractDate = BaseDate;
+        var startDate = BaseDate.AddHours(1);
 
-        // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(BaseDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
 
-        // Assert
         result.Should().Be(2 + 3);
     }
 
     [Fact]
-    public void CalculatePrice_WhenDelayIsExactly2Hours_AppliesLastMinuteExtraCost()
+    public void CalculatePrice_WhenDelayIsExactly2Hours_AppliesLastMinuteExtraCostAndSameDayCost()
     {
-        // Arrange
         var sut = MakeSut();
-        var contractDate = BaseDate.AddHours(2);
+        var contractDate = BaseDate;
+        var startDate = BaseDate.AddHours(2);
 
-        // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(BaseDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
 
-        // Assert
         result.Should().Be(2 + 3);
     }
 
     [Fact]
-    public void CalculatePrice_WhenDelayIsBetween2And18Hours_AppliesNoCostAdjustment()
+    public void CalculatePrice_WhenDelayIsBetween2And18Hours_AppliesOnlySameDayCost()
     {
-        // Arrange
         var sut = MakeSut();
-        var contractDate = BaseDate.AddHours(10);
+        var contractDate = BaseDate;
+        var startDate = BaseDate.AddHours(6);
 
-        // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(BaseDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
 
-        // Assert
         result.Should().Be(2);
     }
 
@@ -131,62 +113,51 @@ public class TourDeliveryStrategyTests
     public void CalculatePrice_ZoneDropoffSteps_AreMultipliedByCorrectStepPrice(
         int grenoble, int border, int periphery, int outside, double expectedZoneCost)
     {
-        // Arrange
         var sut = MakeSut();
-        var startDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
-        var contractDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
+        var contractDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+        var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
-        // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, grenoble, border, periphery, outside, DefaultPackingSize, 0, 0);
 
-        // Assert
         result.Should().Be(2 + expectedZoneCost);
     }
 
     [Fact]
     public void CalculatePrice_IncludesPackingSizeTourPrice()
     {
-        // Arrange
         var sut = MakeSut();
         var packingSize = DefaultPackingSize with { TourPrice = 7.0 };
-        var startDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
-        var contractDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
+        var contractDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+        var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
-        // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, packingSize, 0, 0);
 
-        // Assert
         result.Should().Be(2 + 7.0);
     }
 
     [Fact]
     public void CalculatePrice_UrgencyCoefficientAndDistance_HaveNoEffect()
     {
-        // Arrange
         var sut = MakeSut();
-        var startDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
-        var contractDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero); // 10h, same day
+        var contractDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+        var startDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
 
         var resultWithoutUrgency = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
         var resultWithUrgency = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 10.0, 100.0);
 
-        // Assert
         resultWithUrgency.Should().Be(resultWithoutUrgency);
     }
 
     [Fact]
     public void CalculatePrice_WithAllFactors_ReturnsCorrectTotal()
     {
-        // Arrange
         var sut = MakeSut();
         var packingSize = DefaultPackingSize with { TourPrice = 4.0 };
-        var startDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
-        var contractDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
+        var contractDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+        var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
-        // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 2, 1, 2, 1, 1, packingSize, 0, 0);
 
-        // Assert
         result.Should().Be(55);
     }
 }

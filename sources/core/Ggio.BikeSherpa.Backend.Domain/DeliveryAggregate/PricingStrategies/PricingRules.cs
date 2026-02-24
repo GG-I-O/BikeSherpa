@@ -8,12 +8,13 @@ public static class PricingRules
      private const double EarlyOrderDiscount = -2;
      private const double LastMinuteOrderExtraCost = 3;
      private const double StandardCost = 0;
+     private const double EndOfBusinessDayTime = 17;
 
      // Check if there is an extra cost for a delivery on the same day as the contract
-     // A delivery for the next day ordered after 5PM is considered a "same day delivery"
+     // A delivery for the next day ordered after 5PM is considered a same day delivery
      public static double CalculateSameDayDeliveryExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate)
      {
-          if (contractDate.Hour >= 17 && contractDate.Date.AddDays(1) == startDate.Date || startDate.Date == contractDate.Date)
+          if (contractDate.Hour >= EndOfBusinessDayTime && contractDate.Date.AddDays(1) == startDate.Date || startDate.Date == contractDate.Date)
           {
                return SameDayDeliveryExtraCost;
           }
@@ -37,6 +38,6 @@ public static class PricingRules
 
      private static double CalculateDelayInHours(DateTimeOffset startDate, DateTimeOffset contractDate)
      {
-          return (contractDate - startDate).TotalHours;
+          return (startDate - contractDate).TotalHours;
      }
 }
