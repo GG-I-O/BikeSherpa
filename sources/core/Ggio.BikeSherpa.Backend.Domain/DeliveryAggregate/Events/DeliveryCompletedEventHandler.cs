@@ -5,7 +5,7 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 public class DeliveryCompletedEventHandler(IApplicationTransactionContext context)
      : PostTransactionDomainEventHandlerBase<DeliveryCompletedEvent>(context)
 {
-     protected override ValueTask HandleInternal(DeliveryCompletedEvent notification, CancellationToken cancellationToken)
+     override protected ValueTask HandleInternal(DeliveryCompletedEvent notification, CancellationToken cancellationToken)
      {
           // TODO
           // Send user notification
