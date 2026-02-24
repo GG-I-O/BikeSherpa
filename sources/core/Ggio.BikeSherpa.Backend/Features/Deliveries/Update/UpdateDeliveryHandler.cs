@@ -106,6 +106,8 @@ public class UpdateDeliveryHandler(
 
           entity.UpdateSteps(command.Steps, deliveryZones, pricingStrategyService);
 
+          entity.Steps = command.Steps;
+
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
      }
