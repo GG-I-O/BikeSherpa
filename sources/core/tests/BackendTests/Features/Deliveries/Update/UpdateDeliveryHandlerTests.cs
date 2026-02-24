@@ -92,7 +92,6 @@ public class UpdateDeliveryHandlerTests
           // Arrange
           SetupRepositoryTestingIfReportIdExists(false);
 
-          // Guarantee bool/small-enum fields differ from command so NotBe assertions are reliable
           _mockDelivery.InsulatedBox = !_mockCommand.InsulatedBox;
           _mockDelivery.Status = _mockCommand.StatusEnum == DeliveryStatusEnum.Pending
                ? DeliveryStatusEnum.Completed
@@ -105,7 +104,7 @@ public class UpdateDeliveryHandlerTests
           var originalContractDate = _mockDelivery.ContractDate;
           var originalStartDate = _mockDelivery.StartDate;
           var originalStatus = _mockDelivery.Status;
-          var originalSteps = _mockDelivery.Steps;
+          var originalSteps = _mockDelivery.Steps.ToList();
           var originalInsulatedBox = _mockDelivery.InsulatedBox;
           var originalDetails = _mockDelivery.Details;
           var originalReportId = _mockDelivery.ReportId;
