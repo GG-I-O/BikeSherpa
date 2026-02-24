@@ -75,7 +75,8 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
 public class UpdateDeliveryHandler(
      IReadRepository<Delivery> repository,
      IValidator<UpdateDeliveryCommand> validator,
-     IApplicationTransaction transaction, IDeliveryZoneRepository deliveryZones
+     IApplicationTransaction transaction,
+     IDeliveryZoneRepository deliveryZones
 ) : ICommandHandler<UpdateDeliveryCommand, Result>
 {
      public async ValueTask<Result> Handle(UpdateDeliveryCommand command, CancellationToken cancellationToken)
