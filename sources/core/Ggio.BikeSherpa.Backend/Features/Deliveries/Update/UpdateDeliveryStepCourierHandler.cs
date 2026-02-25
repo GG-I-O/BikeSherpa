@@ -5,10 +5,12 @@ using Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
+using JetBrains.Annotations;
 using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
+[UsedImplicitly]
 public record UpdateDeliveryStepCourierRequest(Guid CourierId);
 
 public record UpdateDeliveryStepCourierCommand(
@@ -17,6 +19,7 @@ public record UpdateDeliveryStepCourierCommand(
      Guid CourierId
 ) : ICommand<Result>;
 
+[UsedImplicitly]
 public class UpdateDeliveryStepCourierCommandValidator : AbstractValidator<UpdateDeliveryStepCourierCommand>
 {
      public UpdateDeliveryStepCourierCommandValidator()

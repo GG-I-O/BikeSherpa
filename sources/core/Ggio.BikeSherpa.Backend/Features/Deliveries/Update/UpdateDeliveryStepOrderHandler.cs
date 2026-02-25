@@ -3,10 +3,12 @@ using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
+using JetBrains.Annotations;
 using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
+[UsedImplicitly]
 public record UpdateDeliveryStepOrderRequest(int Order);
 
 public record UpdateDeliveryStepOrderCommand(
@@ -15,6 +17,7 @@ public record UpdateDeliveryStepOrderCommand(
      int Order
 ) : ICommand<Result>;
 
+[UsedImplicitly]
 public class UpdateDeliveryStepOrderCommandValidator : AbstractValidator<UpdateDeliveryStepOrderCommand>
 {
      public UpdateDeliveryStepOrderCommandValidator()
@@ -25,7 +28,7 @@ public class UpdateDeliveryStepOrderCommandValidator : AbstractValidator<UpdateD
      }
 }
 
-public class UpdateDeliveryStepOrderhandler(
+public class UpdateDeliveryStepOrderHandler(
      IReadRepository<Delivery> deliveryRepository,
      IValidator<UpdateDeliveryStepOrderCommand> validator,
      IApplicationTransaction transaction

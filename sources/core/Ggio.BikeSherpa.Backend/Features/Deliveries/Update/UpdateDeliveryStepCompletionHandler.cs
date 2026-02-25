@@ -3,10 +3,12 @@ using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
+using JetBrains.Annotations;
 using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
+[UsedImplicitly]
 public record UpdateDeliveryStepCompletionRequest(bool Completed);
 
 public record UpdateDeliveryStepCompletionCommand(
@@ -15,6 +17,7 @@ public record UpdateDeliveryStepCompletionCommand(
      bool Completed
 ) : ICommand<Result>;
 
+[UsedImplicitly]
 public class UpdateDeliveryStepCompletionCommandValidator : AbstractValidator<UpdateDeliveryStepCompletionCommand>
 {
      public UpdateDeliveryStepCompletionCommandValidator()
