@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-public class DeliveryStep(StepTypeEnum stepType, int order, Address stepAddress, DeliveryZone stepZone, double distance, DateTimeOffset estimatedDeliveryDate)
+public class DeliveryStep(StepType stepType, int order, Address stepAddress, DeliveryZone stepZone, double distance, DateTimeOffset estimatedDeliveryDate)
      : EntityBase<Guid>, IAuditEntity
 {
      // EF Core requires a parameterless constructor to create an entity instance because it can't create one with complex parameter types like Address and DeliveryZone.

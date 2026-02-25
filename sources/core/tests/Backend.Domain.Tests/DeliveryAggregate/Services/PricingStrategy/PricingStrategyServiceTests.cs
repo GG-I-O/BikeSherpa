@@ -61,7 +61,7 @@ public class PricingStrategyServiceTests
     }
 
     private Delivery MakeDelivery(
-        PricingStrategyEnum pricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
+        Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy pricingStrategy = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy.SimpleDeliveryStrategy,
         List<DeliveryStep>? steps = null,
         double? totalPrice = null,
         string packingSize = "Standard",
@@ -140,7 +140,7 @@ public class PricingStrategyServiceTests
 
         // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(
-            MakeDelivery(PricingStrategyEnum.CustomStrategy, totalPrice: 99.5));
+            MakeDelivery(Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy.CustomStrategy, totalPrice: 99.5));
 
         // Assert
         result.Should().Be(99.5);
