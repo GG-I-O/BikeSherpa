@@ -1,5 +1,3 @@
-using Ggio.BikeSherpa.Backend.Domain.CourierAggregate;
-using Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
@@ -129,7 +127,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     public void UpdateStepCompletion(Guid stepId, bool completed)
+     public async Task UpdateStepCompletion(Guid stepId, bool completed)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.Completed = completed;
