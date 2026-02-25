@@ -1,3 +1,5 @@
+using Ggio.BikeSherpa.Backend.Domain.CourierAggregate;
+using Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
@@ -78,7 +80,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           existingStep.UpdateOrder(order);
      }
 
-     private void UpdateStepCourier(Guid stepId, Guid courierId)
+     public void UpdateStepCourier(Guid stepId, Guid courierId)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.AssignCourier(courierId);
