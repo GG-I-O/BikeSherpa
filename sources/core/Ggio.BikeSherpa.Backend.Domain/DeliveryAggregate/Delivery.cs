@@ -44,13 +44,32 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      }
 
      // Methods allowing to change the delivery status
-     public async Task Start()
+     private async Task UpdateStatus()
+     {
+          switch (Status)
+          {
+               case DeliveryStatusEnum.Pending:
+                    if (Steps.Any(s => s.StepType == StepTypeEnum.Pickup && s.Completed))
+                    {
+                         await Start();
+                    }
+                    break;
+               case DeliveryStatusEnum.Started:
+                    if (Steps.All(s => s.Completed))
+                    {
+                         await Complete();
+                    }
+                    break;
+          }
+     }
+
+     private async Task Start()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Start);
           await _mediator.Publish(new DeliveryStartedEvent(Id));
      }
 
-     public async Task Complete()
+     private async Task Complete()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Complete);
           await _mediator.Publish(new DeliveryCompletedEvent(Id));
@@ -92,10 +111,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           existingStep.UpdateDeliveryTime(estimatedDeliveryDate);
      }
 
-     private void UpdateStepCompletion(Guid stepId, bool completed)
+     public void UpdateStepCompletion(Guid stepId, bool completed)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.UpdateCompletion(completed);
+          UpdateStatus();
      }
 
      private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
