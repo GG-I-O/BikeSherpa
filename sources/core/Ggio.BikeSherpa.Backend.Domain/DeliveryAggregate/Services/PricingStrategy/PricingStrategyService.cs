@@ -15,7 +15,7 @@ public class PricingStrategyService(
           var strategy = strategies.Single(s => s.Name == delivery.PricingStrategy.ToString());
           var packingSize = packingSizes.FromName(delivery.PackingSize);
           var urgencyPriceCoefficient = urgencies.GetUrgency(delivery.Urgency).PriceCoefficient;
-          var pickupCount = delivery.Steps.Count(s => s.StepType == StepTypeEnum.Pickup);
+          var pickupCount = delivery.Steps.Count(s => s.StepType == StepType.Pickup);
           var dropoffsInGrenoble = delivery.Steps.Count(s => s.StepZone.Name == "Grenoble");
           var dropoffsInBorder = delivery.Steps.Count(s => s.StepZone.Name == "Limitrophe");
           var dropoffsInPeriphery = delivery.Steps.Count(s => s.StepZone.Name == "Périphérie");

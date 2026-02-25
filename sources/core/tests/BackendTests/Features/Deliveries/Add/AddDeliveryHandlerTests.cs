@@ -46,7 +46,7 @@ public class AddDeliveryHandlerTests
 
           _mockFactory
                .Setup(x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategyEnum>(),
+                    It.IsAny<PricingStrategy>(),
                     It.IsAny<string>(),
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),
@@ -80,7 +80,7 @@ public class AddDeliveryHandlerTests
      {
           _mockFactory.Verify(
                x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategyEnum>(),
+                    It.IsAny<PricingStrategy>(),
                     It.IsAny<string>(),
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),
@@ -131,7 +131,7 @@ public class AddDeliveryHandlerTests
           Assert.Equal(_mockDelivery.Id, result.Value);
           _mockFactory.Verify(
                x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategyEnum>(),
+                    It.IsAny<PricingStrategy>(),
                     It.IsAny<string>(),
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),
@@ -159,7 +159,7 @@ public class AddDeliveryHandlerTests
 
           _mockFactory.Verify(
                x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategyEnum>(),
+                    It.IsAny<PricingStrategy>(),
                     It.IsAny<string>(),
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),
@@ -188,7 +188,7 @@ public class AddDeliveryHandlerTests
 
           _mockFactory.Verify(
                x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategyEnum>(),
+                    It.IsAny<PricingStrategy>(),
                     It.IsAny<string>(),
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),

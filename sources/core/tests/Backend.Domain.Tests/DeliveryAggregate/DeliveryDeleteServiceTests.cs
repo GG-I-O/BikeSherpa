@@ -29,7 +29,7 @@ public class DeliveryDeleteServiceTests
 
         _delivery = new(_mediatorMock.Object)
         {
-            PricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
+            PricingStrategy = PricingStrategy.SimpleDeliveryStrategy,
             Code = "TEST-001",
             CustomerId = Guid.NewGuid(),
             Urgency = "Normal",

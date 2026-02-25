@@ -12,8 +12,8 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
 public record UpdateDeliveryCommand(
      Guid Id,
-     PricingStrategyEnum PricingStrategyEnum,
-     DeliveryStatusEnum StatusEnum,
+     PricingStrategy PricingStrategy,
+     DeliveryStatus Status,
      string Code,
      Guid CustomerId,
      string Urgency,
@@ -33,8 +33,8 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
      public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies)
      {
           RuleFor(x => x.Id).NotEmpty();
-          RuleFor(x => x.PricingStrategyEnum).IsInEnum().NotEmpty();
-          RuleFor(x => x.StatusEnum).IsInEnum().NotEmpty();
+          RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
+          RuleFor(x => x.Status).IsInEnum().NotEmpty();
           RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
           {
                var codeIsValid = !await repository.AnyAsync(new DeliveryByCodeSpecification(code), cancellationToken);
@@ -88,8 +88,8 @@ public class UpdateDeliveryHandler(
           if (entity is null)
                return Result.NotFound();
 
-          entity.PricingStrategy = command.PricingStrategyEnum;
-          entity.Status = command.StatusEnum;
+          entity.PricingStrategy = command.PricingStrategy;
+          entity.Status = command.Status;
           entity.Code = command.Code;
           entity.CustomerId = command.CustomerId;
           entity.Urgency = command.Urgency;

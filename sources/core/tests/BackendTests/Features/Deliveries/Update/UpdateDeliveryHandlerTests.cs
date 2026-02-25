@@ -94,9 +94,9 @@ public class UpdateDeliveryHandlerTests
           SetupRepositoryTestingIfReportIdExists(false);
 
           _mockDelivery.InsulatedBox = !_mockCommand.InsulatedBox;
-          _mockDelivery.Status = _mockCommand.StatusEnum == DeliveryStatusEnum.Pending
-               ? DeliveryStatusEnum.Completed
-               : DeliveryStatusEnum.Pending;
+          _mockDelivery.Status = _mockCommand.Status == DeliveryStatus.Pending
+               ? DeliveryStatus.Completed
+               : DeliveryStatus.Pending;
 
           var originalCode = _mockDelivery.Code;
           var originalCustomerId = _mockDelivery.CustomerId;

@@ -28,7 +28,7 @@ public class DeliveryFactoryTests
     }
 
     private Task<Delivery> CreateDefault(
-        PricingStrategyEnum strategy = PricingStrategyEnum.SimpleDeliveryStrategy,
+        PricingStrategy strategy = PricingStrategy.SimpleDeliveryStrategy,
         string code = "TEST-001",
         Guid? customerId = null,
         string urgency = "Normal",
@@ -50,7 +50,7 @@ public class DeliveryFactoryTests
     {
         var details = new[] { "fragile", "urgent" };
         var delivery = await CreateDefault(
-            strategy: PricingStrategyEnum.TourDeliveryStrategy,
+            strategy: PricingStrategy.TourDeliveryStrategy,
             code: "DEL-42",
             customerId: CustomerId,
             urgency: "Express",
@@ -62,7 +62,7 @@ public class DeliveryFactoryTests
             contractDate: ContractDate,
             startDate: StartDate);
 
-        delivery.PricingStrategy.Should().Be(PricingStrategyEnum.TourDeliveryStrategy);
+        delivery.PricingStrategy.Should().Be(PricingStrategy.TourDeliveryStrategy);
         delivery.Code.Should().Be("DEL-42");
         delivery.CustomerId.Should().Be(CustomerId);
         delivery.Urgency.Should().Be("Express");

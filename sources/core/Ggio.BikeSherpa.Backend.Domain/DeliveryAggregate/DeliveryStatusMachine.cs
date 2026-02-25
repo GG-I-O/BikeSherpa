@@ -5,25 +5,25 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
 public class DeliveryStatusMachine
 {
-     private readonly StateMachine<DeliveryStatusEnum, DeliveryStatusTrigger> _statusMachine;
+     private readonly StateMachine<DeliveryStatus, DeliveryStatusTrigger> _statusMachine;
 
      public DeliveryStatusMachine(Delivery delivery)
      {
-          _statusMachine = new StateMachine<DeliveryStatusEnum, DeliveryStatusTrigger>(() => delivery.Status, status => delivery.Status = status);
+          _statusMachine = new StateMachine<DeliveryStatus, DeliveryStatusTrigger>(() => delivery.Status, status => delivery.Status = status);
 
-          _statusMachine.Configure(DeliveryStatusEnum.Pending)
-               .PermitIf(DeliveryStatusTrigger.Start, DeliveryStatusEnum.Started, () => delivery.Steps.Any(s => s is { StepType: StepTypeEnum.Pickup, Completed: true }))
-               .Permit(DeliveryStatusTrigger.Cancel, DeliveryStatusEnum.Cancelled);
+          _statusMachine.Configure(DeliveryStatus.Pending)
+               .PermitIf(DeliveryStatusTrigger.Start, DeliveryStatus.Started, () => delivery.Steps.Any(s => s is { StepType: StepType.Pickup, Completed: true }))
+               .Permit(DeliveryStatusTrigger.Cancel, DeliveryStatus.Cancelled);
 
-          _statusMachine.Configure(DeliveryStatusEnum.Started)
-               .PermitIf(DeliveryStatusTrigger.Complete, DeliveryStatusEnum.Completed, () => delivery.Steps.All(s => s.Completed))
-               .Permit(DeliveryStatusTrigger.Cancel, DeliveryStatusEnum.Cancelled);
+          _statusMachine.Configure(DeliveryStatus.Started)
+               .PermitIf(DeliveryStatusTrigger.Complete, DeliveryStatus.Completed, () => delivery.Steps.All(s => s.Completed))
+               .Permit(DeliveryStatusTrigger.Cancel, DeliveryStatus.Cancelled);
 
-          _statusMachine.Configure(DeliveryStatusEnum.Completed)
+          _statusMachine.Configure(DeliveryStatus.Completed)
                .Ignore(DeliveryStatusTrigger.Complete)
                .Ignore(DeliveryStatusTrigger.Start);
 
-          _statusMachine.Configure(DeliveryStatusEnum.Cancelled)
+          _statusMachine.Configure(DeliveryStatus.Cancelled)
                .Ignore(DeliveryStatusTrigger.Complete)
                .Ignore(DeliveryStatusTrigger.Cancel);
      }

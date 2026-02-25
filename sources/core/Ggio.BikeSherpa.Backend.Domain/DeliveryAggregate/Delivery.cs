@@ -10,8 +10,8 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
 public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 {
-     public required PricingStrategyEnum PricingStrategy { get; set; }
-     public DeliveryStatusEnum Status { get; set; } = DeliveryStatusEnum.Pending;
+     public required PricingStrategy PricingStrategy { get; set; }
+     public DeliveryStatus Status { get; set; } = DeliveryStatus.Pending;
      public required string Code { get; set; }
      public required Guid CustomerId { get; set; }
      public required string Urgency { get; set; }
@@ -47,21 +47,21 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      {
           switch (Status)
           {
-               case DeliveryStatusEnum.Pending:
-                    if (Steps.Any(s => s is { StepType: StepTypeEnum.Pickup, Completed: true }))
+               case DeliveryStatus.Pending:
+                    if (Steps.Any(s => s is { StepType: StepType.Pickup, Completed: true }))
                     {
                          await Start();
                     }
                     break;
-               case DeliveryStatusEnum.Started:
+               case DeliveryStatus.Started:
                     if (Steps.All(s => s.Completed))
                     {
                          await Complete();
                     }
                     break;
-               case DeliveryStatusEnum.Completed:
+               case DeliveryStatus.Completed:
                     throw new InvalidOperationException("Course déjà terminée.");
-               case DeliveryStatusEnum.Cancelled:
+               case DeliveryStatus.Cancelled:
                     throw new InvalidOperationException("Course annulée.");
                default:
                     throw new ArgumentOutOfRangeException();
@@ -131,13 +131,13 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep)
+     private bool StepCanFollow(StepType previousStep, StepType currentStep)
      {
-          return previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Pickup;
+          return previousStep == StepType.Pickup && currentStep == StepType.Dropoff || previousStep == StepType.Dropoff && currentStep == StepType.Dropoff || previousStep == StepType.Dropoff && currentStep == StepType.Pickup;
      }
 
      public DeliveryStep AddStep(
-          StepTypeEnum stepType,
+          StepType stepType,
           int order,
           Address stepAddress,
           double distance,

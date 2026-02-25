@@ -1,6 +1,6 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 
-public enum PricingStrategyEnum
+public enum PricingStrategy
 {
      CustomStrategy,
      SimpleDeliveryStrategy,

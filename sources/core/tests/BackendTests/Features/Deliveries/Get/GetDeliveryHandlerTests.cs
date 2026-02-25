@@ -23,7 +23,7 @@ public class GetDeliveryHandlerTests
           {
                Id = Guid.NewGuid(),
                Code = "AAA",
-               PricingStrategy = PricingStrategyEnum.CustomStrategy,
+               PricingStrategy = PricingStrategy.CustomStrategy,
                CustomerId = Guid.Empty,
                Urgency = "Standard",
                Steps = [],
@@ -50,7 +50,7 @@ public class GetDeliveryHandlerTests
           result.Should().NotBeNull();
           result.Id.Should().Be(guid);
           result.Code.Should().Be("AAA");
-          result.PricingStrategy.Should().Be(PricingStrategyEnum.CustomStrategy);
+          result.PricingStrategy.Should().Be(PricingStrategy.CustomStrategy);
           result.PackingSize.Should().Be("Xl");
           VerifyRepositoryCalledOnce();
      }

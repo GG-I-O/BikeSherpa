@@ -13,8 +13,8 @@ using Mediator;
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 
 public record AddDeliveryCommand(
-     PricingStrategyEnum PricingStrategyEnum,
-     DeliveryStatusEnum StatusEnum,
+     PricingStrategy PricingStrategy,
+     DeliveryStatus Status,
      string Code,
      Guid CustomerId,
      string Urgency,
@@ -31,8 +31,8 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
      public AddDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies)
      {
-          RuleFor(x => x.PricingStrategyEnum).IsInEnum().NotEmpty();
-          RuleFor(x => x.StatusEnum).IsInEnum().NotEmpty();
+          RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
+          RuleFor(x => x.Status).IsInEnum().NotEmpty();
           RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
           {
                var codeIsValid = !await repository.AnyAsync(new DeliveryByCodeSpecification(code), cancellationToken);
@@ -68,7 +68,7 @@ public class AddDeliveryHandler(
           var customer = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.CustomerId), cancellationToken);
 
           var delivery = await factory.CreateDeliveryAsync(
-               command.PricingStrategyEnum,
+               command.PricingStrategy,
                command.Code,
                command.CustomerId,
                command.Urgency,

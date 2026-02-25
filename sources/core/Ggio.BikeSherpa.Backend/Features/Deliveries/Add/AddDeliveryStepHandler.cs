@@ -14,7 +14,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 
 public record AddDeliveryStepCommand(
      Guid DeliveryId,
-     StepTypeEnum StepType,
+     StepType StepType,
      int Order,
      Address StepAddress,
      double Distance,

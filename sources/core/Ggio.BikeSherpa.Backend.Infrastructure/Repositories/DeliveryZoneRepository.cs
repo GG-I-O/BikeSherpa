@@ -1,4 +1,7 @@
-﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+
+namespace Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 
 public class DeliveryZoneRepository : IDeliveryZoneRepository
 {

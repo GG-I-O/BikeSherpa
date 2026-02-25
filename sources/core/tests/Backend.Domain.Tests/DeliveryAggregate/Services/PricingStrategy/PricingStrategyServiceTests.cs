@@ -59,7 +59,7 @@ public class PricingStrategyServiceTests
     }
 
     private Delivery MakeDelivery(
-        PricingStrategyEnum pricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
+        Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy pricingStrategy = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy.SimpleDeliveryStrategy,
         List<DeliveryStep>? steps = null,
         double? totalPrice = null,
         string packingSize = "Standard",
@@ -81,7 +81,7 @@ public class PricingStrategyServiceTests
         };
     }
 
-    private static DeliveryStep MakeStep(StepTypeEnum type, DeliveryZone zone, double distance = 0) =>
+    private static DeliveryStep MakeStep(StepType type, DeliveryZone zone, double distance = 0) =>
         new(type, 1, DefaultAddress, zone, distance, ContractDate);
 
     private PricingStrategyService MakeSutWith(
@@ -129,7 +129,7 @@ public class PricingStrategyServiceTests
         var sut = MakeSutWith(strategies: [customMock.Object]);
 
         var result = sut.CalculateDeliveryPriceWithoutVat(
-            MakeDelivery(PricingStrategyEnum.CustomStrategy, totalPrice: 99.5));
+            MakeDelivery(Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy.CustomStrategy, totalPrice: 99.5));
 
         result.Should().Be(99.5);
         customMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
@@ -155,9 +155,9 @@ public class PricingStrategyServiceTests
     {
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepTypeEnum.Pickup, GrenobleZone),
-            MakeStep(StepTypeEnum.Pickup, GrenobleZone),
-            MakeStep(StepTypeEnum.Dropoff, GrenobleZone),
+            MakeStep(StepType.Pickup, GrenobleZone),
+            MakeStep(StepType.Pickup, GrenobleZone),
+            MakeStep(StepType.Dropoff, GrenobleZone),
         };
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
@@ -170,12 +170,12 @@ public class PricingStrategyServiceTests
     {
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepTypeEnum.Dropoff, GrenobleZone),
-            MakeStep(StepTypeEnum.Dropoff, GrenobleZone),
-            MakeStep(StepTypeEnum.Dropoff, BorderZone),
-            MakeStep(StepTypeEnum.Dropoff, PeripheryZone),
-            MakeStep(StepTypeEnum.Dropoff, OutsideZone),
-            MakeStep(StepTypeEnum.Dropoff, OutsideZone),
+            MakeStep(StepType.Dropoff, GrenobleZone),
+            MakeStep(StepType.Dropoff, GrenobleZone),
+            MakeStep(StepType.Dropoff, BorderZone),
+            MakeStep(StepType.Dropoff, PeripheryZone),
+            MakeStep(StepType.Dropoff, OutsideZone),
+            MakeStep(StepType.Dropoff, OutsideZone),
         };
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
@@ -191,8 +191,8 @@ public class PricingStrategyServiceTests
     {
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepTypeEnum.Pickup, GrenobleZone, distance: 3.5),
-            MakeStep(StepTypeEnum.Dropoff, GrenobleZone, distance: 6.0),
+            MakeStep(StepType.Pickup, GrenobleZone, distance: 3.5),
+            MakeStep(StepType.Dropoff, GrenobleZone, distance: 6.0),
         };
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));

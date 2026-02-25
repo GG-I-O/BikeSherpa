@@ -20,13 +20,13 @@ public class DeliveryStatusMachineTests
     private readonly static DeliveryZone SomeZone = new(1, "Zone 1", []);
 
     private static Delivery CreateDelivery(
-        DeliveryStatusEnum status = DeliveryStatusEnum.Pending,
+        DeliveryStatus status = DeliveryStatus.Pending,
         List<DeliveryStep>? steps = null)
     {
         var mediatorMock = new Mock<IMediator>();
         var delivery = new Delivery(mediatorMock.Object)
         {
-            PricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
+            PricingStrategy = PricingStrategy.SimpleDeliveryStrategy,
             Code = "TEST-001",
             CustomerId = Guid.NewGuid(),
             Urgency = "Normal",
@@ -41,24 +41,24 @@ public class DeliveryStatusMachineTests
         return delivery;
     }
 
-    private static DeliveryStep CreateStep(StepTypeEnum type, bool completed = false) =>
+    private static DeliveryStep CreateStep(StepType type, bool completed = false) =>
         new(type, 1, SomeAddress, SomeZone, 1.0, DateTimeOffset.UtcNow) { Completed = completed };
 
     [Fact]
     public void Fire_Start_WhenPendingAndPickupStepCompleted_TransitionsToStarted()
     {
-        var delivery = CreateDelivery(steps: [CreateStep(StepTypeEnum.Pickup, completed: true)]);
+        var delivery = CreateDelivery(steps: [CreateStep(StepType.Pickup, completed: true)]);
         var sut = new DeliveryStatusMachine(delivery);
 
         sut.Fire(DeliveryStatusTrigger.Start);
 
-        delivery.Status.Should().Be(DeliveryStatusEnum.Started);
+        delivery.Status.Should().Be(DeliveryStatus.Started);
     }
 
     [Fact]
     public void Fire_Start_WhenPendingAndPickupStepNotCompleted_Throws()
     {
-        var delivery = CreateDelivery(steps: [CreateStep(StepTypeEnum.Pickup, completed: false)]);
+        var delivery = CreateDelivery(steps: [CreateStep(StepType.Pickup, completed: false)]);
         var sut = new DeliveryStatusMachine(delivery);
 
         var act = () => sut.Fire(DeliveryStatusTrigger.Start);
@@ -85,28 +85,28 @@ public class DeliveryStatusMachineTests
 
         sut.Fire(DeliveryStatusTrigger.Cancel);
 
-        delivery.Status.Should().Be(DeliveryStatusEnum.Cancelled);
+        delivery.Status.Should().Be(DeliveryStatus.Cancelled);
     }
 
     [Fact]
     public void Fire_Complete_WhenStartedAndAllStepsCompleted_TransitionsToCompleted()
     {
         var delivery = CreateDelivery(
-            status: DeliveryStatusEnum.Started,
-            steps: [CreateStep(StepTypeEnum.Pickup, completed: true), CreateStep(StepTypeEnum.Dropoff, completed: true)]);
+            status: DeliveryStatus.Started,
+            steps: [CreateStep(StepType.Pickup, completed: true), CreateStep(StepType.Dropoff, completed: true)]);
         var sut = new DeliveryStatusMachine(delivery);
 
         sut.Fire(DeliveryStatusTrigger.Complete);
 
-        delivery.Status.Should().Be(DeliveryStatusEnum.Completed);
+        delivery.Status.Should().Be(DeliveryStatus.Completed);
     }
 
     [Fact]
     public void Fire_Complete_WhenStartedAndNotAllStepsCompleted_Throws()
     {
         var delivery = CreateDelivery(
-            status: DeliveryStatusEnum.Started,
-            steps: [CreateStep(StepTypeEnum.Pickup, completed: true), CreateStep(StepTypeEnum.Dropoff, completed: false)]);
+            status: DeliveryStatus.Started,
+            steps: [CreateStep(StepType.Pickup, completed: true), CreateStep(StepType.Dropoff, completed: false)]);
         var sut = new DeliveryStatusMachine(delivery);
 
         var act = () => sut.Fire(DeliveryStatusTrigger.Complete);
@@ -117,55 +117,55 @@ public class DeliveryStatusMachineTests
     [Fact]
     public void Fire_Cancel_WhenStarted_TransitionsToCancelled()
     {
-        var delivery = CreateDelivery(status: DeliveryStatusEnum.Started);
+        var delivery = CreateDelivery(status: DeliveryStatus.Started);
         var sut = new DeliveryStatusMachine(delivery);
 
         sut.Fire(DeliveryStatusTrigger.Cancel);
 
-        delivery.Status.Should().Be(DeliveryStatusEnum.Cancelled);
+        delivery.Status.Should().Be(DeliveryStatus.Cancelled);
     }
 
     [Fact]
     public void Fire_Complete_WhenCompleted_IsIgnored()
     {
-        var delivery = CreateDelivery(status: DeliveryStatusEnum.Completed);
+        var delivery = CreateDelivery(status: DeliveryStatus.Completed);
         var sut = new DeliveryStatusMachine(delivery);
 
         sut.Fire(DeliveryStatusTrigger.Complete);
 
-        delivery.Status.Should().Be(DeliveryStatusEnum.Completed);
+        delivery.Status.Should().Be(DeliveryStatus.Completed);
     }
 
     [Fact]
     public void Fire_Start_WhenCompleted_IsIgnored()
     {
-        var delivery = CreateDelivery(status: DeliveryStatusEnum.Completed);
+        var delivery = CreateDelivery(status: DeliveryStatus.Completed);
         var sut = new DeliveryStatusMachine(delivery);
 
         sut.Fire(DeliveryStatusTrigger.Start);
 
-        delivery.Status.Should().Be(DeliveryStatusEnum.Completed);
+        delivery.Status.Should().Be(DeliveryStatus.Completed);
     }
 
     [Fact]
     public void Fire_Complete_WhenCancelled_IsIgnored()
     {
-        var delivery = CreateDelivery(status: DeliveryStatusEnum.Cancelled);
+        var delivery = CreateDelivery(status: DeliveryStatus.Cancelled);
         var sut = new DeliveryStatusMachine(delivery);
 
         sut.Fire(DeliveryStatusTrigger.Complete);
 
-        delivery.Status.Should().Be(DeliveryStatusEnum.Cancelled);
+        delivery.Status.Should().Be(DeliveryStatus.Cancelled);
     }
 
     [Fact]
     public void Fire_Cancel_WhenCancelled_IsIgnored()
     {
-        var delivery = CreateDelivery(status: DeliveryStatusEnum.Cancelled);
+        var delivery = CreateDelivery(status: DeliveryStatus.Cancelled);
         var sut = new DeliveryStatusMachine(delivery);
 
         sut.Fire(DeliveryStatusTrigger.Cancel);
 
-        delivery.Status.Should().Be(DeliveryStatusEnum.Cancelled);
+        delivery.Status.Should().Be(DeliveryStatus.Cancelled);
     }
 }
