@@ -3,9 +3,11 @@ using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
+using JetBrains.Annotations;
 using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
@@ -19,6 +21,7 @@ public record AddDeliveryStepCommand(
      DateTimeOffset EstimatedDeliveryDate
      ) : ICommand<Result<Guid>>;
 
+[UsedImplicitly]
 public class AddDeliveryStepCommandValidator : AbstractValidator<AddDeliveryStepCommand>
 {
      public AddDeliveryStepCommandValidator()
@@ -36,7 +39,8 @@ public class AddDeliveryStepHandler(
      IValidator<AddDeliveryStepCommand> validator,
      IApplicationTransaction transaction,
      IReadRepository<Delivery> deliveryRepository,
-     IDeliveryZoneRepository deliveryZones
+     IDeliveryZoneRepository deliveryZones,
+     IPricingStrategyService pricingStrategyService
      ) : ICommandHandler<AddDeliveryStepCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryStepCommand command, CancellationToken cancellationToken)
@@ -50,7 +54,7 @@ public class AddDeliveryStepHandler(
                return Result<Guid>.NotFound();
           }
 
-          var deliveryStep = delivery.AddStep(command.StepType, command.Order, command.StepAddress, command.Distance, command.EstimatedDeliveryDate, deliveryZones);
+          var deliveryStep = delivery.AddStep(command.StepType, command.Order, command.StepAddress, command.Distance, command.EstimatedDeliveryDate, deliveryZones, pricingStrategyService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);

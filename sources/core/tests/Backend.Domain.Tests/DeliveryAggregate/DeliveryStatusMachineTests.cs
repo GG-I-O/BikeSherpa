@@ -34,9 +34,10 @@ public class DeliveryStatusMachineTests
             InsulatedBox = false,
             ContractDate = DateTimeOffset.UtcNow,
             StartDate = DateTimeOffset.UtcNow,
-            Steps = steps ?? []
+            Steps = steps ?? [],
+            Status = status
         };
-        delivery.Status = status;
+
         return delivery;
     }
 

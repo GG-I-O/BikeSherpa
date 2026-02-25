@@ -1,6 +1,7 @@
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.DddCore;
 using Mediator;
@@ -130,9 +131,10 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
-          previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
-          || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;
+     private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep)
+     {
+          return previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Pickup;
+     }
 
      public DeliveryStep AddStep(
           StepTypeEnum stepType,
@@ -140,9 +142,10 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           Address stepAddress,
           double distance,
           DateTimeOffset estimatedDeliveryDate,
-          IDeliveryZoneRepository deliveryZones)
+          IDeliveryZoneRepository deliveryZones,
+          IPricingStrategyService pricingStrategyService)
      {
-          var newtStep = new DeliveryStep(
+          var newStep = new DeliveryStep(
                stepType,
                order,
                stepAddress,
@@ -153,12 +156,15 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                Id = Guid.NewGuid()
           };
 
-          Steps.Add(newtStep);
+          Steps.Add(newStep);
 
-          return newtStep;
+          // Update delivery price
+          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+
+          return newStep;
      }
 
-     public void UpdateSteps(List<DeliveryStep> steps, IDeliveryZoneRepository deliveryZones)
+     public void UpdateSteps(List<DeliveryStep> steps, IDeliveryZoneRepository deliveryZones, IPricingStrategyService pricingStrategyService)
      {
           foreach (var step in steps)
           {
@@ -188,5 +194,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           // Remove deleted steps from the delivery
           var incomingIds = steps.Select(s => s.Id).ToHashSet();
           Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
+
+          // Update delivery price
+          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 }

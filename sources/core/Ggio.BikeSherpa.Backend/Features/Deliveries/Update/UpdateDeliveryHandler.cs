@@ -2,6 +2,7 @@
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
@@ -76,7 +77,8 @@ public class UpdateDeliveryHandler(
      IReadRepository<Delivery> repository,
      IValidator<UpdateDeliveryCommand> validator,
      IApplicationTransaction transaction,
-     IDeliveryZoneRepository deliveryZones
+     IDeliveryZoneRepository deliveryZones,
+     IPricingStrategyService pricingStrategyService
 ) : ICommandHandler<UpdateDeliveryCommand, Result>
 {
      public async ValueTask<Result> Handle(UpdateDeliveryCommand command, CancellationToken cancellationToken)
@@ -99,8 +101,8 @@ public class UpdateDeliveryHandler(
           entity.InsulatedBox = command.InsulatedBox;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
-          
-          entity.UpdateSteps(command.Steps, deliveryZones);
+
+          entity.UpdateSteps(command.Steps, deliveryZones, pricingStrategyService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
