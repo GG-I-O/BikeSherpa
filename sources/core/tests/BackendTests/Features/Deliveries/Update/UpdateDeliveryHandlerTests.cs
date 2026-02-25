@@ -6,6 +6,7 @@ using AwesomeAssertions;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 using Ggio.DddCore;
@@ -15,12 +16,12 @@ namespace BackendTests.Features.Deliveries.Update;
 
 public class UpdateDeliveryHandlerTests
 {
-     private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
+     private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
+     private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
      private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
      private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
-
      private readonly UpdateDeliveryCommand _mockCommand;
      private readonly Delivery _mockDelivery;
 
@@ -53,7 +54,7 @@ public class UpdateDeliveryHandlerTests
      private UpdateDeliveryHandler CreateSut()
      {
           var validator = new UpdateDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object);
-          return new UpdateDeliveryHandler(_mockDeliveryRepository.Object, validator, _mockTransaction.Object, _mockDeliveryZoneRepository.Object);
+          return new UpdateDeliveryHandler(_mockDeliveryRepository.Object, validator, _mockTransaction.Object, _mockDeliveryZoneRepository.Object, _mockPricingStrategyService.Object);
      }
 
      private void SetupRepositoryTestingIfReportIdExists(bool doesReportIdExist)
