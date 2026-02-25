@@ -99,7 +99,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
           previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
           || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;
-     
+
      public DeliveryStep AddStep(
           StepTypeEnum stepType,
           int order,
@@ -118,7 +118,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           {
                Id = Guid.NewGuid()
           };
-          
+
           Steps.Add(newtStep);
 
           return newtStep;
@@ -128,7 +128,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      {
           foreach (var step in steps)
           {
-               var existing = steps.FirstOrDefault(s => s.Id == step.Id);
+               var existing = Steps.FirstOrDefault(s => s.Id == step.Id);
 
                // Add new steps
                if (existing is null)
