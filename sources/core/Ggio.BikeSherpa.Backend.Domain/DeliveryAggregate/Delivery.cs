@@ -1,6 +1,7 @@
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.DddCore;
 using Mediator;
 
@@ -98,4 +99,60 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      private bool StepCanFollow(StepTypeEnum previousStep, StepTypeEnum currentStep) =>
           previousStep == StepTypeEnum.Pickup && currentStep == StepTypeEnum.Dropoff
           || previousStep == StepTypeEnum.Dropoff && currentStep == StepTypeEnum.Dropoff;
+     
+     public DeliveryStep AddStep(
+          StepTypeEnum stepType,
+          int order,
+          Address stepAddress,
+          double distance,
+          DateTimeOffset estimatedDeliveryDate,
+          IDeliveryZoneRepository deliveryZones)
+     {
+          var newtStep = new DeliveryStep(
+               stepType,
+               order,
+               stepAddress,
+               deliveryZones.FromAddress(stepAddress.City),
+               distance,
+               estimatedDeliveryDate)
+          {
+               Id = Guid.NewGuid()
+          };
+          
+          Steps.Add(newtStep);
+
+          return newtStep;
+     }
+
+     public void UpdateSteps(List<DeliveryStep> steps, IDeliveryZoneRepository deliveryZones)
+     {
+          foreach (var step in steps)
+          {
+               var existing = steps.FirstOrDefault(s => s.Id == step.Id);
+
+               // Add new steps
+               if (existing is null)
+               {
+                    step.StepZone = deliveryZones.FromAddress(step.StepAddress.City);
+                    Steps.Add(step);
+               }
+
+               // Update existing steps
+               else
+               {
+                    existing.Update(
+                         step.StepType,
+                         step.Order,
+                         step.Completed,
+                         step.StepAddress,
+                         deliveryZones.FromAddress(step.StepAddress.City),
+                         step.Distance,
+                         step.EstimatedDeliveryDate);
+               }
+          }
+
+          // Remove deleted steps from the delivery
+          var incomingIds = steps.Select(s => s.Id).ToHashSet();
+          Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
+     }
 }

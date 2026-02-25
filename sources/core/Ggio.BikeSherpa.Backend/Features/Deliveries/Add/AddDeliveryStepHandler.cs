@@ -46,20 +46,11 @@ public class AddDeliveryStepHandler(
           var delivery = await deliveryRepository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.DeliveryId), cancellationToken);
 
           if (delivery is null)
-               return Result<Guid>.NotFound();
-
-          var deliveryStep = new DeliveryStep(
-               command.StepType,
-               command.Order,
-               command.StepAddress,
-               deliveryZones.FromAddress(command.StepAddress.City),
-               command.Distance,
-               command.EstimatedDeliveryDate)
           {
-               Id = Guid.NewGuid()
-          };
+               return Result<Guid>.NotFound();
+          }
 
-          delivery.Steps.Add(deliveryStep);
+          var deliveryStep = delivery.AddStep(command.StepType, command.Order, command.StepAddress, command.Distance, command.EstimatedDeliveryDate, deliveryZones);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);
