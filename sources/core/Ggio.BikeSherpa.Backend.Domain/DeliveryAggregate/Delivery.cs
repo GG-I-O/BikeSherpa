@@ -97,7 +97,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      }
 
      // Methods allowing to update delivery steps
-     private void UpdateStepOrder(Guid stepId, int order)
+     public void UpdateStepOrder(Guid stepId, int order)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.UpdateOrder(order);
