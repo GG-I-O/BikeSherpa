@@ -9,7 +9,7 @@ public class DeleteDeliveryStepEndpoint(IMediator mediator) : EndpointWithoutReq
 {
      public override void Configure()
      {
-          Delete("/delivery/{deliveryId:guid}/{stepId:guid}");
+          Delete("/delivery/{deliveryId:guid}/step/{stepId:guid}");
           Policies("write:deliveries");
           Description(x => x.WithTags("delivery"));
      }
