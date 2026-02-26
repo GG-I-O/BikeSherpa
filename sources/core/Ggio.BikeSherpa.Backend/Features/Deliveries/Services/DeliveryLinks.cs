@@ -12,19 +12,12 @@ public class DeliveryLinks(IHttpContextAccessor httpContextAccessor, IHateoasSer
 {
      public List<Link> GenerateLinks(Guid id)
      {
-          // Get Links depending permissions
-          var context = httpContextAccessor.HttpContext;
-          if (context is null)
-               return [];
-          var scopes = context.User.FindAll("scope")
-               .SelectMany(c => c.Value.Split(' '))
-               .Distinct()
-               .ToList();
+          // Get Links depending on permissions
+          var scopes = httpContextAccessor.GetResourceScopes("read:deliveries", "write:deliveries");
 
-          var canRead = scopes.Contains("read:deliveries");
-          var canWrite = scopes.Contains("write:deliveries");
-          if (!canRead && !canWrite)
-               return [];
+          if (scopes is null) return [];
+
+          var (canRead, canWrite) = scopes.Value;
 
           return hateoasService.GenerateLinks(
                canRead ? IEndpoint.GetName<GetDeliveryEndpoint>() : null,
