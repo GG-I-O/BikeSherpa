@@ -8,7 +8,7 @@ public interface IPricingStrategy
           DateTimeOffset startDate,
           DateTimeOffset contractDate,
           int pickupNumber,
-          int dropoffStepsInGronoble,
+          int dropoffStepsInCore,
           int dropoffStepsInBorder,
           int dropoffStepsInPeriphery,
           int dropoffStepsOutside,

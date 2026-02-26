@@ -20,7 +20,7 @@ public class DeliveryZoneConfiguration : IEntityTypeConfiguration<DeliveryZone>
           builder.Navigation(z => z.Cities).AutoInclude();
 
           builder.HasData(
-               new { Name = "Grenoble" },
+               new { Name = "Centre" },
                new { Name = "Limitrophe" },
                new { Name = "Périphérie" },
                new { Name = "Extérieur" }

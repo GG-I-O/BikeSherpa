@@ -46,7 +46,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.Urgency)
                .NotEmpty()
-               .Must(urgency => urgencies.Urgencies.Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
+               .Must(urgency => urgencies.GetAll().Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
                .WithMessage("Valeur d'urgence saisie invalide.");
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.Discount).NotEmpty();

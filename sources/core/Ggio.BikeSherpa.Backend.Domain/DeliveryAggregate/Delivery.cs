@@ -149,7 +149,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                stepType,
                order,
                stepAddress,
-               deliveryZones.FromAddress(stepAddress.City),
+               deliveryZones.GetByAddress(stepAddress.City),
                distance,
                estimatedDeliveryDate)
           {
@@ -173,7 +173,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                // Add new steps
                if (existing is null)
                {
-                    step.StepZone = deliveryZones.FromAddress(step.StepAddress.City);
+                    step.StepZone = deliveryZones.GetByAddress(step.StepAddress.City);
                     Steps.Add(step);
                }
 
@@ -185,7 +185,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          step.Order,
                          step.Completed,
                          step.StepAddress,
-                         deliveryZones.FromAddress(step.StepAddress.City),
+                         deliveryZones.GetByAddress(step.StepAddress.City),
                          step.Distance,
                          step.EstimatedDeliveryDate);
                }

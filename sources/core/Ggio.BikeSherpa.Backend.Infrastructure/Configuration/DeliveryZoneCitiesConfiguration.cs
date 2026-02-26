@@ -13,7 +13,7 @@ public class DeliveryZoneCitiesConfiguration : IEntityTypeConfiguration<City>
           builder.Property(c => c.Id).ValueGeneratedOnAdd();
           builder.Property(c => c.Name).HasMaxLength(100).IsRequired();
           builder.HasData(
-               new { DeliveryZoneName = "Grenoble", Name = "Grenoble" },
+               new { DeliveryZoneName = "Centre", Name = "Grenoble" },
                new { DeliveryZoneName = "Limitrophe", Name = "Échirolles" },
                new { DeliveryZoneName = "Limitrophe", Name = "Eybens" },
                new { DeliveryZoneName = "Limitrophe", Name = "Fontaine" },

@@ -2,7 +2,7 @@
 
 public class SimpleDeliveryStrategy : IPricingStrategy
 {
-     private const double StepPriceInGrenoble = 1;
+     private const double StepPriceInCore = 1;
      private const double StepPriceInBorder = 2.5;
      private const double StepPriceInPeriphery = 5.5;
      private const double StepPriceOutside = 11;
@@ -13,7 +13,7 @@ public class SimpleDeliveryStrategy : IPricingStrategy
           DateTimeOffset startDate,
           DateTimeOffset contractDate,
           int pickupNumber,
-          int dropoffStepsInGronoble,
+          int dropoffStepsInCore,
           int dropoffStepsInBorder,
           int dropoffStepsInPeriphery,
           int dropoffStepsOutside,
@@ -24,7 +24,7 @@ public class SimpleDeliveryStrategy : IPricingStrategy
 
           return PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
                  PricingRules.CalculateDelayCost(startDate, contractDate) +
-                 dropoffStepsInGronoble * StepPriceInGrenoble +
+                 dropoffStepsInCore * StepPriceInCore +
                  dropoffStepsInBorder * StepPriceInBorder +
                  dropoffStepsInPeriphery * StepPriceInPeriphery +
                  dropoffStepsOutside * StepPriceOutside +

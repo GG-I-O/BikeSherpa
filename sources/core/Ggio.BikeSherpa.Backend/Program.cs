@@ -7,12 +7,10 @@ using Ggio.DddCore.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Auth0.AspNetCore.Authentication.Api;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Features.Couriers;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Infrastructure;
-using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Middleware;
 using Ggio.BikeSherpa.Backend.Services.Notification;
@@ -72,15 +70,6 @@ builder.Services.AddMediator(options =>
      options.Assemblies = [typeof(GetDeliveryQuery).Assembly, typeof(EntityBase).Assembly, typeof(EfCoreDomainEntityAddedEventHandler)];
      options.ServiceLifetime = ServiceLifetime.Scoped;
 });
-
-// Add PackingSizeRepository
-builder.Services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
-
-// Add DeliveryZoneRepository
-builder.Services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
-
-// Add UrgencyRepository
-builder.Services.AddScoped<IUrgencyRepository, UrgencyRepository>();
 
 // Cors
 var allowedOrigins = (builder.Configuration["CORS:AllowedOrigins"] ?? "").Split(',');

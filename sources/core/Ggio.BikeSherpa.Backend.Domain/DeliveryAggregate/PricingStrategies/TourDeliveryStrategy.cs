@@ -3,7 +3,7 @@
 public class TourDeliveryStrategy : IPricingStrategy
 {
      private const double PickupBasePrice = 14;
-     private const double StepPriceInGrenoble = 5;
+     private const double StepPriceInCore = 5;
      private const double StepPriceInBorder = 8;
      private const double StepPriceInPeriphery = 0;
      private const double StepPriceOutside = 0;
@@ -14,7 +14,7 @@ public class TourDeliveryStrategy : IPricingStrategy
           DateTimeOffset startDate,
           DateTimeOffset contractDate,
           int pickupNumber,
-          int dropoffStepsInGronoble,
+          int dropoffStepsInCore,
           int dropoffStepsInBorder,
           int dropoffStepsInPeriphery,
           int dropoffStepsOutside,
@@ -26,7 +26,7 @@ public class TourDeliveryStrategy : IPricingStrategy
                  PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
                  PricingRules.CalculateDelayCost(startDate, contractDate) +
                  packingSize.TourPrice +
-                 dropoffStepsInGronoble * StepPriceInGrenoble +
+                 dropoffStepsInCore * StepPriceInCore +
                  dropoffStepsInBorder * StepPriceInBorder +
                  dropoffStepsInPeriphery * StepPriceInPeriphery +
                  dropoffStepsOutside * StepPriceOutside;

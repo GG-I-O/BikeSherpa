@@ -111,13 +111,13 @@ public class TourDeliveryStrategyTests
     [InlineData(0, 0, 3, 0, 3 * 0.0)]
     [InlineData(0, 0, 0, 3, 3 * 0.0)]
     public void CalculatePrice_ZoneDropoffSteps_AreMultipliedByCorrectStepPrice(
-        int grenoble, int border, int periphery, int outside, double expectedZoneCost)
+        int core, int border, int periphery, int outside, double expectedZoneCost)
     {
         var sut = MakeSut();
         var contractDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
         var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, grenoble, border, periphery, outside, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, core, border, periphery, outside, DefaultPackingSize, 0, 0);
 
         result.Should().Be(2 + expectedZoneCost);
     }

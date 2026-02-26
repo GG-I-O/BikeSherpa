@@ -2,6 +2,6 @@
 
 public interface IDeliveryZoneRepository
 {
-     IReadOnlyList<DeliveryZone> DeliveryZones { get; }
-     DeliveryZone FromAddress(string city);
+     IReadOnlyList<DeliveryZone> GetAll();
+     DeliveryZone GetByAddress(string city);
 }

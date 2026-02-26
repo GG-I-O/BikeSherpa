@@ -3,16 +3,14 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 
-public class UrgencyRepository : IUrgencyRepository
+public class UrgencyRepository(BackendDbContext context) : IUrgencyRepository
 {
-     public IReadOnlyList<Urgency> Urgencies { get; }
-
-     public UrgencyRepository(IEnumerable<Urgency> entities)
+     public IReadOnlyList<Urgency> GetAll()
      {
-          Urgencies = entities.Select(e => new Urgency(e.Id, e.Name, e.PriceCoefficient)).ToList();
+          return context.Urgencies.ToList();
      }
 
-     public Urgency GetUrgency(string name)
+     public Urgency GetByName(string name)
      {
           if (name == "")
           {
@@ -20,7 +18,7 @@ public class UrgencyRepository : IUrgencyRepository
           }
           else
           {
-               return Urgencies.SingleOrDefault(u => string.Equals(u.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Urgence inconnue.");
+               return context.Urgencies.SingleOrDefault(u => string.Equals(u.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Urgence inconnue.");
           }
      }
 }

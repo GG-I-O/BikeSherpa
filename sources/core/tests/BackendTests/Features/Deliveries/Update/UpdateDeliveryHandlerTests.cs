@@ -29,11 +29,11 @@ public class UpdateDeliveryHandlerTests
      {
           var urgencies = new List<Urgency>(_fixture.CreateMany<Urgency>(2));
           _mockUrgencyRepository
-               .Setup(x => x.Urgencies)
+               .Setup(x => x.GetAll())
                .Returns(urgencies);
 
           _mockDeliveryZoneRepository
-               .Setup(x => x.DeliveryZones)
+               .Setup(x => x.GetAll())
                .Returns(new List<DeliveryZone>(_fixture.CreateMany<DeliveryZone>(2)));
 
           _mockCommand = _fixture.Build<UpdateDeliveryCommand>()

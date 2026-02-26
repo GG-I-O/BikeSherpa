@@ -16,7 +16,7 @@ public class PricingStrategyServiceTests
     private readonly static DateTimeOffset ContractDate = new(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
     private readonly static PackingSize DefaultPackingSize = new(1, "Standard", 10, 50, 0, 0);
     private readonly static Urgency DefaultUrgency = new(1, "Normal", PriceCoefficient: 0);
-    private readonly static DeliveryZone GrenobleZone = new(1, "Grenoble", []);
+    private readonly static DeliveryZone CoreZone = new(1, "Centre", []);
     private readonly static DeliveryZone BorderZone = new(2, "Limitrophe", []);
     private readonly static DeliveryZone PeripheryZone = new(3, "Périphérie", []);
     private readonly static DeliveryZone OutsideZone = new(4, "Extérieur", []);
@@ -25,7 +25,7 @@ public class PricingStrategyServiceTests
 
     private record StrategyArgs(
         DateTimeOffset ArgStartDate, DateTimeOffset ArgContractDate,
-        int Pickups, int Grenoble, int Border, int Periphery, int Outside,
+        int Pickups, int Core, int Border, int Periphery, int Outside,
         PackingSize PackingSize, double Coefficient, double Distance);
 
     private readonly Mock<IUrgencyRepository> _urgenciesMock;
@@ -49,10 +49,10 @@ public class PricingStrategyServiceTests
             .Returns(0);
 
         _urgenciesMock = new Mock<IUrgencyRepository>();
-        _urgenciesMock.Setup(r => r.GetUrgency(It.IsAny<string>())).Returns(DefaultUrgency);
+        _urgenciesMock.Setup(r => r.GetByName(It.IsAny<string>())).Returns(DefaultUrgency);
 
         _packingSizesMock = new Mock<IPackingSizeRepository>();
-        _packingSizesMock.Setup(r => r.FromName(It.IsAny<string>())).Returns(DefaultPackingSize);
+        _packingSizesMock.Setup(r => r.GetByName(It.IsAny<string>())).Returns(DefaultPackingSize);
 
         _sut = new PricingStrategyService(
             [strategyMock.Object], _urgenciesMock.Object, _packingSizesMock.Object);
@@ -155,9 +155,9 @@ public class PricingStrategyServiceTests
     {
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepType.Pickup, GrenobleZone),
-            MakeStep(StepType.Pickup, GrenobleZone),
-            MakeStep(StepType.Dropoff, GrenobleZone),
+            MakeStep(StepType.Pickup, CoreZone),
+            MakeStep(StepType.Pickup, CoreZone),
+            MakeStep(StepType.Dropoff, CoreZone),
         };
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
@@ -170,8 +170,8 @@ public class PricingStrategyServiceTests
     {
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepType.Dropoff, GrenobleZone),
-            MakeStep(StepType.Dropoff, GrenobleZone),
+            MakeStep(StepType.Dropoff, CoreZone),
+            MakeStep(StepType.Dropoff, CoreZone),
             MakeStep(StepType.Dropoff, BorderZone),
             MakeStep(StepType.Dropoff, PeripheryZone),
             MakeStep(StepType.Dropoff, OutsideZone),
@@ -180,7 +180,7 @@ public class PricingStrategyServiceTests
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
-        _capturedArgs!.Grenoble.Should().Be(2);
+        _capturedArgs!.Core.Should().Be(2);
         _capturedArgs.Border.Should().Be(1);
         _capturedArgs.Periphery.Should().Be(1);
         _capturedArgs.Outside.Should().Be(2);
@@ -191,8 +191,8 @@ public class PricingStrategyServiceTests
     {
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepType.Pickup, GrenobleZone, distance: 3.5),
-            MakeStep(StepType.Dropoff, GrenobleZone, distance: 6.0),
+            MakeStep(StepType.Pickup, CoreZone, distance: 3.5),
+            MakeStep(StepType.Dropoff, CoreZone, distance: 6.0),
         };
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
@@ -204,7 +204,7 @@ public class PricingStrategyServiceTests
     public void CalculatePrice_PassesUrgencyCoefficientFromRepository()
     {
         var express = new Urgency(2, "Express", PriceCoefficient: 1.5);
-        _urgenciesMock.Setup(r => r.GetUrgency("Express")).Returns(express);
+        _urgenciesMock.Setup(r => r.GetByName("Express")).Returns(express);
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(urgency: "Express"));
 
@@ -215,7 +215,7 @@ public class PricingStrategyServiceTests
     public void CalculatePrice_PassesPackingSizeFromRepository()
     {
         var large = new PackingSize(2, "Large", 30, 80, 5, 8);
-        _packingSizesMock.Setup(r => r.FromName("Large")).Returns(large);
+        _packingSizesMock.Setup(r => r.GetByName("Large")).Returns(large);
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(packingSize: "Large"));
 

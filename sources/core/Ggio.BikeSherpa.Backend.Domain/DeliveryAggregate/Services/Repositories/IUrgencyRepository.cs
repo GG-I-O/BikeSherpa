@@ -2,6 +2,6 @@
 
 public interface IUrgencyRepository
 {
-     IReadOnlyList<Urgency> Urgencies { get; }
-     public Urgency GetUrgency(string name);
+     IReadOnlyList<Urgency> GetAll();
+     public Urgency GetByName(string name);
 }

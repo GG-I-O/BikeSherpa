@@ -36,7 +36,7 @@ public class AddDeliveryHandlerTests
           _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
 
           _mockUrgencyRepository
-               .Setup(x => x.Urgencies)
+               .Setup(x => x.GetAll())
                .Returns(new List<Urgency>
                {
                     new(1, _mockCommand.Urgency, 1),

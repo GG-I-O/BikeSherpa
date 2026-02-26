@@ -3,24 +3,14 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 
-public class PackingSizeRepository : IPackingSizeRepository
+public class PackingSizeRepository(BackendDbContext context) : IPackingSizeRepository
 {
-     public IReadOnlyList<PackingSize> PackingSizes { get; }
-
-     public PackingSizeRepository(IEnumerable<PackingSize> entities)
+     public IReadOnlyList<PackingSize> GetAll()
      {
-          PackingSizes = entities
-               .Select(e => new PackingSize(
-                    e.Id,
-                    e.Name,
-                    e.MaxWeight,
-                    e.MaxPackageLength,
-                    e.TourPrice,
-                    e.Price))
-               .ToList();
+          return context.PackingSizes.ToList();
      }
 
-     public PackingSize FromName(string name)
+     public PackingSize GetByName(string name)
      {
           if (name == "")
           {
@@ -28,7 +18,7 @@ public class PackingSizeRepository : IPackingSizeRepository
           }
           else
           {
-               return PackingSizes.SingleOrDefault(s => string.Equals(s.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Taille de colis inconnue.");
+               return context.PackingSizes.SingleOrDefault(s => string.Equals(s.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Taille de colis inconnue.");
           }
      }
 }
