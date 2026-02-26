@@ -116,6 +116,8 @@ public class PricingStrategyServiceTests
 
         // Act
         var sut = MakeSutWith(strategies: [matchingMock.Object, otherMock.Object]);
+
+        // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
         // Assert
