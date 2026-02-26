@@ -45,8 +45,10 @@ public class DeliveryDeleteServiceTests
     [Fact]
     public async Task DeleteDeliveryAsync_PublishesDomainEntityDeletedEvent()
     {
+        // Arrange & Act
         await _sut.DeleteDeliveryAsync(_delivery, TestContext.Current.CancellationToken);
 
+        // Assert
         _mediatorMock.Verify(
             m => m.Publish(It.IsAny<DomainEntityDeletedEvent>(), It.IsAny<CancellationToken>()),
             Times.Once);
@@ -55,8 +57,10 @@ public class DeliveryDeleteServiceTests
     [Fact]
     public async Task DeleteDeliveryAsync_PublishesEventContainingTheCorrectDelivery()
     {
+        // Arrange & Act
         await _sut.DeleteDeliveryAsync(_delivery, TestContext.Current.CancellationToken);
 
+        // Assert
         _capturedEvent.Should().NotBeNull();
         _capturedEvent!.NewEntity.Should().BeSameAs(_delivery);
     }
@@ -64,10 +68,12 @@ public class DeliveryDeleteServiceTests
     [Fact]
     public async Task DeleteDeliveryAsync_ForwardsCancellationToken()
     {
+        // Arrange & Act
         using var cts = new CancellationTokenSource();
 
         await _sut.DeleteDeliveryAsync(_delivery, cts.Token);
 
+        // Assert
         _capturedToken.Should().Be(cts.Token);
     }
 }

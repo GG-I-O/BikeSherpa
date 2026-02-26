@@ -48,6 +48,7 @@ public class DeliveryFactoryTests
     [Fact]
     public async Task CreateDelivery_MapsAllPropertiesOntoTheReturnedDelivery()
     {
+        // Arrange & Act
         var details = new[] { "fragile", "urgent" };
         var delivery = await CreateDefault(
             strategy: PricingStrategy.TourDeliveryStrategy,
@@ -62,6 +63,7 @@ public class DeliveryFactoryTests
             contractDate: ContractDate,
             startDate: StartDate);
 
+        // Assert
         delivery.PricingStrategy.Should().Be(PricingStrategy.TourDeliveryStrategy);
         delivery.Code.Should().Be("DEL-42");
         delivery.CustomerId.Should().Be(CustomerId);
@@ -78,16 +80,20 @@ public class DeliveryFactoryTests
     [Fact]
     public async Task CreateDelivery_InitialisesStepsAsEmptyList()
     {
+        // Arrange & Act
         var delivery = await CreateDefault();
 
+        // Assert
         delivery.Steps.Should().BeEmpty();
     }
 
     [Fact]
     public async Task CreateDelivery_WhenOptionalFieldsAreNull_LeavesThemNull()
     {
+        // Arrange & Act
         var delivery = await CreateDefault(totalPrice: null, discount: null);
 
+        // Assert
         delivery.TotalPrice.Should().BeNull();
         delivery.Discount.Should().BeNull();
     }
@@ -95,8 +101,10 @@ public class DeliveryFactoryTests
     [Fact]
     public async Task CreateDelivery_PublishesDomainEntityAddedEvent()
     {
+        // Arrange & Act
         await CreateDefault();
 
+        // Assert
         _mediatorMock.Verify(
             m => m.Publish(It.IsAny<DomainEntityAddedEvent>(), It.IsAny<CancellationToken>()),
             Times.Once);
@@ -105,8 +113,10 @@ public class DeliveryFactoryTests
     [Fact]
     public async Task CreateDelivery_PublishesEventContainingTheCreatedDelivery()
     {
+        // Arrange & Act
         var delivery = await CreateDefault();
 
+        // Assert
         _capturedEvent.Should().NotBeNull();
         _capturedEvent!.NewEntity.Should().BeSameAs(delivery);
     }

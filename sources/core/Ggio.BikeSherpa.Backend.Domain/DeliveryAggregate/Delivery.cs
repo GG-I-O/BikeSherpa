@@ -101,19 +101,19 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public void UpdateStepOrder(Guid stepId, int order)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.UpdateOrder(order);
+          existingStep.Order = order;
      }
 
      public void UpdateStepCourier(Guid stepId, Guid courierId)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.AssignCourier(courierId);
+          existingStep.CourierId = courierId;
      }
 
      private void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset estimatedDeliveryDate)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.UpdateDeliveryTime(estimatedDeliveryDate);
+          existingStep.EstimatedDeliveryDate = estimatedDeliveryDate;
      }
 
      public async Task UpdateStepCompletion(Guid stepId, bool completed)
@@ -121,7 +121,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           try
           {
                var existingStep = Steps.Single(s => s.Id == stepId);
-               existingStep.UpdateCompletion(completed);
+               existingStep.Completed = completed;
                await UpdateStatus();
           }
           catch (Exception e)
@@ -158,10 +158,17 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
           Steps.Add(newStep);
 
-          // Update delivery price
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
 
           return newStep;
+     }
+
+     public void DeleteStep(
+          DeliveryStep step,
+          IPricingStrategyService pricingStrategyService)
+     {
+          Steps.Remove(step);
+          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
      public void UpdateSteps(List<DeliveryStep> steps, IDeliveryZoneRepository deliveryZones, IPricingStrategyService pricingStrategyService)

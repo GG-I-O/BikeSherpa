@@ -93,6 +93,7 @@ public class PricingStrategyServiceTests
     [Fact]
     public void CalculatePrice_DelegatesToMatchingStrategy_AndNotToOthers()
     {
+        // Arrange
         var matchingMock = new Mock<IPricingStrategy>();
         matchingMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
         matchingMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
@@ -108,8 +109,11 @@ public class PricingStrategyServiceTests
             It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>())).Returns(99.0);
 
         var sut = MakeSutWith(strategies: [matchingMock.Object, otherMock.Object]);
+
+        // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
+        // Assert
         result.Should().Be(42.0);
         matchingMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
@@ -124,13 +128,16 @@ public class PricingStrategyServiceTests
     [Fact]
     public void CalculatePrice_WhenCustomStrategy_ReturnsTotalPriceWithoutCallingStrategy()
     {
+        // Arrange
         var customMock = new Mock<IPricingStrategy>();
         customMock.Setup(s => s.Name).Returns("CustomStrategy");
         var sut = MakeSutWith(strategies: [customMock.Object]);
 
+        // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(
             MakeDelivery(Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy.CustomStrategy, totalPrice: 99.5));
 
+        // Assert
         result.Should().Be(99.5);
         customMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
@@ -141,18 +148,22 @@ public class PricingStrategyServiceTests
     [Fact]
     public void CalculatePrice_WhenNoStrategyMatches_Throws()
     {
+        // Arrange
         var tourMock = new Mock<IPricingStrategy>();
         tourMock.Setup(s => s.Name).Returns("TourDeliveryStrategy");
         var sut = MakeSutWith(strategies: [tourMock.Object]);
 
+        // Act
         var act = () => sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
+        // Assert
         act.Should().Throw<InvalidOperationException>();
     }
 
     [Fact]
     public void CalculatePrice_CountsOnlyPickupStepsAsPickups()
     {
+        // Arrange & Act
         var steps = new List<DeliveryStep>
         {
             MakeStep(StepType.Pickup, CoreZone),
@@ -162,12 +173,14 @@ public class PricingStrategyServiceTests
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
+        // Assert
         _capturedArgs!.Pickups.Should().Be(2);
     }
 
     [Fact]
     public void CalculatePrice_CountsDropoffStepsPerZone()
     {
+        // Arrange & Act
         var steps = new List<DeliveryStep>
         {
             MakeStep(StepType.Dropoff, CoreZone),
@@ -180,6 +193,7 @@ public class PricingStrategyServiceTests
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
+        // Assert
         _capturedArgs!.Core.Should().Be(2);
         _capturedArgs.Border.Should().Be(1);
         _capturedArgs.Periphery.Should().Be(1);
@@ -189,6 +203,7 @@ public class PricingStrategyServiceTests
     [Fact]
     public void CalculatePrice_SumsDistanceAcrossAllSteps()
     {
+        // Arrange & Act
         var steps = new List<DeliveryStep>
         {
             MakeStep(StepType.Pickup, CoreZone, distance: 3.5),
@@ -197,28 +212,33 @@ public class PricingStrategyServiceTests
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
+        // Assert
         _capturedArgs!.Distance.Should().Be(9.5);
     }
 
     [Fact]
     public void CalculatePrice_PassesUrgencyCoefficientFromRepository()
     {
+        // Arrange & Act
         var express = new Urgency(2, "Express", PriceCoefficient: 1.5);
         _urgenciesMock.Setup(r => r.GetByName("Express")).Returns(express);
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(urgency: "Express"));
 
+        // Assert
         _capturedArgs!.Coefficient.Should().Be(1.5);
     }
 
     [Fact]
     public void CalculatePrice_PassesPackingSizeFromRepository()
     {
+        // Arrange & Act
         var large = new PackingSize(2, "Large", 30, 80, 5, 8);
         _packingSizesMock.Setup(r => r.GetByName("Large")).Returns(large);
 
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(packingSize: "Large"));
 
+        // Assert
         _capturedArgs!.PackingSize.Should().Be(large);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
 using Mediator;
@@ -13,7 +14,8 @@ public record DeleteDeliveryStepCommand(
 
 public class DeleteDeliveryStepHandler(
      IReadRepository<Delivery> repository,
-     IApplicationTransaction transaction
+     IApplicationTransaction transaction,
+     IPricingStrategyService pricingStrategyService
 ) : ICommandHandler<DeleteDeliveryStepCommand, Result>
 {
      public async ValueTask<Result> Handle(DeleteDeliveryStepCommand command, CancellationToken cancellationToken)
@@ -26,7 +28,7 @@ public class DeleteDeliveryStepHandler(
                return Result.NotFound();
           }
 
-          entity.Steps.Remove(step);
+          entity.DeleteStep(step, pricingStrategyService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
