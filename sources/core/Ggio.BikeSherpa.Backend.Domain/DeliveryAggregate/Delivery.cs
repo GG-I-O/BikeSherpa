@@ -170,14 +170,12 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           {
                var existing = Steps.FirstOrDefault(s => s.Id == step.Id);
 
-               // Add new steps
                if (existing is null)
                {
                     step.StepZone = deliveryZones.GetByAddress(step.StepAddress.City);
                     Steps.Add(step);
                }
 
-               // Update existing steps
                else
                {
                     existing.Update(
@@ -191,11 +189,14 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                }
           }
 
-          // Remove deleted steps from the delivery
+          DeleteOldSteps(steps);
+
+          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+     }
+
+     private void DeleteOldSteps(List<DeliveryStep> steps)
+     {
           var incomingIds = steps.Select(s => s.Id).ToHashSet();
           Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
-
-          // Update delivery price
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 }
