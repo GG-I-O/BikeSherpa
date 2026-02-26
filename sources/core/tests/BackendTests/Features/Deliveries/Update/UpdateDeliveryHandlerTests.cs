@@ -19,8 +19,9 @@ public class UpdateDeliveryHandlerTests
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
-     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
      private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
+     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
+     private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private readonly UpdateDeliveryCommand _mockCommand;
      private readonly Delivery _mockDelivery;
@@ -32,12 +33,19 @@ public class UpdateDeliveryHandlerTests
                .Setup(x => x.GetAll())
                .Returns(urgencies);
 
+          var deliveryZones = new List<DeliveryZone>(_fixture.CreateMany<DeliveryZone>(2));
           _mockDeliveryZoneRepository
                .Setup(x => x.GetAll())
-               .Returns(new List<DeliveryZone>(_fixture.CreateMany<DeliveryZone>(2)));
+               .Returns(deliveryZones);
+
+          var packingSizes = new List<PackingSize>(_fixture.CreateMany<PackingSize>(2));
+          _mockPackingSizeRepository
+               .Setup(x => x.GetAll())
+               .Returns(packingSizes);
 
           _mockCommand = _fixture.Build<UpdateDeliveryCommand>()
                .With(c => c.Urgency, urgencies[0].Name)
+               .With(c => c.PackingSize, packingSizes[0].Name)
                .Create();
 
           _mockDelivery = _fixture.Build<Delivery>()
@@ -53,7 +61,7 @@ public class UpdateDeliveryHandlerTests
 
      private UpdateDeliveryHandler CreateSut()
      {
-          var validator = new UpdateDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object);
+          var validator = new UpdateDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
           return new UpdateDeliveryHandler(_mockDeliveryRepository.Object, validator, _mockTransaction.Object, _mockDeliveryZoneRepository.Object, _mockPricingStrategyService.Object);
      }
 

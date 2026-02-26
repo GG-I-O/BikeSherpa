@@ -30,7 +30,7 @@ public record UpdateDeliveryCommand(
 
 public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCommand>
 {
-     public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies)
+     public UpdateDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
      {
           RuleFor(x => x.Id).NotEmpty();
           RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
@@ -67,6 +67,8 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                });
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
+          RuleFor(x => x.PackingSize).NotEmpty().Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
+               .WithMessage("Taille de colis saisie invalide.");
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();

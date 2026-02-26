@@ -10,7 +10,7 @@ public class Address
      [UsedImplicitly]
      public required string StreetInfo { get; set; }
      
-     public string? Complement { get; set; }
+     public string? Complement { get; init; }
      
      [UsedImplicitly]
      public required string Postcode { get; set; }

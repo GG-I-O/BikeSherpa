@@ -21,14 +21,9 @@ public interface IDeliveryFactory
      );
 }
 
-public class DeliveryFactory : FactoryBase, IDeliveryFactory
+public class DeliveryFactory(IMediator mediator) : FactoryBase(mediator), IDeliveryFactory
 {
-     private readonly IMediator _mediator;
-
-     public DeliveryFactory(IMediator mediator) : base(mediator)
-     {
-          _mediator = mediator;
-     }
+     private readonly IMediator _mediator = mediator;
 
      public async Task<Delivery> CreateDeliveryAsync(PricingStrategy pricingStrategy, string code, Guid customerId, string urgency, double? totalPrice, double? discount, string[] details, string packingSize, bool insulatedBox, DateTimeOffset contractDate, DateTimeOffset startDate)
      {

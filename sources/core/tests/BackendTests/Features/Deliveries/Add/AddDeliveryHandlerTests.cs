@@ -20,29 +20,35 @@ public class AddDeliveryHandlerTests
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
      private readonly Mock<IReadRepository<Customer>> _mockCustomerRepository = new();
      private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
+     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
+     private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
-     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
 
      private readonly AddDeliveryCommand _mockCommand;
      private readonly Delivery _mockDelivery;
 
      public AddDeliveryHandlerTests()
      {
-          _mockCommand = _fixture.Create<AddDeliveryCommand>();
           var mockCustomer = _fixture.Create<Customer>();
           _mockDelivery = _fixture.Create<Delivery>();
           _mockDelivery.ReportId = _mockDelivery.GenerateReportId(mockCustomer);
           _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
 
+          var urgencies = new List<Urgency>(_fixture.CreateMany<Urgency>(2));
           _mockUrgencyRepository
                .Setup(x => x.GetAll())
-               .Returns(new List<Urgency>
-               {
-                    new(1, _mockCommand.Urgency, 1),
-                    new(2, "Standard", 1),
-                    new(3, "Urgent", 1.5)
-               });
+               .Returns(urgencies);
+
+          var packingSizes = new List<PackingSize>(_fixture.CreateMany<PackingSize>(2));
+          _mockPackingSizeRepository
+               .Setup(x => x.GetAll())
+               .Returns(packingSizes);
+
+          _mockCommand = _fixture.Build<AddDeliveryCommand>()
+          .With(c => c.Urgency, urgencies[0].Name)
+          .With(c => c.PackingSize, packingSizes[0].Name)
+          .Create();
 
           _mockFactory
                .Setup(x => x.CreateDeliveryAsync(
@@ -63,7 +69,7 @@ public class AddDeliveryHandlerTests
 
      private AddDeliveryHandler CreateSut()
      {
-          var validator = new AddDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object);
+          var validator = new AddDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
           return new AddDeliveryHandler(_mockFactory.Object, validator, _mockTransaction.Object, _mockCustomerRepository.Object, _mockPricingStrategyService.Object);
      }
 

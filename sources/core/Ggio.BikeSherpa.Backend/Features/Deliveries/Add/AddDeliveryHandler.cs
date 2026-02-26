@@ -29,7 +29,7 @@ public record AddDeliveryCommand(
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
-     public AddDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies)
+     public AddDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
      {
           RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
           RuleFor(x => x.Status).IsInEnum().NotEmpty();
@@ -48,6 +48,8 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
                .WithMessage("Valeur d'urgence saisie invalide.");
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
+          RuleFor(x => x.PackingSize).NotEmpty().Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
+               .WithMessage("Taille de colis saisie invalide.");
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
