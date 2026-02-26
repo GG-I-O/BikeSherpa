@@ -231,7 +231,12 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           var incomingIds = steps.Select(s => s.Id).ToHashSet();
           Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
 
-          // Update delivery price
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+     }
+
+     private void DeleteOldSteps(List<DeliveryStep> steps)
+     {
+          var incomingIds = steps.Select(s => s.Id).ToHashSet();
+          Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
      }
 }
