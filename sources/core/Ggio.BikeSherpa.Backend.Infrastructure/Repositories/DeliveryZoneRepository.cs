@@ -6,6 +6,8 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 
 public class DeliveryZoneRepository(BackendDbContext context) : IDeliveryZoneRepository
 {
+     private readonly string _defaultZoneIfDeliveryCityIsNotFound = "Extérieur";
+
      public IReadOnlyList<DeliveryZone> GetAll()
      {
           return context.DeliveryZones.ToList();
@@ -15,6 +17,6 @@ public class DeliveryZoneRepository(BackendDbContext context) : IDeliveryZoneRep
      {
           Guard.Against.NullOrEmpty(city);
 
-          return context.DeliveryZones.FirstOrDefault(zone => zone.Cities.Any(c => string.Equals(c.Name, city, StringComparison.CurrentCultureIgnoreCase))) ?? context.DeliveryZones.First(zone => zone.Name == "Extérieur");
+          return context.DeliveryZones.FirstOrDefault(zone => zone.Cities.Any(c => string.Equals(c.Name, city, StringComparison.CurrentCultureIgnoreCase))) ?? context.DeliveryZones.First(zone => zone.Name == _defaultZoneIfDeliveryCityIsNotFound);
      }
 }
