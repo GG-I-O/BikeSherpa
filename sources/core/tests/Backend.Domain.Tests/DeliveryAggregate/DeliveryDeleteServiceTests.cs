@@ -44,14 +44,14 @@ public class DeliveryDeleteServiceTests
     {
         // Arrange
         using var cts = new CancellationTokenSource();
+        var token = cts.Token;
 
         // Act
-        await _sut.DeleteDeliveryAsync(_delivery, cts.Token);
+        await _sut.DeleteDeliveryAsync(_delivery, token);
 
         // Assert
         _mediatorMock.Verify(
-            m => m.Publish(It.IsAny<DomainEntityDeletedEvent>(), cts.Token),
+            m => m.Publish(It.IsAny<DomainEntityDeletedEvent>(), token),
             Times.Once);
     }
 }
-
