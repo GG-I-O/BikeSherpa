@@ -87,14 +87,10 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      }
 
      // Methods allowing to change delivery properties
-     public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime)
+     public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime, IPricingStrategyService pricingStrategyService)
      {
           StartDate = deliveryDateTime;
-     }
-
-     public void SetDeliveryPrice(double deliveryPrice)
-     {
-          TotalPrice = deliveryPrice;
+          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
      // Methods allowing to update delivery steps
