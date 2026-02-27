@@ -1,48 +1,34 @@
 ﻿using AwesomeAssertions;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
-using Mediator;
-using Moq;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 
 namespace Backend.Domain.Tests.DeliveryAggregate;
 
 public class DeliveryStatusMachineTests
 {
-    private readonly static Address SomeAddress = new()
-    {
-        Name = "Test",
-        StreetInfo = "1 rue Test",
-        Postcode = "75001",
-        City = "Paris"
-    };
-
-    private readonly static DeliveryZone SomeZone = new(1, "Zone 1", []);
+    private readonly static IFixture Fixture = new Fixture().Customize(new AutoMoqCustomization());
 
     private static Delivery CreateDelivery(
         DeliveryStatus status = DeliveryStatus.Pending,
         List<DeliveryStep>? steps = null)
     {
-        var mediatorMock = new Mock<IMediator>();
-        var delivery = new Delivery(mediatorMock.Object)
-        {
-            PricingStrategy = PricingStrategy.SimpleDeliveryStrategy,
-            Code = "TEST-001",
-            CustomerId = Guid.NewGuid(),
-            Urgency = "Normal",
-            PackingSize = "Standard",
-            InsulatedBox = false,
-            ContractDate = DateTimeOffset.UtcNow,
-            StartDate = DateTimeOffset.UtcNow,
-            Steps = steps ?? [],
-            Status = status
-        };
+        var delivery = Fixture.Create<Delivery>();
+        delivery.Status = status;
+        delivery.Steps = steps ?? [];
 
         return delivery;
     }
 
-    private static DeliveryStep CreateStep(StepType type, bool completed = false) =>
-        new(type, 1, SomeAddress, SomeZone, 1.0, DateTimeOffset.UtcNow) { Completed = completed };
+    private static DeliveryStep CreateStep(StepType type, bool completed = false)
+    {
+        var deliveryStep = Fixture.Create<DeliveryStep>();
+        deliveryStep.StepType = type;
+        deliveryStep.Completed = completed;
+        
+        return deliveryStep;
+    }
 
     [Fact]
     public void Fire_Start_WhenPendingAndPickupStepCompleted_TransitionsToStarted()
@@ -84,6 +70,7 @@ public class DeliveryStatusMachineTests
 
         // Assert
         act.Should().Throw<InvalidOperationException>();
+        
     }
 
     [Fact]
