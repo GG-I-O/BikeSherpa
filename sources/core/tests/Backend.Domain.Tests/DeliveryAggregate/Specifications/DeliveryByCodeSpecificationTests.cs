@@ -24,7 +24,7 @@ public class DeliveryByCodeSpecificationTests
 
         // Assert
         result.Should().NotBeNull();
-        result!.Code.Should().Be(Delivery.First().Code);
+        result.Code.Should().Be(Delivery.First().Code);
     }
 
     [Fact]

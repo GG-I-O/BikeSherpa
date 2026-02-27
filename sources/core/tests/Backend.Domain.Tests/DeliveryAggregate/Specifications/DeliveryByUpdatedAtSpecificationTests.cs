@@ -26,7 +26,7 @@ public class DeliveryByUpdatedAtSpecificationTests
 
           // Assert
           result.Should().NotBeNull();
-          result!.UpdatedAt.Should().Be(UpdateDate);
+          result.UpdatedAt.Should().Be(UpdateDate);
      }
      
      [Fact]
@@ -41,7 +41,7 @@ public class DeliveryByUpdatedAtSpecificationTests
 
           // Assert
           result.Should().NotBeNull();
-          result!.UpdatedAt.Should().Be(UpdateDate.AddDays(1));
+          result.UpdatedAt.Should().Be(UpdateDate.AddDays(1));
      }
 
      [Fact]

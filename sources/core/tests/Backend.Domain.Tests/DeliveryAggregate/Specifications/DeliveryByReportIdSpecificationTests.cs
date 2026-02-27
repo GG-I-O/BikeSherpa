@@ -28,7 +28,7 @@ public class DeliveryByReportIdSpecificationTests
 
           // Assert
           result.Should().NotBeNull();
-          result!.ReportId.Should().Be(Delivery.First().ReportId);
+          result.ReportId.Should().Be(Delivery.First().ReportId);
      }
 
      [Fact]

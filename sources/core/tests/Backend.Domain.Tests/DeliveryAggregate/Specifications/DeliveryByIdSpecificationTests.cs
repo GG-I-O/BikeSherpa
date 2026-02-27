@@ -24,7 +24,7 @@ public class DeliveryByIdSpecificationTests
 
           // Assert
           result.Should().NotBeNull();
-          result!.Id.Should().Be(Delivery.First().Id);
+          result.Id.Should().Be(Delivery.First().Id);
      }
 
      [Fact]
