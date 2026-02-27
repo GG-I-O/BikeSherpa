@@ -1,6 +1,6 @@
-﻿using AwesomeAssertions;
+﻿using AutoFixture;
+using AutoFixture.AutoMoq;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.DddCore;
 using Mediator;
 using Moq;
@@ -12,69 +12,46 @@ public class DeliveryDeleteServiceTests
     private readonly Mock<IMediator> _mediatorMock;
     private readonly DeliveryDeleteService _sut;
     private readonly Delivery _delivery;
-    private DomainEntityDeletedEvent? _capturedEvent;
-    private CancellationToken _capturedToken;
+    private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
     public DeliveryDeleteServiceTests()
     {
         _mediatorMock = new Mock<IMediator>();
         _mediatorMock
             .Setup(m => m.Publish(It.IsAny<DomainEntityDeletedEvent>(), It.IsAny<CancellationToken>()))
-            .Callback((DomainEntityDeletedEvent evt, CancellationToken ct) =>
-            {
-                _capturedEvent = evt;
-                _capturedToken = ct;
-            })
             .Returns(ValueTask.CompletedTask);
 
-        _delivery = new(_mediatorMock.Object)
-        {
-            PricingStrategy = PricingStrategy.SimpleDeliveryStrategy,
-            Code = "TEST-001",
-            CustomerId = Guid.NewGuid(),
-            Urgency = "Normal",
-            PackingSize = "Standard",
-            InsulatedBox = false,
-            ContractDate = DateTimeOffset.UtcNow,
-            StartDate = DateTimeOffset.UtcNow,
-            Steps = []
-        };
+        _delivery = _fixture.Create<Delivery>();
         _sut = new DeliveryDeleteService(_mediatorMock.Object);
     }
 
     [Fact]
-    public async Task DeleteDeliveryAsync_PublishesDomainEntityDeletedEvent()
+    public async Task DeleteDeliveryAsync_PublishesPublishesDomainEntityDeletedEventContainingTheCorrectDelivery()
     {
         // Arrange & Act
         await _sut.DeleteDeliveryAsync(_delivery, TestContext.Current.CancellationToken);
 
         // Assert
         _mediatorMock.Verify(
-            m => m.Publish(It.IsAny<DomainEntityDeletedEvent>(), It.IsAny<CancellationToken>()),
+            m => m.Publish(
+                It.Is<DomainEntityDeletedEvent>(e => e.NewEntity == _delivery),
+                It.IsAny<CancellationToken>()),
             Times.Once);
-    }
-
-    [Fact]
-    public async Task DeleteDeliveryAsync_PublishesEventContainingTheCorrectDelivery()
-    {
-        // Arrange & Act
-        await _sut.DeleteDeliveryAsync(_delivery, TestContext.Current.CancellationToken);
-
-        // Assert
-        _capturedEvent.Should().NotBeNull();
-        _capturedEvent!.NewEntity.Should().BeSameAs(_delivery);
     }
 
     [Fact]
     public async Task DeleteDeliveryAsync_ForwardsCancellationToken()
     {
-        // Arrange & Act
+        // Arrange
         using var cts = new CancellationTokenSource();
 
+        // Act
         await _sut.DeleteDeliveryAsync(_delivery, cts.Token);
 
         // Assert
-        _capturedToken.Should().Be(cts.Token);
+        _mediatorMock.Verify(
+            m => m.Publish(It.IsAny<DomainEntityDeletedEvent>(), cts.Token),
+            Times.Once);
     }
 }
 

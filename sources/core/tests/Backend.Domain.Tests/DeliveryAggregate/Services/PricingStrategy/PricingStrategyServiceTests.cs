@@ -1,8 +1,11 @@
-﻿using AwesomeAssertions;
+﻿using AutoFixture;
+using AutoFixture.AutoMoq;
+using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
+using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Mediator;
@@ -12,83 +15,80 @@ namespace Backend.Domain.Tests.DeliveryAggregate.Services.PricingStrategy;
 
 public class PricingStrategyServiceTests
 {
-    private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
-    private readonly static DateTimeOffset ContractDate = new(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
-    private readonly static PackingSize DefaultPackingSize = new(1, "Standard", 10, 50, 0, 0);
-    private readonly static Urgency DefaultUrgency = new(1, "Normal", PriceCoefficient: 0);
+    private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
+    private static DateTimeOffset _startDate;
+    private static DateTimeOffset _contractDate;
     private readonly static DeliveryZone CoreZone = new(1, "Centre", []);
     private readonly static DeliveryZone BorderZone = new(2, "Limitrophe", []);
     private readonly static DeliveryZone PeripheryZone = new(3, "Périphérie", []);
     private readonly static DeliveryZone OutsideZone = new(4, "Extérieur", []);
-    private readonly static Address DefaultAddress = new()
-    { Name = "Test", StreetInfo = "1 rue Test", Postcode = "38000", City = "Grenoble" };
+    private static Address? _defaultAddress;
 
-    private record StrategyArgs(
-        DateTimeOffset ArgStartDate, DateTimeOffset ArgContractDate,
-        int Pickups, int Core, int Border, int Periphery, int Outside,
-        PackingSize PackingSize, double Coefficient, double Distance);
-
-    private readonly Mock<IUrgencyRepository> _urgenciesMock;
-    private readonly Mock<IPackingSizeRepository> _packingSizesMock;
+    private readonly Mock<IPricingStrategy> _mockPricingStrategy;
+    private readonly Mock<IUrgencyRepository> _mockUrgencyRepository;
+    private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository;
     private readonly PricingStrategyService _sut;
-    private StrategyArgs? _capturedArgs;
 
     public PricingStrategyServiceTests()
     {
-        var strategyMock = new Mock<IPricingStrategy>();
-        strategyMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
-        strategyMock
+        _mockPricingStrategy = new Mock<IPricingStrategy>();
+        _startDate = _fixture.Create<DateTimeOffset>();
+        _contractDate = _fixture.Create<DateTimeOffset>().AddHours(10);
+        var defaultPackingSize = _fixture.Create<PackingSize>();
+        var defaultUrgency = _fixture.Create<Urgency>();
+        _defaultAddress = _fixture.Create<Address>();
+        _mockPricingStrategy.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
+        _mockPricingStrategy
             .Setup(s => s.CalculateDeliveryPriceWithoutVat(
                 It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
                 It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
                 It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()))
-            .Callback((DateTimeOffset sd, DateTimeOffset cd,
-                       int pickups, int g, int b, int p, int o,
-                       PackingSize ps, double coeff, double dist) =>
-                _capturedArgs = new(sd, cd, pickups, g, b, p, o, ps, coeff, dist))
             .Returns(0);
 
-        _urgenciesMock = new Mock<IUrgencyRepository>();
-        _urgenciesMock.Setup(r => r.GetByName(It.IsAny<string>())).Returns(DefaultUrgency);
+        _mockUrgencyRepository = new Mock<IUrgencyRepository>();
+        _mockUrgencyRepository
+        .Setup(r => r.GetByName(It.IsAny<string>()))
+        .Returns(defaultUrgency);
 
-        _packingSizesMock = new Mock<IPackingSizeRepository>();
-        _packingSizesMock.Setup(r => r.GetByName(It.IsAny<string>())).Returns(DefaultPackingSize);
+        _mockPackingSizeRepository = new Mock<IPackingSizeRepository>();
+        _mockPackingSizeRepository
+        .Setup(r => r.GetByName(It.IsAny<string>()))
+        .Returns(defaultPackingSize);
 
         _sut = new PricingStrategyService(
-            [strategyMock.Object], _urgenciesMock.Object, _packingSizesMock.Object);
+            [_mockPricingStrategy.Object],
+            _mockUrgencyRepository.Object,
+            _mockPackingSizeRepository.Object);
     }
 
     private Delivery MakeDelivery(
-        Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy pricingStrategy = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy.SimpleDeliveryStrategy,
+        PricingStrategyEnum pricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
         List<DeliveryStep>? steps = null,
         double? totalPrice = null,
         string packingSize = "Standard",
-        string urgency = "Normal")
-    {
-        var mediatorMock = new Mock<IMediator>();
-        return new Delivery(mediatorMock.Object)
+        string urgency = "Normal") =>
+        new(_fixture.Create<IMediator>())
         {
             PricingStrategy = pricingStrategy,
-            Code = "TEST-001",
-            CustomerId = Guid.NewGuid(),
+            Code = _fixture.Create<string>(),
+            CustomerId = _fixture.Create<Guid>(),
             Urgency = urgency,
             PackingSize = packingSize,
             InsulatedBox = false,
-            ContractDate = ContractDate,
-            StartDate = StartDate,
+            ContractDate = _contractDate,
+            StartDate = _startDate,
             Steps = steps ?? [],
             TotalPrice = totalPrice
         };
-    }
 
     private static DeliveryStep MakeStep(StepType type, DeliveryZone zone, double distance = 0) =>
-        new(type, 1, DefaultAddress, zone, distance, ContractDate);
+        new(type, 1, _defaultAddress!, zone, distance, _contractDate);
 
     private PricingStrategyService MakeSutWith(
         IUrgencyRepository? urgencies = null,
         IPackingSizeRepository? packingSizes = null,
         params IPricingStrategy[] strategies) =>
-        new(strategies, urgencies ?? _urgenciesMock.Object, packingSizes ?? _packingSizesMock.Object);
+        new(strategies, urgencies ?? _mockUrgencyRepository.Object, packingSizes ?? _mockPackingSizeRepository.Object);
 
     [Fact]
     public void CalculatePrice_DelegatesToMatchingStrategy_AndNotToOthers()
@@ -108,9 +108,8 @@ public class PricingStrategyServiceTests
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
             It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>())).Returns(99.0);
 
-        var sut = MakeSutWith(strategies: [matchingMock.Object, otherMock.Object]);
-
         // Act
+        var sut = MakeSutWith(strategies: [matchingMock.Object, otherMock.Object]);
         var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
         // Assert
@@ -135,7 +134,7 @@ public class PricingStrategyServiceTests
 
         // Act
         var result = sut.CalculateDeliveryPriceWithoutVat(
-            MakeDelivery(Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy.CustomStrategy, totalPrice: 99.5));
+            MakeDelivery(PricingStrategyEnum.CustomStrategy, totalPrice: 99.5));
 
         // Assert
         result.Should().Be(99.5);
@@ -174,13 +173,16 @@ public class PricingStrategyServiceTests
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
         // Assert
-        _capturedArgs!.Pickups.Should().Be(2);
+        _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            2, It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()), Times.Once);
     }
 
     [Fact]
     public void CalculatePrice_CountsDropoffStepsPerZone()
     {
-        // Arrange & Act
+        // Arrange
         var steps = new List<DeliveryStep>
         {
             MakeStep(StepType.Dropoff, CoreZone),
@@ -191,55 +193,69 @@ public class PricingStrategyServiceTests
             MakeStep(StepType.Dropoff, OutsideZone),
         };
 
+        // Act
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
         // Assert
-        _capturedArgs!.Core.Should().Be(2);
-        _capturedArgs.Border.Should().Be(1);
-        _capturedArgs.Periphery.Should().Be(1);
-        _capturedArgs.Outside.Should().Be(2);
+        _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), 2, 1, 1, 2,
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()), Times.Once);
     }
 
     [Fact]
     public void CalculatePrice_SumsDistanceAcrossAllSteps()
     {
-        // Arrange & Act
+        // Arrange
+        var distance1 = _fixture.Create<double>();
+        var distance2 = _fixture.Create<double>();
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepType.Pickup, CoreZone, distance: 3.5),
-            MakeStep(StepType.Dropoff, CoreZone, distance: 6.0),
+            MakeStep(StepType.Pickup, CoreZone, distance: distance1),
+            MakeStep(StepType.Dropoff, CoreZone, distance: distance2),
         };
 
+        // Act
         _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
 
         // Assert
-        _capturedArgs!.Distance.Should().Be(9.5);
+        _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), It.IsAny<double>(), distance1 + distance2), Times.Once);
     }
 
     [Fact]
     public void CalculatePrice_PassesUrgencyCoefficientFromRepository()
     {
         // Arrange & Act
-        var express = new Urgency(2, "Express", PriceCoefficient: 1.5);
-        _urgenciesMock.Setup(r => r.GetByName("Express")).Returns(express);
+        var express = _fixture.Create<Urgency>() with { PriceCoefficient = 1.5 };
+        _mockUrgencyRepository.Setup(r => r.GetByName(express.Name)).Returns(express);
 
-        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(urgency: "Express"));
+        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(urgency: express.Name));
 
         // Assert
-        _capturedArgs!.Coefficient.Should().Be(1.5);
+        _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), 1.5, It.IsAny<double>()), Times.Once);
     }
 
     [Fact]
     public void CalculatePrice_PassesPackingSizeFromRepository()
     {
-        // Arrange & Act
-        var large = new PackingSize(2, "Large", 30, 80, 5, 8);
-        _packingSizesMock.Setup(r => r.GetByName("Large")).Returns(large);
+        // Arrange
+        var large = _fixture.Create<PackingSize>();
+        _mockPackingSizeRepository.Setup(r => r.GetByName(large.Name)).Returns(large);
 
-        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(packingSize: "Large"));
+        // Act
+        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(packingSize: large.Name));
 
         // Assert
-        _capturedArgs!.PackingSize.Should().Be(large);
+        _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            large, It.IsAny<double>(), It.IsAny<double>()), Times.Once);
     }
 }
 
