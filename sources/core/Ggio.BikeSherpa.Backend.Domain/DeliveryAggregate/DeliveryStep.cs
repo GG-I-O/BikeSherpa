@@ -5,8 +5,13 @@ using JetBrains.Annotations;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-public class DeliveryStep(StepType stepType, int order, Address stepAddress, DeliveryZone stepZone, double distance, DateTimeOffset estimatedDeliveryDate)
-     : EntityBase<Guid>, IAuditEntity
+public class DeliveryStep(
+     StepType stepType,
+     int order,
+     Address stepAddress,
+     DeliveryZone stepZone,
+     double distance
+     ) : EntityBase<Guid>, IAuditEntity
 {
      // EF Core requires a parameterless constructor to create an entity instance because it can't create one with complex parameter types like Address and DeliveryZone.
      [UsedImplicitly]
@@ -29,7 +34,7 @@ public class DeliveryStep(StepType stepType, int order, Address stepAddress, Del
      public Guid? CourierId { get; set; }
      public string? Comment { get; set; }
      public string[]? AttachmentFilePaths { get; set; }
-     public DateTimeOffset EstimatedDeliveryDate { get; set; } = estimatedDeliveryDate;
+     public DateTimeOffset EstimatedDeliveryDate { get; set; }
      public DateTimeOffset? RealDeliveryDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }

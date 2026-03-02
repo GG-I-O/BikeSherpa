@@ -542,7 +542,6 @@ public class DeliveryTests
     {
         // Arrange
         _sut.Steps.Clear();
-        var (mockDeliveryZoneRepository, mockPricingStrategyService) = CreateUpdateStepsDependencies();
         var step1 = CreatePickupStep();
         var step2 = CreateDropoffStep();
         var step3 = CreateDropoffStep();
