@@ -119,11 +119,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           existingStep.CourierId = courierId;
      }
 
-     private void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset estimatedDeliveryDate)
+     public void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset updatedDeliveryDate)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
-          var timeOffset = estimatedDeliveryDate - existingStep.EstimatedDeliveryDate;
-          existingStep.EstimatedDeliveryDate = estimatedDeliveryDate;
+          var timeOffset = updatedDeliveryDate - existingStep.EstimatedDeliveryDate;
+          existingStep.EstimatedDeliveryDate = updatedDeliveryDate;
           foreach (var step in Steps.Where(s => s.Order > existingStep.Order))
           {
                step.EstimatedDeliveryDate += timeOffset;

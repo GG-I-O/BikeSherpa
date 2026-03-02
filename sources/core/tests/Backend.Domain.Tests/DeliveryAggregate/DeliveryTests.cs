@@ -468,6 +468,36 @@ public class DeliveryTests
         _sut.TotalPrice.Should().Be(35.0);
     }
 
+    [Fact]
+    public void UpdateStepUpdateStepDeliveryTime_ChangesUpdatedStepAndNextStepsDeliveryTime()
+    {
+        // Arrange
+        _sut.Steps.Clear();
+        var (mockDeliveryZoneRepository, mockPricingStrategyService) = CreateUpdateStepsDependencies();
+        var step1 = CreatePickupStep();
+        var step2 = CreateDropoffStep();
+        var step3 = CreateDropoffStep();
+        var step4 = CreateDropoffStep();
+        var startTime = DateTimeOffset.UtcNow;
+        step1.Order = 1;
+        step2.Order = 2;
+        step3.Order = 3;
+        step4.Order = 4;
+        step1.EstimatedDeliveryDate = startTime;
+        step2.EstimatedDeliveryDate = startTime.AddMinutes(15);
+        step3.EstimatedDeliveryDate = startTime.AddMinutes(25);
+        step4.EstimatedDeliveryDate = startTime.AddMinutes(35);
+        _sut.Steps.AddRange(step1, step2, step3, step4);
+
+        // Act
+        _sut.UpdateStepDeliveryTime(step2.Id, startTime.AddMinutes(20));
+
+        // Assert
+        step2.EstimatedDeliveryDate.Should().Be(startTime.AddMinutes(20));
+        step3.EstimatedDeliveryDate.Should().Be(startTime.AddMinutes(30));
+        step4.EstimatedDeliveryDate.Should().Be(startTime.AddMinutes(40));
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private (Mock<IDeliveryZoneRepository> mockDeliveryZoneRepository, Mock<IPricingStrategyService> mockPricingStrategyService, Address address)
