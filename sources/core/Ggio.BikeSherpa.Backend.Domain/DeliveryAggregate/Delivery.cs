@@ -158,7 +158,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           StepType stepType,
           Address stepAddress,
           double distance,
-          DateTimeOffset estimatedDeliveryDate,
           IDeliveryZoneRepository deliveryZones,
           IPricingStrategyService pricingStrategyService)
      {
@@ -167,11 +166,20 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                Steps.Count + 1,
                stepAddress,
                deliveryZones.GetByAddress(stepAddress.City),
-               distance,
-               estimatedDeliveryDate)
+               distance)
           {
                Id = Guid.NewGuid()
           };
+
+          if (Steps.Count >= 1)
+          {
+               var previousStep = Steps.Where(s => s.Order == newStep.Order - 1);
+               newStep.EstimatedDeliveryDate = previousStep.Single().EstimatedDeliveryDate + TimeSpan.FromMinutes(15);
+          }
+          else
+          {
+               newStep.EstimatedDeliveryDate = StartDate;
+          }
 
           Steps.Add(newStep);
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);

@@ -16,8 +16,7 @@ public record AddDeliveryStepCommand(
      Guid DeliveryId,
      StepType StepType,
      Address StepAddress,
-     double Distance,
-     DateTimeOffset EstimatedDeliveryDate
+     double Distance
      ) : ICommand<Result<Guid>>;
 
 [UsedImplicitly]
@@ -29,7 +28,6 @@ public class AddDeliveryStepCommandValidator : AbstractValidator<AddDeliveryStep
           RuleFor(x => x.StepType).NotEmpty();
           RuleFor(x => x.StepAddress).NotEmpty();
           RuleFor(x => x.Distance).NotEmpty();
-          RuleFor(x => x.EstimatedDeliveryDate).NotEmpty();
      }
 }
 
@@ -52,7 +50,7 @@ public class AddDeliveryStepHandler(
                return Result<Guid>.NotFound();
           }
 
-          var deliveryStep = delivery.AddStep(command.StepType, command.StepAddress, command.Distance, command.EstimatedDeliveryDate, deliveryZones, pricingStrategyService);
+          var deliveryStep = delivery.AddStep(command.StepType, command.StepAddress, command.Distance, deliveryZones, pricingStrategyService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);

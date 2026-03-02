@@ -282,10 +282,19 @@ public class DeliveryTests
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address) = CreateStepDependencies();
 
         // Act
-        _sut.AddStep(StepType.Pickup, address, 5.0, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
+        _sut.AddStep(StepType.Pickup, address, 5.0, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
+        _sut.AddStep(StepType.Dropoff, address, 5.0, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
 
         // Assert
-        _sut.Steps.Should().HaveCount(1);
+        _sut.Steps.Should().HaveCount(2);
+        _sut.Steps[0].StepType.Should().Be(StepType.Pickup);
+        _sut.Steps[0].Order.Should().Be(1);
+        _sut.Steps[0].Distance.Should().Be(5.0);
+        _sut.Steps[0].StepAddress.Should().Be(address);
+        _sut.Steps[0].StepZone.Should().NotBe(null);
+        _sut.Steps[0].Id.Should().NotBeEmpty();
+        _sut.Steps[0].EstimatedDeliveryDate.Should().Be(_sut.StartDate);
+        _sut.Steps[1].EstimatedDeliveryDate.Should().Be(_sut.StartDate.AddMinutes(15));
     }
 
     [Fact]
@@ -296,7 +305,7 @@ public class DeliveryTests
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address) = CreateStepDependencies();
 
         // Act
-        var step = _sut.AddStep(StepType.Dropoff, address, 7.5, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
+        var step = _sut.AddStep(StepType.Dropoff, address, 7.5, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
 
         // Assert
         step.StepType.Should().Be(StepType.Dropoff);
@@ -309,10 +318,11 @@ public class DeliveryTests
     public void AddStep_RecalculatesTotalPrice()
     {
         // Arrange
+        _sut.Steps.Clear();
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address) = CreateStepDependencies(calculatedPrice: 25.0);
 
         // Act
-        _sut.AddStep(StepType.Pickup, address, 5.0, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
+        _sut.AddStep(StepType.Pickup, address, 5.0, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
 
         // Assert
         _sut.TotalPrice.Should().Be(25.0);
@@ -322,10 +332,11 @@ public class DeliveryTests
     public void AddStep_LooksUpDeliveryZoneByAddressCity()
     {
         // Arrange
+        _sut.Steps.Clear();
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address) = CreateStepDependencies();
 
         // Act
-        _sut.AddStep(StepType.Pickup, address, 5.0, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
+        _sut.AddStep(StepType.Pickup, address, 5.0, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
 
         // Assert
         mockDeliveryZoneRepository.Verify(r => r.GetByAddress(address.City), Times.Once);
@@ -407,7 +418,7 @@ public class DeliveryTests
         _sut.Steps.Add(existingStep);
 
         // Act
-        var updatedStep = new DeliveryStep(StepType.Dropoff, 3, existingStep.StepAddress, zone, 8.0, DateTimeOffset.UtcNow)
+        var updatedStep = new DeliveryStep(StepType.Dropoff, 3, existingStep.StepAddress, zone, 8.0)
         {
             Id = existingStep.Id
         };
@@ -473,7 +484,6 @@ public class DeliveryTests
     {
         // Arrange
         _sut.Steps.Clear();
-        var (mockDeliveryZoneRepository, mockPricingStrategyService) = CreateUpdateStepsDependencies();
         var step1 = CreatePickupStep();
         var step2 = CreateDropoffStep();
         var step3 = CreateDropoffStep();

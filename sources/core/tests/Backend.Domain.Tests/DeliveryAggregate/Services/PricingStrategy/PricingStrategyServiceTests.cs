@@ -82,7 +82,7 @@ public class PricingStrategyServiceTests
         };
 
     private static DeliveryStep MakeStep(StepType type, DeliveryZone zone, double distance = 0) =>
-        new(type, 1, _defaultAddress!, zone, distance, _contractDate);
+        new(type, 1, _defaultAddress!, zone, distance);
 
     private PricingStrategyService MakeSutWith(
         IUrgencyRepository? urgencies = null,
@@ -258,4 +258,3 @@ public class PricingStrategyServiceTests
             large, It.IsAny<double>(), It.IsAny<double>()), Times.Once);
     }
 }
-

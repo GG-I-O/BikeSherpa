@@ -22,8 +22,7 @@ public class AddDeliveryStepEndpoint(IMediator mediator) : Endpoint<DeliveryStep
                Route<Guid>("deliveryId"),
                req.StepType,
                req.StepAddress,
-               req.Distance,
-               req.EstimatedDeliveryDate
+               req.Distance
           );
 
           var result = await mediator.Send(command, ct);
