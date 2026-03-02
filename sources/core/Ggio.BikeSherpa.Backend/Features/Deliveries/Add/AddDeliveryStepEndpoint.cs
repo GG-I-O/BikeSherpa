@@ -21,7 +21,6 @@ public class AddDeliveryStepEndpoint(IMediator mediator) : Endpoint<DeliveryStep
           var command = new AddDeliveryStepCommand(
                Route<Guid>("deliveryId"),
                req.StepType,
-               req.Order,
                req.StepAddress,
                req.Distance,
                req.EstimatedDeliveryDate

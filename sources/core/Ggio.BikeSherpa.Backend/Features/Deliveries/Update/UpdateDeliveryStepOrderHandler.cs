@@ -45,7 +45,7 @@ public class UpdateDeliveryStepOrderHandler(
                return Result.NotFound();
           }
 
-          delivery.UpdateStepOrder(command.StepId, command.Order);
+          delivery.ReorderSteps(command.StepId, command.Order);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

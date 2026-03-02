@@ -15,7 +15,6 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 public record AddDeliveryStepCommand(
      Guid DeliveryId,
      StepType StepType,
-     int Order,
      Address StepAddress,
      double Distance,
      DateTimeOffset EstimatedDeliveryDate
@@ -28,7 +27,6 @@ public class AddDeliveryStepCommandValidator : AbstractValidator<AddDeliveryStep
      {
           RuleFor(x => x.DeliveryId).NotEmpty();
           RuleFor(x => x.StepType).NotEmpty();
-          RuleFor(x => x.Order).NotEmpty();
           RuleFor(x => x.StepAddress).NotEmpty();
           RuleFor(x => x.Distance).NotEmpty();
           RuleFor(x => x.EstimatedDeliveryDate).NotEmpty();
@@ -54,7 +52,7 @@ public class AddDeliveryStepHandler(
                return Result<Guid>.NotFound();
           }
 
-          var deliveryStep = delivery.AddStep(command.StepType, command.Order, command.StepAddress, command.Distance, command.EstimatedDeliveryDate, deliveryZones, pricingStrategyService);
+          var deliveryStep = delivery.AddStep(command.StepType, command.StepAddress, command.Distance, command.EstimatedDeliveryDate, deliveryZones, pricingStrategyService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);

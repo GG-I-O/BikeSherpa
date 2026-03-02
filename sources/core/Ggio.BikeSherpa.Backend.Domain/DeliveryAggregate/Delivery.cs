@@ -86,18 +86,31 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           await _mediator.Publish(new DeliveryCancelledEvent(Id));
      }
 
-     // Methods allowing to change delivery properties
      public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime, IPricingStrategyService pricingStrategyService)
      {
           StartDate = deliveryDateTime;
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
-     // Methods allowing to update delivery steps
-     public void UpdateStepOrder(Guid stepId, int order)
+     public void ReorderSteps(Guid movedStepId, int newOrder)
      {
-          var existingStep = Steps.Single(s => s.Id == stepId);
-          existingStep.Order = order;
+          var movedStep = Steps.Single(s => s.Id == movedStepId);
+          Steps.Remove(movedStep);
+          Steps.Insert(newOrder - 1, movedStep);
+          var order = 1;
+          foreach (var step in Steps)
+          {
+               step.Order = order++;
+          }
+     }
+
+     private void ReorderStepsOnDeletion()
+     {
+          var order = 1;
+          foreach (var step in Steps.OrderBy(s => s.Order))
+          {
+               step.Order = order++;
+          }
      }
 
      public void UpdateStepCourier(Guid stepId, Guid courierId)
@@ -109,7 +122,12 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      private void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset estimatedDeliveryDate)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
+          var timeOffset = estimatedDeliveryDate - existingStep.EstimatedDeliveryDate;
           existingStep.EstimatedDeliveryDate = estimatedDeliveryDate;
+          foreach (var step in Steps.Where(s => s.Order > existingStep.Order))
+          {
+               step.EstimatedDeliveryDate += timeOffset;
+          }
      }
 
      public async Task UpdateStepCompletion(Guid stepId, bool completed)
@@ -118,6 +136,10 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           {
                var existingStep = Steps.Single(s => s.Id == stepId);
                existingStep.Completed = completed;
+               if (completed)
+               {
+                    existingStep.RealDeliveryDate = DateTimeOffset.UtcNow;
+               }
                await UpdateStatus();
           }
           catch (Exception e)
@@ -134,7 +156,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public DeliveryStep AddStep(
           StepType stepType,
-          int order,
           Address stepAddress,
           double distance,
           DateTimeOffset estimatedDeliveryDate,
@@ -143,7 +164,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      {
           var newStep = new DeliveryStep(
                stepType,
-               order,
+               Steps.Count + 1,
                stepAddress,
                deliveryZones.GetByAddress(stepAddress.City),
                distance,
@@ -153,18 +174,34 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           };
 
           Steps.Add(newStep);
-
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
 
           return newStep;
      }
 
      public void DeleteStep(
-          DeliveryStep step,
+          DeliveryStep removedStep,
           IPricingStrategyService pricingStrategyService)
      {
-          Steps.Remove(step);
+          var nextStep = Steps.FirstOrDefault((s => s.Order == removedStep.Order + 1));
+          var timeOffset = CalculateDeliveryTimeOffset(removedStep, nextStep);
+          Steps.Remove(removedStep);
+          ReorderStepsOnDeletion();
+          UpdateStepDeliveryTimeOnDelete(removedStep.Order, timeOffset);
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+     }
+
+     private TimeSpan CalculateDeliveryTimeOffset(DeliveryStep removedStep, DeliveryStep? nextStep)
+     {
+          return nextStep is null ? TimeSpan.Zero : nextStep.EstimatedDeliveryDate - removedStep.EstimatedDeliveryDate;
+     }
+
+     private void UpdateStepDeliveryTimeOnDelete(int stepOrder, TimeSpan timeOffset)
+     {
+          foreach (var step in Steps.Where(s => s.Order >= stepOrder))
+          {
+               step.EstimatedDeliveryDate += timeOffset;
+          }
      }
 
      public void UpdateSteps(List<DeliveryStep> steps, IDeliveryZoneRepository deliveryZones, IPricingStrategyService pricingStrategyService)
@@ -193,7 +230,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
 
           DeleteOldSteps(steps);
-
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 

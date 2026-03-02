@@ -105,41 +105,32 @@ public class DeliveryTests
     }
 
     [Fact]
-    public void UpdateStepOrder_SetsNewOrderOnTargetStep()
+    public void ReorderSteps_ReordersAllStepsSettingCorrectOrderForMovedStep()
     {
         // Arrange
-        var step = CreateDropoffStep();
-        _sut.Steps.Add(step);
-
-        // Act
-        _sut.UpdateStepOrder(step.Id, 5);
-
-        // Assert
-        _sut.Steps.Single(s => s.Id == step.Id).Order.Should().Be(5);
-    }
-
-    [Fact]
-    public void UpdateStepOrder_OnlyAffectsTargetStep()
-    {
-        // Arrange
+        _sut.Steps.Clear();
         var step1 = CreatePickupStep();
         var step2 = CreateDropoffStep();
+        var step3 = CreateDropoffStep();
         step1.Order = 1;
         step2.Order = 2;
-        _sut.Steps.AddRange([step1, step2]);
+        step3.Order = 3;
+        _sut.Steps.AddRange([step1, step2, step3]);
 
         // Act
-        _sut.UpdateStepOrder(step1.Id, 10);
+        _sut.ReorderSteps(step3.Id, 2);
 
         // Assert
-        _sut.Steps.Single(s => s.Id == step2.Id).Order.Should().Be(2);
+        _sut.Steps.Single(s => s.Id == step1.Id).Order.Should().Be(1);
+        _sut.Steps.Single(s => s.Id == step3.Id).Order.Should().Be(2);
+        _sut.Steps.Single(s => s.Id == step2.Id).Order.Should().Be(3);
     }
 
     [Fact]
-    public void UpdateStepOrder_WhenStepNotFound_Throws()
+    public void ReorderSteps_WhenStepNotFound_Throws()
     {
         // Arrange & Act
-        var act = () => _sut.UpdateStepOrder(Guid.NewGuid(), 1);
+        var act = () => _sut.ReorderSteps(Guid.NewGuid(), 1);
 
         // Assert
         act.Should().Throw<InvalidOperationException>();
@@ -171,7 +162,7 @@ public class DeliveryTests
     }
 
     [Fact]
-    public async Task UpdateStepCompletion_MarksStepAsCompleted()
+    public async Task UpdateStepCompletion_MarksStepAsCompletedAndSetsRealDeliveryDate()
     {
         // Arrange
         var step = CreateDropoffStep();
@@ -182,6 +173,7 @@ public class DeliveryTests
 
         // Assert
         step.Completed.Should().BeTrue();
+        step.RealDeliveryDate.Should().NotBe(null);
     }
 
     [Fact]
@@ -290,7 +282,7 @@ public class DeliveryTests
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address) = CreateStepDependencies();
 
         // Act
-        _sut.AddStep(StepType.Pickup, 1, address, 5.0, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
+        _sut.AddStep(StepType.Pickup, address, 5.0, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
 
         // Assert
         _sut.Steps.Should().HaveCount(1);
@@ -300,14 +292,15 @@ public class DeliveryTests
     public void AddStep_ReturnsCreatedStepWithCorrectProperties()
     {
         // Arrange
+        _sut.Steps.Clear();
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address) = CreateStepDependencies();
 
         // Act
-        var step = _sut.AddStep(StepType.Dropoff, 2, address, 7.5, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
+        var step = _sut.AddStep(StepType.Dropoff, address, 7.5, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
 
         // Assert
         step.StepType.Should().Be(StepType.Dropoff);
-        step.Order.Should().Be(2);
+        step.Order.Should().Be(1);
         step.Distance.Should().Be(7.5);
         step.Id.Should().NotBeEmpty();
     }
@@ -319,7 +312,7 @@ public class DeliveryTests
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address) = CreateStepDependencies(calculatedPrice: 25.0);
 
         // Act
-        _sut.AddStep(StepType.Pickup, 1, address, 5.0, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
+        _sut.AddStep(StepType.Pickup, address, 5.0, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
 
         // Assert
         _sut.TotalPrice.Should().Be(25.0);
@@ -332,7 +325,7 @@ public class DeliveryTests
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address) = CreateStepDependencies();
 
         // Act
-        _sut.AddStep(StepType.Pickup, 1, address, 5.0, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
+        _sut.AddStep(StepType.Pickup, address, 5.0, DateTimeOffset.UtcNow, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);
 
         // Assert
         mockDeliveryZoneRepository.Verify(r => r.GetByAddress(address.City), Times.Once);
