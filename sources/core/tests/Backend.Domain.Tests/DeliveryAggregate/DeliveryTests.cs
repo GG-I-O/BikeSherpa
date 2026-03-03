@@ -541,7 +541,7 @@ public class DeliveryTests
     public void UpdateStepUpdateStepDeliveryTime_ChangesUpdatedStepAndNextStepsDeliveryTime()
     {
         // Arrange
-        _sut.Steps.Clear();
+        var delivery = MakeSut();
         var step1 = CreatePickupStep();
         var step2 = CreateDropoffStep();
         var step3 = CreateDropoffStep();
@@ -555,10 +555,10 @@ public class DeliveryTests
         step2.EstimatedDeliveryDate = startTime.AddMinutes(15);
         step3.EstimatedDeliveryDate = startTime.AddMinutes(25);
         step4.EstimatedDeliveryDate = startTime.AddMinutes(35);
-        _sut.Steps.AddRange(step1, step2, step3, step4);
+        delivery.Steps.AddRange(step1, step2, step3, step4);
 
         // Act
-        _sut.UpdateStepDeliveryTime(step2.Id, startTime.AddMinutes(20));
+        delivery.UpdateStepDeliveryTime(step2.Id, startTime.AddMinutes(20));
 
         // Assert
         step2.EstimatedDeliveryDate.Should().Be(startTime.AddMinutes(20));
