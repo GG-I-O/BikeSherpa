@@ -34,11 +34,8 @@ public abstract class TestWebApplicationFactory(string policyName, string scope)
                     .AddAuthentication("Test")
                     .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options => options.Scope = Scope);
 
-               services.AddAuthorization(options =>
-               {
-                    options.AddPolicy(PolicyName,
-                         policy => policy.RequireClaim("scope", Scope));
-               });
+               services.AddAuthorizationBuilder()
+                   .AddPolicy(PolicyName, policy => policy.RequireClaim("scope", Scope));
           });
 
           builder.Configure(app =>
