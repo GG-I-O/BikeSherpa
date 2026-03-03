@@ -85,7 +85,7 @@ public class AddDeliveryHandler(
 
           if (customer is not null)
           {
-               delivery.ReportId = delivery.GenerateReportId(customer);
+               delivery.GenerateReportId(customer);
           }
 
           delivery.TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
