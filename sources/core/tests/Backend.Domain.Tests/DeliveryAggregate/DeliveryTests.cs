@@ -136,6 +136,8 @@ public class DeliveryTests
     {
         // Arrange
         var delivery = MakeSut();
+        
+        // Act
         var act = () => delivery.ReorderSteps(Guid.NewGuid(), 1);
 
         // Assert
@@ -163,6 +165,8 @@ public class DeliveryTests
     {
         // Arrange
         var delivery = MakeSut();
+        
+        // Act
         var act = () => delivery.UpdateStepCourier(Guid.NewGuid(), Guid.NewGuid());
 
         // Assert
@@ -269,6 +273,8 @@ public class DeliveryTests
     {
         // Arrange
         var delivery = MakeSut();
+        
+        // Act
         await delivery.Cancel();
 
         // Assert
