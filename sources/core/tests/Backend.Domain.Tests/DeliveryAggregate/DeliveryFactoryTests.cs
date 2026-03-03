@@ -11,7 +11,6 @@ public class DeliveryFactoryTests
 {
     private readonly Mock<IMediator> _mediatorMock;
     private readonly DeliveryFactory _sut;
-    private DomainEntityAddedEvent? _capturedEvent;
     private readonly static Guid CustomerId = Guid.NewGuid();
     private readonly static DateTimeOffset ContractDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
     private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
@@ -21,7 +20,6 @@ public class DeliveryFactoryTests
         _mediatorMock = new Mock<IMediator>();
         _mediatorMock
             .Setup(m => m.Publish(It.IsAny<DomainEntityAddedEvent>(), It.IsAny<CancellationToken>()))
-            .Callback((DomainEntityAddedEvent evt, CancellationToken _) => _capturedEvent = evt)
             .Returns(ValueTask.CompletedTask);
 
         _sut = new DeliveryFactory(_mediatorMock.Object);
@@ -50,7 +48,7 @@ public class DeliveryFactoryTests
     {
         // Arrange
         var details = new[] { "fragile", "urgent" };
-        
+
         // Act
         var delivery = await CreateDefault(
             strategy: PricingStrategy.TourDeliveryStrategy,
@@ -101,26 +99,15 @@ public class DeliveryFactoryTests
     }
 
     [Fact]
-    public async Task CreateDelivery_PublishesDomainEntityAddedEvent()
-    {
-        // Arrange & Act
-        await CreateDefault();
-
-        // Assert
-        _mediatorMock.Verify(
-            m => m.Publish(It.IsAny<DomainEntityAddedEvent>(), It.IsAny<CancellationToken>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task CreateDelivery_PublishesEventContainingTheCreatedDelivery()
+    public async Task CreateDelivery_PublishesDomainEntityAddedEventContainingTheCreatedDelivery()
     {
         // Arrange & Act
         var delivery = await CreateDefault();
 
         // Assert
-        _capturedEvent.Should().NotBeNull();
-        _capturedEvent!.NewEntity.Should().BeSameAs(delivery);
+        _mediatorMock.Verify(
+            m => m.Publish(It.Is<DomainEntityAddedEvent>(e => ReferenceEquals(e.NewEntity, delivery)), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 }
 
