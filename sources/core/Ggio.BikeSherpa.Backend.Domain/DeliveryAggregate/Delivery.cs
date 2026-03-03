@@ -148,11 +148,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     private bool StepCanFollow(StepType previousStep, StepType currentStep)
-     {
-          return previousStep == StepType.Pickup && currentStep == StepType.Dropoff || previousStep == StepType.Dropoff && currentStep == StepType.Dropoff || previousStep == StepType.Dropoff && currentStep == StepType.Pickup;
-     }
-
      public DeliveryStep AddStep(
           StepType stepType,
           Address stepAddress,
