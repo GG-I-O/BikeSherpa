@@ -36,10 +36,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           _mediator = mediator;
      }
 
-     public string GenerateReportId(Customer customer)
+     public void GenerateReportId(Customer customer)
      {
-          var reportId = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
-          return reportId;
+          ReportId = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
      }
 
      // Methods allowing to change the delivery status

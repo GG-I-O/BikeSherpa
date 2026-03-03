@@ -51,10 +51,10 @@ public class DeliveryTests
         var customer = _fixture.Create<Customer>();
 
         // Act
-        var reportId = _sut.GenerateReportId(customer);
+        _sut.GenerateReportId(customer);
 
         // Assert
-        reportId.Should().StartWith($"{customer.Code}-");
+        _sut.ReportId.Should().StartWith($"{customer.Code}-");
     }
 
     [Fact]
@@ -65,11 +65,11 @@ public class DeliveryTests
         customer.Code = "TEST";
 
         // Act
-        var reportId = _sut.GenerateReportId(customer);
+        _sut.GenerateReportId(customer);
 
         // Assert
         // ReportId format = CUSTOMERCODE-yyyyMMddHHmmss (14-character timestamp)
-        var timestamp = reportId[(reportId.IndexOf('-') + 1)..];
+        var timestamp = _sut.ReportId![("TEST".Length + 1)..];
         timestamp.Should().HaveLength(14);
     }
 
@@ -82,8 +82,10 @@ public class DeliveryTests
         customers[1].Code = "TEST2";
 
         // Act
-        var id1 = _sut.GenerateReportId(customers[0]);
-        var id2 = _sut.GenerateReportId(customers[1]);
+        _sut.GenerateReportId(customers[0]);
+        var id1 = _sut.ReportId;
+        _sut.GenerateReportId(customers[1]);
+        var id2 = _sut.ReportId;
 
         // Assert
         id1.Should().StartWith("TEST1-");

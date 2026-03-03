@@ -32,7 +32,7 @@ public class AddDeliveryHandlerTests
      {
           var mockCustomer = _fixture.Create<Customer>();
           _mockDelivery = _fixture.Create<Delivery>();
-          _mockDelivery.ReportId = _mockDelivery.GenerateReportId(mockCustomer);
+          _mockDelivery.GenerateReportId(mockCustomer);
           _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
 
           var urgencies = new List<Urgency>(_fixture.CreateMany<Urgency>(2));
