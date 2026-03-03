@@ -48,8 +48,10 @@ public class DeliveryFactoryTests
     [Fact]
     public async Task CreateDelivery_MapsAllPropertiesOntoTheReturnedDelivery()
     {
-        // Arrange & Act
+        // Arrange
         var details = new[] { "fragile", "urgent" };
+        
+        // Act
         var delivery = await CreateDefault(
             strategy: PricingStrategy.TourDeliveryStrategy,
             code: "DEL-42",
