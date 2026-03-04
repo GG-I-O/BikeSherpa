@@ -8,7 +8,6 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
-using Mediator;
 using Moq;
 
 namespace Backend.Domain.Tests.DeliveryAggregate.Services.PricingStrategy;

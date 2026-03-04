@@ -2,7 +2,6 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 using Ggio.DddCore;
-using Mediator;
 using Moq;
 
 namespace BackendTests.Features.Deliveries.GetAll;
