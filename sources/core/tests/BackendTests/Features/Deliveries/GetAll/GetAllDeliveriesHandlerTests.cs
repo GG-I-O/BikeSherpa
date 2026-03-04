@@ -10,14 +10,13 @@ namespace BackendTests.Features.Deliveries.GetAll;
 public class GetAllDeliveriesHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
-     private readonly Mock<IMediator> _mockMediator = new();
 
      private readonly Delivery _mockDeliveryA;
      private readonly Delivery _mockDeliveryB;
 
      public GetAllDeliveriesHandlerTests()
      {
-          _mockDeliveryA = new(_mockMediator.Object)
+          _mockDeliveryA = new()
           {
                Id = Guid.NewGuid(),
                Code = "AAA",
@@ -31,7 +30,7 @@ public class GetAllDeliveriesHandlerTests
                StartDate = new DateTimeOffset(2026, 01, 01, 2, 10, 0, TimeSpan.Zero)
           };
 
-          _mockDeliveryB = new(_mockMediator.Object)
+          _mockDeliveryB = new()
           {
                Id = Guid.NewGuid(),
                Code = "BBB",

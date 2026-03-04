@@ -13,13 +13,12 @@ namespace BackendTests.Features.Deliveries.Get;
 public class GetDeliveryHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
-     private readonly Mock<IMediator> _mockMediator = new();
 
      private readonly Delivery _mockDelivery;
 
      public GetDeliveryHandlerTests()
      {
-          _mockDelivery = new(_mockMediator.Object)
+          _mockDelivery = new()
           {
                Id = Guid.NewGuid(),
                Code = "AAA",

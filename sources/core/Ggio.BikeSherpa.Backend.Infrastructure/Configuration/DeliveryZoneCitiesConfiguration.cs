@@ -9,8 +9,7 @@ public class DeliveryZoneCitiesConfiguration : IEntityTypeConfiguration<City>
      public void Configure(EntityTypeBuilder<City> builder)
      {
           builder.ToTable("DeliveryZoneCities");
-          builder.HasKey(c => c.Id);
-          builder.Property(c => c.Id).ValueGeneratedOnAdd();
+          builder.HasKey(c => c.Name);
           builder.Property(c => c.Name).HasMaxLength(100).IsRequired();
           builder.HasData(
                new { DeliveryZoneName = "Centre", Name = "Grenoble" },

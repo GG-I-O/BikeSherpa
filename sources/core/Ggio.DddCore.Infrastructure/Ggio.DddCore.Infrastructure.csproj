@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <UserSecretsId>fbbaeca1-3437-4f85-b5c5-fa6ed605e970</UserSecretsId>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>fbbaeca1-3437-4f85-b5c5-fa6ed605e970</UserSecretsId>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="9.3.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Ardalis.Specification.EntityFrameworkCore" Version="9.3.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Ggio.DddCore\Ggio.DddCore.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Ggio.DddCore\Ggio.DddCore.csproj" />
+  </ItemGroup>
 
 </Project>

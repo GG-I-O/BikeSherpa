@@ -29,8 +29,17 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();
                steps.Property(s => s.Order).IsRequired();
                steps.Property(s => s.Completed).IsRequired();
-               steps.Property(s => s.StepAddress).IsRequired();
-               steps.Property(s => s.StepZone).IsRequired();
+               steps.OwnsOne(s => s.StepAddress, address =>
+               {
+                    address.Property(a => a.Name).HasMaxLength(200).IsRequired();
+                    address.Property(a => a.StreetInfo).HasMaxLength(200).IsRequired();
+                    address.Property(a => a.Complement).HasMaxLength(200);
+                    address.Property(a => a.Postcode).HasMaxLength(5).IsRequired();
+                    address.Property(a => a.City).HasMaxLength(100).IsRequired();
+               });
+               steps.HasOne(s => s.StepZone).WithMany()
+                    .HasForeignKey("StepZoneName")
+                    .IsRequired();
                steps.Property(s => s.Distance).IsRequired();
                steps.Property(s => s.EstimatedDeliveryDate).IsRequired();
                steps.Property(s => s.RealDeliveryDate);

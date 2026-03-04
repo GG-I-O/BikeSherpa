@@ -2,20 +2,25 @@
 using Ggio.DddCore;
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-public class DeliveryStep(
-     StepType stepType,
-     int order,
-     Address stepAddress,
-     DeliveryZone stepZone,
-     double distance
-     ) : EntityBase<Guid>, IAuditEntity
+public class DeliveryStep : EntityBase<Guid>, IAuditEntity
 {
-     public StepType StepType { get; set; } = stepType;
-     public int Order { get; set; } = order;
+     private DeliveryStep() { }
+
+     public DeliveryStep(StepType stepType, int order, Address stepAddress, DeliveryZone stepZone, double distance)
+     {
+          StepType = stepType;
+          Order = order;
+          StepAddress = stepAddress;
+          StepZone = stepZone;
+          Distance = distance;
+     }
+
+     public StepType StepType { get; set; }
+     public int Order { get; set; }
      public bool Completed { get; set; }
-     public Address StepAddress { get; set; } = stepAddress;
-     public DeliveryZone StepZone { get; set; } = stepZone;
-     public double Distance { get; set; } = distance;
+     public Address StepAddress { get; set; } = null!;
+     public DeliveryZone StepZone { get; set; } = null!;
+     public double Distance { get; set; }
      public Guid? CourierId { get; set; }
      public string? Comment { get; set; }
      public string[]? AttachmentFilePaths { get; set; }

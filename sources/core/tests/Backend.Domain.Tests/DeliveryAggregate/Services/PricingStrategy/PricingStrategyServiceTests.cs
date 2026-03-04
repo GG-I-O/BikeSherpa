@@ -18,10 +18,10 @@ public class PricingStrategyServiceTests
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
     private static DateTimeOffset _startDate;
     private static DateTimeOffset _contractDate;
-    private readonly static DeliveryZone CoreZone = new(1, "Centre", []);
-    private readonly static DeliveryZone BorderZone = new(2, "Limitrophe", []);
-    private readonly static DeliveryZone PeripheryZone = new(3, "Périphérie", []);
-    private readonly static DeliveryZone OutsideZone = new(4, "Extérieur", []);
+    private readonly static DeliveryZone CoreZone = new("Centre");
+    private readonly static DeliveryZone BorderZone = new("Limitrophe");
+    private readonly static DeliveryZone PeripheryZone = new("Périphérie");
+    private readonly static DeliveryZone OutsideZone = new("Extérieur");
     private static Address? _defaultAddress;
 
     private readonly Mock<IPricingStrategy> _mockPricingStrategy;
@@ -67,7 +67,7 @@ public class PricingStrategyServiceTests
         double? totalPrice = null,
         string packingSize = "Standard",
         string urgency = "Normal") =>
-        new(_fixture.Create<IMediator>())
+        new()
         {
             PricingStrategy = pricingStrategy,
             Code = _fixture.Create<string>(),

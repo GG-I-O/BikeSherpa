@@ -4,7 +4,6 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.DddCore;
-using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
@@ -28,12 +27,10 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public DateTimeOffset UpdatedAt { get; set; }
 
      private readonly DeliveryStatusMachine _statusMachine;
-     private readonly IMediator _mediator;
 
-     public Delivery(IMediator mediator)
+     public Delivery()
      {
           _statusMachine = new DeliveryStatusMachine(this);
-          _mediator = mediator;
      }
 
      public void GenerateReportId(Customer customer)
@@ -42,20 +39,20 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      }
 
      // Methods allowing to change the delivery status
-     private async Task UpdateStatus()
+     private void UpdateStatus()
      {
           switch (Status)
           {
                case DeliveryStatus.Pending:
                     if (Steps.Any(s => s is { StepType: StepType.Pickup, Completed: true }))
                     {
-                         await Start();
+                         Start();
                     }
                     break;
                case DeliveryStatus.Started:
                     if (Steps.All(s => s.Completed))
                     {
-                         await Complete();
+                         Complete();
                     }
                     break;
                case DeliveryStatus.Completed:
@@ -67,22 +64,23 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     private async Task Start()
+     private void Start()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Start);
-          await _mediator.Publish(new DeliveryStartedEvent(Id));
+          RegisterDomainEvent(new DeliveryStartedEvent(Id));
      }
 
-     private async Task Complete()
+     private void Complete()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Complete);
-          await _mediator.Publish(new DeliveryCompletedEvent(Id));
+          RegisterDomainEvent(new DeliveryCompletedEvent(Id));
      }
 
-     public async Task Cancel()
+     public Task Cancel()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Cancel);
-          await _mediator.Publish(new DeliveryCancelledEvent(Id));
+          RegisterDomainEvent(new DeliveryCancelledEvent(Id));
+          return Task.CompletedTask;
      }
 
      public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime, IPricingStrategyService pricingStrategyService)
@@ -129,7 +127,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     public async Task UpdateStepCompletion(Guid stepId, bool completed)
+     public Task UpdateStepCompletion(Guid stepId, bool completed)
      {
           try
           {
@@ -139,13 +137,14 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                {
                     existingStep.RealDeliveryDate = DateTimeOffset.UtcNow;
                }
-               await UpdateStatus();
+               UpdateStatus();
           }
           catch (Exception e)
           {
                Console.WriteLine(e);
                throw;
           }
+          return Task.CompletedTask;
      }
 
      public DeliveryStep AddStep(

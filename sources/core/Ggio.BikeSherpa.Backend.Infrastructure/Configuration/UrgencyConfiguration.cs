@@ -9,14 +9,13 @@ public class UrgencyConfiguration : IEntityTypeConfiguration<Urgency>
      public void Configure(EntityTypeBuilder<Urgency> builder)
      {
           builder.ToTable("Urgencies");
-          builder.HasKey(u => u.Id);
-          builder.Property(u => u.Id).ValueGeneratedOnAdd();
+          builder.HasKey(u => u.Name);
           builder.Property(u => u.Name).HasMaxLength(100).IsRequired();
           builder.Property(u => u.PriceCoefficient).IsRequired();
           builder.HasData(
                new { Name = "Eco", PriceCoefficient = 0.75 },
                new { Name = "Standard", PriceCoefficient = 1.25 },
-               new { Name = "Urgent", PriceCoefficient = 2 }
+               new { Name = "Urgent", PriceCoefficient = 2.0 }
           );
      }
 }

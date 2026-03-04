@@ -10,7 +10,6 @@ public class DeliveryZoneConfiguration : IEntityTypeConfiguration<DeliveryZone>
      {
           builder.ToTable("DeliveryZones");
           builder.HasKey(z => z.Name);
-          builder.Property(z => z.Id).ValueGeneratedOnAdd();
           builder.Property(z => z.Name).HasMaxLength(100).IsRequired();
           builder.HasMany(z => z.Cities)
                .WithOne()
