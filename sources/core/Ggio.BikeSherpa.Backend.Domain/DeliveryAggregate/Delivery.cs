@@ -127,7 +127,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     public async Task UpdateStepCompletion(Guid stepId, bool completed)
+     public Task UpdateStepCompletion(Guid stepId, bool completed)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.Completed = completed;
