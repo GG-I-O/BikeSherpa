@@ -1,4 +1,6 @@
 ﻿using Ardalis.Specification;
+using AutoFixture;
+using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
@@ -12,24 +14,13 @@ namespace BackendTests.Features.Deliveries.Get;
 public class GetDeliveryHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
+     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly Delivery _mockDelivery;
 
      public GetDeliveryHandlerTests()
      {
-          _mockDelivery = new()
-          {
-               Id = Guid.NewGuid(),
-               Code = "AAA",
-               PricingStrategy = PricingStrategy.CustomStrategy,
-               CustomerId = Guid.Empty,
-               Urgency = "Standard",
-               Steps = [],
-               PackingSize = "Xl",
-               InsulatedBox = false,
-               ContractDate = DateTimeOffset.Now,
-               StartDate = DateTimeOffset.Now + TimeSpan.FromDays(1)
-          };
+          _mockDelivery = _fixture.Create<Delivery>();
      }
 
      [Fact]
@@ -38,6 +29,9 @@ public class GetDeliveryHandlerTests
           // Arrange
           var guid = Guid.NewGuid();
           _mockDelivery.Id = guid;
+          _mockDelivery.Code = "AAA";
+          _mockDelivery.PricingStrategy = PricingStrategy.CustomStrategy;
+          _mockDelivery.PackingSize = "Xl";
           var sut = CreateSut(_mockDelivery);
           var query = new GetDeliveryQuery(guid);
 
