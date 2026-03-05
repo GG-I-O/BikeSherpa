@@ -1,13 +1,13 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Moq;
 
 namespace Backend.Domain.Tests.DeliveryAggregate.Services.PricingStrategy;
@@ -80,8 +80,15 @@ public class PricingStrategyServiceTests
             TotalPrice = totalPrice
         };
 
-    private static DeliveryStep MakeStep(StepType type, DeliveryZone zone, double distance = 0) =>
-        new(type, 1, _defaultAddress!, zone, distance);
+    private static DeliveryStep MakeStep(StepType type, DeliveryZone zone, double distance = 0)
+    {
+        return new DeliveryStep(type, 1, _defaultAddress!, distance)
+        {
+            Id = Guid.NewGuid(),
+            StepAddress = _defaultAddress!,
+            StepZone = zone
+        };
+    }
 
     private PricingStrategyService MakeSutWith(
         IUrgencyRepository? urgencies = null,

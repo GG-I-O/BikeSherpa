@@ -1,4 +1,5 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 using JetBrains.Annotations;
 
@@ -10,20 +11,19 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      [UsedImplicitly]
      private DeliveryStep() { }
 
-     public DeliveryStep(StepType stepType, int order, Address stepAddress, DeliveryZone stepZone, double distance)
+     public DeliveryStep(StepType stepType, int order, Address stepAddress, double distance)
      {
           StepType = stepType;
           Order = order;
           StepAddress = stepAddress;
-          StepZone = stepZone;
           Distance = distance;
      }
 
      public StepType StepType { get; set; }
      public int Order { get; set; }
      public bool Completed { get; set; }
-     public Address StepAddress { get; set; } = null!;
-     public DeliveryZone StepZone { get; set; } = null!;
+     public required Address StepAddress { get; set; }
+     public required DeliveryZone StepZone { get; set; }
      public double Distance { get; set; }
      public Guid? CourierId { get; set; }
      public string? Comment { get; set; }

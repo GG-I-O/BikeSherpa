@@ -11,10 +11,10 @@ public class PackingSizeRepository(BackendDbContext context) : IPackingSizeRepos
           return context.PackingSizes.ToList();
      }
 
-     public PackingSize GetByName(string name)
+     public PackingSize? GetByName(string name)
      {
           Guard.Against.NullOrEmpty(name);
 
-          return context.PackingSizes.SingleOrDefault(s => string.Equals(s.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Taille de colis inconnue.", nameof(name));
+          return context.PackingSizes.SingleOrDefault(s => string.Equals(s.Name, name, StringComparison.InvariantCultureIgnoreCase));
      }
 }

@@ -1,8 +1,8 @@
 ﻿using Ardalis.Specification;
 using AwesomeAssertions;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.DddCore;
 using Moq;
@@ -38,10 +38,10 @@ public class GetCustomerHandlerTests
           _mockCustomer.Id = guid;
           var sut = CreateSut(_mockCustomer);
           var query = new GetCustomerQuery(guid);
-          
+
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
-          
+
           // Assert
           result.Should().NotBeNull();
           result.Id.Should().Be(guid);
@@ -50,7 +50,7 @@ public class GetCustomerHandlerTests
           result.Address.StreetInfo.Should().Be("123 rue des roses");
           VerifyRepositoryCalledOnce();
      }
-     
+
      [Theory]
      [InlineData(true)]
      [InlineData(false)]
@@ -62,10 +62,10 @@ public class GetCustomerHandlerTests
           _mockCustomer.Id = guidA;
           var sut = CreateSut(emptyRepository ? null : _mockCustomer);
           var query = new GetCustomerQuery(guidB);
-          
+
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
-          
+
           // Assert
           result.Should().BeNull();
           VerifyRepositoryCalledOnce();
@@ -75,7 +75,7 @@ public class GetCustomerHandlerTests
      {
           _mockRepository
                .Setup(repo => repo.FirstOrDefaultAsync(
-                    It.Is<ISpecification<Customer>>(s => s is CustomerByIdSpecification && existingCustomer != null && s.IsSatisfiedBy(existingCustomer)), 
+                    It.Is<ISpecification<Customer>>(s => s is CustomerByIdSpecification && existingCustomer != null && s.IsSatisfiedBy(existingCustomer)),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(existingCustomer);
           return new GetCustomerHandler(_mockRepository.Object);
@@ -84,11 +84,11 @@ public class GetCustomerHandlerTests
      private void VerifyRepositoryCalledOnce()
      {
           _mockRepository.Verify(repo => repo.FirstOrDefaultAsync(
-               It.IsAny<ISpecification<Customer>>(), 
+               It.IsAny<ISpecification<Customer>>(),
                It.IsAny<CancellationToken>()),
                Times.Once
           );
      }
 
-     
+
 }

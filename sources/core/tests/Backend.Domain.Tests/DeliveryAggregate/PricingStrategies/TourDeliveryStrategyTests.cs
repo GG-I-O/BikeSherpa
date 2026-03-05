@@ -193,6 +193,6 @@ public class TourDeliveryStrategyTests
         var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 2, 1, 2, 1, 1, packingSize, 0, 0);
 
         // Assert
-        result.Should().Be(55);
+        result.Should().Be(14 * 2 + 2 + 4 + 1 * 5 + 2 * 8 + 1 * 0 + 1 * 0, "Coût PEC * nb PEC +\nCoût PEC le jour même +\ncoût du colisage +\nnb dépôts dans la zone centrale x coût de la zone +\nnb dépôts en bordure x coût de la zone +\nnb dépôts périphérie x coût de la zone +\nnb dépôts en extérieur x coût de la zone");
     }
 }

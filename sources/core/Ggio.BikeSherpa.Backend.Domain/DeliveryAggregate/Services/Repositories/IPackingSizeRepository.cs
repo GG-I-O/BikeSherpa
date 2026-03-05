@@ -3,5 +3,5 @@
 public interface IPackingSizeRepository
 {
      IReadOnlyList<PackingSize> GetAll();
-     PackingSize GetByName(string name);
+     PackingSize? GetByName(string name);
 }
