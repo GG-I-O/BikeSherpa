@@ -2,4 +2,7 @@
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 
-public record DeliveryCancelledEvent(Guid DeliveryId) : DomainEventBase, IDeliveryEvent;
+public interface IDeliveryEvent : IDomainEvent
+{
+     public Guid DeliveryId { get; }
+}
