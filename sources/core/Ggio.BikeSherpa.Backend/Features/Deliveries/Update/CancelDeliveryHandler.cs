@@ -30,15 +30,15 @@ public class CancelDeliveryHandler(
      public async ValueTask<Result> Handle(CancelDeliveryCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
-          
+
           var delivery = await repository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.DeliveryId), cancellationToken);
-          
+
           if (delivery is null)
           {
-               return Result.NotFound();    
+               return Result.NotFound();
           }
 
-          await delivery.Cancel();
+          delivery.Cancel();
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

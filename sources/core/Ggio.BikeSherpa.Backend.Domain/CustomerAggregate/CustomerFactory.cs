@@ -1,4 +1,5 @@
-﻿using Ggio.DddCore;
+﻿using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
+using Ggio.DddCore;
 using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;

@@ -1,12 +1,12 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Moq;
 
 namespace Backend.Domain.Tests.DeliveryAggregate;
@@ -136,7 +136,7 @@ public class DeliveryTests
     {
         // Arrange
         var delivery = MakeSut();
-        
+
         // Act
         var act = () => delivery.ReorderSteps(Guid.NewGuid(), 1);
 
@@ -165,7 +165,7 @@ public class DeliveryTests
     {
         // Arrange
         var delivery = MakeSut();
-        
+
         // Act
         var act = () => delivery.UpdateStepCourier(Guid.NewGuid(), Guid.NewGuid());
 
@@ -182,7 +182,7 @@ public class DeliveryTests
         delivery.Steps.Add(step);
 
         // Act
-        await delivery.UpdateStepCompletion(step.Id, true);
+        delivery.UpdateStepCompletion(step.Id, true);
 
         // Assert
         step.Completed.Should().BeTrue();
@@ -198,7 +198,7 @@ public class DeliveryTests
         delivery.Steps.Add(step);
 
         // Act
-        await delivery.UpdateStepCompletion(step.Id, false);
+        delivery.UpdateStepCompletion(step.Id, false);
 
         // Assert
         step.Completed.Should().BeFalse();
@@ -213,7 +213,7 @@ public class DeliveryTests
         delivery.Steps.Add(pickup);
 
         // Act
-        await delivery.UpdateStepCompletion(pickup.Id, true);
+        delivery.UpdateStepCompletion(pickup.Id, true);
 
         // Assert
         delivery.Status.Should().Be(DeliveryStatus.Started);
@@ -230,7 +230,7 @@ public class DeliveryTests
         delivery.Status = DeliveryStatus.Started;
 
         // Act
-        await delivery.UpdateStepCompletion(dropoff.Id, true);
+        delivery.UpdateStepCompletion(dropoff.Id, true);
 
         // Assert
         delivery.Status.Should().Be(DeliveryStatus.Completed);
@@ -246,10 +246,10 @@ public class DeliveryTests
         delivery.Status = DeliveryStatus.Completed;
 
         // Act
-        var act = async () => await delivery.UpdateStepCompletion(step.Id, true);
+        var act = () => delivery.UpdateStepCompletion(step.Id, true);
 
         // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>();
+        act.Should().Throw<InvalidOperationException>();
     }
 
     [Fact]
@@ -262,10 +262,10 @@ public class DeliveryTests
         delivery.Status = DeliveryStatus.Cancelled;
 
         // Act
-        var act = async () => await delivery.UpdateStepCompletion(step.Id, true);
+        var act = () => delivery.UpdateStepCompletion(step.Id, true);
 
         // Assert
-        await act.Should().ThrowAsync<InvalidOperationException>();
+        act.Should().Throw<InvalidOperationException>();
     }
 
     [Fact]
@@ -273,9 +273,9 @@ public class DeliveryTests
     {
         // Arrange
         var delivery = MakeSut();
-        
+
         // Act
-        await delivery.Cancel();
+        delivery.Cancel();
 
         // Assert
         delivery.Status.Should().Be(DeliveryStatus.Cancelled);
@@ -289,7 +289,7 @@ public class DeliveryTests
         delivery.Status = DeliveryStatus.Started;
 
         // Act
-        await delivery.Cancel();
+        delivery.Cancel();
 
         // Assert
         delivery.Status.Should().Be(DeliveryStatus.Cancelled);
@@ -442,9 +442,11 @@ public class DeliveryTests
         delivery.Steps.Add(existingStep);
 
         // Act
-        var updatedStep = new DeliveryStep(StepType.Dropoff, 3, existingStep.StepAddress, zone, 8.0)
+        var updatedStep = new DeliveryStep(StepType.Dropoff, 3, existingStep.StepAddress, 8.0)
         {
-            Id = existingStep.Id
+            Id = existingStep.Id,
+            StepAddress = existingStep.StepAddress,
+            StepZone = zone
         };
 
         delivery.UpdateSteps([updatedStep], mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object);

@@ -1,4 +1,6 @@
-﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
+﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Services.Notification;
 using Ggio.DddCore;
 
@@ -6,12 +8,24 @@ namespace Ggio.BikeSherpa.Backend.EventHandlers;
 
 public class DeliveryCompletedEventHandler(
      IApplicationTransactionContext context,
-     IResourceNotificationService notificationService)
+     IResourceNotificationService notificationService,
+     IReadRepository<Delivery> repository)
      : PostTransactionDomainEventHandlerBase<DeliveryCompletedEvent>(context)
 {
-     override protected ValueTask HandleInternal(DeliveryCompletedEvent notification, CancellationToken cancellationToken)
+     override protected async ValueTask HandleInternal(DeliveryCompletedEvent notification, CancellationToken cancellationToken)
      {
-          notificationService.NotifyResourceChangeToGroup("Course", ResourceOperation.Put, notification.DeliveryId.ToString());
-          return ValueTask.CompletedTask;
+          var delivery = await repository.FirstOrDefaultAsync(new DeliveryByIdSpecification(notification.DeliveryId), cancellationToken);
+
+          if (delivery is not null)
+          {
+               foreach (var courierId in delivery.Steps
+                             .Where(s => s.CourierId.HasValue)
+                             .Select(s => s.CourierId!.Value)
+                             .Distinct())
+               {
+                    await notificationService.NotifyResourceChangeToGroup(
+                         "courier", ResourceOperation.Put, courierId.ToString());
+               }
+          }
      }
 }

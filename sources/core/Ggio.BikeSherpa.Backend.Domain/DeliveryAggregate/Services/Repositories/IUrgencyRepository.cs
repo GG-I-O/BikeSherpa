@@ -3,5 +3,5 @@
 public interface IUrgencyRepository
 {
      IReadOnlyList<Urgency> GetAll();
-     public Urgency GetByName(string name);
+     public Urgency? GetByName(string name);
 }

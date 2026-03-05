@@ -44,7 +44,7 @@ public class UpdateDeliveryStepCompletionHandler(
                return Result.NotFound();
           }
 
-          await delivery.UpdateStepCompletion(command.StepId, command.Completed);
+          delivery.UpdateStepCompletion(command.StepId, command.Completed);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

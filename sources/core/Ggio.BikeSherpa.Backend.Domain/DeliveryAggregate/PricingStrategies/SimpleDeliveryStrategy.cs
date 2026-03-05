@@ -22,13 +22,15 @@ public class SimpleDeliveryStrategy : IPricingStrategy
           double totalDistance)
      {
 
-          return PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
-                 PricingRules.CalculateDelayCost(startDate, contractDate) +
-                 dropoffStepsInCore * StepPriceInCore +
-                 dropoffStepsInBorder * StepPriceInBorder +
-                 dropoffStepsInPeriphery * StepPriceInPeriphery +
-                 dropoffStepsOutside * StepPriceOutside +
-                 packingSize.Price +
-                 urgencyPriceCoefficient * totalDistance;
+          return Math.Round(
+               (PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
+                  PricingRules.CalculateDelayCost(startDate, contractDate) +
+                  dropoffStepsInCore * StepPriceInCore +
+                  dropoffStepsInBorder * StepPriceInBorder +
+                  dropoffStepsInPeriphery * StepPriceInPeriphery +
+                  dropoffStepsOutside * StepPriceOutside +
+                  packingSize.Price +
+                  urgencyPriceCoefficient * totalDistance)
+               , 2);
      }
 }

@@ -1,4 +1,5 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,7 +23,7 @@ public class DeliveryZoneConfiguration : IEntityTypeConfiguration<DeliveryZone>
                new { Name = "Centre" },
                new { Name = "Limitrophe" },
                new { Name = "Périphérie" },
-               new { Name = "Extérieur" }
+               new { Name = DeliveryZoneRepository.FallbackZoneForUnknownCity }
           );
      }
 }

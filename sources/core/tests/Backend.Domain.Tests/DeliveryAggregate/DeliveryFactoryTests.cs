@@ -1,6 +1,11 @@
-﻿using AwesomeAssertions;
+﻿using Ardalis.Specification;
+using AutoFixture;
+using AwesomeAssertions;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 using Mediator;
 using Moq;
@@ -10,6 +15,9 @@ namespace Backend.Domain.Tests.DeliveryAggregate;
 public class DeliveryFactoryTests
 {
     private readonly Mock<IMediator> _mediatorMock;
+    private readonly Mock<IReadRepository<Customer>> _customerRepositoryMock = new();
+    private readonly Mock<IPricingStrategyService> _pricingStrategyServiceMock = new();
+    private readonly Fixture _fixture = new();
     private readonly DeliveryFactory _sut;
     private readonly static Guid CustomerId = Guid.NewGuid();
     private readonly static DateTimeOffset ContractDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
@@ -22,7 +30,19 @@ public class DeliveryFactoryTests
             .Setup(m => m.Publish(It.IsAny<DomainEntityAddedEvent>(), It.IsAny<CancellationToken>()))
             .Returns(ValueTask.CompletedTask);
 
-        _sut = new DeliveryFactory(_mediatorMock.Object);
+        var fakeCustomer = _fixture.Build<Customer>()
+            .With(c => c.Address, _fixture.Build<Address>()
+                .With(a => a.Complement, (string?)null)
+                .Create())
+            .Create();
+        _customerRepositoryMock
+            .Setup(r => r.FirstOrDefaultAsync(It.IsAny<ISpecification<Customer>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(fakeCustomer);
+        _pricingStrategyServiceMock
+            .Setup(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
+            .Returns(55);
+
+        _sut = new DeliveryFactory(_mediatorMock.Object, _customerRepositoryMock.Object, _pricingStrategyServiceMock.Object);
     }
 
     private Task<Delivery> CreateDefault(
@@ -55,7 +75,6 @@ public class DeliveryFactoryTests
             code: "DEL-42",
             customerId: CustomerId,
             urgency: "Express",
-            totalPrice: 29.99,
             discount: 5.0,
             details: details,
             packingSize: "Large",
@@ -68,13 +87,16 @@ public class DeliveryFactoryTests
         delivery.Code.Should().Be("DEL-42");
         delivery.CustomerId.Should().Be(CustomerId);
         delivery.Urgency.Should().Be("Express");
-        delivery.TotalPrice.Should().Be(29.99);
+        delivery.TotalPrice.Should().Be(55);
         delivery.Discount.Should().Be(5.0);
         delivery.Details.Should().BeEquivalentTo(details);
         delivery.PackingSize.Should().Be("Large");
         delivery.InsulatedBox.Should().BeTrue();
         delivery.ContractDate.Should().Be(ContractDate);
         delivery.StartDate.Should().Be(StartDate);
+        delivery.Status.Should().Be(DeliveryStatus.Pending);
+        delivery.ReportId.Should().NotBeNull();
+        delivery.TotalPrice.Should().Be(55);
     }
 
     [Fact]
@@ -91,10 +113,9 @@ public class DeliveryFactoryTests
     public async Task CreateDelivery_WhenOptionalFieldsAreNull_LeavesThemNull()
     {
         // Arrange & Act
-        var delivery = await CreateDefault(totalPrice: null, discount: null);
+        var delivery = await CreateDefault(discount: null);
 
         // Assert
-        delivery.TotalPrice.Should().BeNull();
         delivery.Discount.Should().BeNull();
     }
 

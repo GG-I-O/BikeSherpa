@@ -1,5 +1,5 @@
 ﻿using Facet;
-using Ggio.BikeSherpa.Backend.Domain;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 
 namespace Ggio.BikeSherpa.Backend.Model;
 

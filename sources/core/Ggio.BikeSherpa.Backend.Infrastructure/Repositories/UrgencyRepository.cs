@@ -11,10 +11,10 @@ public class UrgencyRepository(BackendDbContext context) : IUrgencyRepository
           return context.Urgencies.ToList();
      }
 
-     public Urgency GetByName(string name)
+     public Urgency? GetByName(string name)
      {
           Guard.Against.NullOrEmpty(name);
 
-          return context.Urgencies.SingleOrDefault(u => string.Equals(u.Name, name, StringComparison.CurrentCultureIgnoreCase)) ?? throw new ArgumentException("Urgence inconnue.", nameof(name));
+          return context.Urgencies.SingleOrDefault(u => string.Equals(u.Name, name, StringComparison.CurrentCultureIgnoreCase));
      }
 }

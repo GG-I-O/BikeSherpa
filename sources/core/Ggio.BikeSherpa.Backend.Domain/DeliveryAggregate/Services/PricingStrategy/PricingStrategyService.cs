@@ -14,7 +14,16 @@ public class PricingStrategyService(
      {
           var strategy = strategies.Single(s => s.Name == delivery.PricingStrategy.ToString());
           var packingSize = packingSizes.GetByName(delivery.PackingSize);
-          var urgencyPriceCoefficient = urgencies.GetByName(delivery.Urgency).PriceCoefficient;
+          if (packingSize is null)
+          {
+               throw new Exception("Taille de colis invalide");
+          }
+          var urgency = urgencies.GetByName(delivery.Urgency);
+          if (urgency is null)
+          {
+               throw new Exception("Urgence invalide");
+          }
+          var urgencyPriceCoefficient = urgency.PriceCoefficient;
           var pickupCount = delivery.Steps.Count(s => s.StepType == StepType.Pickup);
           var dropoffsInCore = delivery.Steps.Count(s => s.StepZone.Name == "Centre");
           var dropoffsInBorder = delivery.Steps.Count(s => s.StepZone.Name == "Limitrophe");

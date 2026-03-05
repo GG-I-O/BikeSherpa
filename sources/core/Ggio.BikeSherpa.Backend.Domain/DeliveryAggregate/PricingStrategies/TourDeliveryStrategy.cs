@@ -22,13 +22,15 @@ public class TourDeliveryStrategy : IPricingStrategy
           double urgencyPriceCoefficient,
           double totalDistance)
      {
-          return pickupNumber * PickupBasePrice +
+          return Math.Round(
+               (pickupNumber * PickupBasePrice +
                  PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
                  PricingRules.CalculateDelayCost(startDate, contractDate) +
                  packingSize.TourPrice +
                  dropoffStepsInCore * StepPriceInCore +
                  dropoffStepsInBorder * StepPriceInBorder +
                  dropoffStepsInPeriphery * StepPriceInPeriphery +
-                 dropoffStepsOutside * StepPriceOutside;
+                 dropoffStepsOutside * StepPriceOutside)
+               , 2);
      }
 }

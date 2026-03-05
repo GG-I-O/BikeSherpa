@@ -3,6 +3,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
@@ -76,11 +77,10 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           RegisterDomainEvent(new DeliveryCompletedEvent(Id));
      }
 
-     public Task Cancel()
+     public void Cancel()
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Cancel);
           RegisterDomainEvent(new DeliveryCancelledEvent(Id));
-          return Task.CompletedTask;
      }
 
      public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime, IPricingStrategyService pricingStrategyService)
@@ -127,24 +127,15 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     public Task UpdateStepCompletion(Guid stepId, bool completed)
+     public void UpdateStepCompletion(Guid stepId, bool completed)
      {
-          try
+          var existingStep = Steps.Single(s => s.Id == stepId);
+          existingStep.Completed = completed;
+          if (completed)
           {
-               var existingStep = Steps.Single(s => s.Id == stepId);
-               existingStep.Completed = completed;
-               if (completed)
-               {
-                    existingStep.RealDeliveryDate = DateTimeOffset.UtcNow;
-               }
-               UpdateStatus();
+               existingStep.RealDeliveryDate = DateTimeOffset.UtcNow;
           }
-          catch (Exception e)
-          {
-               Console.WriteLine(e);
-               throw;
-          }
-          return Task.CompletedTask;
+          UpdateStatus();
      }
 
      public DeliveryStep AddStep(
@@ -158,10 +149,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                stepType,
                Steps.Count + 1,
                stepAddress,
-               deliveryZones.GetByAddress(stepAddress.City),
                distance)
           {
-               Id = Guid.NewGuid()
+               Id = Guid.NewGuid(),
+               StepAddress = stepAddress,
+               StepZone = deliveryZones.GetByAddress(stepAddress.City)
           };
 
           if (Steps.Count >= 1)

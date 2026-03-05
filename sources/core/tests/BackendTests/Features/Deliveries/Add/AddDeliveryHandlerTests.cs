@@ -18,7 +18,6 @@ public class AddDeliveryHandlerTests
 {
      private readonly Mock<IDeliveryFactory> _mockFactory = new();
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
-     private readonly Mock<IReadRepository<Customer>> _mockCustomerRepository = new();
      private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
      private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
      private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
@@ -70,7 +69,7 @@ public class AddDeliveryHandlerTests
      private AddDeliveryHandler CreateSut()
      {
           var validator = new AddDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
-          return new AddDeliveryHandler(_mockFactory.Object, validator, _mockTransaction.Object, _mockCustomerRepository.Object, _mockPricingStrategyService.Object);
+          return new AddDeliveryHandler(_mockFactory.Object, validator, _mockTransaction.Object);
      }
 
      private void SetupRepositoryTestingIfCodeExists(bool doesCodeExist)

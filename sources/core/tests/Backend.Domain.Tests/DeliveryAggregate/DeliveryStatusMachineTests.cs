@@ -14,19 +14,21 @@ public class DeliveryStatusMachineTests
         DeliveryStatus status = DeliveryStatus.Pending,
         List<DeliveryStep>? steps = null)
     {
-        var delivery = Fixture.Create<Delivery>();
-        delivery.Status = status;
-        delivery.Steps = steps ?? [];
+        var delivery = Fixture.Build<Delivery>()
+            .With(x => x.Status, status)
+            .With(x => x.Steps, steps ?? [])
+            .Create();
 
         return delivery;
     }
 
     private static DeliveryStep CreateStep(StepType type, bool completed = false)
     {
-        var deliveryStep = Fixture.Create<DeliveryStep>();
-        deliveryStep.StepType = type;
-        deliveryStep.Completed = completed;
-        
+        var deliveryStep = Fixture.Build<DeliveryStep>()
+            .With(x => x.StepType, type)
+            .With(x => x.Completed, completed)
+            .Create();
+
         return deliveryStep;
     }
 
@@ -70,7 +72,7 @@ public class DeliveryStatusMachineTests
 
         // Assert
         act.Should().Throw<InvalidOperationException>();
-        
+
     }
 
     [Fact]

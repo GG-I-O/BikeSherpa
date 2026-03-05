@@ -1,9 +1,9 @@
 ﻿using Ardalis.Result;
 using Facet.Extensions;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Model;
 using Ggio.DddCore;
 using Mediator;
@@ -63,7 +63,7 @@ public class AddCustomerHandler(
      public async ValueTask<Result<Guid>> Handle(AddCustomerCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
-          
+
           var customer = await factory.CreateCustomerAsync(
                command.Name,
                command.Code,
