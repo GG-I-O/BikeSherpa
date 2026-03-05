@@ -1,9 +1,9 @@
 ﻿using Ardalis.Specification;
 using AutoFixture;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.DddCore;
 using Moq;
@@ -51,7 +51,7 @@ public class AddCustomerHandlerTests
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(doesCodeExist);
      }
-     
+
      private void SetupRepositoryTestingIfSiretExists(bool doesSiretExist)
      {
           _mockRepository
@@ -60,7 +60,7 @@ public class AddCustomerHandlerTests
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(doesSiretExist);
      }
-     
+
      private void SetupRepositoryTestingIfVatNumberExists(bool doesVatNumberExist)
      {
           _mockRepository
@@ -273,7 +273,7 @@ public class AddCustomerHandlerTests
 
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
      }
-     
+
      [Fact]
      public async Task Handle_ShouldThrowValidationException_WhenSiretAlreadyExists()
      {
@@ -301,7 +301,7 @@ public class AddCustomerHandlerTests
 
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
      }
-     
+
      [Fact]
      public async Task Handle_ShouldThrowValidationException_WhenVatNumberAlreadyExists()
      {

@@ -1,0 +1,20 @@
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
+using Mediator;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+
+public static class Bootstrap
+{
+     extension(IServiceCollection services)
+     {
+          public IServiceCollection AddDeliveryAggregate()
+          {
+               services.AddScoped<IDeliveryFactory, DeliveryFactory>();
+               services.AddScoped<IDeliveryDeleteEventHandler, DeliveryDeleteService>();
+               services.AddScoped<IPricingStrategyService, PricingStrategyService>();
+               return services;
+          }
+
+     }
+}

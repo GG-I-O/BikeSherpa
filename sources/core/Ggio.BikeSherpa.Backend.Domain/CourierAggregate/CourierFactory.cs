@@ -1,4 +1,5 @@
-﻿using Ggio.DddCore;
+﻿using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
+using Ggio.DddCore;
 using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.CourierAggregate;
@@ -17,7 +18,7 @@ public interface ICourierFactory
 
 public class CourierFactory(IMediator mediator) : FactoryBase(mediator), ICourierFactory
 {
-     public async Task<Courier> CreateCourierAsync(string firstName, string lastName, string code,  string email, string phoneNumber, Address address)
+     public async Task<Courier> CreateCourierAsync(string firstName, string lastName, string code, string email, string phoneNumber, Address address)
      {
           var courier = new Courier
           {
