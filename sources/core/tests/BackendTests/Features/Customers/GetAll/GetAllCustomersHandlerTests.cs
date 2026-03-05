@@ -23,7 +23,8 @@ public class GetAllCustomersHandlerTests
                Name = "Client A",
                StreetInfo = "123 rue des roses",
                Postcode = "12502",
-               City = "Obi-wan"
+               City = "Obi-wan",
+               Coordinates = new GeoPoint(48.8566, 2.3522)
           }
      };
      private readonly Customer _mockCustomerB = new()
@@ -39,7 +40,8 @@ public class GetAllCustomersHandlerTests
                Name = "Client B",
                StreetInfo = "321 rue des roses",
                Postcode = "54855",
-               City = "Anakin"
+               City = "Anakin",
+               Coordinates = new GeoPoint(48.8566, 2.3522)
           }
      };
 
