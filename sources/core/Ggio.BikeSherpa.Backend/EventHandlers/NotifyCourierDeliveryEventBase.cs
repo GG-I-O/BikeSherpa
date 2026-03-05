@@ -6,13 +6,14 @@ using Ggio.DddCore;
 
 namespace Ggio.BikeSherpa.Backend.EventHandlers;
 
-public class DeliveryStartedEventHandler(
+public abstract class NotifyCourierDeliveryEventBase<TEvent>(
      IApplicationTransactionContext context,
      IResourceNotificationService notificationService,
      IReadRepository<Delivery> repository)
-     : PostTransactionDomainEventHandlerBase<DeliveryStartedEvent>(context)
+     : PostTransactionDomainEventHandlerBase<TEvent>(context)
+     where TEvent : IDeliveryEvent
 {
-     override protected async ValueTask HandleInternal(DeliveryStartedEvent notification, CancellationToken cancellationToken)
+     override protected async ValueTask HandleInternal(TEvent notification, CancellationToken cancellationToken)
      {
           var delivery = await repository.FirstOrDefaultAsync(new DeliveryByIdSpecification(notification.DeliveryId), cancellationToken);
 

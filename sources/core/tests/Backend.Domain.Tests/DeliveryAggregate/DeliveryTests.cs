@@ -174,7 +174,7 @@ public class DeliveryTests
     }
 
     [Fact]
-    public async Task UpdateStepCompletion_MarksStepAsCompletedAndSetsRealDeliveryDate()
+    public void UpdateStepCompletion_MarksStepAsCompletedAndSetsRealDeliveryDate()
     {
         // Arrange
         var delivery = MakeSut();
@@ -190,7 +190,7 @@ public class DeliveryTests
     }
 
     [Fact]
-    public async Task UpdateStepCompletion_MarksStepAsNotCompleted()
+    public void UpdateStepCompletion_MarksStepAsNotCompleted()
     {
         // Arrange
         var delivery = MakeSut();
@@ -205,7 +205,7 @@ public class DeliveryTests
     }
 
     [Fact]
-    public async Task UpdateStepCompletion_WhenPickupStepCompleted_StartsDelivery()
+    public void UpdateStepCompletion_WhenPickupStepCompleted_StartsDelivery()
     {
         // Arrange
         var delivery = MakeSut();
@@ -220,7 +220,7 @@ public class DeliveryTests
     }
 
     [Fact]
-    public async Task UpdateStepCompletion_WhenAllStepsCompleted_CompletesDelivery()
+    public void UpdateStepCompletion_WhenAllStepsCompleted_CompletesDelivery()
     {
         // Arrange
         var delivery = MakeSut();
@@ -237,7 +237,7 @@ public class DeliveryTests
     }
 
     [Fact]
-    public async Task UpdateStepCompletion_WhenDeliveryIsAlreadyCompleted_Throws()
+    public void UpdateStepCompletion_WhenDeliveryIsAlreadyCompleted_Throws()
     {
         // Arrange
         var delivery = MakeSut();
@@ -253,7 +253,7 @@ public class DeliveryTests
     }
 
     [Fact]
-    public async Task UpdateStepCompletion_WhenDeliveryIsCancelled_Throws()
+    public void UpdateStepCompletion_WhenDeliveryIsCancelled_Throws()
     {
         // Arrange
         var delivery = MakeSut();
@@ -269,7 +269,7 @@ public class DeliveryTests
     }
 
     [Fact]
-    public async Task Cancel_WhenPending_ChangesStatusToCancelled()
+    public void Cancel_WhenPending_ChangesStatusToCancelled()
     {
         // Arrange
         var delivery = MakeSut();
@@ -282,7 +282,7 @@ public class DeliveryTests
     }
 
     [Fact]
-    public async Task Cancel_WhenStarted_ChangesStatusToCancelled()
+    public void Cancel_WhenStarted_ChangesStatusToCancelled()
     {
         // Arrange
         var delivery = MakeSut();
