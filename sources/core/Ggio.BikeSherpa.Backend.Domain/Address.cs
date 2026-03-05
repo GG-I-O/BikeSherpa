@@ -17,6 +17,4 @@ public class Address
      
      [UsedImplicitly]
      public required string City { get; set; }
-     [UsedImplicitly]
-     public required GeoPoint Coordinates { get; init; }
 }
