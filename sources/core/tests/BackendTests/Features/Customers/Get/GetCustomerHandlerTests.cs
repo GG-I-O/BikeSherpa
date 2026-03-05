@@ -26,8 +26,7 @@ public class GetCustomerHandlerTests
                Name = "Client A",
                StreetInfo = "123 rue des roses",
                Postcode = "12502",
-               City = "Obi-wan",
-               Coordinates = new GeoPoint(48.8566, 2.3522)
+               City = "Obi-wan"
           }
      };
 
