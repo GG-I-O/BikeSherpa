@@ -1,0 +1,17 @@
+﻿{
+  "openApiPath": "./itineraire.yaml",
+  "namespace": "Ggio.BikeSherpa.Backend.Infrastructure.GeoService",
+  "contractsNamespace": "Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts",
+  "naming": {
+    "useOpenApiTitle": false,
+    "interfaceName": "ItineraryApi"
+    },
+  "includePathMatches": ["^/itineraire$"],
+  "generateContracts": true,
+  "useCancellationTokens": true,  
+  "contractsOutputFolder": "./Contracts",
+  "trimUnusedSchema": true,
+  "csharpGeneratorSettings": {
+    "generateNullableReferenceTypes": true
+  }
+}
