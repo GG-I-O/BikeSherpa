@@ -1,8 +1,8 @@
 ﻿using Ardalis.Specification;
+using AutoFixture;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Customers.Get;
 using Ggio.DddCore;
 using Moq;
@@ -12,23 +12,13 @@ namespace BackendTests.Features.Customers.Get;
 public class GetCustomerHandlerTests
 {
      private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
+     private readonly IFixture _fixture = new Fixture();
+     private readonly Customer _mockCustomer;
 
-     private readonly Customer _mockCustomer = new()
+     public GetCustomerHandlerTests()
      {
-          Id = Guid.NewGuid(),
-          Name = "Client A",
-          Code = "AAA",
-          Siret = null,
-          Email = "a@g.com",
-          PhoneNumber = "0123456789",
-          Address = new Address
-          {
-               Name = "Client A",
-               StreetInfo = "123 rue des roses",
-               Postcode = "12502",
-               City = "Obi-wan"
-          }
-     };
+          _mockCustomer = _fixture.Create<Customer>();
+     }
 
      [Fact]
      public async Task Handle_ShouldReturnOneCustomer_WhenCustomerExists()
@@ -45,9 +35,9 @@ public class GetCustomerHandlerTests
           // Assert
           result.Should().NotBeNull();
           result.Id.Should().Be(guid);
-          result.Name.Should().Be("Client A");
-          result.Code.Should().Be("AAA");
-          result.Address.StreetInfo.Should().Be("123 rue des roses");
+          result.Name.Should().Be(_mockCustomer.Name);
+          result.Code.Should().Be(_mockCustomer.Code);
+          result.Address.StreetInfo.Should().Be(_mockCustomer.Address.StreetInfo);
           VerifyRepositoryCalledOnce();
      }
 
@@ -89,6 +79,4 @@ public class GetCustomerHandlerTests
                Times.Once
           );
      }
-
-
 }

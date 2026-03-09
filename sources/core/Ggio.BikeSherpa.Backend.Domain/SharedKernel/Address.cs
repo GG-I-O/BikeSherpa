@@ -17,4 +17,6 @@ public class Address
 
      [UsedImplicitly]
      public required string City { get; set; }
+     [UsedImplicitly]
+     public required string Coordinates { get; set; }
 }
