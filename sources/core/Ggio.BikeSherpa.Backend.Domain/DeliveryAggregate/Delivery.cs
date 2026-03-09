@@ -117,7 +117,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                if (step.Order == 1) continue;
                var previousStep = Steps.First(s => s.Order == step.Order - 1);
                var result = await itineraryService.GetItineraryInfoAsync(previousStep.StepAddress.Coordinates, step.StepAddress.Coordinates);
-               step.Distance = result.DistanceKm;
+               step.Distance = result.DistanceInKm;
           }
      }
 

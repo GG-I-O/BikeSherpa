@@ -17,6 +17,7 @@ const Address = z.object({
   complement: z.string().nullable(),
   postcode: z.string(),
   city: z.string(),
+  coordinates: z.string(),
 });
 const City = z.object({ name: z.string() });
 const DeliveryZone = z.object({ name: z.string(), cities: z.array(City) });
@@ -77,6 +78,7 @@ const AddressCrud = z.object({
   complement: z.string().nullable(),
   postcode: z.string(),
   city: z.string(),
+  coordinates: z.string(),
 });
 const CustomerCrud = z.object({
   name: z.string(),

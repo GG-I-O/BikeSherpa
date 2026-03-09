@@ -40,8 +40,8 @@ public class ItineraryService(IItineraryApi itineraryApi) : IItineraryService
            );
 
           return new ItineraryResult(
-               DistanceKm: result.Distance,
-               TimeMinutes: result.Duration
+               DistanceInKm: result.Distance,
+               TimeInMinutes: result.Duration
           );
      }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Domain;
 
-public record ItineraryResult(double DistanceKm, double TimeMinutes);
+public record ItineraryResult(double DistanceInKm, double TimeInMinutes);
 
 public interface IItineraryService
 {
