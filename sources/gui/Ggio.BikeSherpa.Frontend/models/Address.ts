@@ -7,6 +7,7 @@ export type Address = {
     complement?: string | null;
     postcode: string;
     city: string;
+    coordinates: string;
 }
 
 export const addressSchema = zod
@@ -34,4 +35,11 @@ export const addressSchema = zod
             .string()
             .trim()
             .min(1, "Nom de ville requis"),
+        coordinates: zod
+            .string()
+            .trim()
+            .refine((value) => {
+                const regex = /^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/;
+                return regex.test(value);
+            }, "Coordonnées invalides")
     })

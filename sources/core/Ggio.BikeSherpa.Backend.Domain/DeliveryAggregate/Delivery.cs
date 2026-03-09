@@ -110,16 +110,16 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     /*private void async CalculateStepDistances(IItineraryService itineraryService)
+     private async Task CalculateStepDistances(IItineraryService itineraryService)
      {
           foreach (var step in Steps.Where(s => s.StepType == StepType.Dropoff))
           {
                if (step.Order == 1) continue;
-               var previousStep = Steps.Where(s => s.Order == step.Order - 1);
-               var result = await itineraryService.GetItineraryInfoAsync(previousStep.Coordinatess, step.Coordinates);
+               var previousStep = Steps.First(s => s.Order == step.Order - 1);
+               var result = await itineraryService.GetItineraryInfoAsync(previousStep.StepAddress.Coordinates, step.StepAddress.Coordinates);
                step.Distance = result.DistanceKm;
           }
-     }*/
+     }
 
      public void UpdateStepCourier(Guid stepId, Guid courierId)
      {
