@@ -68,6 +68,7 @@ public class DeliveryFactoryTests
     {
         // Arrange
         var details = new[] { "fragile", "urgent" };
+
         // Act
         var delivery = await CreateDefault(
             strategy: PricingStrategy.TourDeliveryStrategy,

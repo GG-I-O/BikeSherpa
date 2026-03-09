@@ -72,6 +72,7 @@ public class DeliveryStatusMachineTests
 
         // Assert
         act.Should().Throw<InvalidOperationException>();
+
     }
 
     [Fact]
