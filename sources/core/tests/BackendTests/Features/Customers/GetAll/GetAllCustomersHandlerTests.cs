@@ -1,5 +1,5 @@
-﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
+﻿using AutoFixture;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 using Ggio.DddCore;
 using Moq;
@@ -9,39 +9,15 @@ namespace BackendTests.Features.Customers.GetAll;
 public class GetAllCustomersHandlerTests
 {
      private readonly Mock<IReadRepository<Customer>> _mockRepository = new();
+     private readonly IFixture _fixture = new Fixture();
+     private readonly Customer _mockCustomerA;
+     private readonly Customer _mockCustomerB;
 
-     private readonly Customer _mockCustomerA = new()
+     public GetAllCustomersHandlerTests()
      {
-          Id = Guid.NewGuid(),
-          Name = "Client A",
-          Code = "AAA",
-          Siret = null,
-          Email = "a@g.com",
-          PhoneNumber = "0123456789",
-          Address = new Address
-          {
-               Name = "Client A",
-               StreetInfo = "123 rue des roses",
-               Postcode = "12502",
-               City = "Obi-wan"
-          }
-     };
-     private readonly Customer _mockCustomerB = new()
-     {
-          Id = Guid.NewGuid(),
-          Name = "Client B",
-          Code = "BBB",
-          Siret = null,
-          Email = "b@h.com",
-          PhoneNumber = "9876543210",
-          Address = new Address
-          {
-               Name = "Client B",
-               StreetInfo = "321 rue des roses",
-               Postcode = "54855",
-               City = "Anakin"
-          }
-     };
+          _mockCustomerA = _fixture.Create<Customer>();
+          _mockCustomerB = _fixture.Create<Customer>();
+     }
 
      [Fact]
      public async Task Handle_ShouldReturnAllCustomers_WhenCustomersExist()
@@ -62,8 +38,8 @@ public class GetAllCustomersHandlerTests
           // Assert
           Assert.NotNull(result);
           Assert.Equal(2, result.Count);
-          Assert.Contains(result, customer => customer.Name == "Client A");
-          Assert.Contains(result, customer => customer.Code == "BBB");
+          Assert.Contains(result, customer => customer.Name == _mockCustomerA.Name);
+          Assert.Contains(result, customer => customer.Code == _mockCustomerB.Code);
           VerifyRepositoryCalledOnce();
      }
 
