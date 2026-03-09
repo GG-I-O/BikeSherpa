@@ -82,11 +82,12 @@ public class PricingStrategyServiceTests
 
     private static DeliveryStep MakeStep(StepType type, DeliveryZone zone, double distance = 0)
     {
-        return new DeliveryStep(type, 1, _defaultAddress!, distance)
+        return new DeliveryStep(type, 1, _defaultAddress!)
         {
             Id = Guid.NewGuid(),
             StepAddress = _defaultAddress!,
-            StepZone = zone
+            StepZone = zone,
+            Distance = distance
         };
     }
 
