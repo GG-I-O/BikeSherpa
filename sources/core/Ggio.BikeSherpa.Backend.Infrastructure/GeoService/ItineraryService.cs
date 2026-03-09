@@ -31,8 +31,8 @@ public class ItineraryService(IItineraryApi itineraryApi) : IItineraryService
                      ],
                      GetSteps = false,
                      GetBbox = false,
-                     DistanceUnit = "km",
-                     TimeUnit = "min",
+                     DistanceUnit = "kilometer",
+                     TimeUnit = "minute",
                      Crs = "epsg:4326",
                      WaysAttributes = []
                 },
