@@ -59,20 +59,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.ToTable("Couriers");
                 });
 
-            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CourseAggregate.Course", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("StartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Courses");
-                });
-
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -112,9 +98,309 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.City", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DeliveryZoneName")
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Name");
+
+                    b.HasIndex("DeliveryZoneName");
+
+                    b.ToTable("DeliveryZoneCities", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Name = "Grenoble",
+                            DeliveryZoneName = "Centre"
+                        },
+                        new
+                        {
+                            Name = "Échirolles",
+                            DeliveryZoneName = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "Eybens",
+                            DeliveryZoneName = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "Fontaine",
+                            DeliveryZoneName = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "La Tronche",
+                            DeliveryZoneName = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "Poisat",
+                            DeliveryZoneName = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "Saint-Martin-d’Hères",
+                            DeliveryZoneName = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "Saint-Martin-le-Vinoux",
+                            DeliveryZoneName = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "Seyssinet-Pariset",
+                            DeliveryZoneName = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "Seyssins",
+                            DeliveryZoneName = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "Sassenage",
+                            DeliveryZoneName = "Périphérie"
+                        },
+                        new
+                        {
+                            Name = "Saint-Égrève",
+                            DeliveryZoneName = "Périphérie"
+                        },
+                        new
+                        {
+                            Name = "Meylan",
+                            DeliveryZoneName = "Périphérie"
+                        },
+                        new
+                        {
+                            Name = "Gières",
+                            DeliveryZoneName = "Périphérie"
+                        },
+                        new
+                        {
+                            Name = "Bresson",
+                            DeliveryZoneName = "Périphérie"
+                        },
+                        new
+                        {
+                            Name = "Le Pont-de-Claix",
+                            DeliveryZoneName = "Périphérie"
+                        });
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("ContractDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.PrimitiveCollection<string[]>("Details")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<double?>("Discount")
+                        .HasColumnType("double precision");
+
+                    b.Property<bool>("InsulatedBox")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PackingSize")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PricingStrategy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReportId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Urgency")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Deliveries", (string)null);
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryZone", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("DeliveryZones", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Name = "Centre"
+                        },
+                        new
+                        {
+                            Name = "Limitrophe"
+                        },
+                        new
+                        {
+                            Name = "Périphérie"
+                        },
+                        new
+                        {
+                            Name = "Extérieur"
+                        });
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PackingSize", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("MaxPackageLength")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxWeight")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("TourPrice")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("PackingSizes", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Name = "S",
+                            MaxPackageLength = 45,
+                            MaxWeight = 3,
+                            Price = 3.0,
+                            TourPrice = 0.0
+                        },
+                        new
+                        {
+                            Name = "M",
+                            MaxPackageLength = 85,
+                            MaxWeight = 10,
+                            Price = 5.0,
+                            TourPrice = 2.0
+                        },
+                        new
+                        {
+                            Name = "L",
+                            MaxPackageLength = 105,
+                            MaxWeight = 20,
+                            Price = 7.0,
+                            TourPrice = 4.0
+                        },
+                        new
+                        {
+                            Name = "Xl",
+                            MaxPackageLength = 115,
+                            MaxWeight = 30,
+                            Price = 9.0,
+                            TourPrice = 6.0
+                        },
+                        new
+                        {
+                            Name = "Xxl",
+                            MaxPackageLength = 500,
+                            MaxWeight = 40,
+                            Price = 11.0,
+                            TourPrice = 8.0
+                        },
+                        new
+                        {
+                            Name = "Xxxl",
+                            MaxPackageLength = 500,
+                            MaxWeight = 50,
+                            Price = 13.0,
+                            TourPrice = 10.0
+                        },
+                        new
+                        {
+                            Name = "Xxxxl",
+                            MaxPackageLength = 500,
+                            MaxWeight = 60,
+                            Price = 15.0,
+                            TourPrice = 12.0
+                        });
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Urgency", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<double>("PriceCoefficient")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Urgencies", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Name = "Eco",
+                            PriceCoefficient = 0.75
+                        },
+                        new
+                        {
+                            Name = "Standard",
+                            PriceCoefficient = 1.25
+                        },
+                        new
+                        {
+                            Name = "Urgent",
+                            PriceCoefficient = 2.0
+                        });
+                });
+
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier", b =>
                 {
-                    b.OwnsOne("Ggio.BikeSherpa.Backend.Domain.Address", "Address", b1 =>
+                    b.OwnsOne("Ggio.BikeSherpa.Backend.Domain.SharedKernel.Address", "Address", b1 =>
                         {
                             b1.Property<Guid>("CourierId")
                                 .HasColumnType("uuid");
@@ -152,7 +438,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer", b =>
                 {
-                    b.OwnsOne("Ggio.BikeSherpa.Backend.Domain.Address", "Address", b1 =>
+                    b.OwnsOne("Ggio.BikeSherpa.Backend.Domain.SharedKernel.Address", "Address", b1 =>
                         {
                             b1.Property<Guid>("CustomerId")
                                 .HasColumnType("uuid");
@@ -186,6 +472,129 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.Navigation("Address")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.City", b =>
+                {
+                    b.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryZone", null)
+                        .WithMany("Cities")
+                        .HasForeignKey("DeliveryZoneName")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery", b =>
+                {
+                    b.OwnsMany("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryStep", "Steps", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .HasColumnType("uuid");
+
+                            b1.PrimitiveCollection<string[]>("AttachmentFilePaths")
+                                .HasColumnType("text[]");
+
+                            b1.Property<string>("Comment")
+                                .HasColumnType("text");
+
+                            b1.Property<bool>("Completed")
+                                .HasColumnType("boolean");
+
+                            b1.Property<Guid?>("CourierId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<DateTimeOffset>("CreatedAt")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<Guid>("DeliveryId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<double>("Distance")
+                                .HasColumnType("double precision");
+
+                            b1.Property<DateTimeOffset>("EstimatedDeliveryDate")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<int>("Order")
+                                .HasColumnType("integer");
+
+                            b1.Property<DateTimeOffset?>("RealDeliveryDate")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<int>("StepType")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("StepZoneName")
+                                .IsRequired()
+                                .HasColumnType("character varying(100)");
+
+                            b1.Property<DateTimeOffset>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("DeliveryId");
+
+                            b1.HasIndex("StepZoneName");
+
+                            b1.ToTable("DeliverySteps", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("DeliveryId");
+
+                            b1.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryZone", "StepZone")
+                                .WithMany()
+                                .HasForeignKey("StepZoneName")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
+
+                            b1.OwnsOne("Ggio.BikeSherpa.Backend.Domain.SharedKernel.Address", "StepAddress", b2 =>
+                                {
+                                    b2.Property<Guid>("DeliveryStepId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<string>("City")
+                                        .IsRequired()
+                                        .HasMaxLength(100)
+                                        .HasColumnType("character varying(100)");
+
+                                    b2.Property<string>("Complement")
+                                        .HasMaxLength(200)
+                                        .HasColumnType("character varying(200)");
+
+                                    b2.Property<string>("Name")
+                                        .IsRequired()
+                                        .HasMaxLength(200)
+                                        .HasColumnType("character varying(200)");
+
+                                    b2.Property<string>("Postcode")
+                                        .IsRequired()
+                                        .HasMaxLength(5)
+                                        .HasColumnType("character varying(5)");
+
+                                    b2.Property<string>("StreetInfo")
+                                        .IsRequired()
+                                        .HasMaxLength(200)
+                                        .HasColumnType("character varying(200)");
+
+                                    b2.HasKey("DeliveryStepId");
+
+                                    b2.ToTable("DeliverySteps");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("DeliveryStepId");
+                                });
+
+                            b1.Navigation("StepAddress")
+                                .IsRequired();
+
+                            b1.Navigation("StepZone");
+                        });
+
+                    b.Navigation("Steps");
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryZone", b =>
+                {
+                    b.Navigation("Cities");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,6 @@
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
+using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +19,9 @@ public static class Bootstrap
                     options.UseNpgsql(connectionString)
                          .AddInterceptors(new DateInterceptor())
                );
+               services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
+               services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
+               services.AddScoped<IUrgencyRepository, UrgencyRepository>();
           }
      }
-     
 }

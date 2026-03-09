@@ -1,5 +1,5 @@
-﻿using Ggio.BikeSherpa.Backend.Domain;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+﻿using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 using Ggio.DddCore;
 using Moq;
@@ -26,7 +26,7 @@ public class GetAllCustomersHandlerTests
                City = "Obi-wan"
           }
      };
-     private readonly Customer _mockCustomerB = new ()
+     private readonly Customer _mockCustomerB = new()
      {
           Id = Guid.NewGuid(),
           Name = "Client B",
