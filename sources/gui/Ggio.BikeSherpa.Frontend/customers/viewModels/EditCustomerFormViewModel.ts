@@ -3,7 +3,7 @@ import Customer from "../models/Customer";
 import { ICustomerService } from "@/spi/CustomerSPI";
 import { inject } from "inversify";
 import * as zod from 'zod';
-import NewCustomerFormViewModel from "./NewCustomerFormViewModel";
+import { customerFormBaseSchema } from "./zod/customerFormBaseSchema";
 
 export default class EditCustomerFormViewModel {
     private customerServices: ICustomerService;
@@ -21,19 +21,13 @@ export default class EditCustomerFormViewModel {
 
     public getEditCustomerSchema(customerToEdit: Customer, customerList: Customer[]) {
         const originalCode = customerToEdit.code;
-        const newCustomerSchema = new NewCustomerFormViewModel(this.customerServices).getNewCustomerSchema(customerList);
 
-        return newCustomerSchema
-            .partial({ complement: true, siret: true, vatNumber: true })
+        return customerFormBaseSchema
             .extend({
                 id: zod
                     .string()
                     .min(1),
-                code: zod
-                    .string()
-                    .trim()
-                    .min(1, "Code requis")
-                    .max(3, "Code trop long")
+                code: customerFormBaseSchema.shape.code
                     .refine((value) => {
                         if (originalCode === value) {
                             return true;

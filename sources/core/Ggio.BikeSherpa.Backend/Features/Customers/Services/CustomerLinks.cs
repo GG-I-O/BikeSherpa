@@ -8,23 +8,16 @@ using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Customers.Services;
 
-public class CustomerLinks(IHttpContextAccessor httpContextAccessor, IHateoasService hateoasService): ICustomerLinks
+public class CustomerLinks(IHttpContextAccessor httpContextAccessor, IHateoasService hateoasService) : ICustomerLinks
 {
      public List<Link> GenerateLinks(Guid id)
      {
-          // Get Links depending permissions
-          var context = httpContextAccessor.HttpContext;
-          if (context is null)
-               return [];
-          var scopes = context.User.FindAll("scope")
-               .SelectMany(c => c.Value.Split(' '))
-               .Distinct()
-               .ToList();
-          
-          var canRead = scopes.Contains("read:customers");
-          var canWrite = scopes.Contains("write:customers");
-          if (!canRead && !canWrite)
-               return [];
+          // Get Links depending on permissions
+          var scopes = httpContextAccessor.GetResourceScopes("read:customers", "write:customers");
+
+          if (scopes is null) return [];
+
+          var (canRead, canWrite) = scopes.Value;
 
           return hateoasService.GenerateLinks(
                canRead ? IEndpoint.GetName<GetCustomerEndpoint>() : null,
