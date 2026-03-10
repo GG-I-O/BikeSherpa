@@ -16,14 +16,13 @@ public class ItineraryService(IItineraryApi itineraryApi) : IItineraryService
                      Resource = "bdtopo-osrm",
                      Start = startStepCoordinates,
                      End = endStepCoordinates,
-                     Intermediates = [],
                      Profile = "car",
                      Optimization = "fastest",
                      Constraints =
                      [
                           new Constraint
                          {
-                              ConstraintType = ConstraintType.Banned,
+                              ConstraintType = ConstraintType.banned,
                               Key = "waytype",
                               Operator = "=",
                               Value = "autoroute"
@@ -33,8 +32,7 @@ public class ItineraryService(IItineraryApi itineraryApi) : IItineraryService
                      GetBbox = false,
                      DistanceUnit = "kilometer",
                      TimeUnit = "minute",
-                     Crs = "epsg:4326",
-                     WaysAttributes = []
+                     Crs = "EPSG:4326"
                 },
                 cancellationToken
            );

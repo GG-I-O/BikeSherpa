@@ -24,7 +24,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
 {
     using System = global::System;
 
-
+    
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Coordinates : System.Collections.ObjectModel.Collection<string>
@@ -210,10 +210,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"geojson")]
-        Geojson = 0,
+        geojson = 0,
 
         [System.Runtime.Serialization.EnumMember(Value = @"polyline")]
-        Polyline = 1,
+        polyline = 1,
 
     }
 
@@ -222,13 +222,13 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"banned")]
-        Banned = 0,
+        banned = 0,
 
         [System.Runtime.Serialization.EnumMember(Value = @"preferred")]
-        Preferred = 1,
+        preferred = 1,
 
         [System.Runtime.Serialization.EnumMember(Value = @"unpreferred")]
-        Unpreferred = 2,
+        unpreferred = 2,
 
     }
 
@@ -261,10 +261,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"geojson")]
-        Geojson = 0,
+        geojson = 0,
 
         [System.Runtime.Serialization.EnumMember(Value = @"polyline")]
-        Polyline = 1,
+        polyline = 1,
 
     }
 
@@ -466,11 +466,11 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
 
 }
 
-#pragma warning restore 108
-#pragma warning restore 114
-#pragma warning restore 472
-#pragma warning restore 612
-#pragma warning restore 649
+#pragma warning restore  108
+#pragma warning restore  114
+#pragma warning restore  472
+#pragma warning restore  612
+#pragma warning restore  649
 #pragma warning restore 1573
 #pragma warning restore 1591
 #pragma warning restore 8073

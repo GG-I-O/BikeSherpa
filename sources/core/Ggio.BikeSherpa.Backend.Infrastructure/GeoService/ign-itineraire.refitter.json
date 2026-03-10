@@ -5,10 +5,13 @@
   "naming": {
     "useOpenApiTitle": false,
     "interfaceName": "ItineraryApi"
-    },
-  "includePathMatches": ["^/itineraire$"],
+  },
+  "includePathMatches": [
+    "^/itineraire$"
+  ],
+  "noInlineJsonConverters": true,
   "generateContracts": true,
-  "useCancellationTokens": true,  
+  "useCancellationTokens": true,
   "contractsOutputFolder": "./Contracts",
   "trimUnusedSchema": true,
   "csharpGeneratorSettings": {
