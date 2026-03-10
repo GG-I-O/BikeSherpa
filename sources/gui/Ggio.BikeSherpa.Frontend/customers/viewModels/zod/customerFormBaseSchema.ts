@@ -24,13 +24,11 @@ export const customerFormBaseSchema = zod
         siret: zod.string()
             .transform(val => val === "" ? null : val)
             .nullable()
-            .optional()
-            .refine(val => val === null || val!.length === 14, { message: "Siret invalide" }),
+            .refine(val => val === null || val.length === 14, { message: "Siret invalide" }),
         vatNumber: zod.string()
             .transform(val => val === "" ? null : val)
             .nullable()
-            .optional()
-            .refine(val => val === null || val!.length === 13, { message: "Numéro de TVA invalide" }),
+            .refine(val => val === null || val.length === 13, { message: "Numéro de TVA invalide" }),
         phoneNumber: zod
             .string()
             .trim()
