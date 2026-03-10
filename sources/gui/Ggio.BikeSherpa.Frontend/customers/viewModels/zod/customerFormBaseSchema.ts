@@ -8,10 +8,6 @@ export const customerFormBaseSchema = zod
             .trim()
             .min(1, "Nom requis"),
         address: addressSchema,
-        complement: zod
-            .string()
-            .nullable()
-            .optional(),
         code: zod
             .string()
             .trim()
@@ -21,11 +17,13 @@ export const customerFormBaseSchema = zod
             .string()
             .min(1, "Adresse e-mail requise")
             .email("Adresse e-mail invalide"),
-        siret: zod.string()
+        siret: zod
+            .string()
             .transform(val => val === "" ? null : val)
             .nullable()
             .refine(val => val === null || val.length === 14, { message: "Siret invalide" }),
-        vatNumber: zod.string()
+        vatNumber: zod
+            .string()
             .transform(val => val === "" ? null : val)
             .nullable()
             .refine(val => val === null || val.length === 13, { message: "Numéro de TVA invalide" }),

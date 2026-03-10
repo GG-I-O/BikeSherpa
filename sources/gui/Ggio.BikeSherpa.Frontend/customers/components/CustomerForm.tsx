@@ -70,7 +70,7 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
             <ThemedInput
                 testID="customerFormComplementInput"
                 control={control}
-                name="complement"
+                name="address.complement"
                 error={(errors.address as any)?.complement as FieldError | undefined}
                 label="Complément d’adresse"
                 placeholder="Bâtiment B"

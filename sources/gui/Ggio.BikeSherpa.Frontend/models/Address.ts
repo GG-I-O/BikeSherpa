@@ -23,8 +23,7 @@ export const addressSchema = zod
             .min(5, "Veuillez rentrer une adresse valide"),
         complement: zod
             .string()
-            .nullable()
-            .optional(),
+            .nullable(),
         postcode: zod
             .string()
             .trim()

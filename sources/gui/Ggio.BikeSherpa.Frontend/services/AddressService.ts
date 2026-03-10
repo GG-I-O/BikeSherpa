@@ -52,6 +52,7 @@ export default class AddressService implements IAddressService {
                     name: "",
                     fullAddress: feature.properties.label,
                     streetInfo: feature.properties.name,
+                    complement: null,
                     postcode: feature.properties.postcode,
                     city: feature.properties.city
                 }

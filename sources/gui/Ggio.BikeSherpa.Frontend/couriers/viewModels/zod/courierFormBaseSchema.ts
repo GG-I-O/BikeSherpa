@@ -14,10 +14,6 @@ export const courierFormBaseSchema = zod
             .min(1, "Nom requis")
             .max(50, "Nom trop long"),
         address: addressSchema,
-        complement: zod
-            .string()
-            .nullable()
-            .optional(),
         code: zod
             .string()
             .trim()
