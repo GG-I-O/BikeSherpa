@@ -505,7 +505,7 @@ components:
         end:
           $ref: "#/components/schemas/point"
         geometry:
-          type: "string"
+          type: "object"
         duration:
           type: "number"
           format: "float"
@@ -513,7 +513,7 @@ components:
           type: "number"
           format: "float"
         bbox:
-          type: "string"
+          type: "array"
         departure:
           type: "string"
           format: "date"
@@ -555,7 +555,7 @@ components:
                 type: "number"
                 format: "float"
               bbox:
-                type: "string"
+                type: "array"
               departure:
                 type: "string"
                 format: "date"
@@ -585,7 +585,7 @@ components:
                       type: "number"
                       format: "float"
                     geometry:
-                      type: "string"
+                      type: "object"
                     instructions:
                       type: "array"
                       items:
@@ -620,7 +620,7 @@ components:
         crs:
           type: "string"
         geometry:
-          type: "string"
+          type: "object"
         departure:
           type: "string"
           format: "date"

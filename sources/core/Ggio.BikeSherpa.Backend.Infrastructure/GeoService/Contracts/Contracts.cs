@@ -154,7 +154,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
         public string End { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("geometry")]
-        public string Geometry { get; set; }
+        public object Geometry { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("duration")]
         public float Duration { get; set; }
@@ -163,7 +163,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
         public float Distance { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("bbox")]
-        public string Bbox { get; set; }
+        public System.Collections.Generic.ICollection<object> Bbox { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("departure")]
         [System.Text.Json.Serialization.JsonConverter(typeof(DateFormatConverter))]
@@ -326,7 +326,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
         public float Distance { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("bbox")]
-        public string Bbox { get; set; }
+        public System.Collections.Generic.ICollection<object> Bbox { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("departure")]
         [System.Text.Json.Serialization.JsonConverter(typeof(DateFormatConverter))]
@@ -367,7 +367,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
         public float Distance { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("geometry")]
-        public string Geometry { get; set; }
+        public object Geometry { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("instructions")]
         public System.Collections.Generic.ICollection<Instructions> Instructions { get; set; }
