@@ -4,7 +4,7 @@ namespace Ggio.BikeSherpa.Backend.Services.Hateoas;
 
 public static class HttpContextAccessorExtension
 {
-     public static (bool canRead, bool canWrite)? GetResourceScopes(
+     public static (bool CanRead, bool CanWrite)? GetResourceScopes(
           this IHttpContextAccessor accessor, string readScope, string writeScope)
      {
           var context = accessor.HttpContext;
@@ -17,6 +17,6 @@ public static class HttpContextAccessorExtension
 
           var canRead = scopes.Contains(readScope);
           var canWrite = scopes.Contains(writeScope);
-          return canRead || canWrite ? (canRead, canWrite) : null;
+          return canRead || canWrite ? (CanRead: canRead, CanWrite: canWrite) : null;
      }
 }
