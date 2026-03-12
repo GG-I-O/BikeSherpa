@@ -1,12 +1,13 @@
 ﻿using AwesomeAssertions;
-using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
+using Ggio.BikeSherpa.Backend.Domain;
+using Ggio.BikeSherpa.Backend.Infrastructure;
 using Microsoft.Extensions.Configuration;
-using Refit;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace BackendTests.Services;
+namespace Backend.Infrastructure.Tests;
 
-[Trait("Category", "Integration")]
-public class ItineraryServiceTests
+[Trait("Category", "E2E")]
+public class ItineraryServiceE2ETest
 {
      [Fact]
      public async Task GetItineraryInfoAsync_WithRealApi_ReturnsValidData()
@@ -16,9 +17,10 @@ public class ItineraryServiceTests
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddJsonFile("appsettings.json")
                .Build();
-
-          var itineraryApi = RestService.For<IItineraryApi>(configuration["ItineraryService:BaseUrl"]!);
-          var service = new ItineraryService(itineraryApi);
+          var services = new ServiceCollection();
+          services.AddBackendInfrastructure(configuration);
+          var serviceProvider = services.BuildServiceProvider();
+          var service = serviceProvider.GetRequiredService<IItineraryService>();
 
           // Act
           var result = await service.GetItineraryInfoAsync("2.35,48.85", "2.45,48.95", CancellationToken.None);
@@ -27,6 +29,7 @@ public class ItineraryServiceTests
           result.DistanceInKm.Should().BeGreaterThan(0);
           result.TimeInMinutes.Should().BeGreaterThan(0);
 
+          // Debug
           Console.WriteLine($"Distance : {result.DistanceInKm} km");
           Console.WriteLine($"Temps de trajet : {result.TimeInMinutes} minutes");
      }

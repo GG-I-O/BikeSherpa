@@ -7,6 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ggio.DddCore.Infrastructure;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Refit;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure;
@@ -22,7 +25,19 @@ public static class Bootstrap
                     options.UseNpgsql(connectionString)
                          .AddInterceptors(new DateInterceptor())
                );
-               services.AddRefitClient<IItineraryApi>()
+
+               var settings = new RefitSettings
+               {
+                    ContentSerializer = new NewtonsoftJsonContentSerializer(
+                         new JsonSerializerSettings
+                         {
+                              ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                              Converters = { new StringEnumConverter() }
+                         }
+                    )
+               };
+
+               services.AddRefitClient<IItineraryApi>(settings)
                     .ConfigureHttpClient(c =>
                     {
                          c.BaseAddress = new Uri(configuration["ItineraryService:BaseUrl"]!);

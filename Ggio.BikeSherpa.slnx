@@ -12,4 +12,5 @@
     <Project Path="sources/core/Ggio.DddCore/Ggio.DddCore.csproj" />
     <Project Path="sources/core/tests/DddCore.Tests/DddCore.Tests.csproj" />
   </Folder>
+  <Project Path="sources/core/tests/Backend.Infrastructure.Tests/Backend.Infrastructure.Tests.csproj" />
 </Solution>

@@ -66,7 +66,7 @@ dotnet tool install --global Refitter
 You can generate the GeoService Itinéraire API using the itineraire.yaml file provided by the service running the following command:
 
 ```bash
-refitter --settings-file ign-itineraire.refitter
+refitter --settings-file ign-itineraire.refitter.json
 ```
 
 ### Application domain

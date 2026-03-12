@@ -210,10 +210,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"geojson")]
-        geojson = 0,
+        Geojson = 0,
 
         [System.Runtime.Serialization.EnumMember(Value = @"polyline")]
-        polyline = 1,
+        Polyline = 1,
 
     }
 
@@ -222,13 +222,13 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"banned")]
-        banned = 0,
+        Banned = 0,
 
         [System.Runtime.Serialization.EnumMember(Value = @"preferred")]
-        preferred = 1,
+        Preferred = 1,
 
         [System.Runtime.Serialization.EnumMember(Value = @"unpreferred")]
-        unpreferred = 2,
+        Unpreferred = 2,
 
     }
 
@@ -261,10 +261,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts
     {
 
         [System.Runtime.Serialization.EnumMember(Value = @"geojson")]
-        geojson = 0,
+        Geojson = 0,
 
         [System.Runtime.Serialization.EnumMember(Value = @"polyline")]
-        polyline = 1,
+        Polyline = 1,
 
     }
 

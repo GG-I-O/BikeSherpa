@@ -9,7 +9,6 @@
   "includePathMatches": [
     "^/itineraire$"
   ],
-  "noInlineJsonConverters": true,
   "generateContracts": true,
   "useCancellationTokens": true,
   "contractsOutputFolder": "./Contracts",
