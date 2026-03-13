@@ -1,10 +1,13 @@
 <Solution>
   <Folder Name="/Backend/">
-    <Project Path="sources\core\tests/BackendTests/BackendTests.csproj" />
-    <Project Path="sources\core\tests/Backend.Domain.Tests/Backend.Domain.Tests.csproj" />
     <Project Path="sources\core\Ggio.BikeSherpa.Backend.Domain\Ggio.BikeSherpa.Backend.Domain.csproj" />
     <Project Path="sources\core\Ggio.BikeSherpa.Backend.Infrastructure\Ggio.BikeSherpa.Backend.Infrastructure.csproj" />
     <Project Path="sources\core\Ggio.BikeSherpa.Backend\Ggio.BikeSherpa.Backend.csproj" />
+  </Folder>
+  <Folder Name="/Backend/Tests/">
+    <Project Path="sources/core/tests/Backend.Infrastructure.Tests/Backend.Infrastructure.Tests.csproj" />
+    <Project Path="sources\core\tests/Backend.Domain.Tests/Backend.Domain.Tests.csproj" />
+    <Project Path="sources\core\tests/BackendTests/BackendTests.csproj" />
   </Folder>
   <Folder Name="/BackOffice/" />
   <Folder Name="/DddCore/">
@@ -12,5 +15,4 @@
     <Project Path="sources/core/Ggio.DddCore/Ggio.DddCore.csproj" />
     <Project Path="sources/core/tests/DddCore.Tests/DddCore.Tests.csproj" />
   </Folder>
-  <Project Path="sources/core/tests/Backend.Infrastructure.Tests/Backend.Infrastructure.Tests.csproj" />
 </Solution>
