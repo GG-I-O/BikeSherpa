@@ -1,6 +1,7 @@
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
@@ -89,7 +90,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
-     public void ReorderSteps(Guid movedStepId, int newOrder, IItineraryService itineraryService)
+     public async Task ReorderStepsAsync(Guid movedStepId, int newOrder, IItineraryService itineraryService)
      {
           var movedStep = Steps.Single(s => s.Id == movedStepId);
           Steps.Remove(movedStep);
@@ -99,7 +100,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           {
                step.Order = order++;
           }
-          RecalculateStepDistances(itineraryService).Wait();
+          await RecalculateStepDistancesAsync(itineraryService);
      }
 
      private void ReorderStepsOnDeletion()
@@ -111,7 +112,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     private async Task RecalculateStepDistances(IItineraryService itineraryService)
+     private async Task RecalculateStepDistancesAsync(IItineraryService itineraryService)
      {
           foreach (var step in Steps.Where(s => s.StepType == StepType.Dropoff))
           {
@@ -122,7 +123,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     private async Task<double> GetDistance(DeliveryStep step, IItineraryService itineraryService)
+     private async Task<double> GetDistanceAsync(DeliveryStep step, IItineraryService itineraryService)
      {
           if (step.Order == 1 || step.StepType == StepType.Pickup) return 0;
           var previousStep = Steps.First(s => s.Order == step.Order - 1);
@@ -158,7 +159,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           UpdateStatus();
      }
 
-     public async Task<DeliveryStep> AddStep(
+     public async Task<DeliveryStep> AddStepAsync(
           StepType stepType,
           Address stepAddress,
           IDeliveryZoneRepository deliveryZones,
@@ -175,7 +176,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                StepZone = deliveryZones.GetByAddress(stepAddress.City)
           };
 
-          newStep.Distance = await GetDistance(newStep, itineraryService);
+          newStep.Distance = await GetDistanceAsync(newStep, itineraryService);
 
           if (Steps.Count >= 1)
           {
@@ -193,7 +194,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           return newStep;
      }
 
-     public void DeleteStep(
+     public async Task DeleteStepAsync(
           DeliveryStep removedStep,
           IPricingStrategyService pricingStrategyService,
           IItineraryService itineraryService)
@@ -203,7 +204,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           Steps.Remove(removedStep);
           ReorderStepsOnDeletion();
           UpdateStepDeliveryTimeOnDelete(removedStep.Order, timeOffset);
-          RecalculateStepDistances(itineraryService).Wait();
+          await RecalculateStepDistancesAsync(itineraryService);
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
@@ -220,7 +221,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     public void UpdateSteps(List<DeliveryStep> steps,
+     public async Task UpdateStepsAsync(List<DeliveryStep> steps,
           IDeliveryZoneRepository deliveryZones,
           IPricingStrategyService pricingStrategyService,
           IItineraryService itineraryService)
@@ -249,7 +250,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
 
           DeleteOldSteps(steps);
-          RecalculateStepDistances(itineraryService).Wait();
+          await RecalculateStepDistancesAsync(itineraryService);
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 

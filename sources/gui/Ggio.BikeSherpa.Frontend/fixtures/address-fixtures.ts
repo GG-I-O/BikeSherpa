@@ -12,6 +12,9 @@ export function createRandomAddress(name: string): Address {
         complement: null,
         postcode: fakePostcode,
         city: fakeCity,
-        coordinates: `${faker.location.longitude()},${faker.location.latitude()}`
+        coordinates: {
+            longitude: faker.location.longitude(),
+            latitude: faker.location.latitude()
+        }
     };
 }

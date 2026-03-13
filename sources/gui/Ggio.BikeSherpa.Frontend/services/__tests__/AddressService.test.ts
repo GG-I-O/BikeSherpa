@@ -81,7 +81,10 @@ describe("AddressService.fetchAddress", () => {
         expect(addressList[0].streetInfo).toBe("name");
         expect(addressList[0].postcode).toBe("postcode");
         expect(addressList[0].city).toBe("city");
-        expect(addressList[0].coordinates).toBe("1,2");
+        expect(addressList[0].coordinates).toEqual({
+            longitude: "1",
+            latitude: "2"
+        });
     });
 
     it("fetch with a 200 response returns a multiple Address array", async () => {
@@ -149,9 +152,15 @@ describe("AddressService.fetchAddress", () => {
         expect(data).toHaveLength(3);
         if (!data) return;
         expect(data[1].postcode).toBe("postcode 2");
-        expect(data[1].coordinates).toBe("3,4");
+        expect(data[1].coordinates).toEqual({
+            longitude: "3",
+            latitude: "4"
+        });
         expect(data[2].fullAddress).toBe("label 3");
-        expect(data[2].coordinates).toBe("5,6");
+        expect(data[2].coordinates).toEqual({
+            longitude: "5",
+            latitude: "6"
+        });
     });
 
     it("fetch with a 400 response returns a null address list", async () => {

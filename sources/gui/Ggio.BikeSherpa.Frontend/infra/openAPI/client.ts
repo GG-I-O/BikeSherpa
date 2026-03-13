@@ -11,13 +11,14 @@ const DeliveryStatus = z.union([
 const HasDomainEventsBase = z.object({});
 const EntityBaseOfGuid = HasDomainEventsBase.and(z.object({ id: z.string() }));
 const StepType = z.union([z.literal(0), z.literal(1)]);
+const GeoPoint = z.object({ longitude: z.number(), latitude: z.number() });
 const Address = z.object({
   name: z.string(),
   streetInfo: z.string(),
   complement: z.string().nullable(),
   postcode: z.string(),
   city: z.string(),
-  coordinates: z.string(),
+  coordinates: GeoPoint,
 });
 const City = z.object({ name: z.string() });
 const DeliveryZone = z.object({ name: z.string(), cities: z.array(City) });
@@ -78,7 +79,7 @@ const AddressCrud = z.object({
   complement: z.string().nullable(),
   postcode: z.string(),
   city: z.string(),
-  coordinates: z.string(),
+  coordinates: GeoPoint,
 });
 const CustomerCrud = z.object({
   name: z.string(),
@@ -118,6 +119,7 @@ export const schemas = {
   HasDomainEventsBase,
   EntityBaseOfGuid,
   StepType,
+  GeoPoint,
   Address,
   City,
   DeliveryZone,

@@ -1,10 +1,10 @@
-﻿using System.Net;
-using AwesomeAssertions;
-using Ggio.BikeSherpa.Backend.Domain;
+﻿using AwesomeAssertions;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Infrastructure;
+using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Refit;
 
 namespace Backend.Infrastructure.Tests;
 
@@ -18,6 +18,7 @@ public class ItineraryServiceE2ETest
                .AddJsonFile("appsettings.json")
                .Build();
           var services = new ServiceCollection();
+          services.AddLogging();
           services.AddBackendInfrastructure(configuration);
           var serviceProvider = services.BuildServiceProvider();
           var service = serviceProvider.GetRequiredService<IItineraryService>();
@@ -32,26 +33,11 @@ public class ItineraryServiceE2ETest
           var sut = MakeSut();
 
           // Act
-          var result = await sut.GetItineraryInfoAsync("2.35,48.85", "2.45,48.95", CancellationToken.None);
+          var result = await sut.GetItineraryInfoAsync(new GeoPoint(2.35,48.85), new GeoPoint(2.45,48.95), CancellationToken.None);
 
           // Assert
           result.DistanceInKm.Should().BeGreaterThan(0);
           result.TimeInMinutes.Should().BeGreaterThan(0);
-     }
-
-     [Fact]
-     public async Task GetItineraryInfoAsync_WithRealApi_ThrowsApiException_WithInvalidRequest()
-     {
-          // Arrange
-          var sut = MakeSut();
-
-          // Act
-          var ex = await Assert.ThrowsAsync<ApiException>(() =>
-               sut.GetItineraryInfoAsync("a", "b", CancellationToken.None));
-
-          // Assert
-          ex.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-          ex.Content.Should().NotBeNullOrEmpty();
      }
 
      [Fact]
@@ -62,7 +48,7 @@ public class ItineraryServiceE2ETest
 
           // Act
           var ex = await Assert.ThrowsAsync<ItineraryServiceException>(() =>
-               sut.GetItineraryInfoAsync("2.35,48.85", "2.35,48.85", CancellationToken.None));
+               sut.GetItineraryInfoAsync(new GeoPoint(2.35,48.85), new GeoPoint(2.35,48.85), CancellationToken.None));
 
           // Assert
           ex.Message.Should().Be("Coordonnées de départ et d’arrivée identiques");

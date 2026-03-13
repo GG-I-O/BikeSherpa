@@ -1,7 +1,7 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
 using JetBrains.Annotations;
@@ -47,7 +47,7 @@ public class UpdateDeliveryStepOrderHandler(
                return Result.NotFound();
           }
 
-          delivery.ReorderSteps(command.StepId, command.Order, itineraryService);
+          await delivery.ReorderStepsAsync(command.StepId, command.Order, itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

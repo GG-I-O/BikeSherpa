@@ -1,4 +1,4 @@
-using Ggio.BikeSherpa.Backend.Domain;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;

@@ -35,6 +35,9 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                     address.Property(a => a.Complement).HasMaxLength(200);
                     address.Property(a => a.Postcode).HasMaxLength(5).IsRequired();
                     address.Property(a => a.City).HasMaxLength(100).IsRequired();
+                    address.Property(a => a.Coordinates).HasConversion(
+                         c => c.ToString(),
+                         s => GeoPoint.TryParse(s)).IsRequired();
                });
                steps.HasOne(s => s.StepZone).WithMany()
                     .HasForeignKey("StepZoneName")

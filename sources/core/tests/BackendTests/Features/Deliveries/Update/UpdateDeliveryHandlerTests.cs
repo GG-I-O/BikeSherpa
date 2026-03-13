@@ -4,9 +4,9 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
@@ -74,8 +74,8 @@ public class UpdateDeliveryHandlerTests
                .ReturnsAsync(_mockDelivery);
 
           _mockItineraryService.Setup(i => i.GetItineraryInfoAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
+                    It.IsAny<GeoPoint>(),
+                    It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ItineraryResult(10.0, 20.0));
      }

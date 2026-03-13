@@ -1,35 +1,44 @@
-﻿using Ggio.BikeSherpa.Backend.Domain;
+﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts;
-using Refit;
+using Microsoft.Extensions.Logging;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 
-public class ItineraryService(IItineraryApi itineraryApi) : IItineraryService
+public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryService> logger) : IItineraryService
 {
-     private static void EnsureDifferentCoordinates(string start, string end)
+     private static void EnsureDifferentCoordinates(GeoPoint start, GeoPoint end)
      {
           if (start == end)
-               throw new ItineraryServiceException("Coordonnées de départ et d’arrivée identiques");
+          {
+               throw ItineraryServiceException.NoIdenticalCoordinates();
+          }
      }
 
      private static void EnsureApiReturnedResult(Itineraire? result)
      {
           if (result is null)
-               throw new ItineraryServiceException("Aucune réponse de l'API");
+          {
+               throw ItineraryServiceException.NoNullResult();
+          }
      }
 
      public async Task<ItineraryResult> GetItineraryInfoAsync(
-          string startStepCoordinates,
-          string endStepCoordinates,
+          GeoPoint startStepCoordinates,
+          GeoPoint endStepCoordinates,
           CancellationToken cancellationToken)
      {
           EnsureDifferentCoordinates(startStepCoordinates, endStepCoordinates);
 
           try
           {
-               var result = await itineraryApi.RouteItinerairePost(RouteBodyFactory.Create(startStepCoordinates, endStepCoordinates, [WayType.Highway]),
-                    cancellationToken
-               );
+               Console.WriteLine("==========================================================");
+               Console.WriteLine("==========================================================");
+               Console.WriteLine(startStepCoordinates.ToString());
+               Console.WriteLine(endStepCoordinates.ToString());
+               Console.WriteLine("==========================================================");
+               Console.WriteLine("==========================================================");
+               var result = await itineraryApi.RouteItinerairePost(RouteBodyFactory.Create(startStepCoordinates.ToString(), endStepCoordinates.ToString(), [WayType.Highway]), cancellationToken);
 
                EnsureApiReturnedResult(result);
 
@@ -38,19 +47,17 @@ public class ItineraryService(IItineraryApi itineraryApi) : IItineraryService
                     TimeInMinutes: result.Duration
                );
           }
-          catch (ApiException)
-          {
-               throw;
-          }
 
-          catch (ItineraryServiceException)
+          catch (Exception exception)
           {
-               throw;
-          }
-
-          catch (Exception)
-          {
-               throw new ItineraryServiceException("Erreur lors de l’appel à l’API d’itinéraire");
+               logger.LogError(exception, "Error calling the itinerary API");
+               
+               if (exception is ItineraryServiceException)
+               {
+                    throw;
+               }
+               
+               throw new ItineraryServiceException("Erreur lors de l’appel à l’API d’itinéraire", exception);
           }
      }
 }

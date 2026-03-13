@@ -407,10 +407,12 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.Property<string>("City")
                                 .IsRequired()
-                                .HasColumnType("text");
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
 
                             b1.Property<string>("Complement")
-                                .HasColumnType("text");
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)");
 
                             b1.Property<string>("Coordinates")
                                 .IsRequired()
@@ -418,15 +420,18 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.Property<string>("Name")
                                 .IsRequired()
-                                .HasColumnType("text");
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)");
 
                             b1.Property<string>("Postcode")
                                 .IsRequired()
-                                .HasColumnType("text");
+                                .HasMaxLength(5)
+                                .HasColumnType("character varying(5)");
 
                             b1.Property<string>("StreetInfo")
                                 .IsRequired()
-                                .HasColumnType("text");
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)");
 
                             b1.HasKey("CourierId");
 
@@ -449,10 +454,12 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.Property<string>("City")
                                 .IsRequired()
-                                .HasColumnType("text");
+                                .HasMaxLength(100)
+                                .HasColumnType("character varying(100)");
 
                             b1.Property<string>("Complement")
-                                .HasColumnType("text");
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)");
 
                             b1.Property<string>("Coordinates")
                                 .IsRequired()
@@ -460,15 +467,18 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.Property<string>("Name")
                                 .IsRequired()
-                                .HasColumnType("text");
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)");
 
                             b1.Property<string>("Postcode")
                                 .IsRequired()
-                                .HasColumnType("text");
+                                .HasMaxLength(5)
+                                .HasColumnType("character varying(5)");
 
                             b1.Property<string>("StreetInfo")
                                 .IsRequired()
-                                .HasColumnType("text");
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)");
 
                             b1.HasKey("CustomerId");
 

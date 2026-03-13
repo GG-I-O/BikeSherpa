@@ -1,8 +1,8 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
@@ -50,7 +50,7 @@ public class AddDeliveryStepHandler(
                return Result<Guid>.NotFound();
           }
 
-          var deliveryStep = await delivery.AddStep(command.StepType, command.StepAddress, deliveryZones, pricingStrategyService, itineraryService);
+          var deliveryStep = await delivery.AddStepAsync(command.StepType, command.StepAddress, deliveryZones, pricingStrategyService, itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);

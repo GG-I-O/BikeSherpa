@@ -1,8 +1,8 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
@@ -106,7 +106,7 @@ public class UpdateDeliveryHandler(
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
 
-          entity.UpdateSteps(command.Steps, deliveryZones, pricingStrategyService, itineraryService);
+          await entity.UpdateStepsAsync(command.Steps, deliveryZones, pricingStrategyService, itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
