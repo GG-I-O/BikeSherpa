@@ -49,6 +49,26 @@ We prefer managing additions via a factory and not re-wrapping a `DbSet<>` which
 
 So a wrapper of Ardalis RepositoryBase implementing our IRepository interface is provided and should always be used.
 
+#### Refitter
+
+Refitter is a tool for generating a C# REST API Client using the Refit library.
+
+##### Prerequisites
+
+- Install the Refitter CLI Tool running the following command:
+
+```bash
+dotnet tool install --global Refitter
+```
+
+- Install the NuGet packages Refit and Refit.HttpClientFactory
+
+You can generate the GeoService Itinéraire API using the itineraire.yaml file provided by the service running the following command:
+
+```bash
+refitter --settings-file ign-itineraire.refitter.json
+```
+
 ### Application domain
 
 We take as presented Ardalis library

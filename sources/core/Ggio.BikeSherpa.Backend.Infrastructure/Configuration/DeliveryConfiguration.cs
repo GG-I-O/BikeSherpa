@@ -25,7 +25,6 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           {
                steps.WithOwner().HasForeignKey("DeliveryId");
                steps.HasKey("Id");
-               steps.Property(s => s.Id).ValueGeneratedNever();
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();
                steps.Property(s => s.Order).IsRequired();
                steps.Property(s => s.Completed).IsRequired();

@@ -39,7 +39,8 @@ export function useNewCourierFormViewModel() {
                 streetInfo: "",
                 complement: "",
                 postcode: "",
-                city: ""
+                city: "",
+                coordinates: ""
             },
         },
         resolver: zodResolver(newCourierViewModel.getNewCourierSchema(courierList))

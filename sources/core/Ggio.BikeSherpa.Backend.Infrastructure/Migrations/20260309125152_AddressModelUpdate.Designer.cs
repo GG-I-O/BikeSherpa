@@ -3,6 +3,7 @@ using System;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(BackendDbContext))]
-    partial class BackendDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260309125152_AddressModelUpdate")]
+    partial class AddressModelUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -495,7 +498,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.OwnsMany("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryStep", "Steps", b1 =>
                         {
                             b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd()
                                 .HasColumnType("uuid");
 
                             b1.PrimitiveCollection<string[]>("AttachmentFilePaths")

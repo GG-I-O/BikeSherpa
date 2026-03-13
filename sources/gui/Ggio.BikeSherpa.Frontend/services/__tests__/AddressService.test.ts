@@ -49,6 +49,12 @@ describe("AddressService.fetchAddress", () => {
             status: 200,
             json: async () => ({
                 features: [{
+                    geometry: {
+                        coordinates: {
+                            0: "1",
+                            1: "2"
+                        }
+                    },
                     properties: {
                         label: "label 1",
                         name: "name",
@@ -75,6 +81,7 @@ describe("AddressService.fetchAddress", () => {
         expect(addressList[0].streetInfo).toBe("name");
         expect(addressList[0].postcode).toBe("postcode");
         expect(addressList[0].city).toBe("city");
+        expect(addressList[0].coordinates).toBe("1,2");
     });
 
     it("fetch with a 200 response returns a multiple Address array", async () => {
@@ -85,6 +92,12 @@ describe("AddressService.fetchAddress", () => {
             json: async () => ({
                 features: [
                     {
+                        geometry: {
+                            coordinates: {
+                                0: "1",
+                                1: "2"
+                            }
+                        },
                         properties: {
                             label: "label 1",
                             name: "name 1",
@@ -93,6 +106,12 @@ describe("AddressService.fetchAddress", () => {
                         }
                     },
                     {
+                        geometry: {
+                            coordinates: {
+                                0: "3",
+                                1: "4"
+                            }
+                        },
                         properties: {
                             label: "label 2",
                             name: "name 2",
@@ -101,6 +120,12 @@ describe("AddressService.fetchAddress", () => {
                         }
                     },
                     {
+                        geometry: {
+                            coordinates: {
+                                0: "5",
+                                1: "6"
+                            }
+                        },
                         properties: {
                             label: "label 3",
                             name: "name 3",
@@ -124,7 +149,9 @@ describe("AddressService.fetchAddress", () => {
         expect(data).toHaveLength(3);
         if (!data) return;
         expect(data[1].postcode).toBe("postcode 2");
+        expect(data[1].coordinates).toBe("3,4");
         expect(data[2].fullAddress).toBe("label 3");
+        expect(data[2].coordinates).toBe("5,6");
     });
 
     it("fetch with a 400 response returns a null address list", async () => {

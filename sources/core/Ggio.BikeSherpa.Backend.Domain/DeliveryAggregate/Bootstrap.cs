@@ -1,5 +1,4 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
-using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;

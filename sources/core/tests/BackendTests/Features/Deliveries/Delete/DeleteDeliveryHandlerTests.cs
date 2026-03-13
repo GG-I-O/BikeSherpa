@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+using Ardalis.Specification;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using Ardalis.Result;

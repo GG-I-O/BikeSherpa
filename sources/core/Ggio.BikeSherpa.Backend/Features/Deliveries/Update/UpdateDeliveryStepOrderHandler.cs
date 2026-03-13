@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
+using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
@@ -31,7 +32,8 @@ public class UpdateDeliveryStepOrderCommandValidator : AbstractValidator<UpdateD
 public class UpdateDeliveryStepOrderHandler(
      IReadRepository<Delivery> deliveryRepository,
      IValidator<UpdateDeliveryStepOrderCommand> validator,
-     IApplicationTransaction transaction
+     IApplicationTransaction transaction,
+     IItineraryService itineraryService
 ) : ICommandHandler<UpdateDeliveryStepOrderCommand, Result>
 {
      public async ValueTask<Result> Handle(UpdateDeliveryStepOrderCommand command, CancellationToken cancellationToken)
@@ -45,7 +47,7 @@ public class UpdateDeliveryStepOrderHandler(
                return Result.NotFound();
           }
 
-          delivery.ReorderSteps(command.StepId, command.Order);
+          delivery.ReorderSteps(command.StepId, command.Order, itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
