@@ -125,7 +125,7 @@ public class DeliveryTests
         step2.Order = 2;
         step3.Order = 3;
         delivery.Steps.AddRange([step1, step2, step3]);
-        var (mockDeliveryZoneRepository, mockPricingStrategyService, address, mockItineraryService) = CreateStepDependencies(delivery);
+        var (_, _, _, mockItineraryService) = CreateStepDependencies(delivery);
 
         // Act
         delivery.ReorderSteps(step3.Id, 2, mockItineraryService.Object);
