@@ -46,7 +46,7 @@ describe("CourierForm", () => {
         const formButton = screen.getByTestId("formButton");
         const buttonName = screen.queryByTestId("buttonName");
 
-        // Check that ThemedInput is called 6 times (firsName, lastName, code, email, phoneNumber, complement)
+        // Check that ThemedInput is called 6 times (firsName, lastName, code, email, phoneNumber, address.complement)
         expect(ThemedInput).toHaveBeenCalledTimes(6);
 
         // Get the props from each call
@@ -95,7 +95,7 @@ describe("CourierForm", () => {
         // Check sixth call - Complement input (not required)
         expect(call6Props.label).toBe("Complément d’adresse");
         expect(call6Props.placeholder).toBe("Bâtiment B");
-        expect(call6Props.name).toBe("complement");
+        expect(call6Props.name).toBe("address.complement");
         expect(call6Props.required).toBeUndefined();
         expect(call6Props.testID).toBe("courierFormComplementInput");
 

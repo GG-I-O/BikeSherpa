@@ -8,23 +8,16 @@ using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Couriers.Services;
 
-public class CourierLinks(IHttpContextAccessor httpContextAccessor, IHateoasService hateoasService): ICourierLinks
+public class CourierLinks(IHttpContextAccessor httpContextAccessor, IHateoasService hateoasService) : ICourierLinks
 {
      public List<Link> GenerateLinks(Guid id)
      {
-          // Get Links depending permissions
-          var context = httpContextAccessor.HttpContext;
-          if (context is null)
-               return [];
-          var scopes = context.User.FindAll("scope")
-               .SelectMany(c => c.Value.Split(' '))
-               .Distinct()
-               .ToList();
-          
-          var canRead = scopes.Contains("read:couriers");
-          var canWrite = scopes.Contains("write:couriers");
-          if (!canRead && !canWrite)
-               return [];
+          // Get Links depending on permissions
+          var scopes = httpContextAccessor.GetResourceScopes("read:couriers", "write:couriers");
+
+          if (scopes is null) return [];
+
+          var (canRead, canWrite) = scopes.Value;
 
           return hateoasService.GenerateLinks(
                canRead ? IEndpoint.GetName<GetCourierEndpoint>() : null,

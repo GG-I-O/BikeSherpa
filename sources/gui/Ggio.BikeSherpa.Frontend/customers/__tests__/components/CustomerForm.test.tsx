@@ -89,7 +89,7 @@ describe("CustomerForm", () => {
         // Check fifth call - Complement input (not required)
         expect(call5Props.label).toBe("Complément d’adresse");
         expect(call5Props.placeholder).toBe("Bâtiment B");
-        expect(call5Props.name).toBe("complement");
+        expect(call5Props.name).toBe("address.complement");
         expect(call5Props.required).toBeUndefined();
         expect(call5Props.testID).toBe("customerFormComplementInput");
 

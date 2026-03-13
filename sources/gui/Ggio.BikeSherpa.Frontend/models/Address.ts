@@ -4,7 +4,7 @@ export type Address = {
     name: string;
     fullAddress: string;
     streetInfo: string;
-    complement?: string | null;
+    complement: string | null;
     postcode: string;
     city: string;
 }
@@ -23,8 +23,7 @@ export const addressSchema = zod
             .min(5, "Veuillez rentrer une adresse valide"),
         complement: zod
             .string()
-            .nullable()
-            .optional(),
+            .nullable(),
         postcode: zod
             .string()
             .trim()

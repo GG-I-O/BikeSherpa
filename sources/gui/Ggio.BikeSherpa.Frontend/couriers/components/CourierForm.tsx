@@ -79,7 +79,7 @@ export default function CourierForm<T extends FieldValues>(props: CourierFormPro
             <ThemedInput
                 testID="courierFormComplementInput"
                 control={control}
-                name="complement"
+                name="address.complement"
                 error={(errors.address as any)?.complement as FieldError | undefined}
                 label="Complément d’adresse"
                 placeholder="Bâtiment B"

@@ -42,6 +42,9 @@ describe("NewCourierFormViewModel", () => {
 
         beforeEach(() => {
             courierToValidate = createRandomCourier(true, linkType.none);
+            if (courierToValidate.code === existingCouriers[0].code) {
+                courierToValidate.code = "ZZZ";
+            }
         })
 
         it("validates firstName is required", () => {
@@ -92,6 +95,7 @@ describe("NewCourierFormViewModel", () => {
         it("validates phone is required", () => {
             //arrange
             const schema = viewModel.getNewCourierSchema(existingCouriers);
+            courierToValidate.code = "ZZZ";
             courierToValidate.phoneNumber = "";
 
             //act
@@ -100,7 +104,8 @@ describe("NewCourierFormViewModel", () => {
             //assert
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.issues[0].message).toBe("Numéro de téléphone requis");
+                const messages = result.error.issues.map((issue) => issue.message);
+                expect(messages).toContain("Numéro de téléphone requis");
             }
         });
 

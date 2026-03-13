@@ -14,7 +14,9 @@ export function createRandomInputCustomer(): InputCustomer {
     address: fakeAddress,
     code: faker.string.alpha(3).toUpperCase(),
     phoneNumber: faker.phone.number(),
-    email: faker.internet.email()
+    email: faker.internet.email(),
+    siret: null,
+    vatNumber: null
   };
 }
 
