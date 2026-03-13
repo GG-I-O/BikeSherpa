@@ -1,22 +1,24 @@
 ﻿using AwesomeAssertions;
+using Ggio.BikeSherpa.Backend.Domain;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts;
 using Moq;
 
 namespace Backend.Infrastructure.Tests;
 
-[Trait("Category", "Integration")]
-public class ItineraryServiceIntegrationTests
+public class ItineraryServiceTests
 {
+     private readonly Mock<IItineraryApi> _sut = new();
+     private readonly CancellationTokenSource _cts = new();
+
      [Fact]
      public async Task GetItineraryInfoAsync_WithValidCoordinates_ReturnsItineraryResult()
      {
           // Arrange
-          var mockApi = new Mock<IItineraryApi>();
           const float expectedDistance = 25.5f;
           const float expectedDuration = 30.5f;
 
-          mockApi.Setup(x => x.RouteItinerairePost(
+          _sut.Setup(x => x.RouteItinerairePost(
                     It.IsAny<RouteBody>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new Itineraire
@@ -25,7 +27,7 @@ public class ItineraryServiceIntegrationTests
                     Duration = expectedDuration
                });
 
-          var service = new ItineraryService(mockApi.Object);
+          var service = new ItineraryService(_sut.Object);
 
           // Act
           var result = await service.GetItineraryInfoAsync("2.35,48.85", "2.45,48.95", CancellationToken.None);
@@ -39,20 +41,18 @@ public class ItineraryServiceIntegrationTests
      public async Task GetItineraryInfoAsync_IncludesHighwayBanConstraint()
      {
           // Arrange
-          var mockApi = new Mock<IItineraryApi>();
-
-          mockApi.Setup(x => x.RouteItinerairePost(
+          _sut.Setup(x => x.RouteItinerairePost(
                     It.IsAny<RouteBody>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new Itineraire { Distance = 10f, Duration = 15f });
 
-          var service = new ItineraryService(mockApi.Object);
+          var service = new ItineraryService(_sut.Object);
 
           // Act
           await service.GetItineraryInfoAsync("2.35,48.85", "2.45,48.95", CancellationToken.None);
 
           // Assert
-          mockApi.Verify(x => x.RouteItinerairePost(
+          _sut.Verify(x => x.RouteItinerairePost(
                     It.Is<RouteBody>(body =>
                          body.Constraints != null &&
                          body.Constraints.Count == 1 &&
@@ -69,23 +69,51 @@ public class ItineraryServiceIntegrationTests
      public async Task GetItineraryInfoAsync_WithCancellationToken_PassesTokenToApi()
      {
           // Arrange
-          var mockApi = new Mock<IItineraryApi>();
-          var cts = new CancellationTokenSource();
-
-          mockApi.Setup(x => x.RouteItinerairePost(
+          _sut.Setup(x => x.RouteItinerairePost(
                     It.IsAny<RouteBody>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new Itineraire { Distance = 10f, Duration = 15f });
 
-          var service = new ItineraryService(mockApi.Object);
+          var service = new ItineraryService(_sut.Object);
 
           // Act
-          await service.GetItineraryInfoAsync("2.35,48.85", "2.45,48.95", cts.Token);
+          await service.GetItineraryInfoAsync("2.35,48.85", "2.45,48.95", _cts.Token);
 
           // Assert
-          mockApi.Verify(x => x.RouteItinerairePost(
+          _sut.Verify(x => x.RouteItinerairePost(
                     It.IsAny<RouteBody>(),
-                    It.Is<CancellationToken>(c => c == cts.Token)),
+                    It.Is<CancellationToken>(c => c == _cts.Token)),
                Times.Once);
+     }
+
+     [Fact]
+     public async Task GetItineraryInfoAsync_ThrowsItineraryServiceException_WhenCoordinatesAreIdentical()
+     {
+          // Arrange
+          var service = new ItineraryService(_sut.Object);
+
+          // Act & Assert
+          var ex = await Assert.ThrowsAsync<ItineraryServiceException>(() =>
+               service.GetItineraryInfoAsync("2.35,48.85", "2.35,48.85", CancellationToken.None));
+
+          ex.Message.Should().Be("Coordonnées de départ et d’arrivée identiques");
+
+          _sut.Verify(x => x.RouteItinerairePost(It.IsAny<RouteBody>(), It.IsAny<CancellationToken>()), Times.Never);
+     }
+
+     [Fact]
+     public async Task GetItineraryInfoAsync_ThrowsItineraryServiceException_WhenApiReturnsNull()
+     {
+          // Arrange
+          _sut.Setup(x => x.RouteItinerairePost(It.IsAny<RouteBody>(), It.IsAny<CancellationToken>()))!
+               .ReturnsAsync(null as Itineraire);
+
+          var service = new ItineraryService(_sut.Object);
+
+          // Act & Assert
+          var ex = await Assert.ThrowsAsync<ItineraryServiceException>(() =>
+               service.GetItineraryInfoAsync("2.35,48.85", "2.45,48.95", CancellationToken.None));
+
+          ex.Message.Should().Be("Aucune réponse de l'API");
      }
 }

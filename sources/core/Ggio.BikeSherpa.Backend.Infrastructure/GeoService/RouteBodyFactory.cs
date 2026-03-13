@@ -2,13 +2,6 @@
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 
-public enum WayType
-{
-     Autoroute,
-     Tunnel,
-     Pont
-}
-
 public static class RouteBodyFactory
 {
      private const string DefaultResource = "bdtopo-osrm";
@@ -25,7 +18,7 @@ public static class RouteBodyFactory
                ConstraintType = ConstraintType.Banned,
                Key = "waytype",
                Operator = "=",
-               Value = wayType.ToString().ToLower()
+               Value = wayType.ToApiValue()
           };
      }
 

@@ -9,13 +9,13 @@ public class ItineraryService(IItineraryApi itineraryApi) : IItineraryService
      private static void EnsureDifferentCoordinates(string start, string end)
      {
           if (start == end)
-               throw new ItineraryServiceException("Coordonnées des points de départ et d’arrivée identiques", null);
+               throw new ItineraryServiceException("Coordonnées de départ et d’arrivée identiques");
      }
 
      private static void EnsureApiReturnedResult(Itineraire? result)
      {
           if (result is null)
-               throw new ItineraryServiceException("Aucune réponse de l'API", null);
+               throw new ItineraryServiceException("Aucune réponse de l'API");
      }
 
      public async Task<ItineraryResult> GetItineraryInfoAsync(
@@ -27,7 +27,7 @@ public class ItineraryService(IItineraryApi itineraryApi) : IItineraryService
 
           try
           {
-               var result = await itineraryApi.RouteItinerairePost(RouteBodyFactory.Create(startStepCoordinates, endStepCoordinates, [WayType.Autoroute]),
+               var result = await itineraryApi.RouteItinerairePost(RouteBodyFactory.Create(startStepCoordinates, endStepCoordinates, [WayType.Highway]),
                     cancellationToken
                );
 
@@ -43,9 +43,14 @@ public class ItineraryService(IItineraryApi itineraryApi) : IItineraryService
                throw;
           }
 
-          catch (Exception exception)
+          catch (ItineraryServiceException)
           {
-               throw new ItineraryServiceException("Erreur lors de l’appel à l’API d’itinéraire", exception);
+               throw;
+          }
+
+          catch (Exception)
+          {
+               throw new ItineraryServiceException("Erreur lors de l’appel à l’API d’itinéraire");
           }
      }
 }
