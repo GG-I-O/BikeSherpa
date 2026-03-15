@@ -1,4 +1,8 @@
-﻿using AutoFixture;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
@@ -9,6 +13,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Moq;
+using Xunit;
 
 namespace Backend.Domain.Tests.DeliveryAggregate;
 
@@ -528,7 +533,7 @@ public class DeliveryTests
         step2.EstimatedDeliveryDate = startTime.AddMinutes(15);
         step3.EstimatedDeliveryDate = startTime.AddMinutes(25);
         step4.EstimatedDeliveryDate = startTime.AddMinutes(35);
-        delivery.Steps.AddRange(step1, step2, step3, step4);
+        delivery.Steps.AddRange([step1, step2, step3, step4]);
 
         // Act
         delivery.UpdateStepDeliveryTime(step2.Id, startTime.AddMinutes(20));

@@ -1,4 +1,7 @@
-﻿using AwesomeAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Microsoft.AspNetCore.Http;
@@ -6,6 +9,7 @@ using Moq;
 using System.Security.Claims;
 using AutoFixture;
 using Ggio.BikeSherpa.Backend.Model;
+using Xunit;
 
 namespace BackendTests.Features.Customers.Services;
 

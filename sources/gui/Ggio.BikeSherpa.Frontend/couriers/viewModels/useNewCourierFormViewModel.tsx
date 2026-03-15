@@ -40,7 +40,10 @@ export function useNewCourierFormViewModel() {
                 complement: "",
                 postcode: "",
                 city: "",
-                coordinates: {}
+                coordinates: {
+                    longitude: 0,
+                    latitude: 0
+                }
             },
         },
         resolver: zodResolver(newCourierViewModel.getNewCourierSchema(courierList))

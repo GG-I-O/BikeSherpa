@@ -39,7 +39,10 @@ export function useNewCustomerFormViewModel() {
                 complement: '',
                 postcode: '',
                 city: '',
-                coordinates: {}
+                coordinates: {
+                    longitude: 0,
+                    latitude: 0
+                }
             },
             siret: '',
             vatNumber: ''

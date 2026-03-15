@@ -1,4 +1,6 @@
-﻿using Ardalis.Result;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Ardalis.Result;
 using Ardalis.Specification;
 using AutoFixture;
 using AwesomeAssertions;
@@ -6,6 +8,7 @@ using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Features.Customers.Delete;
 using Ggio.DddCore;
 using Moq;
+using Xunit;
 
 namespace BackendTests.Features.Customers.Delete;
 
