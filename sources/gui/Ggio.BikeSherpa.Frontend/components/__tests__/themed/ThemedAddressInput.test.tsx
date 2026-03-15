@@ -12,7 +12,7 @@ const mockAddresses: Address[] = faker.helpers.multiple(() => createRandomAddres
 
 const mockField = {
     name: 'address',
-    value: { name: '', streetInfo: '', postCode: '', city: '' },
+    value: { name: '', streetInfo: '', postCode: '', city: '', coordinates: { longitude: '', latitude: '' } },
     onChange: jest.fn((newValue) => { mockField.value = newValue; }),
     onBlur: jest.fn(),
     ref: jest.fn()
@@ -56,7 +56,7 @@ describe("ThemedAddressInput", () => {
             colors: {}
         });
 
-        mockField.value = { name: '', streetInfo: '', postCode: '', city: '' };
+        mockField.value = { name: '', streetInfo: '', postCode: '', city: '', coordinates: { longitude: '', latitude: '' } };
         (ReactHookForm.useController as jest.Mock).mockReturnValue({
             field: mockField,
             fieldState: {} as any,

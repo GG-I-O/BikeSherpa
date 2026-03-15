@@ -54,7 +54,11 @@ export default class AddressService implements IAddressService {
                     streetInfo: feature.properties.name,
                     complement: null,
                     postcode: feature.properties.postcode,
-                    city: feature.properties.city
+                    city: feature.properties.city,
+                    coordinates: {
+                        longitude: Number(feature.geometry.coordinates[0]),
+                        latitude: Number(feature.geometry.coordinates[1])
+                    }
                 }
                 return address;
             })

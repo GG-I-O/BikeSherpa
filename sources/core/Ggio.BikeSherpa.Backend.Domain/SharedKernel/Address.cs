@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using JetBrains.Annotations;
 
 namespace Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 
@@ -17,4 +18,6 @@ public class Address
 
      [UsedImplicitly]
      public required string City { get; set; }
+     [UsedImplicitly]
+     public required GeoPoint Coordinates { get; set; }
 }

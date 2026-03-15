@@ -38,7 +38,8 @@ export function useNewCustomerFormViewModel() {
                 streetInfo: '',
                 complement: '',
                 postcode: '',
-                city: ''
+                city: '',
+                coordinates: {}
             },
             siret: '',
             vatNumber: ''

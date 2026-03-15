@@ -6,6 +6,7 @@ using AwesomeAssertions;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
@@ -22,6 +23,7 @@ public class UpdateDeliveryHandlerTests
      private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
      private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
      private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
+     private readonly Mock<IItineraryService> _mockItineraryService = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private readonly UpdateDeliveryCommand _mockCommand;
      private readonly Delivery _mockDelivery;
@@ -43,7 +45,20 @@ public class UpdateDeliveryHandlerTests
                .Setup(x => x.GetAll())
                .Returns(packingSizes);
 
+          var steps = new List<DeliveryStep>
+          {
+               _fixture.Build<DeliveryStep>()
+                    .With(s => s.Order, 1)
+                    .With(s => s.StepType, StepType.Pickup)
+                    .Create(),
+               _fixture.Build<DeliveryStep>()
+                    .With(s => s.Order, 2)
+                    .With(s => s.StepType, StepType.Dropoff)
+                    .Create()
+          };
+
           _mockCommand = _fixture.Build<UpdateDeliveryCommand>()
+               .With(c => c.Steps, steps)
                .With(c => c.Urgency, urgencies[0].Name)
                .With(c => c.PackingSize, packingSizes[0].Name)
                .Create();
@@ -57,12 +72,18 @@ public class UpdateDeliveryHandlerTests
                     It.IsAny<ISpecification<Delivery>>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(_mockDelivery);
+
+          _mockItineraryService.Setup(i => i.GetItineraryInfoAsync(
+                    It.IsAny<GeoPoint>(),
+                    It.IsAny<GeoPoint>(),
+                    It.IsAny<CancellationToken>()))
+               .ReturnsAsync(new ItineraryResult(10.0, 20.0));
      }
 
      private UpdateDeliveryHandler CreateSut()
      {
           var validator = new UpdateDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
-          return new UpdateDeliveryHandler(_mockDeliveryRepository.Object, validator, _mockTransaction.Object, _mockDeliveryZoneRepository.Object, _mockPricingStrategyService.Object);
+          return new UpdateDeliveryHandler(_mockDeliveryRepository.Object, validator, _mockTransaction.Object, _mockDeliveryZoneRepository.Object, _mockPricingStrategyService.Object, _mockItineraryService.Object);
      }
 
      private void SetupRepositoryTestingIfReportIdExists(bool doesReportIdExist)
