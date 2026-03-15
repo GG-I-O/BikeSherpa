@@ -35,6 +35,7 @@ export function useNewCustomerFormViewModel() {
             email: '',
             address: {
                 name: '',
+                fullAddress: '',
                 streetInfo: '',
                 complement: '',
                 postcode: '',

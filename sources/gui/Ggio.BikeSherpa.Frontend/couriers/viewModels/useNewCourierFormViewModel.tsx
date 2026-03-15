@@ -36,6 +36,7 @@ export function useNewCourierFormViewModel() {
             email: "",
             address: {
                 name: "",
+                fullAddress: "",
                 streetInfo: "",
                 complement: "",
                 postcode: "",

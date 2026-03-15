@@ -23,8 +23,8 @@ public record GeoPoint(double Longitude, double Latitude)
                throw new ArgumentException("Coordonnées invalides.", nameof(input));
           }
 
-          var longitude = double.Parse(parts[0]);
-          var latitude = double.Parse(parts[1]);
+          var longitude = double.Parse(parts[0], CultureInfo.InvariantCulture);
+          var latitude = double.Parse(parts[1], CultureInfo.InvariantCulture);
 
           return new GeoPoint(longitude, latitude);
      }

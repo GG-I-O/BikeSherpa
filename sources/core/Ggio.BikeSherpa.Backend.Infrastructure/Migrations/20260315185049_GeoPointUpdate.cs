@@ -15,7 +15,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                 table: "DeliverySteps",
                 type: "text",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: "0,0");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Address_StreetInfo",
@@ -68,7 +68,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                 table: "Customers",
                 type: "text",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: "0,0");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Address_StreetInfo",
@@ -121,7 +121,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                 table: "Couriers",
                 type: "text",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: "0,0");
         }
 
         /// <inheritdoc />

@@ -137,7 +137,11 @@ describe("CustomerListView", () => {
                 streetInfo: undefined as any,
                 complement: null,
                 postcode: undefined as any,
-                city: undefined as any
+                city: undefined as any,
+                coordinates: {
+                    longitude: 0,
+                    latitude: 0
+                }
             }
         };
 
