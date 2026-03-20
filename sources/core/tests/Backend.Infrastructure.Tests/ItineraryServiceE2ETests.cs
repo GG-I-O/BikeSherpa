@@ -1,6 +1,6 @@
 ﻿using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Microsoft.Extensions.Configuration;
@@ -11,7 +11,7 @@ namespace Backend.Infrastructure.Tests;
 [Trait("Category", "E2E")]
 public class ItineraryServiceE2ETest
 {
-     private static IItineraryService MakeSut()
+     private static IItinerarySpi MakeSut()
      {
           var configuration = new ConfigurationBuilder()
                .SetBasePath(Directory.GetCurrentDirectory())
@@ -21,7 +21,7 @@ public class ItineraryServiceE2ETest
           services.AddLogging();
           services.AddBackendInfrastructure(configuration);
           var serviceProvider = services.BuildServiceProvider();
-          var service = serviceProvider.GetRequiredService<IItineraryService>();
+          var service = serviceProvider.GetRequiredService<IItinerarySpi>();
 
           return service;
      }

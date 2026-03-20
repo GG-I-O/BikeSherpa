@@ -1,11 +1,11 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts;
 using Microsoft.Extensions.Logging;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 
-public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryService> logger) : IItineraryService
+public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryService> logger) : IItinerarySpi
 {
      private static void EnsureDifferentCoordinates(GeoPoint start, GeoPoint end)
      {
@@ -32,12 +32,6 @@ public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryServi
 
           try
           {
-               Console.WriteLine("==========================================================");
-               Console.WriteLine("==========================================================");
-               Console.WriteLine(startStepCoordinates.ToString());
-               Console.WriteLine(endStepCoordinates.ToString());
-               Console.WriteLine("==========================================================");
-               Console.WriteLine("==========================================================");
                var result = await itineraryApi.RouteItinerairePost(RouteBodyFactory.Create(startStepCoordinates.ToString(), endStepCoordinates.ToString(), [WayType.Highway]), cancellationToken);
 
                EnsureApiReturnedResult(result);
@@ -48,14 +42,9 @@ public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryServi
                );
           }
 
-          catch (Exception exception)
+          catch (Exception exception) when (exception is not ItineraryServiceException)
           {
                logger.LogError(exception, "Error calling the itinerary API");
-
-               if (exception is ItineraryServiceException)
-               {
-                    throw;
-               }
 
                throw new ItineraryServiceException("Erreur lors de l’appel à l’API d’itinéraire", exception);
           }

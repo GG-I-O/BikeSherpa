@@ -1,8 +1,8 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.DddCore;
 using JetBrains.Annotations;
 using Mediator;
@@ -33,7 +33,7 @@ public class UpdateDeliveryStepOrderHandler(
      IReadRepository<Delivery> deliveryRepository,
      IValidator<UpdateDeliveryStepOrderCommand> validator,
      IApplicationTransaction transaction,
-     IItineraryService itineraryService
+     IItinerarySpi itineraryService
 ) : ICommandHandler<UpdateDeliveryStepOrderCommand, Result>
 {
      public async ValueTask<Result> Handle(UpdateDeliveryStepOrderCommand command, CancellationToken cancellationToken)

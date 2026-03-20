@@ -8,9 +8,9 @@ using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Moq;
 using Xunit;
@@ -20,7 +20,7 @@ namespace Backend.Domain.Tests.DeliveryAggregate;
 public class DeliveryTests
 {
     private readonly Mock<IPricingStrategyService> _pricingStrategyServiceMock = new();
-    private readonly Mock<IItineraryService> _mockItineraryService = new();
+    private readonly Mock<IItinerarySpi> _mockItineraryService = new();
     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
     private Delivery MakeSut()
@@ -546,12 +546,12 @@ public class DeliveryTests
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private (Mock<IDeliveryZoneRepository> mockDeliveryZoneRepository, Mock<IPricingStrategyService> mockPricingStrategyService, Address address, Mock<IItineraryService> mockItineraryService)
+    private (Mock<IDeliveryZoneRepository> mockDeliveryZoneRepository, Mock<IPricingStrategyService> mockPricingStrategyService, Address address, Mock<IItinerarySpi> mockItineraryService)
         CreateStepDependencies(Delivery delivery, double calculatedPrice = 15.0)
     {
         var mockDeliveryZoneRepository = new Mock<IDeliveryZoneRepository>();
         var mockPricingStrategyService = new Mock<IPricingStrategyService>();
-        var mockItineraryService = new Mock<IItineraryService>();
+        var mockItineraryService = new Mock<IItinerarySpi>();
         var address = _fixture.Create<Address>();
         address.Coordinates = new GeoPoint(5.2, 45.3);
         mockDeliveryZoneRepository.Setup(r => r.GetByAddress(address.City)).Returns(_fixture.Create<DeliveryZone>());
@@ -564,12 +564,12 @@ public class DeliveryTests
         return (mockDeliveryZoneRepository, mockPricingStrategyService, address, mockItineraryService);
     }
 
-    private (Mock<IDeliveryZoneRepository> mockDeliveryZoneRepository, Mock<IPricingStrategyService> mockPricingStrategyService, Mock<IItineraryService> mockItineraryService)
+    private (Mock<IDeliveryZoneRepository> mockDeliveryZoneRepository, Mock<IPricingStrategyService> mockPricingStrategyService, Mock<IItinerarySpi> mockItineraryService)
         CreateUpdateStepsDependencies(Delivery delivery, DeliveryZone? zone = null, double calculatedPrice = 10.0)
     {
         var mockDeliveryZoneRepository = new Mock<IDeliveryZoneRepository>();
         var mockPricingStrategyService = new Mock<IPricingStrategyService>();
-        var mockItineraryService = new Mock<IItineraryService>();
+        var mockItineraryService = new Mock<IItinerarySpi>();
         mockDeliveryZoneRepository.Setup(r => r.GetByAddress(It.IsAny<string>())).Returns(zone ?? _fixture.Create<DeliveryZone>());
         mockPricingStrategyService.Setup(p => p.CalculateDeliveryPriceWithoutVat(delivery)).Returns(calculatedPrice);
         mockItineraryService.Setup(i => i.GetItineraryInfoAsync(

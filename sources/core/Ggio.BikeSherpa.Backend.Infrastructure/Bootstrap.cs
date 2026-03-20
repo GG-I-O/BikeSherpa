@@ -1,5 +1,5 @@
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
 using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
@@ -42,7 +42,7 @@ public static class Bootstrap
                     {
                          c.BaseAddress = new Uri(configuration["ItineraryService:BaseUrl"]!);
                     });
-               services.AddScoped<IItineraryService, ItineraryService>();
+               services.AddScoped<IItinerarySpi, ItineraryService>();
                services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
                services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
                services.AddScoped<IUrgencyRepository, UrgencyRepository>();

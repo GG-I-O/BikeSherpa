@@ -2,10 +2,10 @@
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 using JetBrains.Annotations;
@@ -36,7 +36,7 @@ public class AddDeliveryStepHandler(
      IReadRepository<Delivery> deliveryRepository,
      IDeliveryZoneRepository deliveryZones,
      IPricingStrategyService pricingStrategyService,
-     IItineraryService itineraryService
+     IItinerarySpi itineraryService
      ) : ICommandHandler<AddDeliveryStepCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryStepCommand command, CancellationToken cancellationToken)

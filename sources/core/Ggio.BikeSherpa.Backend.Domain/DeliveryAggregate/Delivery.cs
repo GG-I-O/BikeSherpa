@@ -1,9 +1,9 @@
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 
@@ -90,7 +90,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
-     public async Task ReorderStepsAsync(Guid movedStepId, int newOrder, IItineraryService itineraryService)
+     public async Task ReorderStepsAsync(Guid movedStepId, int newOrder, IItinerarySpi itineraryService)
      {
           var movedStep = Steps.Single(s => s.Id == movedStepId);
           Steps.Remove(movedStep);
@@ -112,7 +112,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     private async Task RecalculateStepDistancesAsync(IItineraryService itineraryService)
+     private async Task RecalculateStepDistancesAsync(IItinerarySpi itineraryService)
      {
           foreach (var step in Steps.Where(s => s.StepType == StepType.Dropoff))
           {
@@ -123,7 +123,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     private async Task<double> GetDistanceAsync(DeliveryStep step, IItineraryService itineraryService)
+     private async Task<double> GetDistanceAsync(DeliveryStep step, IItinerarySpi itineraryService)
      {
           if (step.Order == 1 || step.StepType == StepType.Pickup) return 0;
           var previousStep = Steps.First(s => s.Order == step.Order - 1);
@@ -164,7 +164,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           Address stepAddress,
           IDeliveryZoneRepository deliveryZones,
           IPricingStrategyService pricingStrategyService,
-          IItineraryService itineraryService)
+          IItinerarySpi itineraryService)
      {
           var newStep = new DeliveryStep(
                stepType,
@@ -197,7 +197,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public async Task DeleteStepAsync(
           DeliveryStep removedStep,
           IPricingStrategyService pricingStrategyService,
-          IItineraryService itineraryService)
+          IItinerarySpi itineraryService)
      {
           var nextStep = Steps.FirstOrDefault((s => s.Order == removedStep.Order + 1));
           var timeOffset = CalculateDeliveryTimeOffset(removedStep, nextStep);
@@ -224,7 +224,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public async Task UpdateStepsAsync(List<DeliveryStep> steps,
           IDeliveryZoneRepository deliveryZones,
           IPricingStrategyService pricingStrategyService,
-          IItineraryService itineraryService)
+          IItinerarySpi itineraryService)
      {
           foreach (var step in steps)
           {

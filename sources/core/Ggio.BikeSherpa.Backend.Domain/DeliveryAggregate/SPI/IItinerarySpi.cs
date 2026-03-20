@@ -1,8 +1,8 @@
-﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services;
+﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 
 public record ItineraryResult(double DistanceInKm, double TimeInMinutes);
 
-public interface IItineraryService
+public interface IItinerarySpi
 {
      Task<ItineraryResult> GetItineraryInfoAsync(
           GeoPoint startStepCoordinates,
