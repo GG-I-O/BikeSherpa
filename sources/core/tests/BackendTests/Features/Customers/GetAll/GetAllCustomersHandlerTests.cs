@@ -1,12 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoFixture;
+﻿using AutoFixture;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Features.Customers.GetAll;
 using Ggio.DddCore;
 using Moq;
-using Xunit;
 
 namespace BackendTests.Features.Customers.GetAll;
 

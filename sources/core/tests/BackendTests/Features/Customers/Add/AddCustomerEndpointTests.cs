@@ -1,10 +1,6 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Ardalis.Result;
 using AutoFixture;
 using AwesomeAssertions;
@@ -14,7 +10,6 @@ using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using JetBrains.Annotations;
 using Mediator;
 using Moq;
-using Xunit;
 
 namespace BackendTests.Features.Customers.Add;
 

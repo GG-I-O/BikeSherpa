@@ -1,16 +1,11 @@
-﻿using System;
-using Ardalis.Result;
+﻿using Ardalis.Result;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Features.Customers.Delete;
 using Mediator;
 using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using BackendTests.Services;
 using JetBrains.Annotations;
 using Moq;
-using Xunit;
 
 namespace BackendTests.Features.Customers.Delete;
 
