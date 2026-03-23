@@ -28,8 +28,9 @@ public class DeliveryFactory(IMediator mediator, IReadRepository<Customer> custo
 {
      public async Task<Delivery> CreateDeliveryAsync(PricingStrategy pricingStrategy, string code, Guid customerId, string urgency, double? totalPrice, double? discount, string[] details, string packingSize, bool insulatedBox, DateTimeOffset contractDate, DateTimeOffset startDate)
      {
-          var delivery = new Delivery()
+          var delivery = new Delivery
           {
+               Id = Guid.NewGuid(),
                PricingStrategy = pricingStrategy,
                Code = code,
                CustomerId = customerId,

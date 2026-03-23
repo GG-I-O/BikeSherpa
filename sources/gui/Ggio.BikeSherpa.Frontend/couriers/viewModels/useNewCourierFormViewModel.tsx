@@ -36,10 +36,15 @@ export function useNewCourierFormViewModel() {
             email: "",
             address: {
                 name: "",
+                fullAddress: "",
                 streetInfo: "",
                 complement: "",
                 postcode: "",
-                city: ""
+                city: "",
+                coordinates: {
+                    longitude: 0,
+                    latitude: 0
+                }
             },
         },
         resolver: zodResolver(newCourierViewModel.getNewCourierSchema(courierList))

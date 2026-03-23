@@ -35,10 +35,15 @@ export function useNewCustomerFormViewModel() {
             email: '',
             address: {
                 name: '',
+                fullAddress: '',
                 streetInfo: '',
                 complement: '',
                 postcode: '',
-                city: ''
+                city: '',
+                coordinates: {
+                    longitude: 0,
+                    latitude: 0
+                }
             },
             siret: '',
             vatNumber: ''

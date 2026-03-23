@@ -5,6 +5,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 using JetBrains.Annotations;
@@ -15,8 +16,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 public record AddDeliveryStepCommand(
      Guid DeliveryId,
      StepType StepType,
-     Address StepAddress,
-     double Distance
+     Address StepAddress
      ) : ICommand<Result<Guid>>;
 
 [UsedImplicitly]
@@ -27,7 +27,6 @@ public class AddDeliveryStepCommandValidator : AbstractValidator<AddDeliveryStep
           RuleFor(x => x.DeliveryId).NotEmpty();
           RuleFor(x => x.StepType).NotEmpty();
           RuleFor(x => x.StepAddress).NotEmpty();
-          RuleFor(x => x.Distance).NotEmpty();
      }
 }
 
@@ -36,7 +35,8 @@ public class AddDeliveryStepHandler(
      IApplicationTransaction transaction,
      IReadRepository<Delivery> deliveryRepository,
      IDeliveryZoneRepository deliveryZones,
-     IPricingStrategyService pricingStrategyService
+     IPricingStrategyService pricingStrategyService,
+     IItinerarySpi itineraryService
      ) : ICommandHandler<AddDeliveryStepCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryStepCommand command, CancellationToken cancellationToken)
@@ -50,7 +50,7 @@ public class AddDeliveryStepHandler(
                return Result<Guid>.NotFound();
           }
 
-          var deliveryStep = delivery.AddStep(command.StepType, command.StepAddress, command.Distance, deliveryZones, pricingStrategyService);
+          var deliveryStep = await delivery.AddStepAsync(command.StepType, command.StepAddress, deliveryZones, pricingStrategyService, itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);

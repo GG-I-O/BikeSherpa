@@ -169,10 +169,10 @@ describe("CourierBackendClientFacade", () => {
             expect(result).toBe(newId);
         });
 
-        it("should set complement to empty string when undefined", async () => {
+        it("should set complement to empty string when null", async () => {
             // Arrange
             const courier = createRandomCourier(false, linkType.none);
-            courier.address.complement = undefined;
+            courier.address.complement = null;
             const newId = faker.string.uuid();
 
             (schemas.CourierCrud.safeParse as jest.Mock).mockReturnValue({
@@ -238,10 +238,10 @@ describe("CourierBackendClientFacade", () => {
             );
         });
 
-        it("should set complement to empty string when undefined", async () => {
+        it("should set complement to empty string when null", async () => {
             // Arrange
             const courier = createRandomCourier(true, linkType.update);
-            courier.address.complement = undefined;
+            courier.address.complement = null;
 
             (schemas.CourierCrud.safeParse as jest.Mock).mockReturnValue({
                 success: true,
