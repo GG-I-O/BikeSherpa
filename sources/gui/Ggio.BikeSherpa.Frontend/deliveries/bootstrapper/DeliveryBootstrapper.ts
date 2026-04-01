@@ -2,7 +2,6 @@ import { IStorageContext } from "@/spi/StorageSPI";
 import { Container } from "inversify";
 import Delivery from "../models/Delivery";
 import { DeliveryServiceIdentifier } from "./DeliveryServiceIdentifier";
-import InputDelivery from "../models/InputDelivery";
 import { IBackendClient } from "@/spi/BackendClientSPI";
 import DeliveryStorageContext from "../services/DeliveryStorageContext";
 import DeliveryBackendClientFacade from "../services/DeliveryBackendClientfacade";
