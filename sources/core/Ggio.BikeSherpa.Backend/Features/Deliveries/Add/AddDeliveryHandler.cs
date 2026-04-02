@@ -11,7 +11,6 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 
 public record AddDeliveryCommand(
      PricingStrategy PricingStrategy,
-     DeliveryStatus Status,
      string Code,
      Guid CustomerId,
      string Urgency,
@@ -29,7 +28,6 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
      public AddDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
      {
           RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
-          RuleFor(x => x.Status).IsInEnum().NotEmpty();
           RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
           {
                var codeIsValid = !await repository.AnyAsync(new DeliveryByCodeSpecification(code), cancellationToken);

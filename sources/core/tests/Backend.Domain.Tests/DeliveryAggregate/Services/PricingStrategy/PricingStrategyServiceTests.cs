@@ -36,7 +36,7 @@ public class PricingStrategyServiceTests
         var defaultPackingSize = _fixture.Create<PackingSize>();
         var defaultUrgency = _fixture.Create<Urgency>();
         _defaultAddress = _fixture.Create<Address>();
-        _mockPricingStrategy.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
+        _mockPricingStrategy.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
         _mockPricingStrategy
             .Setup(s => s.CalculateDeliveryPriceWithoutVat(
                 It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
@@ -102,14 +102,14 @@ public class PricingStrategyServiceTests
     {
         // Arrange
         var matchingMock = new Mock<IPricingStrategy>();
-        matchingMock.Setup(s => s.Name).Returns("SimpleDeliveryStrategy");
+        matchingMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
         matchingMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
             It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>())).Returns(42.0);
 
         var otherMock = new Mock<IPricingStrategy>();
-        otherMock.Setup(s => s.Name).Returns("TourDeliveryStrategy");
+        otherMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.TourDeliveryStrategy);
         otherMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
@@ -136,7 +136,7 @@ public class PricingStrategyServiceTests
     {
         // Arrange
         var customMock = new Mock<IPricingStrategy>();
-        customMock.Setup(s => s.Name).Returns("CustomStrategy");
+        customMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.CustomStrategy);
         var sut = MakeSutWith(strategies: [customMock.Object]);
 
         // Act
@@ -156,7 +156,7 @@ public class PricingStrategyServiceTests
     {
         // Arrange
         var tourMock = new Mock<IPricingStrategy>();
-        tourMock.Setup(s => s.Name).Returns("TourDeliveryStrategy");
+        tourMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.TourDeliveryStrategy);
         var sut = MakeSutWith(strategies: [tourMock.Object]);
 
         // Act
