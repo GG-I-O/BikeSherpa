@@ -23,11 +23,11 @@ export const deliveryFormBaseSchema = zod
             .trim(),
         totalPrice: zod
             .number()
-            .positive()
+            .gte(0, "Le prix ne peut pas être négatif")
             .nullable(),
         discount: zod
             .number()
-            .positive()
+            .gte(0, "La remise ne peut pas être négative")
             .nullable(),
         reportId: zod
             .string()
@@ -40,9 +40,11 @@ export const deliveryFormBaseSchema = zod
         insulatedBox: zod
             .boolean(),
         contractDate: zod
+            .coerce
             .string()
-            .datetime({ offset: true }),
+            .datetime({offset: true}),
         startDate: zod
+            .coerce
             .string()
-            .datetime({ offset: true }),
+            .datetime({offset: true}),
     });

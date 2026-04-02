@@ -38,7 +38,14 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
     }
 
     public async AddEndpoint(item: Delivery): Promise<string> {
-        const parsed = schemas.DeliveryCrud.safeParse(item);
+        // Fill fields for Zod
+        const data = {
+            ...item,
+            contractDate: new Date(item.contractDate).toISOString(),
+            startDate: new Date(item.startDate).toISOString(),
+            steps: []
+        };
+        const parsed = schemas.DeliveryCrud.safeParse(data);
         if (!parsed.success) {
             console.error("Create Debug(DeliveryCrud validation Failed):");
             console.error(parsed.error.format());

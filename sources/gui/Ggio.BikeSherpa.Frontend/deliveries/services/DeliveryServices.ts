@@ -58,10 +58,12 @@ export default class DeliveryServices implements IDeliveryServices {
 
     // Wrapper for NewDeliveryForm
     public createDelivery(delivery: InputDelivery) {
+        const date = new Date(delivery.contractDate);
         const newDelivery: Delivery = {
             id: Crypto.randomUUID(),
             operationId: Crypto.randomUUID(),
             ...delivery,
+            code: `${delivery.customerId}-${date.getDate()}${date.getMonth() + 1}`
         };
         this.deliveryStore$[newDelivery.id].set(newDelivery);
     };

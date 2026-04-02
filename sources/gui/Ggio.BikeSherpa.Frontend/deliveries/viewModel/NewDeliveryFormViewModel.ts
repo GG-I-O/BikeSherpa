@@ -15,7 +15,8 @@ export default class NewDeliveryFormViewModel {
         this.deliveryServices = deliveryServices;
     }
 
-    public onSubmit(delivery: InputDelivery): void {
+    // Keep it as a lambda to be able to use "this". Don't ask me why, JavaScript things
+    public onSubmit = (delivery: InputDelivery): void => {
         this.deliveryServices.createDelivery(delivery);
         if (this.resetCallback)
             this.resetCallback();

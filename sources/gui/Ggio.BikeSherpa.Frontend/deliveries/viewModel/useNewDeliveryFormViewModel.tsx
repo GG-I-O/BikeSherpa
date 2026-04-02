@@ -4,8 +4,8 @@ import { DeliveryServiceIdentifier } from "../bootstrapper/DeliveryServiceIdenti
 import NewDeliveryFormViewModel from "./NewDeliveryFormViewModel";
 import { useForm } from "react-hook-form";
 import InputDelivery from "../models/InputDelivery";
-import { DeliveryPacking } from "../models/DeliveryPacking";
 import { zodResolver } from "@hookform/resolvers/zod";
+import packingSize from "@/deliveries/models/dropdownOptions/packingSize";
 
 export function useNewDeliveryFormViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -21,14 +21,16 @@ export function useNewDeliveryFormViewModel() {
             code: '',
             status: 0,
             customerId: '',
-            pricingStrategy: 0,
-            urgency: '',
+            pricingStrategy: 1,
+            urgency: 'Standard',
             totalPrice: 0,
             discount: 0,
             reportId: '',
-            details: [],
-            packingSize: DeliveryPacking.S.toString(),
+            details: [""],
+            packingSize: packingSize[0].value,
             insulatedBox: false,
+            startDate: new Date().toISOString(),
+            contractDate: new Date().toISOString(),
         },
         resolver: zodResolver(newDeliveryViewModel.getNewDeliverySchema())
     });
