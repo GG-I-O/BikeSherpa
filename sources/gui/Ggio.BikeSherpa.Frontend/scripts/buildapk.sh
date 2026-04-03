@@ -13,6 +13,10 @@ KEYSTORE_FILE="release.keystore"
 KEY_ALIAS="release"
 KEYSTORE_PATH="android/app/$KEYSTORE_FILE"
 GRADLE_PROPERTIES="android/gradle.properties"
+BUILD_GRADLE="android/app/build.gradle"
+ANDROID_HOME="$HOME/Android/Sdk"
+
+echo -e "$HOME"
 
 echo -e "${GREEN}=== Expo APK Build Script ===${NC}\n"
 
@@ -56,6 +60,23 @@ if ! command -v keytool &> /dev/null; then
         echo -e "${CYAN}  Or download from: https://adoptium.net/${NC}\n"
         exit 1
     fi
+fi
+
+# Check for Android SDK
+if [ -z "$ANDROID_HOME" ] && [ ! -f "android/local.properties" ]; then
+    echo -e "${YELLOW}Android SDK not found!${NC}"
+    echo -e "${YELLOW}Please install the Android SDK and set ANDROID_HOME:${NC}"
+    echo -e "${CYAN}  Ubuntu/Debian:${NC}"
+    echo -e "${CYAN}    sudo apt update && sudo apt install unzip wget openjdk-17-jdk${NC}"
+    echo -e "${CYAN}    mkdir -p $HOME/Android/Sdk${NC}"
+    echo -e "${CYAN}    cd $HOME/Android/Sdk${NC}"
+    echo -e "${CYAN}    wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip${NC}"
+    echo -e "${CYAN}    unzip commandlinetools-linux-9477386_latest.zip -d latest${NC}"
+    echo -e "${CYAN}    export ANDROID_HOME=$HOME/Android/Sdk${NC}"
+    echo -e "${CYAN}    export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools${NC}"
+    echo
+    echo -e "${CYAN}  Then run: sdkmanager 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0'${NC}"
+    exit 1
 fi
 
 # Verify keytool works
@@ -148,6 +169,9 @@ else
     echo -e "${GREEN}Keystore found${NC}\n"
 fi
 
+# Specify android sdk folder
+echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+
 # Check and update build.gradle if needed
 BUILD_GRADLE="android/app/build.gradle"
 if ! grep -q "signingConfig signingConfigs.release" "$BUILD_GRADLE"; then
@@ -156,29 +180,25 @@ if ! grep -q "signingConfig signingConfigs.release" "$BUILD_GRADLE"; then
     # Backup original file
     cp "$BUILD_GRADLE" "$BUILD_GRADLE.bak"
     
-    # Add release signing config if not present
-    if ! grep -q "signingConfigs {" "$BUILD_GRADLE"; then
-        # Insert signingConfigs section before buildTypes
-        sed -i.tmp '/buildTypes {/i\
-    signingConfigs {\
-        release {\
-            if (project.hasProperty("MYAPP_RELEASE_STORE_FILE")) {\
-                storeFile file(project.property("MYAPP_RELEASE_STORE_FILE"))\
-                storePassword project.property("MYAPP_RELEASE_STORE_PASSWORD")\
-                keyAlias project.property("MYAPP_RELEASE_KEY_ALIAS")\
-                keyPassword project.property("MYAPP_RELEASE_KEY_PASSWORD")\
-            }\
-        }\
-    }\
-' "$BUILD_GRADLE"
-    fi
+    # Add release block to signingConfig
+    perl -0777 -i -pe '
+    if ($_ !~ /signingConfigs\s*\{[^}]*release/) {
+        s/(signingConfigs\s*\{)/$1
+        release {
+            if (project.hasProperty('"'"'MYAPP_RELEASE_STORE_FILE'"'"')) {
+                storeFile file(project.property('"'"'MYAPP_RELEASE_STORE_FILE'"'"'))
+                storePassword project.property('"'"'MYAPP_RELEASE_STORE_PASSWORD'"'"')
+                keyAlias project.property('"'"'MYAPP_RELEASE_KEY_ALIAS'"'"')
+                keyPassword project.property('"'"'MYAPP_RELEASE_KEY_PASSWORD'"'"')
+            }
+        }/s
+    }
+    ' "$BUILD_GRADLE"
     
-    # Add signingConfig to release buildType if not present
-    if ! grep -q "signingConfig signingConfigs.release" "$BUILD_GRADLE"; then
-        sed -i.tmp '/buildTypes {/,/release {/a\
-            signingConfig signingConfigs.release
-' "$BUILD_GRADLE"
-    fi
+    # Update release buildType signingConfig
+    perl -0777 -i -pe '
+    s/(buildTypes\s*\{.*?release\s*\{)(.*?)(signingConfig\s+signingConfigs\.debug)/$1$2signingConfig signingConfigs.release/s
+    ' "$BUILD_GRADLE"
     
     rm -f "$BUILD_GRADLE.tmp"
     echo -e "${GREEN}build.gradle configured${NC}\n"
