@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Control, FieldError, useController} from 'react-hook-form';
 import {Text, TextInput, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
@@ -37,28 +37,34 @@ const ThemedDateInput: React.FC<CustomDateInputProps> = (
         name,
     });
 
-    const date = new Date(field.value);
-    const inputText = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-    const [textValue, setTextValue] = useState(inputText);
+    const [textValue, setTextValue] = useState<string>('');
+
+    useEffect(() => {
+        const date = new Date(field.value);
+        setTextValue(formatDate(date));
+    }, [field, setTextValue]);
+
+    const formatDate = (date: Date): string => {
+        return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    }
 
     const onChange = (value: string) => {
         const parsedString = value.split('/');
-        
+
         const parsedNumber = parsedString.map((text) => {
             if (text === "")
                 return 1;
             return parseInt(text)
         });
-        
+
         const newDate = new Date(Date.UTC(
             parsedNumber[2],
             parsedNumber[1] - 1,
             parsedNumber[0]
         ));
-        field.onChange(newDate.toISOString());
         
-        const inputText = `${newDate.getDate()}/${newDate.getMonth() + 1}/${newDate.getFullYear()}`;
-        setTextValue(inputText);
+        field.onChange(newDate.toISOString());
+        setTextValue(formatDate(newDate));
     }
 
     return (

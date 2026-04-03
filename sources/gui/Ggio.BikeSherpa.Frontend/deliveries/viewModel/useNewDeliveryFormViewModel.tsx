@@ -6,10 +6,13 @@ import { useForm } from "react-hook-form";
 import InputDelivery from "../models/InputDelivery";
 import { zodResolver } from "@hookform/resolvers/zod";
 import packingSize from "@/deliveries/models/dropdownOptions/packingSize";
+import {ICustomerService} from "@/spi/CustomerSPI";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
 export function useNewDeliveryFormViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
-    const newDeliveryViewModel = new NewDeliveryFormViewModel(deliveryServices);
+    const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
+    const newDeliveryViewModel = new NewDeliveryFormViewModel(deliveryServices, customerServices);
     
     const {
         control,
