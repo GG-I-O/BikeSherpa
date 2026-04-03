@@ -13,7 +13,7 @@ public class PricingStrategyService(
      public double CalculateDeliveryPriceWithoutVat(Delivery delivery)
      {
           var strategy = strategies.SingleOrDefault(s => s.ImplementedStrategy == delivery.PricingStrategy);
-          if (strategy is null)
+          if (strategy is null || strategy.ImplementedStrategy == Enumerations.PricingStrategy.CustomStrategy)
           {
                return (double)delivery.TotalPrice!;
           }
