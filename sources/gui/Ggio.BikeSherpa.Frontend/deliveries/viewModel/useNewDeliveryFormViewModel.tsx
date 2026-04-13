@@ -3,7 +3,6 @@ import {IDeliveryServices} from "../spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "../bootstrapper/DeliveryServiceIdentifier";
 import NewDeliveryFormViewModel from "./NewDeliveryFormViewModel";
 import {useForm} from "react-hook-form";
-import InputDelivery from "../models/InputDelivery";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {ICustomerService} from "@/spi/CustomerSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
@@ -11,6 +10,7 @@ import {useEffect, useState} from "react";
 import {DropdownOptions} from "@/models/DropdownOptions";
 import {IDropdownOptions} from "@/spi/IDropdownOptions";
 import Delivery from "@/deliveries/models/Delivery";
+import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 
 export function useNewDeliveryFormViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -39,7 +39,7 @@ export function useNewDeliveryFormViewModel() {
         handleSubmit,
         formState: {errors},
         reset
-    } = useForm<InputDelivery>({
+    } = useForm<DeliveryFormValues>({
         defaultValues: {
             code: '',
             status: 0,
@@ -49,6 +49,7 @@ export function useNewDeliveryFormViewModel() {
             totalPrice: 0,
             discount: 0,
             reportId: '',
+            steps: [],
             details: [""],
             packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'L',
             insulatedBox: false,

@@ -3,8 +3,6 @@ import * as Crypto from 'expo-crypto';
 import InputStep from './InputStep';
 import Storable from '@/models/Storable';
 import { HateoasLinks, Link } from '@/models/HateoasLink';
-import { z } from 'zod';
-import { schemas } from '@/infra/openAPI/client';
 
 export class Step extends InputStep implements Storable, HateoasLinks {
     // Storable

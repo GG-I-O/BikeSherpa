@@ -1,16 +1,17 @@
 import {UseFormReset} from "react-hook-form";
-import InputDelivery from "../models/InputDelivery";
 import {IDeliveryServices} from "../spi/IDeliveryServices";
 import {inject} from "inversify";
 import {DeliveryServiceIdentifier} from "../bootstrapper/DeliveryServiceIdentifier";
-import {deliveryFormBaseSchema} from "../models/zod/deliveryFormBaseSchema";
+import {deliveryFormBaseSchema, DeliveryFormValues} from "../models/zod/deliveryFormBaseSchema";
 import {ICustomerService} from "@/spi/CustomerSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import * as Crypto from "expo-crypto";
+import Delivery from "@/deliveries/models/Delivery";
 
 export default class NewDeliveryFormViewModel {
     private deliveryServices: IDeliveryServices;
     private customerServices: ICustomerService;
-    private resetCallback?: UseFormReset<InputDelivery>;
+    private resetCallback?: UseFormReset<DeliveryFormValues>;
 
     constructor(
         @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
@@ -21,7 +22,7 @@ export default class NewDeliveryFormViewModel {
     }
 
     // Keep it as a lambda to be able to use "this". Don't ask me why, JavaScript things
-    public onSubmit = (delivery: InputDelivery): void => {
+    public onSubmit = (delivery: DeliveryFormValues): void => {
         // Generate code without increment
         const date = new Date(delivery.contractDate);
         const day = date.getDate().toLocaleString(undefined, {minimumIntegerDigits: 2, useGrouping: false});
@@ -60,12 +61,33 @@ export default class NewDeliveryFormViewModel {
         } catch (e) {
             console.error("Create Delivery onSubmit found :" + delivery.customerId);
         }
-        this.deliveryServices.createDelivery(delivery);
+
+        // Mapping
+        delivery.steps.map(step => {
+            return {
+                ...step,
+                id: Crypto.randomUUID(),
+            }
+        });
+
+        const deliveryObject: Delivery = {
+            id: Crypto.randomUUID(),
+            operationId: Crypto.randomUUID(),
+            ...delivery,
+            steps: delivery.steps.map(step => {
+                return {
+                    ...step,
+                    id: Crypto.randomUUID(),
+                }
+            })
+        };
+
+        this.deliveryServices.createDelivery(deliveryObject);
         if (this.resetCallback)
             this.resetCallback();
     }
 
-    public setResetCallback(reset?: UseFormReset<InputDelivery>) {
+    public setResetCallback(reset?: UseFormReset<DeliveryFormValues>) {
         this.resetCallback = reset;
     }
 

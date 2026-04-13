@@ -57,13 +57,8 @@ export default class DeliveryServices implements IDeliveryServices {
     }
 
     // Wrapper for NewDeliveryForm
-    public createDelivery(delivery: InputDelivery) {
-        const newDelivery: Delivery = {
-            id: Crypto.randomUUID(),
-            operationId: Crypto.randomUUID(),
-            ...delivery
-        };
-        this.deliveryStore$[newDelivery.id].set(newDelivery);
+    public createDelivery(delivery: Delivery) {
+        this.deliveryStore$[delivery.id].set(delivery);
     };
 
     // Wrapper for EditDeliveryForm

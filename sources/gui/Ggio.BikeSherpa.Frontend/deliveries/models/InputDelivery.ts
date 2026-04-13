@@ -1,3 +1,5 @@
+import {Step} from "@/steps/models/Step";
+
 export default class InputDelivery {
     public code: string;
     public status: number;
@@ -7,6 +9,7 @@ export default class InputDelivery {
     public totalPrice: number | null;
     public discount: number | null;
     public reportId: string | null;
+    public steps: Step[];
     public details: string[];
     public packingSize: string;
     public insulatedBox: boolean;
@@ -22,6 +25,7 @@ export default class InputDelivery {
         totalPrice: number, 
         discount: number,
         reportId: string,
+        steps: Step[],
         details: string[],
         packingSize: string,
         insulatedBox: boolean,
@@ -36,6 +40,7 @@ export default class InputDelivery {
         this.totalPrice = totalPrice;
         this.discount = discount;
         this.reportId = reportId;
+        this.steps = steps;
         this.details = details;
         this.packingSize = packingSize;
         this.insulatedBox = insulatedBox;

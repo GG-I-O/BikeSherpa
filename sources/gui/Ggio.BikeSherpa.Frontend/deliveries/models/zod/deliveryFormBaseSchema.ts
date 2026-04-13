@@ -1,6 +1,7 @@
 import * as zod from "zod";
+import {stepFormBaseSchema} from "@/steps/models/zod/stepFormBaseSchema";
 
-export const deliveryFormBaseSchema = zod
+const deliveryFormBaseSchema = zod
     .object({
         code: zod
             .string()
@@ -32,6 +33,8 @@ export const deliveryFormBaseSchema = zod
         reportId: zod
             .string()
             .nullable(),
+        steps: zod
+            .array(stepFormBaseSchema),
         details: zod
             .array(zod.string()),
         packingSize: zod
@@ -48,3 +51,7 @@ export const deliveryFormBaseSchema = zod
             .string()
             .datetime({offset: true}),
     });
+
+type DeliveryFormValues = zod.infer<typeof deliveryFormBaseSchema>;
+
+export {deliveryFormBaseSchema, DeliveryFormValues};

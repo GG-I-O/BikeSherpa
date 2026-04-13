@@ -7,9 +7,9 @@ export default class InputStep {
     public stepAddress: Address;
     public stepZone: string;
     public distance: number;
-    public courierId: string;
-    public comment: string;
-    public attachmentFilePaths: string[];
+    public courierId: string | null;
+    public comment: string | null;
+    public attachmentFilePaths: string[] | null;
     public estimatedDeliveryDate: string;
     public realDeliveryDate: string;
 
@@ -20,9 +20,9 @@ export default class InputStep {
         stepAddress: Address,
         stepZone: string,
         distance: number,
-        courierId: string,
-        comment: string,
-        attachmentFilePaths: string[],
+        courierId: string | null,
+        comment: string | null,
+        attachmentFilePaths: string[] | null,
         estimatedDeliveryDate: string,
         realDeliveryDate: string
     ) {

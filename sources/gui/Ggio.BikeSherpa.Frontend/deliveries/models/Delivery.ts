@@ -4,6 +4,7 @@ import { schemas } from '@/infra/openAPI/client';
 import InputDelivery from "./InputDelivery";
 import Storable from "@/models/Storable";
 import { HateoasLinks, Link } from "@/models/HateoasLink";
+import {Step} from "@/steps/models/Step";
 
 export default class Delivery extends InputDelivery implements Storable, HateoasLinks {
     // Storable
@@ -22,6 +23,7 @@ export default class Delivery extends InputDelivery implements Storable, Hateoas
         totalPrice: number,
         discount: number,
         reportId: string,
+        steps: Step[],
         details: string[],
         packingSize: string,
         insulatedBox: boolean,
@@ -37,6 +39,7 @@ export default class Delivery extends InputDelivery implements Storable, Hateoas
             totalPrice,
             discount,
             reportId,
+            steps,
             details,
             packingSize,
             insulatedBox,
