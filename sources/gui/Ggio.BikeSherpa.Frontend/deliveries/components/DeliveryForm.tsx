@@ -2,33 +2,35 @@ import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
 import ThemedInput from "@/components/themed/ThemedInput";
 import formStyle from "@/style/formStyle";
 import {Control, FieldError, FieldErrors, FieldValues, Path, useController} from "react-hook-form";
-import { ScrollView } from "react-native";
-import { Button, Text, useTheme } from "react-native-paper";
-import pricingStrategies from "../models/dropdownOptions/pricingStrategies";
-import urgencies from "../models/dropdownOptions/urgencies";
+import {ScrollView} from "react-native";
+import {Button, Text, useTheme} from "react-native-paper";
 import React from "react";
 import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 import ThemedDateInput from "@/components/themed/ThemedDateInput";
-import packingSize from "@/deliveries/models/dropdownOptions/packingSize";
+import {DropdownOptions} from "@/models/DropdownOptions";
 
 interface DeliveryFormProps<T extends FieldValues> {
     control: Control<T, any, T>;
     handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
     errors: FieldErrors<T>;
     buttonName: string;
+    urgencies: DropdownOptions[];
+    pricingStrategies: DropdownOptions[];
+    packingSizes: DropdownOptions[];
 }
 
 export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormProps<T>) {
     const theme = useTheme();
-    const { control, errors, handleSubmit, buttonName } = props;
+    const {control, errors, handleSubmit, buttonName} = props;
 
-    const { field } = useController({
+    const {field} = useController({
         control,
         name: "pricingStrategy" as Path<T>,
     });
+
     return (
         <ScrollView
-            style={[formStyle.container, { backgroundColor: theme.colors.background }]}
+            style={[formStyle.container, {backgroundColor: theme.colors.background}]}
             contentContainerStyle={formStyle.elements}
         >
             <ThemedInput
@@ -46,7 +48,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 name="pricingStrategy"
                 error={errors.pricingStrategy as FieldError | undefined}
                 label="Calcul de prix"
-                options={pricingStrategies}
+                options={props.pricingStrategies}
                 required
                 isNumber
             />
@@ -56,7 +58,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 name="urgency"
                 error={errors.urgency as FieldError | undefined}
                 label="Urgence"
-                options={urgencies}
+                options={props.urgencies}
                 required
             />
             <ThemedInput
@@ -66,7 +68,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 error={errors.totalPrice as FieldError | undefined}
                 label="Prix total"
                 placeholder="10"
-                disabled={field.value !== parseInt(pricingStrategies[0].value) }
+                disabled={props.pricingStrategies.length === 0 || field.value !== parseInt(props.pricingStrategies[0].value)}
                 required
             />
             <ThemedInput
@@ -92,7 +94,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 name="packingSize"
                 error={errors.packingSize as FieldError | undefined}
                 label="Taille"
-                options={packingSize}
+                options={props.packingSizes}
                 required
             />
             <ThemedCheckboxInput
