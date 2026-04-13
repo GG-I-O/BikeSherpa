@@ -44,7 +44,7 @@ const ThemedDropdownInput: React.FC<CustomDropdownInputProps> = (
                 value={ isNumber ? field.value.toString() : field.value}
                 onSelect={(value) => isNumber ? field.onChange(parseInt(value ?? "0")) : field.onChange(value)}
                 mode='outlined'
-                error={error != undefined}
+                error={error !== undefined}
                 testID={testID}
                 options={options}
             />
