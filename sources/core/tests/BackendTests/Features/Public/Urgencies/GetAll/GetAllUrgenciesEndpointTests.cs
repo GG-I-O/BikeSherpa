@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 using Mediator;
 using Moq;
 
-namespace BackendTests.Features.Public.Urgencies;
+namespace BackendTests.Features.Public.Urgencies.GetAll;
 
 [UsedImplicitly]
 public class GetAllUrgenciesWebApplicationFactory() : TestWebApplicationFactory();

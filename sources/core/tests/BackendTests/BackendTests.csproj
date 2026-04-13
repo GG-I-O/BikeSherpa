@@ -42,7 +42,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Public\PackingSizes\" />
     <Folder Include="Features\Public\PricingStrategies\" />
   </ItemGroup>
 

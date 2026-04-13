@@ -3,10 +3,9 @@ using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Features.Public.Urgencies.GetAll;
-using Ggio.BikeSherpa.Backend.Features.Public.Urgencies.Model;
 using Moq;
 
-namespace BackendTests.Features.Public.Urgencies;
+namespace BackendTests.Features.Public.Urgencies.GetAll;
 
 public class GetAllUrgenciesHandlerTests
 {
@@ -61,13 +60,13 @@ public class GetAllUrgenciesHandlerTests
           VerifyRepositoryCalledOnce();
      }
 
-     private GetAllUrgenciesHandler CreateSut(List<Urgency> returnCustomers)
+     private GetAllUrgenciesHandler CreateSut(List<Urgency> returnUrgencies)
      {
           _mockRepository
                .Setup(repo =>
                     repo.GetAll()
                )
-               .Returns(returnCustomers);
+               .Returns(returnUrgencies);
 
           return new GetAllUrgenciesHandler(_mockRepository.Object);
      }
