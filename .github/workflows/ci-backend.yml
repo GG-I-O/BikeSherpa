@@ -55,6 +55,7 @@ jobs:
         continue-on-error: false
         run: |
           dotnet test sources/core/tests/BackendTests/BackendTests.csproj \
+            --filter 'Category!=Integration' \
             --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=lcov \
@@ -64,6 +65,27 @@ jobs:
         continue-on-error: false
         run: |
           dotnet test sources/core/tests/DddCore.Tests/DddCore.Tests.csproj \
+            --filter 'Category!=Integration' \
+            --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=lcov \
+            /p:CoverletOutput=./.qodana/code-coverage/
+          
+      - name: Run Domain.tests with coverage
+        continue-on-error: false
+        run: |
+          dotnet test sources/core/tests/Backend.Domain.Tests/Backend.Domain.Tests.csproj \
+            --filter 'Category!=Integration' \
+            --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=lcov \
+            /p:CoverletOutput=./.qodana/code-coverage/
+          
+      - name: Run Infrastructure.tests with coverage
+        continue-on-error: false
+        run: |
+          dotnet test sources/core/tests/Backend.Infrastructure.Tests/Backend.Infrastructure.Tests.csproj \
+            --filter 'Category!=Integration' \
             --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=lcov \
@@ -76,3 +98,5 @@ jobs:
           path: |
             sources/core/tests/BackendTests/.qodana/code-coverage/coverage.info
             sources/core/tests/DddCore.Tests/.qodana/code-coverage/coverage.info
+            sources/core/tests/Backend.Domain.Tests/.qodana/code-coverage/coverage.info
+            sources/core/tests/Backend.Infrastructure.Tests/.qodana/code-coverage/coverage.info
