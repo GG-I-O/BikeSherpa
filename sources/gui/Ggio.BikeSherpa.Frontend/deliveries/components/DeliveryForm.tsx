@@ -8,6 +8,7 @@ import React from "react";
 import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 import ThemedDateInput from "@/components/themed/ThemedDateInput";
 import {DropdownOptions} from "@/models/DropdownOptions";
+import StepInputDataTable from "@/steps/components/inputs/StepInputDataTable";
 
 interface DeliveryFormProps<T extends FieldValues> {
     control: Control<T, any, T>;
@@ -23,6 +24,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
     const theme = useTheme();
     const {control, errors, handleSubmit, buttonName} = props;
 
+    // Used to disable a field, so we read the value here
     const {field} = useController({
         control,
         name: "pricingStrategy" as Path<T>,
@@ -39,7 +41,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 name="customerId"
                 error={errors.customerId as FieldError | undefined}
                 label="Code client"
-                placeholder="CLI80"
+                placeholder="CL1"
                 required
             />
             <ThemedDropdownInput
@@ -111,7 +113,6 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 name="contractDate"
                 error={errors.contractDate as FieldError | undefined}
                 label="Date du contrat"
-                placeholder="30/01/2000"
                 required
             />
             <ThemedDateInput
@@ -120,8 +121,11 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 name="startDate"
                 error={errors.startDate as FieldError | undefined}
                 label="Date de début"
-                placeholder="30/01/2000"
                 required
+            />
+            <StepInputDataTable
+                control={control}
+                name="steps"
             />
             <Button
                 testID="formButton"

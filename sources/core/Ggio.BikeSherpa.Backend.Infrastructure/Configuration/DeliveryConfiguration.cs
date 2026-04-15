@@ -25,6 +25,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           {
                steps.WithOwner().HasForeignKey("DeliveryId");
                steps.HasKey("Id");
+               steps.Property(s => s.Id).ValueGeneratedNever();
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();
                steps.Property(s => s.Order).IsRequired();
                steps.Property(s => s.Completed).IsRequired();
@@ -42,6 +43,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                steps.HasOne(s => s.StepZone).WithMany()
                     .HasForeignKey("StepZoneName")
                     .IsRequired();
+               steps.Navigation(s => s.StepZone).AutoInclude();
                steps.Property(s => s.Distance).IsRequired();
                steps.Property(s => s.EstimatedDeliveryDate).IsRequired();
                steps.Property(s => s.RealDeliveryDate);

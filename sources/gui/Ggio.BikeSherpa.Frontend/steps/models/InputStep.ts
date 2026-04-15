@@ -1,24 +1,24 @@
-import { Address } from "@/models/Address";
+import {Address} from "@/models/Address";
 
 export default class InputStep {
     public stepType: number;
     public order: number;
     public completed: boolean;
     public stepAddress: Address;
-    public stepZone: string;
+    public stepZone: { name: string, cities: { name: string }[] };
     public distance: number;
     public courierId: string | null;
     public comment: string | null;
     public attachmentFilePaths: string[] | null;
     public estimatedDeliveryDate: string;
-    public realDeliveryDate: string;
+    public realDeliveryDate: string | null;
 
     public constructor(
         stepType: number,
         order: number,
         completed: boolean,
         stepAddress: Address,
-        stepZone: string,
+        stepZone: { name: string, cities: { name: string }[] },
         distance: number,
         courierId: string | null,
         comment: string | null,

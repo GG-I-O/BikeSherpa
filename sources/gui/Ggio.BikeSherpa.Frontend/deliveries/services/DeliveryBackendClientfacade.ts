@@ -5,6 +5,7 @@ import { createApiClient, schemas } from "@/infra/openAPI/client";
 import axios from "axios";
 import DeliveryMapper from "./DeliveryMapper";
 import { Link } from "@/models/HateoasLink";
+import {Step} from "@/steps/models/Step";
 
 @injectable()
 export default class DeliveryBackendClientFacade implements IBackendClient<Delivery> {
@@ -38,29 +39,54 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
     }
 
     public async AddEndpoint(item: Delivery): Promise<string> {
+        // Creating Delivery
+        
         // Fill fields for Zod
-        const data = {
+        const deliveryData = {
             ...item,
             contractDate: new Date(item.contractDate).toISOString(),
             startDate: new Date(item.startDate).toISOString(),
             steps: []
         };
-        const parsed = schemas.DeliveryCrud.safeParse(data);
-        if (!parsed.success) {
-            console.error("Create Debug(DeliveryCrud validation Failed):");
-            console.error(parsed.error.format());
-            throw parsed.error;
+        const parsedDelivery = schemas.DeliveryCrud.safeParse(deliveryData);
+        if (!parsedDelivery.success) {
+            console.error("Parsing Create Delivery error:");
+            console.error(parsedDelivery.error.format());
+            throw parsedDelivery.error;
         }
-
-        const delivery = parsed.data;
-        const response = await this.apiClient.AddDeliveryEndpoint(
-            delivery,
+        
+        const deliveryResponse = await this.apiClient.AddDeliveryEndpoint(
+            parsedDelivery.data,
             {
                 headers: { operationId: item.operationId }
             }
         );
+        
+        // Creating steps associated
+        for(let i = 0; i<item.steps.length; i++) {
+            const step = {
+                ...item.steps[i],
+                estimatedDeliveryDate: new Date(item.steps[i].estimatedDeliveryDate).toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            const parsedStep = schemas.DeliveryStep.safeParse(step);
+            if (!parsedStep.success) {
+                console.error("Parsing Create Step error:");
+                console.error(parsedStep.error.format());
+                throw parsedStep.error;
+            }
 
-        return response.id;
+            await this.apiClient.AddDeliveryStepEndpoint(
+                parsedStep.data,
+                {
+                    params: { deliveryId: deliveryResponse.id },
+                    headers: { operationId: item.operationId }
+                }
+            );
+        }
+
+        return deliveryResponse.id;
     }
 
     public async UpdateEndpoint(item: Delivery): Promise<void> {

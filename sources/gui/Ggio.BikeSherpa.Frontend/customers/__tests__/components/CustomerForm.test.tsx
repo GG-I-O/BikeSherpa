@@ -111,7 +111,6 @@ describe("CustomerForm", () => {
         expect(ThemedAddressInput).toHaveBeenCalledTimes(1);
         const addressProps = ThemedAddressInput.mock.calls[0][0];
         expect(addressProps.label).toBe("Adresse");
-        expect(addressProps.placeholder).toBe("10 rue de la République 38100 Grenoble");
         expect(addressProps.name).toBe("address");
         expect(addressProps.required).toBe(true);
 

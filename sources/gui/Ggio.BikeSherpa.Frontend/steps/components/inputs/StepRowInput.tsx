@@ -1,91 +1,63 @@
-import TimePickerInput from "@/components/general/TimePickerInput";
-import { useState } from "react";
-import { Button, DataTable, IconButton, Text, TextInput } from "react-native-paper";
-import { DatePickerInput } from "react-native-paper-dates";
-import { Step } from "@/steps/models/Step";
+import {DataTable, IconButton} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
-import { StepType } from "@/steps/models/StepType";
+import {Control} from "react-hook-form";
+import StepTypeInput from "@/steps/components/inputs/StepTypeInput";
+import React from "react";
+import ThemedInput from "@/components/themed/ThemedInput";
+import ThemedDateInput from "@/components/themed/ThemedDateInput";
+import ThemedTimeInput from "@/components/themed/ThemedTimeInput";
+import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 
 type Props = {
-    step: Step,
-    deleteRow: (step: Step) => void
+    control: Control<any>;
+    name: string;
+    index: number;
+    deleteRow: () => void;
 }
 
-export default function StepRowInput({ step, deleteRow }: Props) {
-
-    // Input useState
-    // TODO: change it for react-hook-form
-    const [type, setType] = useState<StepType>(step.type);
-    const [deliveryDate, setDeliveryDate] = useState<Date>(step.contractDate);
-    const [contractTime, setContractTime] = useState<{ hours: number, minutes: number }>({ hours: step.contractDate.getHours(), minutes: step.contractDate.getMinutes() })
-    const [description, setDescription] = useState<string>(step.comment ?? '');
-    const [comment, setComment] = useState<string>(step.comment ?? '');
-    const [address, setAddress] = useState<string>(step.address.streetInfo ? `${step.address.streetInfo} ${step.address.postcode} ${step.address.city}` : '');
-
+export default function StepRowInput({control, name, index, deleteRow}: Props) {
     return (
-        <DataTable.Row style={{ padding: 0 }}>
+        <DataTable.Row style={{padding: 0}}>
             <DataTable.Cell style={[datatableStyle.column, datatableStyle.width60]}>
-                <IconButton icon="trash-can-outline" onPress={() => deleteRow(step)} />
-            </DataTable.Cell>
-            <DataTable.Cell style={[datatableStyle.column, datatableStyle.width60]}>
-                <Button
-                    mode='outlined'
-                    onPress={() => setType(type === StepType.PickUp ? StepType.Drop : StepType.PickUp)}
-                >
-                    {/* Wrap the Icon into a text to be able to reduce margin */}
-                    <Text style={{ marginInline: 0 }}>
-                        <DeliveryTypeIcon type={type} />
-                    </Text>
-                </Button>
-            </DataTable.Cell>
-            <DataTable.Cell style={[datatableStyle.column]}>
-                <DatePickerInput
-                    locale={"fr"}
-                    inputMode={"start"}
-                    onChange={(date: Date | undefined): void => {
-                        let auxDate: Date;
-                        if (date)
-                            auxDate = date;
-                        else
-                            auxDate = new Date();
-                        auxDate.setHours(contractTime.hours, contractTime.minutes, 0, 0);
-                        setDeliveryDate(auxDate);
-                    }}
-                    value={deliveryDate}
-                />
+                <IconButton icon="trash-can-outline" onPress={() => deleteRow()}/>
             </DataTable.Cell>
             <DataTable.Cell style={[datatableStyle.column, datatableStyle.width60]}>
-                <TimePickerInput
-                    hours={contractTime.hours}
-                    minutes={contractTime.minutes}
-                    onConfirm={({ hours, minutes }: { hours: number; minutes: number; }): void => {
-                        setContractTime({ hours, minutes });
-                    }}
+                <StepTypeInput
+                    control={control}
+                    name={`${name}.${index}.stepType`}
+                    testID="StepTypeInput"
                 />
             </DataTable.Cell>
             <DataTable.Cell style={[datatableStyle.column]}>
-                <TextInput
-                    style={{ width: '100%' }}
-                    label="Description"
-                    value={description}
-                    onChangeText={text => setDescription(text)}
+                <ThemedAddressInput
+                    control={control}
+                    name={`${name}.${index}.stepAddress`}
+                    label=""
                 />
             </DataTable.Cell>
-            <DataTable.Cell style={[datatableStyle.column]}>
-                <TextInput
-                    style={{ width: '100%' }}
-                    label="Commentaire"
-                    value={comment}
-                    onChangeText={text => setComment(text)}
+            <DataTable.Cell style={[datatableStyle.column, datatableStyle.width180]}>
+                <ThemedInput
+                    testID="StepCommentInput"
+                    control={control}
+                    name={`${name}.${index}.comment`}
+                    label=""
+                    placeholder="Commentaire..."
                 />
             </DataTable.Cell>
-            <DataTable.Cell style={[datatableStyle.column]}>
-                <TextInput
-                    style={{ width: '100%' }}
-                    label="Adresse"
-                    value={address}
-                    onChangeText={text => setAddress(text)}
+            <DataTable.Cell style={[datatableStyle.column, datatableStyle.widthDatePicker]}>
+                <ThemedDateInput
+                    testID="stepEstimatedDateInput"
+                    control={control}
+                    name={`${name}.${index}.estimatedDeliveryDate`}
+                    label=""
+                />
+            </DataTable.Cell>
+            <DataTable.Cell style={[datatableStyle.column, datatableStyle.width40]}>
+                <ThemedTimeInput
+                    testID="stepEstimatedDateInput"
+                    control={control}
+                    name={`${name}.${index}.estimatedDeliveryDate`}
+                    label=""
                 />
             </DataTable.Cell>
         </DataTable.Row>

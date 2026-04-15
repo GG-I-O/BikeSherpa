@@ -1,5 +1,4 @@
 import {useNewDeliveryFormViewModel} from "@/deliveries/viewModel/useNewDeliveryFormViewModel";
-import InputDelivery from "@/deliveries/models/InputDelivery";
 import DeliveryForm from "@/deliveries/components/DeliveryForm";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 

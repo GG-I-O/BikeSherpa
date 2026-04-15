@@ -1,10 +1,10 @@
-import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import ThemedInput from "@/components/themed/ThemedInput";
 import formStyle from "@/style/formStyle";
 import { Control, FieldError, FieldErrors, FieldValues } from "react-hook-form";
 import { ScrollView } from "react-native";
 import { Button, Text, useTheme } from "react-native-paper";
 import React from 'react'
+import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 
 interface CustomerFormProps<T extends FieldValues> {
     control: Control<T, any, T>;
@@ -64,7 +64,6 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
                 name="address"
                 error={(errors.address as any)?.name as FieldError | undefined}
                 label="Adresse"
-                placeholder="10 rue de la République 38100 Grenoble"
                 required
             />
             <ThemedInput
