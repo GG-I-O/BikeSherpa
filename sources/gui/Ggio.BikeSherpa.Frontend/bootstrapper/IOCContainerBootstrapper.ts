@@ -23,6 +23,7 @@ import Courier from "@/couriers/models/Courier";
 import CourierStorageContext from "@/couriers/services/CourierStorageContext";
 import CourierServices from "@/couriers/services/CourierServices";
 import { ICourierService } from "@/spi/CourierSPI";
+import DeliveryBootstrapper from "@/deliveries/bootstrapper/DeliveryBootstrapper";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -51,6 +52,7 @@ export default class IOCContainerBootstrapper {
 
         IOCContainerBootstrapper.bindCourierBackendClientFacade();
 
+        DeliveryBootstrapper.init(IOCContainer);
     }
 
     private static bindUserService() {

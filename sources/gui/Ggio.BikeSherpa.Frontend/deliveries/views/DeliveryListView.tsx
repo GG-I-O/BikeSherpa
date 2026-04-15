@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Dimensions, ScrollView } from "react-native";
 import { Button, SegmentedButtons, Text, useTheme } from 'react-native-paper';
 import { Dropdown } from 'react-native-paper-dropdown';
-import { Delivery } from "../models/Delivery";
+import Delivery from "../models/Delivery";
 import { Step } from "@/steps/models/Step";
 import useDeliveryViewModel from "../viewModel/DeliveryViewModel";
 import DeliveryCardList from "../components/DeliveryCardList";

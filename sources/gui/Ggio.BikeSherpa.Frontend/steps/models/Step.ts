@@ -1,59 +1,44 @@
 import { Address } from '@/models/Address';
-import { Identifiable } from '@/models/Identifiable';
 import * as Crypto from 'expo-crypto';
-import { StepType } from './StepType';
+import InputStep from './InputStep';
+import Storable from '@/models/Storable';
+import { HateoasLinks, Link } from '@/models/HateoasLink';
 
-export class Step implements Identifiable<string> {
-    readonly id: string;
-    public type: StepType;
-    public address: Address;
-    public distance: number;
-    public price: number;
-    public contractDate: Date;
-    public estimatedDate?: Date;
-    public realDate?: Date;
-    public comment?: string;
-    public courier?: string;
-    public nbToDo: number;
-    public nbDone: number;
-    public filesPath: string[];
+export class Step extends InputStep implements Storable, HateoasLinks {
+    // Storable
+    public readonly id: string;
+    public createdAt?: string;
+    public updatedAt?: string;
+    public operationId?: string;
+    public links?: Link[];
 
     public constructor(
-        type: StepType,
-        address: Address,
+        stepType: number,
+        order: number,
+        completed: boolean,
+        stepAddress: Address,
+        stepZone: string,
         distance: number,
-        price: number,
-        contractDate: Date,
-        estimatedDate?: Date,
-        comment?: string,
-        nbToDo: number = 0,
-        filesPath: string[] = []
+        courierId: string,
+        comment: string,
+        attachmentFilePaths: string[],
+        estimatedDeliveryDate: string,
+        realDeliveryDate: string
     ) {
+        super(
+            stepType,
+            order,
+            completed,
+            stepAddress,
+            stepZone,
+            distance,
+            courierId,
+            comment,
+            attachmentFilePaths,
+            estimatedDeliveryDate,
+            realDeliveryDate
+        );
         this.id = Crypto.randomUUID();
-        this.type = type;
-        this.address = address;
-        this.distance = distance;
-        this.price = price;
-        this.contractDate = contractDate;
-        this.estimatedDate = estimatedDate;
-        this.comment = comment;
-
-        this.nbToDo = nbToDo;
-        this.nbDone = 0;
-
-        this.filesPath = filesPath;
-    }
-
-    public getContractDate(): string {
-        return this.contractDate.toLocaleDateString();
-    }
-
-    public getContractTime(): string {
-        return this.contractDate.toLocaleTimeString();
-    }
-
-    public getEstimatedTime(): string {
-        if (!this.estimatedDate) return '';
-        return this.estimatedDate.toLocaleTimeString();
+        this.links = [];
     }
 }

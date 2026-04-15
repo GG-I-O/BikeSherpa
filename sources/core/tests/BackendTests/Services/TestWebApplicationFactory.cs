@@ -8,7 +8,7 @@ using Moq;
 
 namespace BackendTests.Services;
 
-public abstract class TestWebApplicationFactory(string policyName, string scope) : WebApplicationFactory<Program>
+public abstract class TestWebApplicationFactory(string policyName = "", string scope = "") : WebApplicationFactory<Program>
 {
      public Mock<IMediator> MockMediator { get; } = new();
 

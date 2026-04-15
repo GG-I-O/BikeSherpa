@@ -1,4 +1,6 @@
-﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
+﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+
+namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
 public class SimpleDeliveryStrategy : IPricingStrategy
 {
@@ -7,7 +9,7 @@ public class SimpleDeliveryStrategy : IPricingStrategy
      private const double StepPriceInPeriphery = 5.5;
      private const double StepPriceOutside = 11;
 
-     public string Name => "SimpleDelivery";
+     public PricingStrategy ImplementedStrategy => PricingStrategy.SimpleDeliveryStrategy;
 
      public double CalculateDeliveryPriceWithoutVat(
           DateTimeOffset startDate,

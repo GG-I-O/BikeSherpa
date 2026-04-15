@@ -1,17 +1,18 @@
 import AppBootstrapper from "@/bootstrapper/AppBootstrapper";
-import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
-import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import AppSnackbarView from "@/snackbar/views/AppSnackbarView";
-import { IAuthService, IUserService } from "@/spi/AuthSPI";
-import { Stack } from "expo-router";
-import { useEffect } from "react";
-import { Platform } from "react-native";
-import { Auth0Provider, useAuth0 } from "react-native-auth0";
+import {IAuthService, IUserService} from "@/spi/AuthSPI";
+import {Stack} from "expo-router";
+import {useEffect} from "react";
+import {Platform} from "react-native";
+import {Auth0Provider, useAuth0} from "react-native-auth0";
+import {PaperProvider} from "react-native-paper";
 
 AppBootstrapper.init();
 
 function AppStack() {
-    const { user, getCredentials } = useAuth0();
+    const {user, getCredentials} = useAuth0();
 
     const loggedIn = user !== null && user !== undefined;
 
@@ -25,10 +26,10 @@ function AppStack() {
     return (
         <Stack>
             <Stack.Protected guard={loggedIn}>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
             </Stack.Protected>
             <Stack.Protected guard={!loggedIn}>
-                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="login" options={{headerShown: false}}/>
             </Stack.Protected>
         </Stack>
     );
@@ -49,8 +50,10 @@ export default function RootLayout() {
 
     return (
         <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
-            <AppStack />
-            <AppSnackbarView />
+            <PaperProvider>
+                <AppStack/>
+                <AppSnackbarView/>
+            </PaperProvider>
         </Auth0Provider>
     );
 }

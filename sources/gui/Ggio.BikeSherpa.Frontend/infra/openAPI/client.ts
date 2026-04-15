@@ -1,7 +1,13 @@
 import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
+const UrgencyDto = z.object({ label: z.string(), value: z.string() });
 const PricingStrategy = z.union([z.literal(0), z.literal(1), z.literal(2)]);
+const PricingStrategyDto = z.object({
+  label: z.string(),
+  value: PricingStrategy,
+});
+const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
 const DeliveryStatus = z.union([
   z.literal(0),
   z.literal(1),
@@ -114,7 +120,10 @@ const CourierDto = z.object({
 });
 
 export const schemas = {
+  UrgencyDto,
   PricingStrategy,
+  PricingStrategyDto,
+  PackingSizeDto,
   DeliveryStatus,
   HasDomainEventsBase,
   EntityBaseOfGuid,
@@ -760,6 +769,30 @@ const endpoints = makeApi([
         schema: z.void(),
       },
     ],
+  },
+  {
+    method: "get",
+    path: "/public/packingSizes",
+    alias: "GetAllPackingSizesEndpoint",
+    tags: ["public"],
+    requestFormat: "json",
+    response: z.array(PackingSizeDto),
+  },
+  {
+    method: "get",
+    path: "/public/pricingStrategies",
+    alias: "GetAllPricingStrategiesEndpoint",
+    tags: ["public"],
+    requestFormat: "json",
+    response: z.array(PricingStrategyDto),
+  },
+  {
+    method: "get",
+    path: "/public/urgencies",
+    alias: "GetAllUrgenciesEndpoint",
+    tags: ["public"],
+    requestFormat: "json",
+    response: z.array(UrgencyDto),
   },
 ]);
 

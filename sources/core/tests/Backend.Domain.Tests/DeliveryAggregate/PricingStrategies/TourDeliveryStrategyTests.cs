@@ -1,5 +1,6 @@
 ﻿using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
 namespace Backend.Domain.Tests.DeliveryAggregate.PricingStrategies;
@@ -17,7 +18,7 @@ public class TourDeliveryStrategyTests
         var sut = MakeSut();
 
         // Assert
-        sut.Name.Should().Be("TourDelivery");
+        sut.ImplementedStrategy.Should().Be(PricingStrategy.TourDeliveryStrategy);
     }
 
     [Theory]

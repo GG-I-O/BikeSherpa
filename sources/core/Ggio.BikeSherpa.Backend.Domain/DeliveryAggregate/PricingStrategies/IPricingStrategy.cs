@@ -1,8 +1,10 @@
-﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
+﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+
+namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
 public interface IPricingStrategy
 {
-     string Name { get; }
+     PricingStrategy ImplementedStrategy { get; }
 
      double CalculateDeliveryPriceWithoutVat(
           DateTimeOffset startDate,

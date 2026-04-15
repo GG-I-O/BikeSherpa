@@ -1,4 +1,6 @@
-﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
+﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+
+namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
 public class TourDeliveryStrategy : IPricingStrategy
 {
@@ -8,7 +10,7 @@ public class TourDeliveryStrategy : IPricingStrategy
      private const double StepPriceInPeriphery = 0;
      private const double StepPriceOutside = 0;
 
-     public string Name => "TourDelivery";
+     public PricingStrategy ImplementedStrategy => PricingStrategy.TourDeliveryStrategy;
 
      public double CalculateDeliveryPriceWithoutVat(
           DateTimeOffset startDate,
@@ -24,13 +26,13 @@ public class TourDeliveryStrategy : IPricingStrategy
      {
           return Math.Round(
                (pickupNumber * PickupBasePrice +
-                 PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
-                 PricingRules.CalculateDelayCost(startDate, contractDate) +
-                 packingSize.TourPrice +
-                 dropoffStepsInCore * StepPriceInCore +
-                 dropoffStepsInBorder * StepPriceInBorder +
-                 dropoffStepsInPeriphery * StepPriceInPeriphery +
-                 dropoffStepsOutside * StepPriceOutside)
+                PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
+                PricingRules.CalculateDelayCost(startDate, contractDate) +
+                packingSize.TourPrice +
+                dropoffStepsInCore * StepPriceInCore +
+                dropoffStepsInBorder * StepPriceInBorder +
+                dropoffStepsInPeriphery * StepPriceInPeriphery +
+                dropoffStepsOutside * StepPriceOutside)
                , 2);
      }
 }

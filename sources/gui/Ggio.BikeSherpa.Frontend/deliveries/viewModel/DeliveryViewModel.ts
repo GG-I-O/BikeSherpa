@@ -1,5 +1,5 @@
 import DateToolbox from "@/services/DateToolbox";
-import { Delivery } from "../models/Delivery";
+import Delivery from "../models/Delivery";
 import { Step } from "@/steps/models/Step";
 
 class DeliveryViewModel {
