@@ -49,7 +49,7 @@ export default function StepDataTableRow({ step, isSelected = false, onPress, ca
             <DataTable.Cell style={[style.column, style.width60]}>
                 {
                     !canChangeDate ? (
-                        <Text>{step.estimatedDate}</Text>
+                        <Text>{step.estimatedTime}</Text>
                     ) : (
                         <TimePickerInput
                             hours={contractTime.hours}
