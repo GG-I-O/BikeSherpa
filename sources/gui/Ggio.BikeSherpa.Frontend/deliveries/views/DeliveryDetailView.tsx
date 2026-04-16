@@ -1,7 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import useDeliveryViewModel from "../viewModel/DeliveryViewModel";
 import { useEffect, useState } from "react";
-import { Delivery } from "../models/Delivery";
 import { Dimensions, View } from "react-native";
 import { Button, Divider, Text, useTheme } from "react-native-paper";
 import AppStyle from "@/constants/AppStyle";
@@ -89,7 +87,7 @@ export default function DeliveryDetailView({ canEdit = false }: Props) {
                                             viewModel.assignSteps(courier, [step]);
                                         }}
                                         onTimePicker={(step: Step, time: Date) => {
-                                            step.estimatedDate = time;
+                                            step.estimatedDeliveryDate = time.toISOString();
                                         }}
                                     />
                                 );

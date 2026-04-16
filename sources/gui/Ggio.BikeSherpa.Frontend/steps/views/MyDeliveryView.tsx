@@ -1,7 +1,6 @@
 import { navigate } from "expo-router/build/global-state/routing";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import useDeliveryViewModel from "../../deliveries/viewModel/DeliveryViewModel";
 import { Step } from "../models/Step";
 import StepCardList from "../components/StepCardList";
 import { SegmentedButtons, useTheme } from "react-native-paper";

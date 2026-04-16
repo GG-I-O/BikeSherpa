@@ -1,15 +1,15 @@
-import { navigate } from "expo-router/build/global-state/routing";
-import { useEffect, useState } from "react";
-import { Dimensions, ScrollView } from "react-native";
-import { Button, SegmentedButtons, Text, useTheme } from 'react-native-paper';
-import { Dropdown } from 'react-native-paper-dropdown';
+import {navigate} from "expo-router/build/global-state/routing";
+import {useEffect, useState} from "react";
+import {ScrollView} from "react-native";
+import {Button, SegmentedButtons, Text, useTheme} from 'react-native-paper';
+import {Dropdown} from 'react-native-paper-dropdown';
 import Delivery from "../models/Delivery";
-import { Step } from "@/steps/models/Step";
-import useDeliveryViewModel from "../viewModel/DeliveryViewModel";
-import DeliveryCardList from "../components/DeliveryCardList";
-import DeliveryDataTable from "../components/DeliveryTadaTable";
+import {Step} from "@/steps/models/Step";
+import DeliveryDataTable from "../components/DeliveryDataTable";
 import StepDataTableAssign from "@/steps/components/StepDatatableAssign";
-import { useDeliverySelection } from "../hooks/useDeliverySelection";
+import {useDeliverySelection} from "../hooks/useDeliverySelection";
+import useDeliveryListViewModel from "@/deliveries/viewModel/useDeliveryListViewModel";
+import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal";
 
 export function DeliveryListView() {
     const theme = useTheme();
@@ -18,24 +18,26 @@ export function DeliveryListView() {
     const [courierFilter, setCourierFilter] = useState<string>('NONE');
     const [isAssigning, setIsAssigning] = useState<boolean>(false);
     const [assignDropdown, setAssignDropdown] = useState<string>('NONE');
+    const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
 
     // Data
     const [deliveries, setDeliveries] = useState<Delivery[]>([]);
     const [steps, setSteps] = useState<Step[]>([]);
 
-    const viewModel = useDeliveryViewModel();
-    const { selectedSteps, isStepSelected, isDeliverySelected, toggleStepSelection, toggleDeliverySelection, clearSelection } = useDeliverySelection();
+    const viewModel = useDeliveryListViewModel();
+    const {
+        selectedSteps,
+        isStepSelected,
+        isDeliverySelected,
+        toggleStepSelection,
+        toggleDeliverySelection,
+        clearSelection
+    } = useDeliverySelection();
 
     useEffect(() => {
         setDeliveries(viewModel.getFilteredDeliveries(dateFilter, courierFilter));
         setSteps(viewModel.getFilteredStepList(dateFilter, courierFilter));
     }, [viewModel, dateFilter, courierFilter, isAssigning]);
-
-    const assignSteps = (courier: string, steps: Step[]) => {
-        viewModel.assignSteps(courier, steps);
-    }
-
-    const screenWidth = Dimensions.get('window').width;
 
     return (
         <>
@@ -52,7 +54,7 @@ export function DeliveryListView() {
                 {!isAssigning ? (
                     <>
                         <SegmentedButtons
-                            style={{ height: "auto", flex: 1, alignItems: "center" }}
+                            style={{height: "auto", flex: 1, alignItems: "center"}}
                             value={dateFilter}
                             onValueChange={setDateFilter}
                             buttons={[
@@ -78,7 +80,11 @@ export function DeliveryListView() {
                             mode="outlined"
                         />
                         <Button
-                            style={{ backgroundColor: theme.colors.background, borderWidth: 1, borderColor: theme.colors.onBackground }}
+                            style={{
+                                backgroundColor: theme.colors.background,
+                                borderWidth: 1,
+                                borderColor: theme.colors.onBackground
+                            }}
                             onPress={() => {
                                 clearSelection();
                                 setIsAssigning(true);
@@ -97,9 +103,12 @@ export function DeliveryListView() {
                             onSelect={(value) => setAssignDropdown(value ?? 'NONE')}
                         />
                         <Button
-                            style={{ backgroundColor: theme.colors.background, borderWidth: 1, borderColor: theme.colors.onBackground }}
+                            style={{
+                                backgroundColor: theme.colors.background,
+                                borderWidth: 1,
+                                borderColor: theme.colors.onBackground
+                            }}
                             onPress={() => {
-                                assignSteps(assignDropdown, selectedSteps);
                                 clearSelection();
                                 setIsAssigning(false);
                             }}
@@ -107,7 +116,11 @@ export function DeliveryListView() {
                             <Text>Valider</Text>
                         </Button>
                         <Button
-                            style={{ backgroundColor: theme.colors.background, borderWidth: 1, borderColor: theme.colors.onBackground }}
+                            style={{
+                                backgroundColor: theme.colors.background,
+                                borderWidth: 1,
+                                borderColor: theme.colors.onBackground
+                            }}
                             onPress={() => {
                                 clearSelection();
                                 setIsAssigning(false);
@@ -119,66 +132,62 @@ export function DeliveryListView() {
                 )}
 
             </ScrollView>
-            {screenWidth <= 992 ? (
-                <DeliveryCardList
+            {courierFilter === 'NONE' ? (
+                <DeliveryDataTable
                     deliveries={deliveries}
                     isDeliverySelected={isAssigning ? isDeliverySelected : undefined}
-                    onDeliveryPress={isAssigning ?
-                        toggleDeliverySelection :
+                    isStepSelected={isAssigning ? isStepSelected : undefined}
+                    onDeliveryPress={isAssigning ? toggleDeliverySelection : undefined}
+                    onStepPress={isAssigning ? toggleStepSelection : undefined}
+                    onDetails={
                         (delivery: Delivery) => navigate({
-                            pathname: '/(tabs)/(deliveries)/assign',
-                            params: { deliveryId: delivery.id }
-                        })
-                    }
+                            pathname: '/(tabs)/(deliveries)/[deliveryId]',
+                            params: {deliveryId: delivery.id}
+                        })}
+                    onEdit={(delivery: Delivery) => navigate({
+                        pathname: '/(tabs)/(deliveries)/edit',
+                        params: {deliveryId: delivery.id}
+                    })}
+                    onCopy={(delivery: Delivery) => navigate({
+                        pathname: '/(tabs)/(deliveries)/copy',
+                        params: {deliveryId: delivery.id}
+                    })}
+                    onDelete={(delivery: Delivery) => {
+                        viewModel.setDeliveryToDelete(delivery.id);
+                        setDisplayConfirmationModal(true);
+                    }}
                 />
             ) : (
-                <>
-                    {courierFilter === 'NONE' ? (
-                        <DeliveryDataTable
-                            deliveries={deliveries}
-                            isDeliverySelected={isAssigning ? isDeliverySelected : undefined}
-                            isStepSelected={isAssigning ? isStepSelected : undefined}
-                            onDeliveryPress={isAssigning ? toggleDeliverySelection : undefined}
-                            onStepPress={isAssigning ? toggleStepSelection : undefined}
-                            onDetails={
-                                (delivery: Delivery) => navigate({
-                                    pathname: '/(tabs)/(deliveries)/[deliveryId]',
-                                    params: { deliveryId: delivery.id }
-                                })}
-                            onEdit={(delivery: Delivery) => navigate({
-                                pathname: '/(tabs)/(deliveries)/edit',
-                                params: { deliveryId: delivery.id }
-                            })}
-                            onCopy={(delivery: Delivery) => navigate({
-                                pathname: '/(tabs)/(deliveries)/copy',
-                                params: { deliveryId: delivery.id }
-                            })}
-                            onDelete={(delivery: Delivery) => navigate({
+                <StepDataTableAssign
+                    steps={steps}
+                    isStepSelected={isAssigning ? isStepSelected : undefined}
+                    onRowPress={(step) => {
+                        const delivery = deliveries.find((d) => d.code === step.id);
+                        if (!delivery) return
+                        if (isAssigning)
+                            toggleStepSelection(step, delivery);
+                        else
+                            navigate({
                                 pathname: '/(tabs)/(deliveries)/[deliveryId]',
-                                params: { deliveryId: delivery.id }
-                            })}
-                        />
-                    ) : (
-                        <StepDataTableAssign
-                            steps={steps}
-                            isStepSelected={isAssigning ? isStepSelected : undefined}
-                            onRowPress={(step) => {
-                                const delivery = deliveries.find((d) => d.code === step.id);
-                                if (!delivery) return
-                                if (isAssigning)
-                                    toggleStepSelection(step, delivery);
-                                else
-                                    navigate({
-                                        pathname: '/(tabs)/(deliveries)/[deliveryId]',
-                                        params: { deliveryId: delivery.id }
-                                    })
-                            }}
-                            canChangeDate={true}
-                            showHeader={true}
-                        />
-                    )}
-                </>
+                                params: {deliveryId: delivery.id}
+                            })
+                    }}
+                    canChangeDate={true}
+                    showHeader={true}
+                />
             )}
+            <ThemedConfirmationModal
+                visible={displayConfirmationModal}
+                title="Supprimer la course ?"
+                confirmButton={() => {
+                    viewModel.deleteDelivery();
+                    setDisplayConfirmationModal(false);
+                }}
+                cancelButton={() => {
+                    viewModel.setDeliveryToDelete(null);
+                    setDisplayConfirmationModal(false);
+                }}
+            />
         </>
     );
 }

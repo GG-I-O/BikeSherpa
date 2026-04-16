@@ -20,13 +20,11 @@ export default function StepDataTable({ steps, isStepSelected, onRowPress, canCh
             {showHeader ? (
                 <DataTable.Header>
                     <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
-                    <DataTable.Title style={[style.column, style.width90]}>Date</DataTable.Title>
-                    <DataTable.Title style={[style.column, style.width60]}>Heure contrat</DataTable.Title>
-                    <DataTable.Title style={[style.column, style.minWidth100]}>Description</DataTable.Title>
-                    <DataTable.Title style={[style.column, style.minWidth100]}>Commentaire</DataTable.Title>
                     <DataTable.Title style={[style.column, style.minWidth150]}>Adresse</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.minWidth150]}>Commentaire</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width60]}>Livreur</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width40]}>Completed</DataTable.Title>
                 </DataTable.Header>
             ) : (
                 <></>

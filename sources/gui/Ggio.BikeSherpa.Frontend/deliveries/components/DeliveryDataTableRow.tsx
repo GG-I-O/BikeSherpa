@@ -1,10 +1,12 @@
 import { DataTable, IconButton, useTheme } from "react-native-paper";
-import { Delivery } from "../models/Delivery";
 import datatableStyle from "@/style/datatableStyle";
 import { View } from "react-native";
 import { useState } from "react";
 import StepDataTable from "@/steps/components/StepDataTable";
 import { Step } from "@/steps/models/Step";
+import Delivery from "@/deliveries/models/Delivery";
+import DateToolbox from "@/services/DateToolbox";
+import useDeliveryDataTableRowViewModel from "@/deliveries/viewModel/useDeliveryDataTableRowViewModel";
 
 type Props = {
     delivery: Delivery,
@@ -20,9 +22,9 @@ type Props = {
 
 export default function DeliveryDataTableRow({ delivery, isSelected = false, isStepSelected, onPress, onStepPress, onDetails, onEdit, onCopy, onDelete }: Props) {
     const theme = useTheme();
-
     const style = datatableStyle;
 
+    const viewModel = useDeliveryDataTableRowViewModel();
     const [showSteps, setShowSteps] = useState<boolean>(false);
 
     return (
@@ -38,18 +40,21 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     {delivery.code}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.customer.name}
+                    {viewModel.getCustomerName(delivery.customerId)}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.steps?.length}
+                    {delivery.steps.length}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.steps ? delivery.steps[0].getContractDate() : ''}
+                    {delivery.steps.length > 0 ? DateToolbox.getFormattedDateFromISO(delivery.steps[0].estimatedDeliveryDate) : ''}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column,]}>
-                    {delivery.steps ? delivery.steps[0].getContractTime() : ''}
+                    {delivery.steps.length > 0 ? DateToolbox.getFormattedTimeFromISO(delivery.steps[0].estimatedDeliveryDate) : ''}
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column,]}>
+                <DataTable.Cell style={[style.column]}>
+                    {delivery.urgency}
+                </DataTable.Cell>
+                <DataTable.Cell style={[style.column, style.width180]}>
                     <IconButton style={{ margin: 0 }} icon="magnify" onPress={() => onDetails ? onDetails(delivery) : {}} />
                     <IconButton style={{ margin: 0 }} icon="pencil" onPress={() => onEdit ? onEdit(delivery) : {}} />
                     <IconButton style={{ margin: 0 }} icon="content-copy" onPress={() => onCopy ? onCopy(delivery) : {}} />

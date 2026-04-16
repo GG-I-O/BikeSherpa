@@ -1,6 +1,6 @@
 import { Step } from "@/steps/models/Step";
 import { useCallback, useState } from "react";
-import { Delivery } from "../models/Delivery";
+import Delivery from "@/deliveries/models/Delivery";
 
 export function useDeliverySelection() {
     const [selectedSteps, setSelectedSteps] = useState<Step[]>([]);
