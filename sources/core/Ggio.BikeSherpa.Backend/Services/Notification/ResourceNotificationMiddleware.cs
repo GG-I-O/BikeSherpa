@@ -50,6 +50,10 @@ public class ResourceNotificationMiddleware(RequestDelegate next, ILogger<Resour
                };
 
                if (!operation.HasValue) return;
+               
+               // For inner resources on POST, it's in reality a PUT of the parent
+               if (operation == ResourceOperation.Post && segments.Length >= 3)
+                    operation = ResourceOperation.Put;
 
                switch (operation)
                {

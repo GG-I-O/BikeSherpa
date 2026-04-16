@@ -39,9 +39,13 @@ const datatableStyle = StyleSheet.create({
         minWidth: 130,
         maxWidth: 130
     },
-    width160: {
-        minWidth: 160,
-        maxWidth: 160
+    width180: {
+        minWidth: 180,
+        maxWidth: 180
+    },
+    widthDatePicker: {
+        minWidth: 192,
+        maxWidth: 192
     },
     minWidth100: {
         minWidth: 100

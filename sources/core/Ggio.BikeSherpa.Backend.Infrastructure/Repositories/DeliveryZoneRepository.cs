@@ -17,6 +17,10 @@ public class DeliveryZoneRepository(BackendDbContext context) : IDeliveryZoneRep
      {
           Guard.Against.NullOrEmpty(city);
 
-          return context.DeliveryZones.FirstOrDefault(zone => zone.Cities.Any(c => string.Equals(c.Name, city, StringComparison.InvariantCultureIgnoreCase))) ?? context.DeliveryZones.First(zone => zone.Name == FallbackZoneForUnknownCity);
+          return context.DeliveryZones.FirstOrDefault(
+               zone => zone.Cities.Any(
+                    c => string.Equals(c.Name, city)
+               )
+          ) ?? context.DeliveryZones.First(zone => zone.Name == FallbackZoneForUnknownCity);
      }
 }

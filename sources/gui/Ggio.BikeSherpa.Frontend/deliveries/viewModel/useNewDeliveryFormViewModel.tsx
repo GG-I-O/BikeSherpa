@@ -63,9 +63,17 @@ export function useNewDeliveryFormViewModel() {
 
     return {
         control,
-        handleSubmit: handleSubmit(newDeliveryViewModel.onSubmit),
+        handleSubmit: handleSubmit(
+            (data) => {
+                newDeliveryViewModel.onSubmit(data);
+            },
+            (errors) => {
+                console.error("Invalid delivery for creation");
+                console.error(errors);
+            }
+        ),
         errors,
-        urgencies, 
+        urgencies,
         pricingStrategies,
         packingSizes
     };

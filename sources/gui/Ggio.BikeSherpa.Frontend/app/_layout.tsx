@@ -8,6 +8,8 @@ import {useEffect} from "react";
 import {Platform} from "react-native";
 import {Auth0Provider, useAuth0} from "react-native-auth0";
 import {PaperProvider} from "react-native-paper";
+import {fr, registerTranslation} from "react-native-paper-dates";
+registerTranslation('fr', fr);
 
 AppBootstrapper.init();
 

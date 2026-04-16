@@ -25,7 +25,7 @@ public class AddDeliveryStepCommandValidator : AbstractValidator<AddDeliveryStep
      public AddDeliveryStepCommandValidator()
      {
           RuleFor(x => x.DeliveryId).NotEmpty();
-          RuleFor(x => x.StepType).NotEmpty();
+          RuleFor(x => x.StepType).IsInEnum();
           RuleFor(x => x.StepAddress).NotEmpty();
      }
 }

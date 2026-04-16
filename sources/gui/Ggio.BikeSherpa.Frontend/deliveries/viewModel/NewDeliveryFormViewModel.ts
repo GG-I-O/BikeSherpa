@@ -35,7 +35,7 @@ export default class NewDeliveryFormViewModel {
                 this.deliveryServices.getDeliveryList$().get()
             );
             const deliveriesWithSameCode = deliveryList.filter(
-                (delivery) => delivery.code.startsWith(code)
+                (delivery) => delivery !== null && delivery.code.startsWith(code)
             );
 
             // Apply increment
@@ -60,6 +60,7 @@ export default class NewDeliveryFormViewModel {
             delivery.customerId = customer!.id;
         } catch (e) {
             console.error("Create Delivery onSubmit found :" + delivery.customerId);
+            return;
         }
 
         // Mapping
@@ -78,6 +79,14 @@ export default class NewDeliveryFormViewModel {
                 return {
                     ...step,
                     id: Crypto.randomUUID(),
+                    order: 0,
+                    completed: false,
+                    stepZone: {name: '', cities: []},
+                    courierId: null,
+                    comment: step.comment ?? null,
+                    distance: 0,
+                    attachmentFilePaths: [],
+                    realDeliveryDate: null
                 }
             })
         };

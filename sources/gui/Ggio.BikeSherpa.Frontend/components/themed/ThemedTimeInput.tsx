@@ -3,9 +3,9 @@ import {Control, FieldError, useController} from 'react-hook-form';
 import {Text, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
 import {View} from 'react-native';
-import {DatePickerInput} from "react-native-paper-dates";
+import TimePickerInput from "@/components/general/TimePickerInput";
 
-interface CustomDateInputProps {
+interface CustomTimeInputProps {
     name: string;
     control: Control<any>;
     label: string;
@@ -15,7 +15,7 @@ interface CustomDateInputProps {
     disabled?: boolean;
 }
 
-const ThemedDateInput: React.FC<CustomDateInputProps> = (
+const ThemedTimeInput: React.FC<CustomTimeInputProps> = (
     {
         name,
         control,
@@ -30,31 +30,27 @@ const ThemedDateInput: React.FC<CustomDateInputProps> = (
         name,
     });
 
+    const fieldDate = field.value ? new Date(field.value) : new Date();
+
     return (
         <View style={formStyle.intputContainer}>
             <Text
                 style={[formStyle.label, {color: theme.colors.onBackground}, theme.fonts.labelLarge]}>{label}{required &&
                 <Text style={{color: theme.colors.error}}> *</Text>}
             </Text>
-            <DatePickerInput
-                locale={"fr"}
-                inputMode={"start"}
-                onChange={(date: Date | undefined): void => {
-                    if (!date) return;
-
-                    const baseDate = field.value ? new Date(field.value) : new Date();
-
-                    const newDate = new Date(date);
-                    newDate.setHours(baseDate.getHours());
-                    newDate.setMinutes(baseDate.getMinutes());
-
+            <TimePickerInput
+                hours={fieldDate.getHours()}
+                minutes={fieldDate.getMinutes()}
+                onConfirm={({hours, minutes}: { hours: number; minutes: number; }): void => {
+                    let newDate: Date = new Date(field.value);
+                    newDate.setHours(hours);
+                    newDate.setMinutes(minutes);
                     field.onChange(newDate.toISOString());
                 }}
-                value={field.value ? new Date(field.value) : undefined}
             />
             {error && (<Text style={{color: theme.colors.error}}>{error.message}</Text>)}
         </View>
     );
 };
 
-export default ThemedDateInput;
+export default ThemedTimeInput;
