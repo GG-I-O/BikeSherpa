@@ -5,7 +5,6 @@ import { createApiClient, schemas } from "@/infra/openAPI/client";
 import axios from "axios";
 import DeliveryMapper from "./DeliveryMapper";
 import { Link } from "@/models/HateoasLink";
-import {Step} from "@/steps/models/Step";
 
 @injectable()
 export default class DeliveryBackendClientFacade implements IBackendClient<Delivery> {
@@ -33,9 +32,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         const response = await this.apiClient.GetDeliveryEndpoint({
             params: { deliveryId: id }
         });
-        const delivery = DeliveryMapper.DeliveryDtoToDelivery(response);
-
-        return delivery;
+        return DeliveryMapper.DeliveryDtoToDelivery(response);
     }
 
     public async AddEndpoint(item: Delivery): Promise<string> {

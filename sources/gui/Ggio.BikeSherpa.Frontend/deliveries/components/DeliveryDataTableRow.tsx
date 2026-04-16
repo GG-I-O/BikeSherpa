@@ -1,28 +1,26 @@
 import { DataTable, IconButton, useTheme } from "react-native-paper";
-import { Delivery } from "../models/Delivery";
 import datatableStyle from "@/style/datatableStyle";
 import { View } from "react-native";
 import { useState } from "react";
 import StepDataTable from "@/steps/components/StepDataTable";
-import { Step } from "@/steps/models/Step";
+import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
 
 type Props = {
-    delivery: Delivery,
+    delivery: DeliveryToDisplay,
     isSelected?: boolean,
-    isStepSelected?: (step: Step) => boolean,
-    onPress?: (delivery: Delivery) => void,
-    onStepPress?: (step: Step, delivery: Delivery) => void,
-    onDetails?: (delivery: Delivery) => void,
-    onEdit?: (delivery: Delivery) => void,
-    onCopy?: (delivery: Delivery) => void,
-    onDelete?: (delivery: Delivery) => void
+    isStepSelected?: (step: StepToDisplay) => boolean,
+    onPress?: (delivery: DeliveryToDisplay) => void,
+    onStepPress?: (step: StepToDisplay, delivery: DeliveryToDisplay) => void,
+    onDetails?: (delivery: DeliveryToDisplay) => void,
+    onEdit?: (delivery: DeliveryToDisplay) => void,
+    onCopy?: (delivery: DeliveryToDisplay) => void,
+    onDelete?: (delivery: DeliveryToDisplay) => void
 }
 
 export default function DeliveryDataTableRow({ delivery, isSelected = false, isStepSelected, onPress, onStepPress, onDetails, onEdit, onCopy, onDelete }: Props) {
     const theme = useTheme();
-
     const style = datatableStyle;
-
     const [showSteps, setShowSteps] = useState<boolean>(false);
 
     return (
@@ -38,18 +36,21 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     {delivery.code}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.customer.name}
+                    {delivery.customerName}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.steps?.length}
+                    {delivery.steps.length}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.steps ? delivery.steps[0].getContractDate() : ''}
+                    {delivery.startDate}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column,]}>
-                    {delivery.steps ? delivery.steps[0].getContractTime() : ''}
+                    {delivery.startTime}
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column,]}>
+                <DataTable.Cell style={[style.column]}>
+                    {delivery.urgency}
+                </DataTable.Cell>
+                <DataTable.Cell style={[style.column, style.width180]}>
                     <IconButton style={{ margin: 0 }} icon="magnify" onPress={() => onDetails ? onDetails(delivery) : {}} />
                     <IconButton style={{ margin: 0 }} icon="pencil" onPress={() => onEdit ? onEdit(delivery) : {}} />
                     <IconButton style={{ margin: 0 }} icon="content-copy" onPress={() => onCopy ? onCopy(delivery) : {}} />
@@ -61,7 +62,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     <StepDataTable
                         steps={delivery.steps ?? []}
                         isStepSelected={isStepSelected}
-                        onRowPress={onStepPress ? (step: Step) => onStepPress(step, delivery) : undefined}
+                        onRowPress={onStepPress ? (step: StepToDisplay) => onStepPress(step, delivery) : undefined}
                         canChangeDate={true}
                     />
                 </View>

@@ -2,6 +2,14 @@
 
 ## Getting started
 
+## Models
+### Deliveries
+- ContractDate => Customer created a request at this time. Used to calculate delay for price
+- StartDate => Pickup or DropOff cannot be before StartDate
+### Steps
+- EstimatedDate => Dispatcher estimated date for the step
+- RealDate => Courier inputed date for the step
+
 ## Database connection
 
 To develop locally, you can use the local PostGresql database defined in docker compose file `infrastructure/dev`

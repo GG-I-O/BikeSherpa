@@ -1,13 +1,13 @@
 import { DataTable, useTheme } from "react-native-paper";
-import { Step } from "../models/Step";
 import datatableStyle from "@/style/datatableStyle";
 import StepDataTableRowAssign from "./StepDataTableRowAssign";
 import { ScrollView } from "react-native";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
 
 type Props = {
-    steps: Step[],
-    isStepSelected?: (step: Step) => boolean,
-    onRowPress?: (step: Step) => void,
+    steps: StepToDisplay[],
+    isStepSelected?: (step: StepToDisplay) => boolean,
+    onRowPress?: (step: StepToDisplay) => void,
     canChangeDate?: boolean,
     showHeader?: boolean
 }
@@ -29,7 +29,7 @@ export default function StepDataTableAssign({ steps, isStepSelected, onRowPress,
                         <DataTable.Title style={[style.column, style.minWidth100]}>Description</DataTable.Title>
                         <DataTable.Title style={[style.column, style.minWidth100]}>Commentaire</DataTable.Title>
                         <DataTable.Title style={[style.column, style.minWidth150]}>Adresse</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.width160]}>Heure</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width180]}>Heure</DataTable.Title>
                     </DataTable.Header>
                 ) : (
                     <></>

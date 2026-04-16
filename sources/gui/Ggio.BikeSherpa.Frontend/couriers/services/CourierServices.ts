@@ -41,7 +41,7 @@ export default class CourierServices implements ICourierService {
     /**
      * Get a single courier without subscribing to changes
      */
-    private getCourier(courierId: string): Courier {
+    public getCourier(courierId: string): Courier {
         return this.courierStore$[courierId].peek();
     }
 

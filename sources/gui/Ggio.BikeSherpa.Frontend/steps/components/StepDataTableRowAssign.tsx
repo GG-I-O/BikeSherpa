@@ -1,15 +1,15 @@
 import { DataTable, IconButton, Text, useTheme } from "react-native-paper";
-import { Step } from "../models/Step";
 import datatableStyle from "@/style/datatableStyle";
 import { useState } from "react";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import TimePickerInput from "@/components/general/TimePickerInput";
 import { View } from "react-native";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
 
 type Props = {
-    step: Step,
+    step: StepToDisplay,
     isSelected?: boolean,
-    onPress?: (step: Step) => void,
+    onPress?: (step: StepToDisplay) => void,
     canChangeDate?: boolean
 }
 
@@ -17,18 +17,17 @@ export default function StepDataTableRowAssign({ step, isSelected = false, onPre
     const theme = useTheme();
     const style = datatableStyle;
 
+    const splitTime = step.estimatedTime.split(':');
     const [heureContrat, setHeureContrat] = useState<{ hours: number, minutes: number }>(
         {
-            hours: step.estimatedDate?.getHours() ?? 0,
-            minutes: step.estimatedDate?.getMinutes() ?? 0
+            hours: parseInt(splitTime[0]) ?? 0,
+            minutes: parseInt(splitTime[1]) ?? 0
         }
     )
     const [isTimePickerOpen, setIsTimePickerOpen] = useState(false); // Disable onRowPress if we're picking time
 
     const changeTime = (hours: number, minutes: number) => {
         setHeureContrat({ hours, minutes });
-        step.estimatedDate = new Date(step.contractDate);
-        step.estimatedDate?.setHours(hours, minutes, 0, 0);
     }
 
     return (
@@ -49,8 +48,8 @@ export default function StepDataTableRowAssign({ step, isSelected = false, onPre
                 <DeliveryTypeIcon type={step.type} />
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width100]}>{step.id}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width90]}>{step.getContractDate()}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width60]}>{step.getContractTime()}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width90]}>{step.estimatedDate}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>{step.estimatedTime}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth100]}>
                 <Text numberOfLines={2}>{step.comment}</Text>
             </DataTable.Cell>
@@ -59,10 +58,10 @@ export default function StepDataTableRowAssign({ step, isSelected = false, onPre
                 <Text numberOfLines={3}>{step.address.streetInfo}</Text>
                 <Text numberOfLines={3}>{`${step.address.postcode} ${step.address.city}`}</Text>
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width160]}>
+            <DataTable.Cell style={[style.column, style.width180]}>
                 {
                     !canChangeDate ? (
-                        <Text>{step.getEstimatedTime()}</Text>
+                        <Text>{step.estimatedTime}</Text>
                     ) : (
                         <View style={{ flexDirection: 'row', gap: 4 }}>
                             <IconButton
