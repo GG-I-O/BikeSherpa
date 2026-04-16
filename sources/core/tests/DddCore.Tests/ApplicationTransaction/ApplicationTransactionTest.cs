@@ -55,7 +55,7 @@ public class ApplicationTransactionTest
           contextMock.Verify(x => x.Complete(), Times.Once);
 
           // 4. Dispatch post-save events
-          dispatcherMock.Verify(x => x.DispatchAndClearEventsAsync(
+          dispatcherMock.Verify(x => x.DispatchEventsToPostTransactionalHandlersAsync(
                It.Is<IEnumerable<HasDomainEventsBase>>(e => e.Contains(entity))), Times.Once);
      }
 
@@ -82,6 +82,7 @@ public class ApplicationTransactionTest
 
      public class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
      {
+          [UsedImplicitly]
           public virtual DbSet<TestEntity> TestEntities { get; set; }
      }
 

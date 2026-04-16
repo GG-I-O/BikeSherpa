@@ -1,22 +1,23 @@
 using System.Security.Claims;
+using Auth0.AspNetCore.Authentication.Api;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using Ggio.BikeSherpa.Backend.Domain;
-using Ggio.BikeSherpa.Backend.Features.Deliveries;
-using Ggio.DddCore.Infrastructure;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Auth0.AspNetCore.Authentication.Api;
 using Ggio.BikeSherpa.Backend.Features.Couriers;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Features.Customers;
+using Ggio.BikeSherpa.Backend.Features.Deliveries;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Middleware;
 using Ggio.BikeSherpa.Backend.Services.Notification;
 using Ggio.DddCore;
+using Ggio.DddCore.Infrastructure;
 using Ggio.DddCore.Infrastructure.Persistence;
+using Mediator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NJsonSchema.Generation;
@@ -69,6 +70,7 @@ builder.Services.AddMediator(options =>
 {
      options.Assemblies = [typeof(GetDeliveryQuery).Assembly, typeof(EntityBase).Assembly, typeof(EfCoreDomainEntityAddedEventHandler)];
      options.ServiceLifetime = ServiceLifetime.Scoped;
+     options.NotificationPublisherType = typeof(TaskWhenAllPublisher);
 });
 
 // Cors
@@ -89,12 +91,13 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
 {
      builder.Services.AddAuthorization(options =>
      {
-          options.AddPolicy("read:customers", policy => policy.RequireClaim("scope", "read:customers"));
-          options.AddPolicy("write:customers", policy => policy.RequireClaim("scope", "write:customers"));
-          options.AddPolicy("read:couriers", policy => policy.RequireClaim("scope", "read:couriers"));
-          options.AddPolicy("write:couriers", policy => policy.RequireClaim("scope", "write:couriers"));
-          options.AddPolicy("read:deliveries", policy => policy.RequireClaim("scope", "read:deliveries"));
-          options.AddPolicy("write:deliveries", policy => policy.RequireClaim("scope", "write:deliveries"));
+          const string scopeName = "scope";
+          options.AddPolicy("read:customers", policy => policy.RequireClaim(scopeName, "read:customers"));
+          options.AddPolicy("write:customers", policy => policy.RequireClaim(scopeName, "write:customers"));
+          options.AddPolicy("read:couriers", policy => policy.RequireClaim(scopeName, "read:couriers"));
+          options.AddPolicy("write:couriers", policy => policy.RequireClaim(scopeName, "write:couriers"));
+          options.AddPolicy("read:deliveries", policy => policy.RequireClaim(scopeName, "read:deliveries"));
+          options.AddPolicy("write:deliveries", policy => policy.RequireClaim(scopeName, "write:deliveries"));
      });
 
      builder.Services.AddAuth0ApiAuthentication(options =>
@@ -105,7 +108,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                Audience = builder.Configuration["Auth0Identifier"],
                RequireHttpsMetadata = true,
                MetadataAddress = $"{builder.Configuration["Auth0Metadata"]}",
-               TokenValidationParameters = new TokenValidationParameters()
+               TokenValidationParameters = new TokenValidationParameters
                {
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -114,9 +117,9 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                     ValidIssuer = builder.Configuration["Auth0Issuer"],
                     ValidAudience = builder.Configuration["Auth0Identifier"]
                },
-               Events = new JwtBearerEvents()
+               Events = new JwtBearerEvents
                {
-                    OnTokenValidated = async (context) =>
+                    OnTokenValidated = async context =>
                     {
                          if (context.Principal?.Identity is ClaimsIdentity claimsIdentity)
                          {
@@ -159,6 +162,7 @@ if (!app.Environment.IsEnvironment("IntegrationTest"))
 {
      app.UseFastEndpoints(config => { config.Endpoints.ShortNames = true; })
           .UseSwaggerGen();
+
      app.UseSerilogRequestLogging();
      app.UseHttpLogging();
 }

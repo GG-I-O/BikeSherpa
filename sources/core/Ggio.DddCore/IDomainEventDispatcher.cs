@@ -6,5 +6,5 @@
 public interface IDomainEventDispatcher
 {
      Task DispatchEventsAsync(IEnumerable<IHasDomainEvents> entitiesWithEvents);
-     Task DispatchAndClearEventsAsync(IEnumerable<IHasDomainEvents> entitiesWithEvents);
+     Task DispatchEventsToPostTransactionalHandlersAsync(IEnumerable<IHasDomainEvents> entitiesWithEvents);
 }

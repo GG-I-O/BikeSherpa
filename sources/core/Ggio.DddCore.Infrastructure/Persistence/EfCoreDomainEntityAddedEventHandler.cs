@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ggio.DddCore.Infrastructure.Persistence;
 
-public class EfCoreDomainEntityAddedEventHandler(DbContext dbContext) : INotificationHandler<DomainEntityAddedEvent> 
+public class EfCoreDomainEntityAddedEventHandler(DbContext dbContext) : INotificationHandler<AggregateRootAddedEvent>
 {
-     public async ValueTask Handle(DomainEntityAddedEvent notification, CancellationToken cancellationToken)
+     public async ValueTask Handle(AggregateRootAddedEvent notification, CancellationToken cancellationToken)
      {
-          await dbContext.AddAsync(notification.NewEntity, cancellationToken);
+          await dbContext.AddAsync(notification.NewAggregate, cancellationToken);
      }
 }
