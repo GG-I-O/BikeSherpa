@@ -3,6 +3,7 @@
   <component name="UserContentModel">
     <attachedFolders />
     <explicitIncludes>
+      <Path>infrastructure</Path>
       <Path>sources/gui</Path>
     </explicitIncludes>
     <explicitExcludes />
