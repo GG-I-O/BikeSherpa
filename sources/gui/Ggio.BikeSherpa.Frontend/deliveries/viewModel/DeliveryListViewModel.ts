@@ -5,21 +5,26 @@ import {inject} from "inversify";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import Delivery from "@/deliveries/models/Delivery";
 import DateToolbox from "@/services/DateToolbox";
-import {Step} from "@/steps/models/Step";
+import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
+import {ICustomerService} from "@/spi/CustomerSPI";
 
 export default class DeliveryListViewModel {
     private readonly deliveryServices: IDeliveryServices;
     private readonly courierServices: ICourierService;
+    private readonly customerServices: ICustomerService;
 
     constructor(
         @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
         @inject(ServicesIdentifiers.CourierServices) courierServices: ICourierService,
+        @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService,
     ) {
         this.deliveryServices = deliveryServices;
         this.courierServices = courierServices;
+        this.customerServices = customerServices;
     }
 
-    public getFilteredDeliveries = (dateFilter: string, courierFilter: string): Delivery[] => {
+    public getFilteredDeliveries = (dateFilter: string, courierFilter: string): DeliveryToDisplay[] => {
         if (!this.deliveryServices || !this.courierServices)
             return [];
         
@@ -41,9 +46,8 @@ export default class DeliveryListViewModel {
                 );
             });
         });
-
-        // Return sorted deliveries
-        return [...filteredDeliveries].sort((deliveryA, deliveryB) => {
+        
+        const sortedDeliveries: Delivery[] = [...filteredDeliveries].sort((deliveryA, deliveryB) => {
             if (!deliveryA.steps || !deliveryB.steps)
                 return 0;
             return (
@@ -52,9 +56,30 @@ export default class DeliveryListViewModel {
                 new Date(deliveryB.steps[0].estimatedDeliveryDate).getTime()
             );
         });
+        
+        return sortedDeliveries.map((delivery) => {
+            return {
+                id: delivery.id,
+                code: delivery.code,
+                customerName: this.customerServices.getCustomer$(delivery.customerId).get().name,
+                urgency: delivery.urgency,
+                startDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
+                startTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
+                steps: delivery.steps?.map((step) => ({
+                    id: step.id,
+                    type: step.stepType,
+                    completed: step.completed,
+                    address: step.stepAddress,
+                    courierCode: step.courierId ? this.courierServices.getCourier$(step.courierId).get().code : undefined,
+                    comment: step.comment ?? '',
+                    estimatedDate: DateToolbox.getFormattedDateFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
+                    estimatedTime: DateToolbox.getFormattedTimeFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
+                }))
+            }
+        });
     }
 
-    public getFilteredStepList = (dateFilter: string, courier: string): Step[] => {
+    public getFilteredStepList = (dateFilter: string, courier: string): StepToDisplay[] => {
         return this.getFilteredDeliveries(dateFilter, courier)
             .flatMap((delivery) => delivery.steps ?? []);
     }

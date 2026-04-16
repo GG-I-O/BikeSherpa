@@ -13,7 +13,8 @@ import {ICustomerService} from "@/spi/CustomerSPI";
 export default function useDeliveryListViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
     const courierServices = IOCContainer.get<ICourierService>(ServicesIdentifiers.CourierServices);
-    const viewModel = new DeliveryListViewModel(deliveryServices, courierServices);
+    const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
+    const viewModel = new DeliveryListViewModel(deliveryServices, courierServices, customerServices);
 
     
     const deliveryStore$ = deliveryServices.getDeliveryList$();

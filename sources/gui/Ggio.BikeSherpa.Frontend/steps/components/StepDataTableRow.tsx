@@ -1,17 +1,15 @@
 import { DataTable, Text, useTheme } from "react-native-paper";
-import { Step } from "../models/Step";
 import datatableStyle from "@/style/datatableStyle";
 import { useState } from "react";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import TimePickerInput from "@/components/general/TimePickerInput";
-import DateToolbox from "@/services/DateToolbox";
 import {Icon} from "react-native-paper/src";
-import {StepType} from "@/steps/models/StepType";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
 
 type Props = {
-    step: Step,
+    step: StepToDisplay,
     isSelected?: boolean,
-    onPress?: (step: Step) => void,
+    onPress?: (step: StepToDisplay) => void,
     canChangeDate?: boolean
 }
 
@@ -19,11 +17,11 @@ export default function StepDataTableRow({ step, isSelected = false, onPress, ca
     const theme = useTheme();
     const style = datatableStyle;
     
-    const stepEstimatedDate = new Date(step.estimatedDeliveryDate);
+    const splitTime = step.estimatedTime.split(':');
     const [contractTime, setContractTime] = useState<{ hours: number, minutes: number }>(
         {
-            hours: stepEstimatedDate.getHours() ?? 0,
-            minutes: stepEstimatedDate.getMinutes() ?? 0
+            hours: parseInt(splitTime[0]) ?? 0,
+            minutes: parseInt(splitTime[1]) ?? 0
         }
     )
     const [isTimePickerOpen, setIsTimePickerOpen] = useState(false); // Disable onRowPress if we're picking time
@@ -37,21 +35,21 @@ export default function StepDataTableRow({ step, isSelected = false, onPress, ca
             style={{ backgroundColor: isSelected ? theme.colors.primary : theme.colors.background }}
         >
             <DataTable.Cell style={[style.column, style.width40]}>
-                <DeliveryTypeIcon type={step.stepType} />
+                <DeliveryTypeIcon type={step.type} />
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
-                <Text numberOfLines={3}>{step.stepAddress.streetInfo}</Text>
-                <Text numberOfLines={3}>{`${step.stepAddress.postcode} ${step.stepAddress.city}`}</Text>
+                <Text numberOfLines={3}>{step.address.streetInfo}</Text>
+                <Text numberOfLines={3}>{`${step.address.postcode} ${step.address.city}`}</Text>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <Text numberOfLines={2}>{step.comment}</Text>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth100]}>{step.comment}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width60]}>{step.courierId}</DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>{step.courierCode}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>
                 {
                     !canChangeDate ? (
-                        <Text>{step.estimatedDeliveryDate}</Text>
+                        <Text>{step.estimatedDate}</Text>
                     ) : (
                         <TimePickerInput
                             hours={contractTime.hours}

@@ -3,13 +3,13 @@ import {useEffect, useState} from "react";
 import {ScrollView} from "react-native";
 import {Button, SegmentedButtons, Text, useTheme} from 'react-native-paper';
 import {Dropdown} from 'react-native-paper-dropdown';
-import Delivery from "../models/Delivery";
-import {Step} from "@/steps/models/Step";
 import DeliveryDataTable from "../components/DeliveryDataTable";
 import StepDataTableAssign from "@/steps/components/StepDatatableAssign";
 import {useDeliverySelection} from "../hooks/useDeliverySelection";
 import useDeliveryListViewModel from "@/deliveries/viewModel/useDeliveryListViewModel";
 import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
+import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 
 export function DeliveryListView() {
     const theme = useTheme();
@@ -21,8 +21,8 @@ export function DeliveryListView() {
     const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
 
     // Data
-    const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-    const [steps, setSteps] = useState<Step[]>([]);
+    const [deliveries, setDeliveries] = useState<DeliveryToDisplay[]>([]);
+    const [steps, setSteps] = useState<StepToDisplay[]>([]);
 
     const viewModel = useDeliveryListViewModel();
     const {
@@ -140,19 +140,19 @@ export function DeliveryListView() {
                     onDeliveryPress={isAssigning ? toggleDeliverySelection : undefined}
                     onStepPress={isAssigning ? toggleStepSelection : undefined}
                     onDetails={
-                        (delivery: Delivery) => navigate({
+                        (delivery: DeliveryToDisplay) => navigate({
                             pathname: '/(tabs)/(deliveries)/[deliveryId]',
                             params: {deliveryId: delivery.id}
                         })}
-                    onEdit={(delivery: Delivery) => navigate({
+                    onEdit={(delivery: DeliveryToDisplay) => navigate({
                         pathname: '/(tabs)/(deliveries)/edit',
                         params: {deliveryId: delivery.id}
                     })}
-                    onCopy={(delivery: Delivery) => navigate({
+                    onCopy={(delivery: DeliveryToDisplay) => navigate({
                         pathname: '/(tabs)/(deliveries)/copy',
                         params: {deliveryId: delivery.id}
                     })}
-                    onDelete={(delivery: Delivery) => {
+                    onDelete={(delivery: DeliveryToDisplay) => {
                         viewModel.setDeliveryToDelete(delivery.id);
                         setDisplayConfirmationModal(true);
                     }}

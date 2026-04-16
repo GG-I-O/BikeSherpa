@@ -1,30 +1,30 @@
-import { Step } from "@/steps/models/Step";
 import { useCallback, useState } from "react";
-import Delivery from "@/deliveries/models/Delivery";
+import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
 
 export function useDeliverySelection() {
-    const [selectedSteps, setSelectedSteps] = useState<Step[]>([]);
-    const [selectedDeliveries, setSelectedDeliveries] = useState<Delivery[]>([]);
+    const [selectedSteps, setSelectedSteps] = useState<StepToDisplay[]>([]);
+    const [selectedDeliveries, setSelectedDeliveries] = useState<DeliveryToDisplay[]>([]);
 
-    const isStepSelected = useCallback((step: Step) => {
+    const isStepSelected = useCallback((step: StepToDisplay) => {
         return selectedSteps.some(s => s.id === step.id);
     }, [selectedSteps]);
 
-    const isDeliverySelected = useCallback((delivery: Delivery) => {
+    const isDeliverySelected = useCallback((delivery: DeliveryToDisplay) => {
         return selectedDeliveries.some(d => d.id === delivery.id)
     }, [selectedDeliveries]);
 
-    const toggleDeliverySelection = useCallback((delivery: Delivery) => {
+    const toggleDeliverySelection = useCallback((delivery: DeliveryToDisplay) => {
         if (!delivery.steps) return;
 
         const isCurrentlySelected = selectedDeliveries.some((d) => d.id === delivery.id);
 
         if (isCurrentlySelected) {
-            setSelectedSteps(selectedSteps.filter((step: Step) => !delivery.steps?.some((s: Step) => s.id === step.id)));
-            setSelectedDeliveries(selectedDeliveries.filter((d: Delivery) => d.id !== delivery.id));
+            setSelectedSteps(selectedSteps.filter((step: StepToDisplay) => !delivery.steps?.some((s: StepToDisplay) => s.id === step.id)));
+            setSelectedDeliveries(selectedDeliveries.filter((d: DeliveryToDisplay) => d.id !== delivery.id));
         }
         else {
-            const stepsToAdd = delivery.steps?.filter((step: Step) =>
+            const stepsToAdd = delivery.steps?.filter((step: StepToDisplay) =>
                 !selectedSteps.some(s => s.id === step.id)
             );
             setSelectedSteps(current => current.concat(stepsToAdd ?? []));
@@ -32,16 +32,16 @@ export function useDeliverySelection() {
         }
     }, [selectedSteps, selectedDeliveries]);
 
-    const toggleStepSelection = useCallback((step: Step, delivery: Delivery) => {
-        const isSelected = selectedSteps.some((s: Step) => s.id === step.id);
+    const toggleStepSelection = useCallback((step: StepToDisplay, delivery: DeliveryToDisplay) => {
+        const isSelected = selectedSteps.some((s: StepToDisplay) => s.id === step.id);
         if (isSelected) {
-            setSelectedSteps(selectedSteps.filter((s: Step) => s.id !== step.id));
-            setSelectedDeliveries(selectedDeliveries.filter((d: Delivery) => d.id !== delivery.id));
+            setSelectedSteps(selectedSteps.filter((s: StepToDisplay) => s.id !== step.id));
+            setSelectedDeliveries(selectedDeliveries.filter((d: DeliveryToDisplay) => d.id !== delivery.id));
         }
         else {
             const tempSelectedSteps = selectedSteps.concat([step]);
             setSelectedSteps(tempSelectedSteps);
-            const doWeAddDelivery = delivery.steps?.every((s: Step) => tempSelectedSteps.some((ss: Step) => ss.id === s.id));
+            const doWeAddDelivery = delivery.steps?.every((s: StepToDisplay) => tempSelectedSteps.some((ss: StepToDisplay) => ss.id === s.id));
             if (doWeAddDelivery)
                 setSelectedDeliveries(selectedDeliveries.concat([delivery]));
         }

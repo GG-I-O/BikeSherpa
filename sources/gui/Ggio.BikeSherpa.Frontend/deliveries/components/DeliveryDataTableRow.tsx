@@ -3,28 +3,24 @@ import datatableStyle from "@/style/datatableStyle";
 import { View } from "react-native";
 import { useState } from "react";
 import StepDataTable from "@/steps/components/StepDataTable";
-import { Step } from "@/steps/models/Step";
-import Delivery from "@/deliveries/models/Delivery";
-import DateToolbox from "@/services/DateToolbox";
-import useDeliveryDataTableRowViewModel from "@/deliveries/viewModel/useDeliveryDataTableRowViewModel";
+import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
 
 type Props = {
-    delivery: Delivery,
+    delivery: DeliveryToDisplay,
     isSelected?: boolean,
-    isStepSelected?: (step: Step) => boolean,
-    onPress?: (delivery: Delivery) => void,
-    onStepPress?: (step: Step, delivery: Delivery) => void,
-    onDetails?: (delivery: Delivery) => void,
-    onEdit?: (delivery: Delivery) => void,
-    onCopy?: (delivery: Delivery) => void,
-    onDelete?: (delivery: Delivery) => void
+    isStepSelected?: (step: StepToDisplay) => boolean,
+    onPress?: (delivery: DeliveryToDisplay) => void,
+    onStepPress?: (step: StepToDisplay, delivery: DeliveryToDisplay) => void,
+    onDetails?: (delivery: DeliveryToDisplay) => void,
+    onEdit?: (delivery: DeliveryToDisplay) => void,
+    onCopy?: (delivery: DeliveryToDisplay) => void,
+    onDelete?: (delivery: DeliveryToDisplay) => void
 }
 
 export default function DeliveryDataTableRow({ delivery, isSelected = false, isStepSelected, onPress, onStepPress, onDetails, onEdit, onCopy, onDelete }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
-
-    const viewModel = useDeliveryDataTableRowViewModel();
     const [showSteps, setShowSteps] = useState<boolean>(false);
 
     return (
@@ -40,16 +36,16 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     {delivery.code}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {viewModel.getCustomerName(delivery.customerId)}
+                    {delivery.customerName}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
                     {delivery.steps.length}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.steps.length > 0 ? DateToolbox.getFormattedDateFromISO(delivery.steps[0].estimatedDeliveryDate) : ''}
+                    {delivery.startDate}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column,]}>
-                    {delivery.steps.length > 0 ? DateToolbox.getFormattedTimeFromISO(delivery.steps[0].estimatedDeliveryDate) : ''}
+                    {delivery.startTime}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
                     {delivery.urgency}
@@ -66,7 +62,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     <StepDataTable
                         steps={delivery.steps ?? []}
                         isStepSelected={isStepSelected}
-                        onRowPress={onStepPress ? (step: Step) => onStepPress(step, delivery) : undefined}
+                        onRowPress={onStepPress ? (step: StepToDisplay) => onStepPress(step, delivery) : undefined}
                         canChangeDate={true}
                     />
                 </View>
