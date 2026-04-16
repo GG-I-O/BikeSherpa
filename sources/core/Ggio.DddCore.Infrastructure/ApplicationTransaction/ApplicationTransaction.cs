@@ -27,7 +27,7 @@ public class ApplicationTransaction<TDbContext>(TDbContext dbContext, IApplicati
           context.Complete();
 
           //Dispatch events for PostTransactionHandlers
-          await domainEventDispatcher.DispatchAndClearEventsAsync(entitiesWithEvents);
+          await domainEventDispatcher.DispatchEventsToPostTransactionalHandlersAsync(entitiesWithEvents);
 
      }
 }

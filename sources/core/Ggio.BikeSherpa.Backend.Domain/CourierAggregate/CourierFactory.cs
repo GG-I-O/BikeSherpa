@@ -30,7 +30,7 @@ public class CourierFactory(IMediator mediator) : FactoryBase(mediator), ICourie
                Address = address
           };
 
-          await NotifyNewEntityAdded(courier);
+          await NotifyNewAggregateRootAdded(courier);
           return courier;
      }
 }

@@ -32,7 +32,7 @@ public class CustomerFactory(IMediator mediator) : FactoryBase(mediator), ICusto
                Address = address
           };
 
-          await NotifyNewEntityAdded(customer);
+          await NotifyNewAggregateRootAdded(customer);
           return customer;
      }
 }

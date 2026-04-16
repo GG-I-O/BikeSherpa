@@ -54,7 +54,7 @@ public class DeliveryFactory(IMediator mediator, IReadRepository<Customer> custo
 
           delivery.TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
 
-          await NotifyNewEntityAdded(delivery);
+          await NotifyNewAggregateRootAdded(delivery);
 
           return delivery;
      }
