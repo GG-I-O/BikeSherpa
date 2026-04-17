@@ -3,7 +3,6 @@ using Ardalis.Specification;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
-using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;

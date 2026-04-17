@@ -1,7 +1,7 @@
 ﻿using Ardalis.Specification;
 using AutoFixture;
 using AutoFixture.AutoMoq;
-using FluentValidation;
+using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
@@ -113,8 +113,8 @@ public class AddDeliveryHandlerTests
           var result = await sut.Handle(_mockCommand, CancellationToken.None);
 
           // Assert
-          Assert.True(result.IsSuccess);
-          Assert.Equal(_mockDelivery.Id, result.Value);
+          result.IsSuccess.Should().BeTrue();
+          result.Value.Should().Be(_mockDelivery.Id);
           VerifyFactoryCalledOnce();
           VerifyTransactionCommittedOnce();
      }
@@ -130,8 +130,8 @@ public class AddDeliveryHandlerTests
           var result = await sut.Handle(_mockCommand, CancellationToken.None);
 
           // Assert
-          Assert.True(result.IsSuccess);
-          Assert.Equal(_mockDelivery.Id, result.Value);
+          result.IsSuccess.Should().BeTrue();
+          result.Value.Should().Be(_mockDelivery.Id);
           _mockFactory.Verify(
                x => x.CreateDeliveryAsync(
                     It.IsAny<PricingStrategy>(),
