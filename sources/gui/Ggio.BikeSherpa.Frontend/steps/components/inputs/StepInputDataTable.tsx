@@ -13,7 +13,7 @@ export default function StepInputDataTable({name, control}: Props) {
     const theme = useTheme();
     const windowWidth = Dimensions.get('window').width;
 
-    const {fields, append, remove} = useFieldArray({
+    const {fields, append, remove, move} = useFieldArray({
         name,
         control
     });
@@ -33,8 +33,7 @@ export default function StepInputDataTable({name, control}: Props) {
                     longitude: 0,
                     latitude: 0
                 }
-            },
-            estimatedDeliveryDate: new Date().toISOString()
+            }
         })
     }
 
@@ -47,7 +46,7 @@ export default function StepInputDataTable({name, control}: Props) {
             </Button>
             <DataTable style={{backgroundColor: theme.colors.background, width: windowWidth * 0.9}}>
                 <DataTable.Header style={{padding: 0}}>
-                    <DataTable.Title style={[datatableStyle.column, datatableStyle.width60]}>
+                    <DataTable.Title style={[datatableStyle.column, datatableStyle.width130]}>
                         <Text>Actions</Text>
                     </DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column, datatableStyle.width60]}>
@@ -56,14 +55,8 @@ export default function StepInputDataTable({name, control}: Props) {
                     <DataTable.Title style={[datatableStyle.column]}>
                         <Text>Adresse</Text>
                     </DataTable.Title>
-                    <DataTable.Title style={[datatableStyle.column, datatableStyle.width180]}>
+                    <DataTable.Title style={[datatableStyle.column]}>
                         <Text>Commentaire</Text>
-                    </DataTable.Title>
-                    <DataTable.Title style={[datatableStyle.column, datatableStyle.widthDatePicker]}>
-                        <Text>Date</Text>
-                    </DataTable.Title>
-                    <DataTable.Title style={[datatableStyle.column, datatableStyle.width40]}>
-                        <Text>Heure</Text>
                     </DataTable.Title>
                 </DataTable.Header>
 
@@ -74,6 +67,8 @@ export default function StepInputDataTable({name, control}: Props) {
                         name={name}
                         index={index}
                         deleteRow={() => remove(index)}
+                        listLength={fields.length}
+                        moveRow={move}
                     />
                 ))}
             </DataTable>

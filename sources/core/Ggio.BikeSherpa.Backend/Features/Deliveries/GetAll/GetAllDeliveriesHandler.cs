@@ -15,6 +15,14 @@ public class GetAllDeliveriesHandler(IReadRepository<Delivery> repository) : IQu
           var allDeliveries = query.LastSync is null ?
                (await repository.ListAsync(cancellationToken)).SelectFacets<Delivery, Model.DeliveryCrud>() :
                (await repository.ListAsync(new DeliveryByUpdatedAtSpecification(query.LastSync!.Value), cancellationToken)).SelectFacets<Delivery, Model.DeliveryCrud>();
-          return allDeliveries.ToList();
+          
+          var orderedDeliveries = allDeliveries
+               .Select(delivery => delivery with
+               {
+                    Steps = delivery.Steps.OrderBy(s => s.Order).ToList()
+               })
+               .ToList();
+
+          return orderedDeliveries;
      }
 }

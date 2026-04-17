@@ -1,5 +1,6 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 using Ggio.DddCore;
@@ -33,6 +34,14 @@ public class GetAllDeliveriesHandlerTests
      public async Task Handle_ShouldReturnAllDeliveries_WhenDeliveriesExist()
      {
           // Arrange
+          var mockStepA1 = _fixture.Build<DeliveryStep>().With(s => s.Order, 1).Create();
+          var mockStepA2 = _fixture.Build<DeliveryStep>().With(s => s.Order, 2).Create();
+          _mockDeliveryA.Steps = [mockStepA1, mockStepA2];
+          
+          var mockStepB1 = _fixture.Build<DeliveryStep>().With(s => s.Order, 1).Create();
+          var mockStepB2 = _fixture.Build<DeliveryStep>().With(s => s.Order, 2).Create();
+          _mockDeliveryB.Steps = [mockStepB2, mockStepB1];
+          
           var deliveries = new List<Delivery>
           {
                _mockDeliveryA,
@@ -46,16 +55,19 @@ public class GetAllDeliveriesHandlerTests
           var result = await sut.Handle(query, CancellationToken.None);
 
           // Assert
-          Assert.NotNull(result);
-          Assert.Equal(2, result.Count);
-          Assert.Contains(result, delivery => delivery.Code == "BBB");
-          Assert.Contains(result, delivery => delivery.Code == "AAA");
-          Assert.Contains(result, delivery => delivery.PackingSize == "Xxl");
-          Assert.Contains(result, delivery => delivery.PackingSize == "Xl");
-          Assert.Contains(result, delivery => delivery.Urgency == "Standard");
-          Assert.Contains(result, delivery => delivery.Urgency == "Urgent");
-          Assert.Contains(result, delivery => delivery.ReportId == _mockDeliveryB.ReportId);
-          Assert.Contains(result, delivery => delivery.Steps == _mockDeliveryA.Steps);
+          result.Should().HaveCount(2);
+          
+          var deliveryA = result.Single(d => d.Code == "AAA");
+          var deliveryB = result.Single(d => d.Code == "BBB");
+
+          deliveryA.PackingSize.Should().Be("Xxl");
+          deliveryA.Urgency.Should().Be("Standard");
+          deliveryA.Steps.Select(s => s.Order).Should().Equal(1, 2);
+
+          deliveryB.PackingSize.Should().Be("Xl");
+          deliveryB.Urgency.Should().Be("Urgent");
+          deliveryB.Steps.Select(s => s.Order).Should().Equal(1, 2);
+
           VerifyRepositoryCalledOnce();
      }
 
@@ -70,8 +82,8 @@ public class GetAllDeliveriesHandlerTests
           var result = await sut.Handle(query, CancellationToken.None);
 
           // Assert
-          Assert.NotNull(result);
-          Assert.Empty(result);
+          result.Should().NotBeNull();
+          result.Should().BeEmpty();
           VerifyRepositoryCalledOnce();
      }
 

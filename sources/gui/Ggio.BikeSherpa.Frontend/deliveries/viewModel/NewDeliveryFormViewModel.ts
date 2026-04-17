@@ -86,7 +86,8 @@ export default class NewDeliveryFormViewModel {
                     comment: step.comment ?? null,
                     distance: 0,
                     attachmentFilePaths: [],
-                    realDeliveryDate: null
+                    realDeliveryDate: null,
+                    estimatedDeliveryDate: delivery.startDate
                 }
             })
         };

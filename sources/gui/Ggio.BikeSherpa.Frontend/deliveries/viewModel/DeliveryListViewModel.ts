@@ -51,10 +51,11 @@ export default class DeliveryListViewModel {
         const sortedDeliveries: Delivery[] = [...filteredDeliveries].sort((deliveryA, deliveryB) => {
             if (!deliveryA.steps || !deliveryB.steps)
                 return 0;
+            
             return (
-                new Date(deliveryA.steps[0].estimatedDeliveryDate).getTime()
+                new Date(deliveryA.steps[0].estimatedDeliveryDate).valueOf()
                 -
-                new Date(deliveryB.steps[0].estimatedDeliveryDate).getTime()
+                new Date(deliveryB.steps[0].estimatedDeliveryDate).valueOf()
             );
         });
 
