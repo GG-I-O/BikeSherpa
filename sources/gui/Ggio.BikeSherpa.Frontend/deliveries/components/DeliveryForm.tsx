@@ -12,6 +12,7 @@ import StepInputDataTable from "@/steps/components/inputs/StepInputDataTable";
 import ThemedTimeInput from "@/components/themed/ThemedTimeInput";
 
 interface DeliveryFormProps<T extends FieldValues> {
+    update?: boolean;
     control: Control<T, any, T>;
     handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
     errors: FieldErrors<T>;
@@ -44,6 +45,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 label="Code client"
                 placeholder="CL1"
                 required
+                disabled={props.update}
             />
             <ThemedDropdownInput
                 testID="deliveryFormPricingStrategyInput"
@@ -115,6 +117,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 error={errors.contractDate as FieldError | undefined}
                 label="Date de la demande"
                 required
+                disabled={props.update}
             />
             <ThemedDateInput
                 testID="deliveryFormStartDateInput"

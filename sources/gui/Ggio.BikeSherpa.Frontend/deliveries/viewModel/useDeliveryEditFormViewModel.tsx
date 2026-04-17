@@ -1,7 +1,6 @@
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IDeliveryServices} from "../spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "../bootstrapper/DeliveryServiceIdentifier";
-import NewDeliveryFormViewModel from "./NewDeliveryFormViewModel";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {ICustomerService} from "@/spi/CustomerSPI";
@@ -12,46 +11,46 @@ import {IDropdownOptions} from "@/spi/IDropdownOptions";
 import Delivery from "@/deliveries/models/Delivery";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 import useDeliveryDropdown from "@/deliveries/hooks/useDeliveryDropdown";
+import DeliveryEditFormViewModel from "@/deliveries/viewModel/DeliveryEditFormViewModel";
 
-export function useNewDeliveryFormViewModel() {
+export function useDeliveryEditFormViewModel(deliveryId: string) {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
-    const newDeliveryViewModel = new NewDeliveryFormViewModel(deliveryServices, customerServices);
-
+    const viewModel = new DeliveryEditFormViewModel(deliveryServices, customerServices);
+    
     const { urgencies, pricingStrategies, packingSizes } = useDeliveryDropdown();
+    
+    const delivery: Delivery = deliveryServices.getDelivery$(deliveryId).get();
 
     const {
         control,
         handleSubmit,
-        formState: {errors},
-        reset
+        formState: {errors}
     } = useForm<DeliveryFormValues>({
         defaultValues: {
-            code: '',
-            status: 0,
-            customerId: '',
-            pricingStrategy: pricingStrategies.length > 0 ? parseInt(packingSizes[0].value) : 1,
-            urgency: urgencies.length > 0 ? urgencies[0].value : 'Standard',
-            totalPrice: 0,
-            discount: 0,
-            reportId: '',
-            steps: [],
-            details: [""],
-            packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'L',
-            insulatedBox: false,
-            startDate: new Date().toISOString(),
-            contractDate: new Date().toISOString(),
+            code: delivery.code,
+            status: delivery.status,
+            customerId: customerServices.getCustomer$(delivery.customerId).get().code,
+            pricingStrategy: delivery.pricingStrategy,
+            urgency: delivery.urgency,
+            totalPrice: delivery.totalPrice ?? 0,
+            discount: delivery.discount ?? 0,
+            reportId: delivery.reportId ?? '',
+            steps: delivery.steps,
+            details: delivery.details,
+            packingSize: delivery.packingSize,
+            insulatedBox: delivery.insulatedBox,
+            startDate: delivery.startDate,
+            contractDate: delivery.contractDate,
         },
-        resolver: zodResolver(newDeliveryViewModel.getNewDeliverySchema())
+        resolver: zodResolver(viewModel.getEditDeliverySchema())
     });
-
-    newDeliveryViewModel.setResetCallback(reset);
 
     return {
         control,
         handleSubmit: handleSubmit(
             (data) => {
-                newDeliveryViewModel.onSubmit(data);
+                viewModel.onSubmit(data, delivery);
             },
             (errors) => {
                 console.error("Invalid delivery for creation");

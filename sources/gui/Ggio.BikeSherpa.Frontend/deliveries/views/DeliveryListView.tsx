@@ -14,16 +14,10 @@ import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 export function DeliveryListView() {
     const theme = useTheme();
 
-    const [dateFilter, setDateFilter] = useState<string>('1');
-    const [courierFilter, setCourierFilter] = useState<string>('NONE');
     const [isAssigning, setIsAssigning] = useState<boolean>(false);
     const [assignDropdown, setAssignDropdown] = useState<string>('NONE');
     const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
-
-    // Data
-    const [deliveries, setDeliveries] = useState<DeliveryToDisplay[]>([]);
-    const [steps, setSteps] = useState<StepToDisplay[]>([]);
-
+    
     const viewModel = useDeliveryListViewModel();
     const {
         selectedSteps,
@@ -33,11 +27,6 @@ export function DeliveryListView() {
         toggleDeliverySelection,
         clearSelection
     } = useDeliverySelection();
-
-    useEffect(() => {
-        setDeliveries(viewModel.getFilteredDeliveries(dateFilter, courierFilter));
-        setSteps(viewModel.getFilteredStepList(dateFilter, courierFilter));
-    }, [viewModel, dateFilter, courierFilter, isAssigning]);
 
     return (
         <>
@@ -55,8 +44,8 @@ export function DeliveryListView() {
                     <>
                         <SegmentedButtons
                             style={{height: "auto", flex: 1, alignItems: "center"}}
-                            value={dateFilter}
-                            onValueChange={setDateFilter}
+                            value={viewModel.dateFilter}
+                            onValueChange={viewModel.setDateFilter}
                             buttons={[
                                 {
                                     value: '1',
@@ -75,8 +64,8 @@ export function DeliveryListView() {
                         <Dropdown
                             label="Assignées à"
                             options={[]}
-                            value={courierFilter}
-                            onSelect={(value) => setCourierFilter(value ?? 'NONE')}
+                            value={viewModel.courierFilter}
+                            onSelect={(value) => viewModel.setCourierFilter(value ?? 'NONE')}
                             mode="outlined"
                         />
                         <Button
@@ -132,9 +121,9 @@ export function DeliveryListView() {
                 )}
 
             </ScrollView>
-            {courierFilter === 'NONE' ? (
+            {viewModel.courierFilter === 'NONE' ? (
                 <DeliveryDataTable
-                    deliveries={deliveries}
+                    deliveries={viewModel.deliveries}
                     isDeliverySelected={isAssigning ? isDeliverySelected : undefined}
                     isStepSelected={isAssigning ? isStepSelected : undefined}
                     onDeliveryPress={isAssigning ? toggleDeliverySelection : undefined}
@@ -159,10 +148,10 @@ export function DeliveryListView() {
                 />
             ) : (
                 <StepDataTableAssign
-                    steps={steps}
+                    steps={viewModel.steps}
                     isStepSelected={isAssigning ? isStepSelected : undefined}
                     onRowPress={(step) => {
-                        const delivery = deliveries.find((d) => d.code === step.id);
+                        const delivery = viewModel.deliveries.find((d) => d.code === step.id);
                         if (!delivery) return
                         if (isAssigning)
                             toggleStepSelection(step, delivery);

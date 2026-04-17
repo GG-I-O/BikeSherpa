@@ -9,6 +9,8 @@ import DeliveryListViewModel from "@/deliveries/viewModel/DeliveryListViewModel"
 import {ICourierService} from "@/spi/CourierSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {ICustomerService} from "@/spi/CustomerSPI";
+import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
 
 export default function useDeliveryListViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -18,8 +20,16 @@ export default function useDeliveryListViewModel() {
 
     
     const deliveryStore$ = deliveryServices.getDeliveryList$();
-    const [deliveryList, setDeliveryList] = useState<Delivery[]>([]);
+    const customerStore$ = customerServices.getCustomerList$();
+    const courierStore$ = courierServices.getCourierList$();
+    
     const [deliveryToDelete, setDeliveryToDelete] = useState<string | null>(null);
+    
+    const [deliveries, setDeliveries] = useState<DeliveryToDisplay[]>([]);
+    const [steps, setSteps] = useState<StepToDisplay[]>([]);
+
+    const [dateFilter, setDateFilter] = useState<string>('1');
+    const [courierFilter, setCourierFilter] = useState<string>('NONE');
     
     function displayEditForm(id: string) {
         navigate({
@@ -32,18 +42,23 @@ export default function useDeliveryListViewModel() {
         if (deliveryToDelete)
             deliveryServices.deleteDelivery(deliveryToDelete);
     }
-    
+
     useEffect(() => {
         return observe(() => {
             const record = deliveryStore$.get() ?? {};
-            setDeliveryList(Object.values(record).filter((delivery) => delivery != undefined));
+            setDeliveries(viewModel.getFilteredDeliveries(dateFilter, courierFilter));
+            setSteps(viewModel.getFilteredStepList(dateFilter, courierFilter));
         });
-    }, [deliveryStore$, setDeliveryList]);
+        
+    }, [deliveryStore$, customerStore$, courierStore$, setDeliveries, setSteps, dateFilter, courierFilter]);
     
     return {
-        deliveryList,
-        getFilteredDeliveries: viewModel.getFilteredDeliveries,
-        getFilteredStepList: viewModel.getFilteredStepList,
+        deliveries,
+        steps,
+        dateFilter,
+        setDateFilter,
+        courierFilter,
+        setCourierFilter,
         displayEditForm,
         deleteDelivery,
         setDeliveryToDelete

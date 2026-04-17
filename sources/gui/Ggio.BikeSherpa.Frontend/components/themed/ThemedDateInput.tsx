@@ -21,7 +21,8 @@ const ThemedDateInput: React.FC<CustomDateInputProps> = (
         control,
         label,
         error,
-        required = false
+        required = false,
+        disabled
     }) => {
     const theme = useTheme();
 
@@ -51,6 +52,7 @@ const ThemedDateInput: React.FC<CustomDateInputProps> = (
                     field.onChange(newDate.toISOString());
                 }}
                 value={field.value ? new Date(field.value) : undefined}
+                disabled={disabled}
             />
             {error && (<Text style={{color: theme.colors.error}}>{error.message}</Text>)}
         </View>

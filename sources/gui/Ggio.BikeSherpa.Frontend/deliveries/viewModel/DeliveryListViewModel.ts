@@ -62,8 +62,14 @@ export default class DeliveryListViewModel {
         return sortedDeliveries.map((delivery) => {
             return DeliveryMapper.DeliveryToDeliveryToDisplay(
                 delivery,
-                (id: string) => this.customerServices.getCustomer$(id).get().name,
-                (id: string) => this.courierServices.getCourier$(id).get().code
+                (id: string) => {
+                    const customer = this.customerServices.getCustomer$(id).get();
+                    return customer?.name ?? "";
+                },
+                (id: string) => {
+                    const courier = this.courierServices.getCourier$(id).get();
+                    return courier?.code ?? "";
+                }
             );
         });
     }
