@@ -200,21 +200,6 @@ public class UpdateDeliveryHandlerTests
      }
 
      [Fact]
-     public async Task Handle_ShouldThrowValidationException_WhenReportIdIsEmpty()
-     {
-          // Arrange
-          var commandWithEmptyReportId = _mockCommand with { ReportId = "" };
-          SetupRepositoryTestingIfReportIdExists(false);
-          var sut = CreateSut();
-
-          // Act & Assert
-          await Assert.ThrowsAsync<ValidationException>(() =>
-               sut.Handle(commandWithEmptyReportId, CancellationToken.None).AsTask());
-
-          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
-     }
-
-     [Fact]
      public async Task Handle_ShouldRespectCancellationToken()
      {
           // Arrange

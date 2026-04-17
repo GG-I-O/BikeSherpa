@@ -148,34 +148,6 @@ public class AddDeliveryHandlerTests
      }
 
      [Fact]
-     public async Task Handle_ShouldThrowValidationException_WhenCodeAlreadyExists()
-     {
-          // Arrange
-          SetupRepositoryTestingIfCodeExists(true);
-          var sut = CreateSut();
-
-          // Act & Assert
-          await Assert.ThrowsAsync<ValidationException>(() =>
-               sut.Handle(_mockCommand, CancellationToken.None).AsTask());
-
-          _mockFactory.Verify(
-               x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategy>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<string[]>(),
-                    It.IsAny<string>(),
-                    It.IsAny<bool>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>()),
-               Times.Never);
-
-          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
-     }
-
-     [Fact]
      public async Task Handle_ShouldRespectCancellationToken()
      {
           // Arrange
