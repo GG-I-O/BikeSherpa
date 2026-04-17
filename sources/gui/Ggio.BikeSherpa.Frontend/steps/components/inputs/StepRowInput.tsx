@@ -4,8 +4,6 @@ import {Control} from "react-hook-form";
 import StepTypeInput from "@/steps/components/inputs/StepTypeInput";
 import React from "react";
 import ThemedInput from "@/components/themed/ThemedInput";
-import ThemedDateInput from "@/components/themed/ThemedDateInput";
-import ThemedTimeInput from "@/components/themed/ThemedTimeInput";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";
 
