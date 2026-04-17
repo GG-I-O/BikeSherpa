@@ -2,13 +2,14 @@ import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
 import ThemedInput from "@/components/themed/ThemedInput";
 import formStyle from "@/style/formStyle";
 import {Control, FieldError, FieldErrors, FieldValues, Path, useController} from "react-hook-form";
-import {ScrollView} from "react-native";
+import {ScrollView, View} from "react-native";
 import {Button, Text, useTheme} from "react-native-paper";
 import React from "react";
 import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 import ThemedDateInput from "@/components/themed/ThemedDateInput";
 import {DropdownOptions} from "@/models/DropdownOptions";
 import StepInputDataTable from "@/steps/components/inputs/StepInputDataTable";
+import ThemedTimeInput from "@/components/themed/ThemedTimeInput";
 
 interface DeliveryFormProps<T extends FieldValues> {
     control: Control<T, any, T>;
@@ -49,7 +50,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 control={control}
                 name="pricingStrategy"
                 error={errors.pricingStrategy as FieldError | undefined}
-                label="Calcul de prix"
+                label="Type de livraison"
                 options={props.pricingStrategies}
                 required
                 isNumber
@@ -112,7 +113,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 control={control}
                 name="contractDate"
                 error={errors.contractDate as FieldError | undefined}
-                label="Date du contrat"
+                label="Date de la demande"
                 required
             />
             <ThemedDateInput
@@ -120,7 +121,13 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 control={control}
                 name="startDate"
                 error={errors.startDate as FieldError | undefined}
-                label="Date de début"
+                label="Date de livraison"
+                required
+            />
+            <ThemedTimeInput
+                control={control}
+                name="startDate"
+                label="Heure de livraison"
                 required
             />
             <StepInputDataTable

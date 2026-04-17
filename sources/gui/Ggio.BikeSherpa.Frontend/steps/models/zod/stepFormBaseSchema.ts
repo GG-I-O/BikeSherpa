@@ -11,11 +11,7 @@ const stepFormBaseSchema = zod.object({
     comment: zod
         .string()
         .optional()
-        .nullable(),
-    estimatedDeliveryDate: zod
-        .coerce
-        .string()
-        .datetime({offset: true})
+        .nullable()
 });
 
 type StepFormValues = zod.infer<typeof stepFormBaseSchema>;
