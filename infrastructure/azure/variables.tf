@@ -116,7 +116,7 @@ variable "nginx_version" {
 
 variable "cors_allowed_origins" {
   description = "CORS allowed origins (use * for all or specify domain)"
-  type        = string
+  type        = list(string)
 }
 
 # Tags

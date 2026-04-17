@@ -13,31 +13,6 @@ output "container_app_environment_domain" {
   value       = azurerm_container_app_environment.env.default_domain
 }
 
-output "nginx_fqdn" {
-  description = "NGINX reverse proxy FQDN (main entry point)"
-  value       = azurerm_container_app.nginx.latest_revision_fqdn
-}
-
-output "nginx_url" {
-  description = "NGINX reverse proxy URL (HTTPS)"
-  value       = "https://${azurerm_container_app.nginx.latest_revision_fqdn}"
-}
-
-output "loki_url" {
-  description = "Loki URL for applications to push logs (via NGINX with CORS)"
-  value       = "https://${azurerm_container_app.nginx.latest_revision_fqdn}/loki"
-}
-
-output "loki_push_endpoint" {
-  description = "Loki push endpoint for your mobile application"
-  value       = "https://${azurerm_container_app.nginx.latest_revision_fqdn}/loki/api/v1/push"
-}
-
-output "grafana_url" {
-  description = "Grafana URL to access the dashboard (via NGINX)"
-  value       = "https://${azurerm_container_app.nginx.latest_revision_fqdn}/grafana"
-}
-
 output "grafana_admin_user" {
   description = "Grafana admin username"
   value       = var.grafana_admin_user
@@ -45,7 +20,7 @@ output "grafana_admin_user" {
 
 output "grafana_login_info" {
   description = "Grafana login information"
-  value       = "Login to Grafana at ${azurerm_container_app.nginx.latest_revision_fqdn}/grafana with username: ${var.grafana_admin_user}"
+  value       = "Login to Grafana at ${azurerm_container_app.grafana.latest_revision_fqdn} with username: ${var.grafana_admin_user}"
 }
 
 output "storage_account_name" {

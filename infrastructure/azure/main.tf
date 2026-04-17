@@ -216,7 +216,7 @@ resource "azurerm_container_app" "grafana" {
 
       env {
         name  = "GF_SERVER_ROOT_URL"
-        value = "https://${azurerm_container_app.grafana.ingress.fqdn}"
+        value = "https://${var.prefix}-grafana.${var.location}.azurecontainerapps.io"
       }
 
       env {
@@ -248,7 +248,7 @@ resource "azurerm_container_app" "grafana" {
     
       env {
         name  = "LOKI_URL"
-        value = "https://${azurerm_container_app.loki.ingress.fqdn}"
+        value = "https://${azurerm_container_app.loki.ingress[0].fqdn}"
       }
 
       # Simplified startup command - provision Loki datasource
@@ -269,7 +269,7 @@ datasources:
     type: loki
     access: proxy
     orgId: 1
-    url: "https://${azurerm_container_app.loki.ingress.fqdn}"
+    url: "https://${azurerm_container_app.loki.ingress[0].fqdn}"
     basicAuth: false
     isDefault: true
     version: 1
@@ -301,7 +301,7 @@ EOF
 
   # Internal ingress only - accessed via NGINX
   ingress {
-    external_enabled = false
+    external_enabled = true
     target_port      = 3000
     transport        = "http"
 
