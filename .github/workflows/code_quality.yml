@@ -30,11 +30,11 @@ jobs:
         run: dotnet build Ggio.BikeSherpa.slnx --configuration Release
 
       - name: "Qodana Scan"
-        uses: JetBrains/qodana-action@v2025.2
+        uses: JetBrains/qodana-action@v2025.3
         with:
           pr-mode: false
           use-caches: false
-          args: --image,jetbrains/qodana-dotnet:latest
+          args: --image,jetbrains/qodana-cdnet:2025.3-eap
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
           QODANA_ENDPOINT: "https://qodana.cloud"
