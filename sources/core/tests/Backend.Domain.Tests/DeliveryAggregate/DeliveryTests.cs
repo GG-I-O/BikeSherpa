@@ -307,8 +307,22 @@ public class DeliveryTests
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address, mockItineraryService) = CreateStepDependencies(delivery);
 
         // Act
-        await delivery.AddStepAsync(StepType.Pickup, address, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object, mockItineraryService.Object);
-        await delivery.AddStepAsync(StepType.Dropoff, address, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object, mockItineraryService.Object);
+        await delivery.AddStepAsync(
+            StepType.Pickup,
+            address,
+            "CommentPickup",
+            mockDeliveryZoneRepository.Object,
+            mockPricingStrategyService.Object,
+            mockItineraryService.Object
+            );
+        await delivery.AddStepAsync(
+            StepType.Dropoff,
+            address,
+            "CommentDropoff",
+            mockDeliveryZoneRepository.Object,
+            mockPricingStrategyService.Object,
+            mockItineraryService.Object
+            );
 
         // Assert
         delivery.Steps.Should().HaveCount(2);
@@ -329,7 +343,13 @@ public class DeliveryTests
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address, mockItineraryService) = CreateStepDependencies(delivery);
 
         // Act
-        var step = await delivery.AddStepAsync(StepType.Dropoff, address, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object, mockItineraryService.Object);
+        var step = await delivery.AddStepAsync(
+            StepType.Dropoff,
+            address,
+            "CommentDropoff",
+            mockDeliveryZoneRepository.Object,
+            mockPricingStrategyService.Object,
+            mockItineraryService.Object);
 
         // Assert
         step.StepType.Should().Be(StepType.Dropoff);
@@ -345,7 +365,12 @@ public class DeliveryTests
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address, mockItineraryService) = CreateStepDependencies(delivery, calculatedPrice: 25.0);
 
         // Act
-        await delivery.AddStepAsync(StepType.Pickup, address, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object, mockItineraryService.Object);
+        await delivery.AddStepAsync(StepType.Pickup,
+            address,
+            "CommentPickup",
+            mockDeliveryZoneRepository.Object,
+            mockPricingStrategyService.Object,
+            mockItineraryService.Object);
 
         // Assert
         delivery.TotalPrice.Should().Be(25.0);
@@ -359,7 +384,12 @@ public class DeliveryTests
         var (mockDeliveryZoneRepository, mockPricingStrategyService, address, mockItineraryService) = CreateStepDependencies(delivery);
 
         // Act
-        await delivery.AddStepAsync(StepType.Pickup, address, mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object, mockItineraryService.Object);
+        await delivery.AddStepAsync(StepType.Pickup,
+            address,
+            "CommentPickup",
+            mockDeliveryZoneRepository.Object,
+            mockPricingStrategyService.Object,
+            mockItineraryService.Object);
 
         // Assert
         mockDeliveryZoneRepository.Verify(r => r.GetByAddress(address.City), Times.Once);
@@ -430,7 +460,7 @@ public class DeliveryTests
         await delivery.UpdateStepsAsync([newStep], mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object, mockItineraryService.Object);
 
         // Assert
-        delivery.Steps.Should().ContainSingle(s => s.Id == newStep.Id);
+        delivery.Steps.Should().ContainSingle(s => s.StepType == newStep.StepType && s.StepAddress == newStep.StepAddress);
     }
 
     [Fact]

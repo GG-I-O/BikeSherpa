@@ -167,6 +167,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public async Task<DeliveryStep> AddStepAsync(
           StepType stepType,
           Address stepAddress,
+          string? comment,
           IDeliveryZoneRepository deliveryZones,
           IPricingStrategyService pricingStrategyService,
           IItinerarySpi itineraryService)
@@ -174,7 +175,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           var newStep = new DeliveryStep(
                stepType,
                Steps.Count + 1,
-               stepAddress)
+               stepAddress,
+               comment)
           {
                Id = Guid.NewGuid(),
                StepAddress = stepAddress,
@@ -231,30 +233,45 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           IPricingStrategyService pricingStrategyService,
           IItinerarySpi itineraryService)
      {
-          foreach (var step in steps)
+          for (var index = 0; index < steps.Count; index++)
           {
-               var existing = Steps.FirstOrDefault(s => s.Id == step.Id);
+               var existing = Steps.FirstOrDefault(s => s.Id == steps[index].Id);
 
                if (existing is null)
                {
-                    step.StepZone = deliveryZones.GetByAddress(step.StepAddress.City);
-                    Steps.Add(step);
+                    steps[index] = new DeliveryStep(
+                         steps[index].StepType,
+                         order: index + 1,
+                         steps[index].StepAddress,
+                         steps[index].Comment)
+                    {
+                         Id = Guid.NewGuid(),
+                         StepAddress = steps[index].StepAddress,
+                         StepZone = deliveryZones.GetByAddress(steps[index].StepAddress.City)
+                    };
                }
-
                else
                {
                     existing.Update(
-                         step.StepType,
-                         step.Order,
-                         step.Completed,
-                         step.StepAddress,
-                         deliveryZones.GetByAddress(step.StepAddress.City),
-                         step.Distance,
-                         step.EstimatedDeliveryDate);
+                         steps[index].StepType,
+                         order: index + 1,
+                         steps[index].Completed,
+                         steps[index].StepAddress,
+                         deliveryZones.GetByAddress(steps[index].StepAddress.City),
+                         steps[index].Distance,
+                         steps[index].EstimatedDeliveryDate);
+                    steps[index] = existing;
                }
+
+               if (index == 0)
+                    steps[index].Distance = 0;
+               else
+                    steps[index].EstimatedDeliveryDate = steps[index - 1].EstimatedDeliveryDate + TimeSpan.FromMinutes(15);
+               
           }
 
           DeleteOldSteps(steps);
+          Steps = steps;
           await RecalculateStepDistancesAsync(itineraryService);
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }

@@ -11,11 +11,12 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      [UsedImplicitly]
      private DeliveryStep() { }
 
-     public DeliveryStep(StepType stepType, int order, Address stepAddress)
+     public DeliveryStep(StepType stepType, int order, Address stepAddress, string? comment = null)
      {
           StepType = stepType;
           Order = order;
           StepAddress = stepAddress;
+          Comment = comment;
      }
 
      public StepType StepType { get; set; }

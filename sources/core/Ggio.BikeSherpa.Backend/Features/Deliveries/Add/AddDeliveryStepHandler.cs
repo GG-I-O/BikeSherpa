@@ -16,7 +16,8 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 public record AddDeliveryStepCommand(
      Guid DeliveryId,
      StepType StepType,
-     Address StepAddress
+     Address StepAddress,
+     string? comment
      ) : ICommand<Result<Guid>>;
 
 [UsedImplicitly]
@@ -50,7 +51,7 @@ public class AddDeliveryStepHandler(
                return Result<Guid>.NotFound();
           }
 
-          var deliveryStep = await delivery.AddStepAsync(command.StepType, command.StepAddress, deliveryZones, pricingStrategyService, itineraryService);
+          var deliveryStep = await delivery.AddStepAsync(command.StepType, command.StepAddress, command.comment, deliveryZones, pricingStrategyService, itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);
