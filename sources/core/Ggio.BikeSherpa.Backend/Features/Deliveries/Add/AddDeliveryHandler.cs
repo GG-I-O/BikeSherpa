@@ -3,7 +3,6 @@ using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
 using Mediator;
 
@@ -11,7 +10,6 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 
 public record AddDeliveryCommand(
      PricingStrategy PricingStrategy,
-     string Code,
      Guid CustomerId,
      string Urgency,
      double? TotalPrice,
@@ -25,17 +23,9 @@ public record AddDeliveryCommand(
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
-     public AddDeliveryCommandValidator(IReadRepository<Delivery> repository, IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
+     public AddDeliveryCommandValidator(IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
      {
           RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
-          RuleFor(x => x.Code).NotEmpty().CustomAsync(async (code, context, cancellationToken) =>
-          {
-               var codeIsValid = !await repository.AnyAsync(new DeliveryByCodeSpecification(code), cancellationToken);
-               if (!codeIsValid)
-               {
-                    context.AddFailure("Code de course déjà utilisé");
-               }
-          });
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.Urgency)
                .NotEmpty().
@@ -62,7 +52,6 @@ public class AddDeliveryHandler(
 
           var delivery = await factory.CreateDeliveryAsync(
                command.PricingStrategy,
-               command.Code,
                command.CustomerId,
                command.Urgency,
                command.TotalPrice,

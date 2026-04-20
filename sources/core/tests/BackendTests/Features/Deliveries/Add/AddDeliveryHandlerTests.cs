@@ -1,7 +1,7 @@
 ﻿using Ardalis.Specification;
 using AutoFixture;
 using AutoFixture.AutoMoq;
-using FluentValidation;
+using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
@@ -52,7 +52,6 @@ public class AddDeliveryHandlerTests
           _mockFactory
                .Setup(x => x.CreateDeliveryAsync(
                     It.IsAny<PricingStrategy>(),
-                    It.IsAny<string>(),
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),
                     It.IsAny<double>(),
@@ -68,7 +67,7 @@ public class AddDeliveryHandlerTests
 
      private AddDeliveryHandler CreateSut()
      {
-          var validator = new AddDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
+          var validator = new AddDeliveryCommandValidator(_mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
           return new AddDeliveryHandler(_mockFactory.Object, validator, _mockTransaction.Object);
      }
 
@@ -86,7 +85,6 @@ public class AddDeliveryHandlerTests
           _mockFactory.Verify(
                x => x.CreateDeliveryAsync(
                     It.IsAny<PricingStrategy>(),
-                    It.IsAny<string>(),
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),
                     It.IsAny<double>(),
@@ -115,8 +113,8 @@ public class AddDeliveryHandlerTests
           var result = await sut.Handle(_mockCommand, CancellationToken.None);
 
           // Assert
-          Assert.True(result.IsSuccess);
-          Assert.Equal(_mockDelivery.Id, result.Value);
+          result.IsSuccess.Should().BeTrue();
+          result.Value.Should().Be(_mockDelivery.Id);
           VerifyFactoryCalledOnce();
           VerifyTransactionCommittedOnce();
      }
@@ -132,12 +130,11 @@ public class AddDeliveryHandlerTests
           var result = await sut.Handle(_mockCommand, CancellationToken.None);
 
           // Assert
-          Assert.True(result.IsSuccess);
-          Assert.Equal(_mockDelivery.Id, result.Value);
+          result.IsSuccess.Should().BeTrue();
+          result.Value.Should().Be(_mockDelivery.Id);
           _mockFactory.Verify(
                x => x.CreateDeliveryAsync(
                     It.IsAny<PricingStrategy>(),
-                    It.IsAny<string>(),
                     It.IsAny<Guid>(),
                     It.IsAny<string>(),
                     It.IsAny<double>(),
@@ -148,65 +145,6 @@ public class AddDeliveryHandlerTests
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>()),
                Times.Once);
-     }
-
-     [Fact]
-     public async Task Handle_ShouldThrowValidationException_WhenCodeIsEmpty()
-     {
-          // Arrange
-          var commandWithEmptyCode = _mockCommand with { Code = "" };
-          SetupRepositoryTestingIfCodeExists(false);
-          var sut = CreateSut();
-
-          // Act & Assert
-          await Assert.ThrowsAsync<ValidationException>(() =>
-               sut.Handle(commandWithEmptyCode, CancellationToken.None).AsTask());
-
-          _mockFactory.Verify(
-               x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategy>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<string[]>(),
-                    It.IsAny<string>(),
-                    It.IsAny<bool>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>()),
-               Times.Never);
-
-          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
-     }
-
-     [Fact]
-     public async Task Handle_ShouldThrowValidationException_WhenCodeAlreadyExists()
-     {
-          // Arrange
-          SetupRepositoryTestingIfCodeExists(true);
-          var sut = CreateSut();
-
-          // Act & Assert
-          await Assert.ThrowsAsync<ValidationException>(() =>
-               sut.Handle(_mockCommand, CancellationToken.None).AsTask());
-
-          _mockFactory.Verify(
-               x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategy>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<string[]>(),
-                    It.IsAny<string>(),
-                    It.IsAny<bool>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>()),
-               Times.Never);
-
-          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
      }
 
      [Fact]

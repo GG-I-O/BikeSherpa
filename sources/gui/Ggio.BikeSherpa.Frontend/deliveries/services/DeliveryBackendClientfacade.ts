@@ -63,7 +63,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         for(let i = 0; i<item.steps.length; i++) {
             const step = {
                 ...item.steps[i],
-                estimatedDeliveryDate: new Date(item.steps[i].estimatedDeliveryDate).toISOString(),
+                estimatedDeliveryDate: new Date().toISOString(),
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             };
@@ -87,14 +87,24 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
     }
 
     public async UpdateEndpoint(item: Delivery): Promise<void> {
-        const parsed = schemas.DeliveryCrud.safeParse(item);
-        if (!parsed.success) {
+        const deliveryData = {
+            ...item,
+            contractDate: new Date(item.contractDate).toISOString(),
+            startDate: new Date(item.startDate).toISOString(),
+            steps: item.steps.map(step => ({
+                ...step,
+                createdAt: step.createdAt ? step.createdAt : new Date().toISOString(),
+                updatedAt: step.updatedAt ? step.updatedAt : new Date().toISOString()
+            }))
+        };
+        const parsedDelivery = schemas.DeliveryCrud.safeParse(deliveryData);
+        if (!parsedDelivery.success) {
             console.error("Create Debug (DeliveryCrud validation failed):");
-            console.error(parsed.error.format());
-            throw parsed.error;
+            console.error(parsedDelivery.error.format());
+            throw parsedDelivery.error;
         }
 
-        const delivery = parsed.data;
+        const delivery = parsedDelivery.data;
         await this.apiClient.UpdateDeliveryEndpoint(
             delivery,
             {

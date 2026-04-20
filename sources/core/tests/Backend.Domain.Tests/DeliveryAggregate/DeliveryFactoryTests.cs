@@ -15,9 +15,11 @@ namespace Backend.Domain.Tests.DeliveryAggregate;
 public class DeliveryFactoryTests
 {
      private readonly static Guid CustomerId = Guid.NewGuid();
+     private readonly static string CustomerCode = "T01";
      private readonly static DateTimeOffset ContractDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
      private readonly Mock<IReadRepository<Customer>> _customerRepositoryMock = new();
+     private readonly Mock<IReadRepository<Delivery>> _deliveryRepositoryMock = new();
      private readonly Fixture _fixture = new();
      private readonly Mock<IMediator> _mediatorMock;
      private readonly Mock<IPricingStrategyService> _pricingStrategyServiceMock = new();
@@ -34,22 +36,30 @@ public class DeliveryFactoryTests
                .With(c => c.Address, _fixture.Build<Address>()
                     .With(a => a.Complement, (string?)null)
                     .Create())
+               .With(c => c.Id, CustomerId)
+               .With(c => c.Code, CustomerCode)
                .Create();
 
           _customerRepositoryMock
                .Setup(r => r.FirstOrDefaultAsync(It.IsAny<ISpecification<Customer>>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(fakeCustomer);
 
+          var fakeDelivery = _fixture.Build<Delivery>()
+               .With(d => d.Code, $"{CustomerCode}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-1")
+               .Create();
+          _deliveryRepositoryMock
+               .Setup(d => d.ListAsync(It.IsAny<ISpecification<Delivery>>()))
+               .ReturnsAsync([fakeDelivery]);
+
           _pricingStrategyServiceMock
                .Setup(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
                .Returns(55);
 
-          _sut = new DeliveryFactory(_mediatorMock.Object, _customerRepositoryMock.Object, _pricingStrategyServiceMock.Object);
+          _sut = new DeliveryFactory(_mediatorMock.Object, _customerRepositoryMock.Object, _deliveryRepositoryMock.Object, _pricingStrategyServiceMock.Object);
      }
 
      private Task<Delivery> CreateDefault(
           PricingStrategy strategy = PricingStrategy.SimpleDeliveryStrategy,
-          string code = "TEST-001",
           Guid? customerId = null,
           string urgency = "Normal",
           double? totalPrice = null,
@@ -60,7 +70,7 @@ public class DeliveryFactoryTests
           DateTimeOffset? contractDate = null,
           DateTimeOffset? startDate = null) =>
           _sut.CreateDeliveryAsync(
-               strategy, code, customerId ?? CustomerId, urgency,
+               strategy, customerId ?? CustomerId, urgency,
                totalPrice, discount, details ?? [], packingSize,
                insulatedBox,
                contractDate ?? ContractDate, startDate ?? StartDate);
@@ -74,7 +84,6 @@ public class DeliveryFactoryTests
           // Act
           var delivery = await CreateDefault(
                PricingStrategy.TourDeliveryStrategy,
-               "DEL-42",
                CustomerId,
                "Express",
                discount: 5.0,
@@ -86,7 +95,7 @@ public class DeliveryFactoryTests
 
           // Assert
           delivery.PricingStrategy.Should().Be(PricingStrategy.TourDeliveryStrategy);
-          delivery.Code.Should().Be("DEL-42");
+          delivery.Code.Should().Be($"{CustomerCode}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-2");
           delivery.CustomerId.Should().Be(CustomerId);
           delivery.Urgency.Should().Be("Express");
           delivery.TotalPrice.Should().Be(55);

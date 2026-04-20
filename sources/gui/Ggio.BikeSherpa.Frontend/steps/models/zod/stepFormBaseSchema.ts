@@ -2,6 +2,9 @@ import * as zod from "zod";
 import {addressSchema} from "@/models/Address";
 
 const stepFormBaseSchema = zod.object({
+    id: zod
+        .string()
+        .optional(),
     stepType: zod
         .number()
         .int()

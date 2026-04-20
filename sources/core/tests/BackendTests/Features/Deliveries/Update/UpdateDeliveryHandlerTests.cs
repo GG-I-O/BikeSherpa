@@ -3,7 +3,6 @@ using Ardalis.Specification;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
-using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
@@ -82,7 +81,7 @@ public class UpdateDeliveryHandlerTests
 
      private UpdateDeliveryHandler CreateSut()
      {
-          var validator = new UpdateDeliveryCommandValidator(_mockDeliveryRepository.Object, _mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
+          var validator = new UpdateDeliveryCommandValidator(_mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
           return new UpdateDeliveryHandler(_mockDeliveryRepository.Object, validator, _mockTransaction.Object, _mockDeliveryZoneRepository.Object, _mockPricingStrategyService.Object, _mockItineraryService.Object);
      }
 
@@ -196,35 +195,6 @@ public class UpdateDeliveryHandlerTests
           // Assert
           result.IsSuccess.Should().BeFalse();
           result.IsNotFound().Should().BeTrue();
-          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
-     }
-
-     [Fact]
-     public async Task Handle_ShouldThrowValidationException_WhenReportIdIsEmpty()
-     {
-          // Arrange
-          var commandWithEmptyReportId = _mockCommand with { ReportId = "" };
-          SetupRepositoryTestingIfReportIdExists(false);
-          var sut = CreateSut();
-
-          // Act & Assert
-          await Assert.ThrowsAsync<ValidationException>(() =>
-               sut.Handle(commandWithEmptyReportId, CancellationToken.None).AsTask());
-
-          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
-     }
-
-     [Fact]
-     public async Task Handle_ShouldThrowValidationException_WhenReportIdAlreadyExists()
-     {
-          // Arrange
-          SetupRepositoryTestingIfReportIdExists(true);
-          var sut = CreateSut();
-
-          // Act & Assert
-          await Assert.ThrowsAsync<ValidationException>(() =>
-               sut.Handle(_mockCommand, CancellationToken.None).AsTask());
-
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
      }
 

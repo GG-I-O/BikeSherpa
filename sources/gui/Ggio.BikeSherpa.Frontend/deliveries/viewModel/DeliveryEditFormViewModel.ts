@@ -1,17 +1,15 @@
-import {UseFormReset} from "react-hook-form";
-import {IDeliveryServices} from "../spi/IDeliveryServices";
-import {inject} from "inversify";
-import {DeliveryServiceIdentifier} from "../bootstrapper/DeliveryServiceIdentifier";
-import {deliveryFormBaseSchema, DeliveryFormValues} from "../models/zod/deliveryFormBaseSchema";
+import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
 import {ICustomerService} from "@/spi/CustomerSPI";
+import {deliveryFormBaseSchema, DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
+import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
-import * as Crypto from "expo-crypto";
+import {inject} from "inversify";
 import Delivery from "@/deliveries/models/Delivery";
+import * as Crypto from "expo-crypto";
 
-export default class NewDeliveryFormViewModel {
+export default class DeliveryEditFormViewModel {
     private deliveryServices: IDeliveryServices;
     private customerServices: ICustomerService;
-    private resetCallback?: UseFormReset<DeliveryFormValues>;
 
     constructor(
         @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
@@ -21,9 +19,8 @@ export default class NewDeliveryFormViewModel {
         this.customerServices = customerServices;
     }
 
-    // Keep it as a lambda to be able to use "this" on services.
-    // Javascript does not bind "this" to the instance of class if declared as a method
-    public onSubmit = (delivery: DeliveryFormValues): void => {
+    // Keep it as a lambda to be able to use "this". Don't ask me why, JavaScript things
+    public onSubmit = (delivery: DeliveryFormValues, oldDelivery: Delivery): void => {
         const customerCode = delivery.customerId;
         const customerId = this.customerServices.getCustomerIdByCode(customerCode);
 
@@ -33,10 +30,21 @@ export default class NewDeliveryFormViewModel {
 
         // Mapping
         const deliveryObject: Delivery = {
-            id: Crypto.randomUUID(),
-            operationId: Crypto.randomUUID(),
+            id: oldDelivery.id,
+            operationId: oldDelivery.operationId,
             ...delivery,
             steps: delivery.steps.map(step => {
+                const oldStep = oldDelivery.steps.find(s => s.id === step.id);
+                
+                if (oldStep) {
+                    return {
+                        ... oldStep,
+                        stepType: step.stepType,
+                        stepAddress: step.stepAddress,
+                        comment: step.comment ?? null
+                    }
+                }
+                
                 return {
                     ...step,
                     id: Crypto.randomUUID(),
@@ -53,16 +61,10 @@ export default class NewDeliveryFormViewModel {
             })
         };
 
-        this.deliveryServices.createDelivery(deliveryObject);
-        if (this.resetCallback)
-            this.resetCallback();
+        this.deliveryServices.updateDelivery(deliveryObject);
     }
 
-    public setResetCallback(reset?: UseFormReset<DeliveryFormValues>) {
-        this.resetCallback = reset;
-    }
-
-    public getNewDeliverySchema() {
+    public getEditDeliverySchema() {
         // Asking user to input the customer code, so that's what we validate
         // We convert it onsubmit later
         const customerList = Object.values(

@@ -45,6 +45,18 @@ export default class CustomerServices implements ICustomerService {
         return this.customerStore$[customerId].peek();
     }
 
+    /**
+     * @param customerCode
+     * return customerId
+     */
+    public getCustomerIdByCode(customerCode: string): string | undefined {
+        const customerList = Object.values(this.customerStore$.get());
+        const customer = customerList.find(
+            (customer) => customer.code === customerCode
+        );
+        return customer?.id;
+    }
+
     public deleteCustomer(customerId: string): void {
         const customer = this.getCustomer(customerId);
         const canDelete = customer.links?.some((link) => link.rel === hateoasRel.delete);

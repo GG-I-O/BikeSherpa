@@ -40,6 +40,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           ReportId = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
      }
 
+     public void GenerateCode(Customer customer, int increment)
+     {
+          Code = $"{customer.Code}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-{increment}";
+     }
+
      // Methods allowing to change the delivery status
      private void UpdateStatus()
      {

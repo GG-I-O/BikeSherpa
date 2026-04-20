@@ -68,7 +68,7 @@ export function ThemedSuggestiveInput<T>(
             setSuggestions(res);
             setOpen(true);
         });
-    }, [debouncedQuery]);
+    }, [debouncedQuery, fetchSuggestions, minLength]);
 
     // Measure position
     const measure = () => {
