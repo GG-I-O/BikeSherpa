@@ -21,7 +21,8 @@ export default class NewDeliveryFormViewModel {
         this.customerServices = customerServices;
     }
 
-    // Keep it as a lambda to be able to use "this". Don't ask me why, JavaScript things
+    // Keep it as a lambda to be able to use "this" on services.
+    // Javascript does not bind "this" to the instance of class if declared as a method
     public onSubmit = (delivery: DeliveryFormValues): void => {
         const customerCode = delivery.customerId;
         const customerId = this.customerServices.getCustomerIdByCode(customerCode);

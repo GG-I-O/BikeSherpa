@@ -57,7 +57,7 @@ public class DeliveryFactory(
           {
                delivery.GenerateReportId(customer);
 
-               var deliveries = await deliveryRepository.ListAsync(new DeliveryByCodeLikeSpecification(customer.Code));
+               var deliveries = await deliveryRepository.ListAsync(new DeliveryByCodeStartsWithSpecification(customer.Code));
                delivery.GenerateCode(customer, deliveries.Count + 1);
           }
 
