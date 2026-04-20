@@ -45,7 +45,6 @@ export default function useDeliveryListViewModel() {
 
     useEffect(() => {
         return observe(() => {
-            const record = deliveryStore$.get() ?? {};
             setDeliveries(viewModel.getFilteredDeliveries(dateFilter, courierFilter));
             setSteps(viewModel.getFilteredStepList(dateFilter, courierFilter));
         });

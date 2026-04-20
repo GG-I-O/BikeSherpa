@@ -35,8 +35,9 @@ export default function DeliveryDataTable({ deliveries, isDeliverySelected, isSt
                     <DataTable.Title style={[style.column, style.width180]}>Actions</DataTable.Title>
                 </DataTable.Header>
 
-                {deliveries.map((delivery, index) => (
-                    <DeliveryDataTableRow key={index}
+                {deliveries.map((delivery) => (
+                    <DeliveryDataTableRow
+                        key={delivery.id}
                         delivery={delivery}
                         isSelected={isDeliverySelected ? isDeliverySelected(delivery) : false}
                         isStepSelected={isStepSelected}

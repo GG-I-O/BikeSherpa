@@ -18,12 +18,6 @@ export default function StepDataTableRow({ step, isSelected = false, onPress, ca
     const style = datatableStyle;
     
     const splitTime = step.estimatedTime.split(':');
-    const [contractTime, setContractTime] = useState<{ hours: number, minutes: number }>(
-        {
-            hours: parseInt(splitTime[0]) ?? 0,
-            minutes: parseInt(splitTime[1]) ?? 0
-        }
-    )
     const [isTimePickerOpen, setIsTimePickerOpen] = useState(false); // Disable onRowPress if we're picking time
 
     return (
@@ -44,7 +38,6 @@ export default function StepDataTableRow({ step, isSelected = false, onPress, ca
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <Text numberOfLines={2}>{step.comment}</Text>
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.minWidth100]}>{step.comment}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>{step.courierCode}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>
                 {
@@ -52,16 +45,11 @@ export default function StepDataTableRow({ step, isSelected = false, onPress, ca
                         <Text>{step.estimatedTime}</Text>
                     ) : (
                         <TimePickerInput
-                            hours={contractTime.hours}
-                            minutes={contractTime.minutes}
+                            hours={parseInt(splitTime[0]) ?? 0}
+                            minutes={parseInt(splitTime[1]) ?? 0}
                             onOpen={() => setIsTimePickerOpen(true)}
                             onClose={() => setIsTimePickerOpen(false)}
-                            onConfirm={({ hours, minutes }: { hours: number; minutes: number; }): void => {
-                                setContractTime({ hours, minutes });
-                                /*const stepDate = new Date(step.estimatedDeliveryDate);
-                                stepDate.setHours(hours, minutes, 0, 0);
-                                step.estimatedDeliveryDate = stepDate.toISOString();*/
-                            }}
+                            onConfirm={({ hours, minutes }: { hours: number; minutes: number; }): void => {}}
                         />
                     )
                 }
