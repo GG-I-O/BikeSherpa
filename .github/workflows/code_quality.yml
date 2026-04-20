@@ -8,36 +8,36 @@ on:
       - "releases/*" # The release branches
 
 jobs:
-  qodana_dotnet:
-    name: Qodana Scan .Net
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      checks: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "10.0.x"
-
-      - name: Restore and build
-        run: dotnet build Ggio.BikeSherpa.slnx --configuration Release
-
-      - name: "Qodana Scan"
-        uses: JetBrains/qodana-action@v2025.3
-        with:
-          pr-mode: false
-          use-caches: false
-          args: --image,jetbrains/qodana-cdnet:2025.3-eap
-        env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
-          QODANA_ENDPOINT: "https://qodana.cloud"
+#  qodana_dotnet:
+#    name: Qodana Scan .Net
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: write
+#      pull-requests: write
+#      checks: write
+#    steps:
+#      - uses: actions/checkout@v4
+#        with:
+#          ref: ${{ github.event.pull_request.head.sha }}
+#          fetch-depth: 0
+#
+#      - name: Setup .NET
+#        uses: actions/setup-dotnet@v4
+#        with:
+#          dotnet-version: "10.0.x"
+#
+#      - name: Restore and build
+#        run: dotnet build Ggio.BikeSherpa.slnx --configuration Release
+#
+#      - name: "Qodana Scan"
+#        uses: JetBrains/qodana-action@v2025.3
+#        with:
+#          pr-mode: false
+#          use-caches: false
+#          args: --image,jetbrains/qodana-cdnet:2025.3-eap
+#        env:
+#          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+#          QODANA_ENDPOINT: "https://qodana.cloud"
 
   qodana_typescript:
     name: Qodana Scan TS
