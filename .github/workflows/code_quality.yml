@@ -34,7 +34,7 @@ jobs:
         with:
           pr-mode: false
           use-caches: false
-          args: --image,jetbrains/qodana-cdnet:2025.2-eap-privileged
+          args: --image,jetbrains/qodana-dotnet:latest
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
           QODANA_ENDPOINT: "https://qodana.cloud"
