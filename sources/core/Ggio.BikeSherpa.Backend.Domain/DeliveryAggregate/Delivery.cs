@@ -242,8 +242,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                     steps[index] = new DeliveryStep(
                          steps[index].StepType,
                          order: index + 1,
-                         steps[index].StepAddress,
-                         steps[index].Comment)
+                         steps[index].StepAddress)
                     {
                          Id = Guid.NewGuid(),
                          StepAddress = steps[index].StepAddress,
@@ -259,6 +258,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          steps[index].StepAddress,
                          deliveryZones.GetByAddress(steps[index].StepAddress.City),
                          steps[index].Distance,
+                         steps[index].Comment,
                          steps[index].EstimatedDeliveryDate);
                     steps[index] = existing;
                }
