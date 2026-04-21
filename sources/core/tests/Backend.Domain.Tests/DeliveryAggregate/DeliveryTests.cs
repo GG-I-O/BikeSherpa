@@ -474,14 +474,24 @@ public class DeliveryTests
         delivery.Steps.Add(existingStep);
 
         // Act
-        var updatedStep = new DeliveryStep(StepType.Dropoff, 1, existingStep.StepAddress)
+        var updatedStep = new DeliveryStep(
+            StepType.Dropoff,
+            1,
+            existingStep.StepAddress,
+            comment: "NewComm"
+            )
         {
             Id = existingStep.Id,
             StepAddress = existingStep.StepAddress,
             StepZone = zone
         };
 
-        await delivery.UpdateStepsAsync([updatedStep], mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object, mockItineraryService.Object);
+        await delivery.UpdateStepsAsync(
+            [updatedStep],
+            mockDeliveryZoneRepository.Object,
+            mockPricingStrategyService.Object,
+            mockItineraryService.Object
+            );
 
         // Assert
         delivery.Steps.Should().HaveCount(1);
@@ -489,6 +499,90 @@ public class DeliveryTests
         delivery.Steps[0].Order.Should().Be(1);
         delivery.Steps[0].Distance.Should().Be(0);
         delivery.Steps[0].StepZone.Should().Be(zone);
+        delivery.Steps[0].Comment.Should().Be("NewComm");
+    }
+    
+    [Fact]
+        public async Task UpdateSteps_WhenMixingExistingAndNewSteps_ReordersAndKeepsExistingStep()
+        {
+            // Arrange
+            var delivery = MakeSut();
+            var zone = _fixture.Create<DeliveryZone>();
+            var (mockDeliveryZoneRepository, mockPricingStrategyService, mockItineraryService) = CreateUpdateStepsDependencies(delivery, zone, calculatedPrice: 42.0);
+
+            var existingStep = CreatePickupStep();
+            existingStep.Order = 1;
+            existingStep.EstimatedDeliveryDate = delivery.StartDate;
+            delivery.Steps.Add(existingStep);
+
+            var incomingExistingStep = new DeliveryStep(
+                StepType.Dropoff,
+                1,
+                existingStep.StepAddress,
+                comment: "Updated existing step")
+            {
+                Id = existingStep.Id,
+                StepAddress = existingStep.StepAddress,
+                StepZone = zone,
+                Distance = 12.5,
+                EstimatedDeliveryDate = existingStep.EstimatedDeliveryDate,
+                Completed = true
+            };
+
+            var newStep = CreateDropoffStep();
+            newStep.StepAddress.Coordinates = new GeoPoint(8, 9);
+
+            // Act
+            await delivery.UpdateStepsAsync(
+                [incomingExistingStep, newStep],
+                mockDeliveryZoneRepository.Object,
+                mockPricingStrategyService.Object,
+                mockItineraryService.Object);
+
+            // Assert
+            delivery.Steps.Should().HaveCount(2);
+
+            var updatedExistingStep = delivery.Steps.Single(s => s.Id == existingStep.Id);
+            updatedExistingStep.StepType.Should().Be(StepType.Dropoff);
+            updatedExistingStep.Order.Should().Be(1);
+            updatedExistingStep.Comment.Should().Be("Updated existing step");
+            updatedExistingStep.Completed.Should().BeTrue();
+            updatedExistingStep.StepZone.Should().Be(zone);
+            updatedExistingStep.Distance.Should().Be(0);
+
+            var createdStep = delivery.Steps.Single(s => s.Id != existingStep.Id);
+            createdStep.StepType.Should().Be(StepType.Dropoff);
+            createdStep.Order.Should().Be(2);
+            createdStep.Comment.Should().Be(newStep.Comment);
+            createdStep.StepZone.Should().NotBeNull();
+            createdStep.Id.Should().NotBeEmpty();
+
+            delivery.TotalPrice.Should().Be(42.0);
+        }
+    
+    [Fact]
+    public async Task UpdateSteps_WhenIncomingListIsAlreadyOrdered_ReassignsSequentialOrders()
+    {
+        // Arrange
+        var delivery = MakeSut();
+        var (mockDeliveryZoneRepository, mockPricingStrategyService, mockItineraryService) = CreateUpdateStepsDependencies(delivery);
+
+        var step1 = CreatePickupStep();
+        var step2 = CreateDropoffStep();
+        var step3 = CreateDropoffStep();
+
+        step1.Order = 99;
+        step2.Order = 98;
+        step3.Order = 97;
+
+        // Act
+        await delivery.UpdateStepsAsync([step1, step2, step3], mockDeliveryZoneRepository.Object, mockPricingStrategyService.Object, mockItineraryService.Object);
+
+        // Assert
+        delivery.Steps.Select(s => s.Order).Should().Equal(1, 2, 3);
+        delivery.Steps[0].Distance.Should().Be(0);
+        delivery.Steps[1].EstimatedDeliveryDate.Should().Be(delivery.Steps[0].EstimatedDeliveryDate.AddMinutes(15));
+        delivery.Steps[2].EstimatedDeliveryDate.Should().Be(delivery.Steps[1].EstimatedDeliveryDate.AddMinutes(15));
     }
 
     [Fact]
