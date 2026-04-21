@@ -6,10 +6,6 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {ICustomerService} from "@/spi/CustomerSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
-import {useEffect, useState} from "react";
-import {DropdownOptions} from "@/models/DropdownOptions";
-import {IDropdownOptions} from "@/spi/IDropdownOptions";
-import Delivery from "@/deliveries/models/Delivery";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 import useDeliveryDropdown from "@/deliveries/hooks/useDeliveryDropdown";
 
