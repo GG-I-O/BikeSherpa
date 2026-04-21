@@ -259,6 +259,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          steps[index].StepAddress,
                          deliveryZones.GetByAddress(steps[index].StepAddress.City),
                          steps[index].Distance,
+                         steps[index].Comment,
                          steps[index].EstimatedDeliveryDate);
                     steps[index] = existing;
                }

@@ -40,6 +40,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           Address stepAddress,
           DeliveryZone deliveryZone,
           double distance,
+          string? comment,
           DateTimeOffset estimatedDeliveryDate)
      {
           StepType = stepType;
@@ -48,6 +49,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           StepAddress = stepAddress;
           StepZone = deliveryZone;
           Distance = distance;
+          Comment = comment;
           EstimatedDeliveryDate = estimatedDeliveryDate;
      }
 }
