@@ -62,11 +62,11 @@ public class GetAllDeliveriesHandlerTests
 
           deliveryA.PackingSize.Should().Be("Xxl");
           deliveryA.Urgency.Should().Be("Standard");
-          deliveryA.Steps.Select(s => s.Order).Should().Equal(1, 2);
+          deliveryA.Steps.Select(s => s.Data.Order).Should().Equal(1, 2);
 
           deliveryB.PackingSize.Should().Be("Xl");
           deliveryB.Urgency.Should().Be("Urgent");
-          deliveryB.Steps.Select(s => s.Order).Should().Equal(1, 2);
+          deliveryB.Steps.Select(s => s.Data.Order).Should().Equal(1, 2);
 
           VerifyRepositoryCalledOnce();
      }

@@ -19,7 +19,7 @@ public class GetAllDeliveriesHandler(IReadRepository<Delivery> repository) : IQu
           var orderedDeliveries = allDeliveries
                .Select(delivery => delivery with
                {
-                    Steps = delivery.Steps.OrderBy(s => s.Order).ToList()
+                    Steps = delivery.Steps.OrderBy(s => s.Data.Order).ToList()
                })
                .ToList();
 

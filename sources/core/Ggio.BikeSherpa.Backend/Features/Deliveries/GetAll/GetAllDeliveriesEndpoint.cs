@@ -6,7 +6,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 
-public class GetAllDeliveriesEndpoint(IMediator mediator, IDeliveryLinks deliveryLinks) : EndpointWithoutRequest<List<DeliveryDto>>
+public class GetAllDeliveriesEndpoint(
+     IMediator mediator,
+     IDeliveryLinks deliveryLinks,
+     IDeliveryStepLinks deliveryStepLinks
+) : EndpointWithoutRequest<List<DeliveryDto>>
 {
      public override void Configure()
      {
@@ -23,13 +27,23 @@ public class GetAllDeliveriesEndpoint(IMediator mediator, IDeliveryLinks deliver
           var deliveryDtoList = new List<DeliveryDto>();
           foreach (var delivery in deliveries)
           {
+               var deliveryStepDtoList = delivery.Steps.Select(deliveryStep => new DeliveryStepDto
+               {
+                    Data = deliveryStep.Data,
+                    Links = deliveryStepLinks.GenerateLinks(delivery.Id, deliveryStep.Data.Id)
+               }).ToList();
+
+               delivery.Steps = deliveryStepDtoList;
+
                var deliveryDto = new DeliveryDto
                {
                     Data = delivery,
                     Links = deliveryLinks.GenerateLinks(delivery.Id)
                };
+
                deliveryDtoList.Add(deliveryDto);
           }
+
           await Send.OkAsync(deliveryDtoList, ct);
      }
 }
