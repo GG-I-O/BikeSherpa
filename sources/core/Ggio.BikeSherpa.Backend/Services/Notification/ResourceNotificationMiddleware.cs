@@ -44,7 +44,7 @@ public class ResourceNotificationMiddleware(RequestDelegate next, ILogger<Resour
                ResourceOperation? operation = method.ToUpper() switch
                {
                     "POST" => ResourceOperation.Post,
-                    "PUT" => ResourceOperation.Put,
+                    "PUT" or "PATCH" => ResourceOperation.Put,
                     "DELETE" => ResourceOperation.Delete,
                     _ => null
                };
