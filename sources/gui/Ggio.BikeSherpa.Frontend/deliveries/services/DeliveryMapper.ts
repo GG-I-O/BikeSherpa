@@ -9,11 +9,12 @@ export default class DeliveryMapper {
             ...deliveryCrud,
             steps: deliveryDto.data.steps.map((step => {
                 return {
-                    ...step,
+                    ...step.data,
                     stepAddress: {
-                        ...step.stepAddress,
-                        fullAddress: `${step.stepAddress.streetInfo} ${step.stepAddress.postcode} ${step.stepAddress.city}`,
-                    }
+                        ...step.data.stepAddress,
+                        fullAddress: `${step.data.stepAddress.streetInfo} ${step.data.stepAddress.postcode} ${step.data.stepAddress.city}`,
+                    },
+                    links: step.links ?? []
                 }
             })),
             links: deliveryDto.links ?? []

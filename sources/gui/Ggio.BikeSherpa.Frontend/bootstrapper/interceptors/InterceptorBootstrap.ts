@@ -17,7 +17,10 @@ export default class InterceptorBootstrap {
     public startToIntercept() {
         axios.interceptors.request.use(
             (config) => {
-                config.headers['Content-Type'] = 'application/json';
+                if (!config.headers['Content-Type']) {
+                    config.headers['Content-Type'] = 'application/json';
+                }
+
                 return config;
             },
             (error) => {

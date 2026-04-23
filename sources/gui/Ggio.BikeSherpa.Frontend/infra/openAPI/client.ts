@@ -8,12 +8,6 @@ const PricingStrategyDto = z.object({
   value: PricingStrategy,
 });
 const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
-const DeliveryStatus = z.union([
-  z.literal(0),
-  z.literal(1),
-  z.literal(2),
-  z.literal(3),
-]);
 const HasDomainEventsBase = z.object({});
 const EntityBaseOfGuid = HasDomainEventsBase.and(z.object({ id: z.string() }));
 const StepType = z.union([z.literal(0), z.literal(1)]);
@@ -45,7 +39,23 @@ const DeliveryStep = EntityBaseOfGuid.and(
     updatedAt: z.string().datetime({ offset: true }),
   })
 );
+const Link = z.object({
+  href: z.string(),
+  rel: z.string(),
+  method: z.string(),
+});
+const DeliveryStepDto = z.object({
+  data: DeliveryStep,
+  links: z.array(Link).nullable(),
+});
+const DeliveryStatus = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+]);
 const DeliveryCrud = z.object({
+  steps: z.array(DeliveryStepDto),
   pricingStrategy: PricingStrategy,
   status: DeliveryStatus,
   code: z.string(),
@@ -54,20 +64,14 @@ const DeliveryCrud = z.object({
   totalPrice: z.number().nullable(),
   discount: z.number().nullable(),
   reportId: z.string().nullable(),
-  steps: z.array(DeliveryStep),
   details: z.array(z.string()),
   packingSize: z.string(),
   insulatedBox: z.boolean(),
-  contractDate: z.string().datetime({ offset: true }),
   startDate: z.string().datetime({ offset: true }),
+  contractDate: z.string().datetime({ offset: true }),
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
   id: z.string(),
-});
-const Link = z.object({
-  href: z.string(),
-  rel: z.string(),
-  method: z.string(),
 });
 const DeliveryDto = z.object({
   data: DeliveryCrud,
@@ -78,6 +82,16 @@ const UpdateDeliveryStepCompletionRequest = z.object({
 });
 const UpdateDeliveryStepCourierRequest = z.object({ courierId: z.string() });
 const UpdateDeliveryStepOrderRequest = z.object({ order: z.number().int() });
+const OperationBase = z.object({
+  path: z.string(),
+  op: z.string(),
+  from: z.string(),
+});
+const Operation = OperationBase.and(z.object({ value: z.unknown() }));
+const OperationOfDeliveryStep = Operation.and(z.object({}));
+const JsonPatchDocumentOfDeliveryStep = z.object({
+  operations: z.array(OperationOfDeliveryStep),
+});
 const AddResultOfGuid = z.object({ id: z.string() });
 const AddressCrud = z.object({
   name: z.string(),
@@ -124,7 +138,6 @@ export const schemas = {
   PricingStrategy,
   PricingStrategyDto,
   PackingSizeDto,
-  DeliveryStatus,
   HasDomainEventsBase,
   EntityBaseOfGuid,
   StepType,
@@ -133,12 +146,18 @@ export const schemas = {
   City,
   DeliveryZone,
   DeliveryStep,
-  DeliveryCrud,
   Link,
+  DeliveryStepDto,
+  DeliveryStatus,
+  DeliveryCrud,
   DeliveryDto,
   UpdateDeliveryStepCompletionRequest,
   UpdateDeliveryStepCourierRequest,
   UpdateDeliveryStepOrderRequest,
+  OperationBase,
+  Operation,
+  OperationOfDeliveryStep,
+  JsonPatchDocumentOfDeliveryStep,
   AddResultOfGuid,
   AddressCrud,
   CustomerCrud,
@@ -771,12 +790,61 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "patch",
+    path: "/delivery/:deliveryId/step/:stepId/time",
+    alias: "PatchDeliveryStepTimeEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: JsonPatchDocumentOfDeliveryStep,
+      },
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "stepId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "get",
     path: "/public/packingSizes",
     alias: "GetAllPackingSizesEndpoint",
     tags: ["public"],
     requestFormat: "json",
     response: z.array(PackingSizeDto),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
   },
   {
     method: "get",
@@ -785,6 +853,18 @@ const endpoints = makeApi([
     tags: ["public"],
     requestFormat: "json",
     response: z.array(PricingStrategyDto),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
   },
   {
     method: "get",
@@ -793,6 +873,18 @@ const endpoints = makeApi([
     tags: ["public"],
     requestFormat: "json",
     response: z.array(UrgencyDto),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
   },
 ]);
 

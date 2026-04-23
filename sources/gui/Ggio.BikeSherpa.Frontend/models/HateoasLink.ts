@@ -8,4 +8,4 @@ export type HateoasLinks = {
     links?: Link[];
 };
 
-export const hateoasRel = { get: "get", update: "update", delete: "delete" }
+export const hateoasRel = { get: "get", update: "update", delete: "delete", patchTime: "patchTime" }

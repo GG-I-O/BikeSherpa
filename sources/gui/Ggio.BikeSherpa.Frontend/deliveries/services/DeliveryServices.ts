@@ -65,6 +65,9 @@ export default class DeliveryServices implements IDeliveryServices {
         const canUpdate = deliveryToUpdate.links?.some((link) => link.rel === hateoasRel.update);
         if (!canUpdate)
             throw new Error(`Cannot update delivery ${delivery.id}`);
+        
+        delivery.steps.forEach((step) => step.operationAction = undefined);
+        
         this.deliveryStore$[delivery.id].assign(delivery);
     };
 }
