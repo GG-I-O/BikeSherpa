@@ -25,6 +25,7 @@ public class PatchDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicatio
 {
      private readonly WebApplicationFactory<Program> _factory;
      private readonly Fixture _fixture = new();
+
      private readonly JsonSerializerOptions _jsonSerializerOptions = new()
      {
           PropertyNameCaseInsensitive = false,
@@ -92,7 +93,7 @@ public class PatchDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicatio
           var newEstimatedDate = utcNow.AddHours(3);
 
           var patchDocument = new JsonPatchDocument<DeliveryStep>();
-          patchDocument.Operations.Add(new Operation<DeliveryStep>()
+          patchDocument.Operations.Add(new Operation<DeliveryStep>
           {
                op = "replace",
                path = "/estimatedDeliveryDate",
@@ -113,10 +114,10 @@ public class PatchDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicatio
                await using var verificationScope = _factory.Services.CreateAsyncScope();
                var verificationDbContext = verificationScope.ServiceProvider.GetRequiredService<BackendDbContext>();
 
-               var dbDelivery = verificationDbContext.Deliveries
+               var dbDelivery = await verificationDbContext.Deliveries
                     .AsNoTracking()
                     .Include(d => d.Steps)
-                    .FirstOrDefault(d => d.Id == delivery.Id);
+                    .FirstOrDefaultAsync(d => d.Id == delivery.Id, CancellationToken.None);
 
                dbDelivery.Should().NotBeNull();
                dbDelivery.Steps.Should().HaveCount(1);
@@ -124,8 +125,12 @@ public class PatchDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicatio
           }
           finally
           {
-               dbContext.Deliveries.Remove(delivery);
-               await dbContext.SaveChangesAsync(CancellationToken.None);
+               await using var cleanupScope = _factory.Services.CreateAsyncScope();
+               var cleanupDbContext = cleanupScope.ServiceProvider.GetRequiredService<BackendDbContext>();
+
+               await cleanupDbContext.Deliveries
+                    .Where(d => d.Id == delivery.Id)
+                    .ExecuteDeleteAsync(CancellationToken.None);
           }
      }
 }
