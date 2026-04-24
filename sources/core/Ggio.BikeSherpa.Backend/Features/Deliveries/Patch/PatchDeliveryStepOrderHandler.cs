@@ -27,7 +27,7 @@ public class PatchDeliveryStepOrderHandler(
                    rawValue,
                    out var newOrder))
           {
-               return Result.Error("estimatedDeliveryDate must be a valid ISO-8601 datetime.");
+               return Result.Error("Invalid step order value provided.");
           }
           
           await delivery.ReorderStepsAsync(
