@@ -791,6 +791,43 @@ const endpoints = makeApi([
   },
   {
     method: "patch",
+    path: "/delivery/:deliveryId/step/:stepId/order",
+    alias: "PatchDeliveryStepOrderEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: JsonPatchDocumentOfDeliveryStep,
+      },
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "stepId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "patch",
     path: "/delivery/:deliveryId/step/:stepId/time",
     alias: "PatchDeliveryStepTimeEndpoint",
     tags: ["delivery"],

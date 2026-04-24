@@ -1,5 +1,6 @@
 const deliveryOperationAction = {
-    patchTime: "patchTime"
+    patchTime: "patchTime",
+    patchOrder: "patchOrder"
 }
 
 export default deliveryOperationAction;

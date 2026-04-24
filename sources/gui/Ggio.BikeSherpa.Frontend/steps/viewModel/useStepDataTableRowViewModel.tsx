@@ -9,6 +9,7 @@ export default function useStepDataTableRowViewModel() {
     const viewModel = new StepDataTableRowViewModel(stepServices);
     
     return {
-        updateStepTime: viewModel.updateStepTime
+        updateStepTime: viewModel.updateStepTime,
+        reorderStep: viewModel.reorderStep
     }
 }

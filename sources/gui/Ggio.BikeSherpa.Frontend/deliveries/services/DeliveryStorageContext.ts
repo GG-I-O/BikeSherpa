@@ -7,19 +7,23 @@ import { DeliveryServiceIdentifier } from "../bootstrapper/DeliveryServiceIdenti
 import { IBackendClient } from "@/spi/BackendClientSPI";
 import { getTagByAlias } from "@/infra/openAPI/client";
 import { ILogger } from "@/spi/LogsSPI";
+import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddleware";
 
 @injectable()
 export default class DeliveryStorageContext extends AbstractStorageContext<Delivery> {
     private backendClient;
+    private storageMiddleware;
 
     public constructor(
         @inject(ServicesIdentifiers.Logger) logger: ILogger,
         @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService,
-        @inject(DeliveryServiceIdentifier.BackendClientFacade) deliveryBackendClientFacade: IBackendClient<Delivery>
+        @inject(DeliveryServiceIdentifier.BackendClientFacade) deliveryBackendClientFacade: IBackendClient<Delivery>,
+        @inject(DeliveryServiceIdentifier.StorageMiddleware) storageMiddleware: IDeliveryStorageMiddleware
     ) {
         const tag = getTagByAlias("CreateDelivery") || "Delivery";
         super(tag, logger, notificationService);
         this.backendClient = deliveryBackendClientFacade;
+        this.storageMiddleware = storageMiddleware;
     }
 
     protected async getList(lastSync?: string): Promise<Delivery[]> {
@@ -32,10 +36,9 @@ export default class DeliveryStorageContext extends AbstractStorageContext<Deliv
         return await this.backendClient.AddEndpoint(item);
     }
     protected async update(item: Delivery): Promise<void> {
-        return await this.backendClient.UpdateEndpoint(item);
+        return await this.storageMiddleware.update(item);
     }
     protected async delete(item: Delivery): Promise<void> {
         return await this.backendClient.DeleteEndpoint(item);
     }
-
 }

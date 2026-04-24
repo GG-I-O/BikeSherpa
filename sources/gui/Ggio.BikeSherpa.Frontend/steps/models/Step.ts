@@ -10,7 +10,6 @@ export class Step extends InputStep implements Storable, HateoasLinks {
     public createdAt?: string;
     public updatedAt?: string;
     public operationId?: string;
-    public operationAction?: string;
     public links?: Link[];
 
     public constructor(

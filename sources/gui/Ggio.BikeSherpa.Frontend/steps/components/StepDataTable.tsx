@@ -17,8 +17,11 @@ export default function StepDataTable({ steps, isStepSelected, onRowPress, canCh
 
     return (
         <DataTable style={{ backgroundColor: theme.colors.background }}>
-            {showHeader ? (
+            {showHeader && (
                 <DataTable.Header>
+                    { canChangeDate && (
+                        <DataTable.Title style={[style.column, style.width40]}>Ordre</DataTable.Title>
+                    )}
                     <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
                     <DataTable.Title style={[style.column, style.minWidth150]}>Adresse</DataTable.Title>
                     <DataTable.Title style={[style.column, style.minWidth150]}>Commentaire</DataTable.Title>
@@ -26,8 +29,6 @@ export default function StepDataTable({ steps, isStepSelected, onRowPress, canCh
                     <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width40]}>Finis</DataTable.Title>
                 </DataTable.Header>
-            ) : (
-                <></>
             )}
 
             {steps.map((step) => (
@@ -37,6 +38,7 @@ export default function StepDataTable({ steps, isStepSelected, onRowPress, canCh
                     isSelected={isStepSelected ? isStepSelected(step) : false}
                     onPress={onRowPress}
                     canChangeDate={canChangeDate}
+                    listLength={steps.length}
                 />
             ))}
         </DataTable>

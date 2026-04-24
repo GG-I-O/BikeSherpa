@@ -37,6 +37,7 @@ export default class DeliveryMapper {
             steps: delivery.steps?.map((step) => ({
                 id: step.id,
                 type: step.stepType,
+                order: step.order,
                 completed: step.completed,
                 address: step.stepAddress,
                 courierCode: step.courierId ? getCourierCode(step.courierId) : undefined,

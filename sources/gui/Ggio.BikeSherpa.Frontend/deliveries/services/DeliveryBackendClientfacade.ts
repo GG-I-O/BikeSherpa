@@ -10,9 +10,10 @@ import {ILogger} from "@/spi/LogsSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {Step} from "@/steps/models/Step";
 import JsonPatchDocument from "@/models/JsonPatchDocument";
+import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCustomBackendClientFacade";
 
 @injectable()
-export default class DeliveryBackendClientFacade implements IBackendClient<Delivery> {
+export default class DeliveryBackendClientFacade implements IBackendClient<Delivery>, IDeliveryCustomBackendClientFacade {
     private apiClient;
     private logger: ILogger;
 
@@ -107,23 +108,6 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
     }
 
     public async UpdateEndpoint(item: Delivery): Promise<void> {
-        const step = item.steps.find(step => step.operationAction !== undefined);
-
-        if (!step)
-            await this.UpdateDelivery(item);
-        else {
-            switch (step.operationAction) {
-                case deliveryOperationAction.patchTime:
-                    await this.PatchStepTime(step);
-                    break;
-                default:
-                    throw new Error(`Unsupported operation action: ${step.operationAction}`);
-            }
-            step.operationAction = undefined;
-        }
-    }
-
-    private async UpdateDelivery(item: Delivery): Promise<void> {
         const deliveryData = {
             ...item,
             contractDate: new Date(item.contractDate).toISOString(),
@@ -154,13 +138,13 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         );
     }
 
-    private async PatchStepTime(step: Step): Promise<void> {
+    public async PatchStepTimeEndpoint(step: Step): Promise<void> {
         if (!step.links)
             throw new Error(`Step links empty`);
 
-        const url = step.links.find(link => link.rel === step.operationAction);
-        if (!url)
-            throw new Error(`Step operationAction '${step.operationAction}' not found in links`);
+        const link = step.links.find(link => link.rel === deliveryOperationAction.patchTime);
+        if (!link)
+            throw new Error(`Step link for '${deliveryOperationAction.patchTime}' not found`);
 
         let jsonPatchDocument = new JsonPatchDocument();
         jsonPatchDocument.addOperation(
@@ -169,7 +153,32 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             new Date(step.estimatedDeliveryDate).toISOString()
         );
         await axios.patch(
-            url.href,
+            link.href,
+            jsonPatchDocument.getOperations(),
+            {
+                headers: {
+                    "Content-Type": "application/json-patch+json"
+                }
+            }
+        );
+    }
+
+    public async PatchStepOrderEndpoint(step: Step): Promise<void> {
+        if (!step.links)
+            throw new Error(`Step links empty`);
+
+        const link = step.links.find(link => link.rel === deliveryOperationAction.patchOrder);
+        if (!link)
+            throw new Error(`Step link for '${deliveryOperationAction.patchOrder}' not found`);
+
+        let jsonPatchDocument = new JsonPatchDocument();
+        jsonPatchDocument.addOperation(
+            "/order",
+            "replace",
+            step.order
+        );
+        await axios.patch(
+            link.href,
             jsonPatchDocument.getOperations(),
             {
                 headers: {

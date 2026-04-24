@@ -1,0 +1,50 @@
+import {inject, injectable} from "inversify";
+import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddleware";
+import Delivery from "../models/Delivery";
+import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
+import deliveryOperationAction from "@/steps/constants/deliveryOperationAction";
+import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCustomBackendClientFacade";
+import {IBackendClient} from "@/spi/BackendClientSPI";
+
+@injectable()
+export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddleware {
+    private backendClientFacade: IBackendClient<Delivery>;
+    private customClientFacade: IDeliveryCustomBackendClientFacade;
+    private updateStepState: {deliveryId: string, stepId: string, state: string}[] = [];
+    
+    constructor(
+        @inject(DeliveryServiceIdentifier.BackendClientFacade) backendClientFacade: IBackendClient<Delivery>,
+        @inject(DeliveryServiceIdentifier.CustomBackendClientFacade) customClientFacade: IDeliveryCustomBackendClientFacade
+    ) {
+        this.backendClientFacade = backendClientFacade;
+        this.customClientFacade = customClientFacade;
+    }
+    public addUpdateStepState(deliveryId: string, stepId: string, state: string): void {
+        this.updateStepState.push({deliveryId, stepId, state});
+    }
+    public async update(delivery: Delivery): Promise<void> {
+        const stateIndex = this.updateStepState.findIndex(state => state.deliveryId === delivery.id);
+
+        if (stateIndex === -1)
+            await this.backendClientFacade.UpdateEndpoint(delivery);
+        else {
+            const step = delivery.steps.find(step => step.id === this.updateStepState[stateIndex].stepId)
+            if (!step)
+                throw new Error(`Step with ID ${this.updateStepState[stateIndex].stepId} not found in delivery ${delivery.id}`);
+            
+            switch (this.updateStepState[stateIndex].state) {
+                case deliveryOperationAction.patchTime:
+                    await this.customClientFacade.PatchStepTimeEndpoint(step);
+                    break;
+                case deliveryOperationAction.patchOrder:
+                    await this.customClientFacade.PatchStepOrderEndpoint(step);
+                    break;
+                default:
+                    throw new Error(`Unsupported update action: ${this.updateStepState[stateIndex].state}`);
+            }
+        }
+        
+        this.updateStepState.splice(stateIndex, 1);
+    } 
+    
+}

@@ -14,4 +14,8 @@ export default class StepDataTableRowViewModel {
     public updateStepTime = (stepId: string, hours: number, minutes: number): void => {
         this.stepServices.updateTime(stepId, hours, minutes);
     }
+    
+    public reorderStep = (stepId: string, newOrder: number): void => {
+        this.stepServices.reorderStep(stepId, newOrder);
+    }
 }

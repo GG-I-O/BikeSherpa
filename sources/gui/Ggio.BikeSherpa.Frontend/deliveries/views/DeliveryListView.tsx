@@ -1,5 +1,5 @@
 import {navigate} from "expo-router/build/global-state/routing";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {ScrollView} from "react-native";
 import {Button, SegmentedButtons, Text, useTheme} from 'react-native-paper';
 import {Dropdown} from 'react-native-paper-dropdown';
@@ -8,7 +8,6 @@ import StepDataTableAssign from "@/steps/components/StepDatatableAssign";
 import {useDeliverySelection} from "../hooks/useDeliverySelection";
 import useDeliveryListViewModel from "@/deliveries/viewModel/useDeliveryListViewModel";
 import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal";
-import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 
 export function DeliveryListView() {
