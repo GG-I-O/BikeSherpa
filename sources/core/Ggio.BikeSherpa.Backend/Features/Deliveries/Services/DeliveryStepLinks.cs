@@ -16,13 +16,6 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
           if (scopes is null) return [];
 
           var (canRead, canWrite) = scopes.Value;
-
-          /*return hateoasService.GenerateLinks(
-               canRead ? IEndpoint.GetName<GetDeliveryEndpoint>() : null,
-               canWrite ? IEndpoint.GetName<UpdateDeliveryEndpoint>() : null,
-               canWrite ? IEndpoint.GetName<DeleteDeliveryEndpoint>() : null,
-               new { deliveryId = id }
-          );*/
           
           var links = new List<Link>();
           var routeValues = new { deliveryId, stepId };
@@ -36,6 +29,12 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                });
           
           // PATCH /delivery/{deliveryId}/step/{stepId}/order
+          if (canWrite)
+               links.Add(new Link {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<PatchDeliveryStepOrderEndpoint>(), routeValues),
+                    Rel = "patchOrder",
+                    Method = "PATCH" 
+               });
           
           // PUT /delivery/{deliveryId}/step/{stepId}/complete
           

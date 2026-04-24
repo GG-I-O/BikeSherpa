@@ -55,12 +55,14 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                     {
                          Start();
                     }
+
                     break;
                case DeliveryStatus.Started:
                     if (Steps.All(s => s.Completed))
                     {
                          Complete();
                     }
+
                     break;
                case DeliveryStatus.Completed:
                     throw new InvalidOperationException("Course déjà terminée.");
@@ -98,6 +100,14 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public async Task ReorderStepsAsync(Guid movedStepId, int newOrder, IItinerarySpi itineraryService)
      {
           var movedStep = Steps.Single(s => s.Id == movedStepId);
+          (
+               movedStep.EstimatedDeliveryDate,
+               Steps[newOrder - 1].EstimatedDeliveryDate
+               ) = (
+               Steps[newOrder - 1].EstimatedDeliveryDate,
+               movedStep.EstimatedDeliveryDate
+               );
+
           Steps.Remove(movedStep);
           Steps.Insert(newOrder - 1, movedStep);
           var order = 1;
@@ -105,6 +115,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           {
                step.Order = order++;
           }
+
           await RecalculateStepDistancesAsync(itineraryService);
      }
 
@@ -161,6 +172,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           {
                existingStep.RealDeliveryDate = DateTimeOffset.UtcNow;
           }
+
           UpdateStatus();
      }
 
@@ -261,6 +273,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          steps[index].Distance,
                          steps[index].Comment,
                          steps[index].EstimatedDeliveryDate);
+
                     steps[index] = existing;
                }
 
@@ -268,7 +281,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                     steps[index].Distance = 0;
                else
                     steps[index].EstimatedDeliveryDate = steps[index - 1].EstimatedDeliveryDate + TimeSpan.FromMinutes(15);
-               
+
           }
 
           DeleteOldSteps(steps);
