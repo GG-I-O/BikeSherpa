@@ -1,6 +1,6 @@
 ﻿namespace Ggio.BikeSherpa.Backend.Services.Notification;
 
-public enum ResourceOperation
+public enum NotificationOperation
 {
      Post, Put, Delete
 }

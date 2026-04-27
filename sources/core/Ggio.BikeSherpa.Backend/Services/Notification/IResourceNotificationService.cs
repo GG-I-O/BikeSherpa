@@ -2,5 +2,5 @@
 
 public interface IResourceNotificationService
 {
-     Task NotifyResourceChangeToGroup(string dataType, ResourceOperation operation, string resourceId, Guid? operationId = null);
+     Task NotifyResourceChangeToGroup(string dataType, NotificationOperation operation, string resourceId, Guid? operationId = null);
 }

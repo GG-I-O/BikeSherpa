@@ -41,23 +41,23 @@ public class ResourceNotificationMiddleware(RequestDelegate next, ILogger<Resour
 
                var resourceName = segments[0].ToLowerInvariant();
 
-               ResourceOperation? operation = method.ToUpper() switch
+               NotificationOperation? operation = method.ToUpper() switch
                {
-                    "POST" => ResourceOperation.Post,
-                    "PUT" or "PATCH" => ResourceOperation.Put,
-                    "DELETE" => ResourceOperation.Delete,
+                    "POST" => NotificationOperation.Post,
+                    "PUT" or "PATCH" => NotificationOperation.Put,
+                    "DELETE" => NotificationOperation.Delete,
                     _ => null
                };
 
                if (!operation.HasValue) return;
                
                // For inner resources on POST, it's in reality a PUT of the parent
-               if (operation == ResourceOperation.Post && segments.Length >= 3)
-                    operation = ResourceOperation.Put;
+               if (operation == NotificationOperation.Post && segments.Length >= 3)
+                    operation = NotificationOperation.Put;
 
                switch (operation)
                {
-                    case ResourceOperation.Post:
+                    case NotificationOperation.Post:
                          body.Seek(0, SeekOrigin.Begin);
                          using (var reader = new StreamReader(body, leaveOpen: true))
                          {
@@ -75,8 +75,8 @@ public class ResourceNotificationMiddleware(RequestDelegate next, ILogger<Resour
 
                          break;
 
-                    case ResourceOperation.Put:
-                    case ResourceOperation.Delete:
+                    case NotificationOperation.Put:
+                    case NotificationOperation.Delete:
                          if (segments.Length < 2) return;
                          var urlId = segments[1];
                          await service.NotifyResourceChangeToGroup(
