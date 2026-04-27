@@ -147,7 +147,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           return result.DistanceInKm;
      }
 
-     public void UpdateStepCourier(Guid stepId, Guid courierId)
+     public void UpdateStepCourier(Guid stepId, Guid? courierId)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.CourierId = courierId;
