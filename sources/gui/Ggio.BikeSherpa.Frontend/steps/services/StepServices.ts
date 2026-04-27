@@ -114,4 +114,58 @@ export default class StepServices implements IStepServices {
 
         return observables;
     }
+    
+    public assignCourier(stepId: string, courierId: string) {
+        const observables = this.getDeliveryFromStep(stepId);
+        if (!observables.delivery$) {
+            this.logger.error(`AssignCourier : Parent delivery not found for step ${stepId}`);
+            return;
+        }
+        if (!observables.step$) {
+            this.logger.error(`AssignCourier: Step ${stepId} not found in delivery ${observables.delivery$.peek().id}`);
+            return;
+        }
+
+        // Test if the user got the rights to do this action
+        const step = observables.step$.get();
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.stepCourier.post)) {
+            this.logger.error(`Cannot post courier for step ${stepId}`);
+            return
+        }
+
+        this.deliveryStorageMiddleware.addUpdateStepState(
+            observables.delivery$.peek().id,
+            observables.step$.peek().id,
+            deliveryOperationAction.postCourier
+        );
+
+        observables.step$!.courierId.set(courierId);
+    }
+    
+    public unassignCourier(stepId: string) {
+        const observables = this.getDeliveryFromStep(stepId);
+        if (!observables.delivery$) {
+            this.logger.error(`UnassignCourier : Parent delivery not found for step ${stepId}`);
+            return;
+        }
+        if (!observables.step$) {
+            this.logger.error(`UnassignCourier: Step ${stepId} not found in delivery ${observables.delivery$.peek().id}`);
+            return;
+        }
+
+        // Test if the user got the rights to do this action
+        const step = observables.step$.get();
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.stepCourier.delete)) {
+            this.logger.error(`Cannot delete courier for step ${stepId}`);
+            return
+        }
+
+        this.deliveryStorageMiddleware.addUpdateStepState(
+            observables.delivery$.peek().id,
+            observables.step$.peek().id,
+            deliveryOperationAction.deleteCourier
+        );
+
+        observables.step$!.courierId.set(null);
+    }
 }

@@ -9,18 +9,24 @@ import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import {ICustomerService} from "@/spi/CustomerSPI";
 import DeliveryMapper from "@/deliveries/services/DeliveryMapper";
+import {IStepServices} from "@/steps/spi/IStepServices";
+import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
+import {Step} from "@/steps/models/Step";
 
 export default class DeliveryListViewModel {
     private readonly deliveryServices: IDeliveryServices;
+    private readonly stepServices: IStepServices;
     private readonly courierServices: ICourierService;
     private readonly customerServices: ICustomerService;
 
     constructor(
         @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
+        @inject(StepServiceIdentifier.Services) stepServices: IStepServices,
         @inject(ServicesIdentifiers.CourierServices) courierServices: ICourierService,
         @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService,
     ) {
         this.deliveryServices = deliveryServices;
+        this.stepServices = stepServices;
         this.courierServices = courierServices;
         this.customerServices = customerServices;
     }
@@ -37,13 +43,10 @@ export default class DeliveryListViewModel {
                 return false;
 
             return delivery.steps.some((step) => {
-                const courier = step.courierId
-                    ? this.courierServices.getCourier(step.courierId).code
-                    : 'NONE';
                 return (
                     DateToolbox.dateFilterFunction(dateFilter, new Date(step.estimatedDeliveryDate))
                     &&
-                    ((courierFilter === 'NONE' && courier === undefined) || courierFilter === courier)
+                    ((courierFilter === '' && step.courierId === null) || courierFilter === step.courierId)
                 );
             });
         });
@@ -51,7 +54,7 @@ export default class DeliveryListViewModel {
         const sortedDeliveries: Delivery[] = [...filteredDeliveries].sort((deliveryA, deliveryB) => {
             if (!deliveryA.steps || !deliveryB.steps)
                 return 0;
-            
+
             return (
                 new Date(deliveryA.steps[0].estimatedDeliveryDate).valueOf()
                 -
@@ -74,8 +77,59 @@ export default class DeliveryListViewModel {
         });
     }
 
-    public getFilteredStepList = (dateFilter: string, courier: string): StepToDisplay[] => {
-        return this.getFilteredDeliveries(dateFilter, courier)
-            .flatMap((delivery) => delivery.steps ?? []);
+    public getFilteredStepList = (dateFilter: string, courierFilter: string): StepToDisplay[] => {
+        if (!this.deliveryServices || !this.courierServices)
+            return [];
+
+        const deliveries: Delivery[] = Object.values(this.deliveryServices.getDeliveryList$().get());
+
+        const filteredDeliveries: DeliveryToDisplay[] = [];
+
+        deliveries.forEach((delivery) => {
+            const filteredSteps: Step[] = [];
+            delivery.steps.forEach((step) => {
+                if (
+                    DateToolbox.dateFilterFunction(dateFilter, new Date(step.estimatedDeliveryDate))
+                    &&
+                    ((courierFilter === '' && step.courierId === null) || courierFilter === step.courierId)
+                ) {
+                    filteredSteps.push(step);
+                }
+            });
+            filteredDeliveries.push(DeliveryMapper.DeliveryToDeliveryToDisplay(
+                {
+                    ...delivery,
+                    steps: filteredSteps
+                },
+                (id: string) => {
+                    const customer = this.customerServices.getCustomer$(id).get();
+                    return customer?.name ?? "";
+                },
+                (id: string) => {
+                    const courier = this.courierServices.getCourier$(id).get();
+                    return courier?.code ?? "";
+                }
+            ));
+        });
+
+        return filteredDeliveries.flatMap(delivery => delivery.steps).sort((stepA, stepB) => {
+            return (
+                new Date(stepA.estimatedIsoDate).valueOf()
+                -
+                new Date(stepB.estimatedIsoDate).valueOf()
+            );
+        });
+    }
+
+    public assignCourier = (steps: StepToDisplay[], courierId: string) => {
+        steps.forEach(step => {
+            this.stepServices.assignCourier(step.id, courierId);
+        });
+    }
+
+    public unassignCourier = (steps: StepToDisplay[]) => {
+        steps.forEach(step => {
+            this.stepServices.unassignCourier(step.id);
+        });
     }
 }

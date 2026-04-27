@@ -8,4 +8,13 @@ export type HateoasLinks = {
     links?: Link[];
 };
 
-export const hateoasRel = { get: "get", update: "update", delete: "delete", patch: "patch" }
+export const hateoasRel = {
+    get: "get",
+    update: "update",
+    delete: "delete",
+    patch: "patch",
+    stepCourier: {
+        post: "postCourier",
+        delete: "deleteCourier"
+    }
+}

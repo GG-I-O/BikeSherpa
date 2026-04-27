@@ -5,7 +5,6 @@ import {createApiClient, schemas} from "@/infra/openAPI/client";
 import axios from "axios";
 import DeliveryMapper from "./DeliveryMapper";
 import {hateoasRel, Link} from "@/models/HateoasLink";
-import deliveryOperationAction from "@/steps/constants/deliveryOperationAction";
 import {ILogger} from "@/spi/LogsSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {Step} from "@/steps/models/Step";
@@ -154,6 +153,37 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
                     "Content-Type": "application/json-patch+json"
                 }
             }
+        );
+    }
+
+    public async PostStepCourierEndpoint(step: Step): Promise<void> {
+        if (!step.links)
+            throw new Error(`Step links empty`);
+
+        const link = step.links.find(link => link.rel === hateoasRel.stepCourier.post);
+        if (!link)
+            throw new Error(`Step link for '${hateoasRel.stepCourier.post}' not found`);
+        
+        if (!step.courierId)
+            throw new Error(`Step courierId empty`);
+
+        link.href = link.href.substring(0, link.href.lastIndexOf("/") + 1);
+        link.href += step.courierId;
+        
+        await axios.post(
+            link.href
+        );
+    }
+    public async DeleteStepCourierEndpoint(step: Step): Promise<void> {
+        if (!step.links)
+            throw new Error(`Step links empty`);
+
+        const link = step.links.find(link => link.rel === hateoasRel.stepCourier.delete);
+        if (!link)
+            throw new Error(`Step link for '${hateoasRel.stepCourier.delete}' not found`);
+
+        await axios.delete(
+            link.href
         );
     }
 }

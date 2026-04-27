@@ -11,8 +11,8 @@ import JsonPatchDocument from "@/models/JsonPatchDocument";
 export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddleware {
     private backendClientFacade: IBackendClient<Delivery>;
     private customClientFacade: IDeliveryCustomBackendClientFacade;
-    private updateStepState: {deliveryId: string, stepId: string, state: string}[] = [];
-    
+    private updateStepState: { deliveryId: string, stepId: string, state: string }[] = [];
+
     constructor(
         @inject(DeliveryServiceIdentifier.BackendClientFacade) backendClientFacade: IBackendClient<Delivery>,
         @inject(DeliveryServiceIdentifier.CustomBackendClientFacade) customClientFacade: IDeliveryCustomBackendClientFacade
@@ -20,20 +20,22 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
         this.backendClientFacade = backendClientFacade;
         this.customClientFacade = customClientFacade;
     }
+
     public addUpdateStepState(deliveryId: string, stepId: string, state: string): void {
         this.updateStepState.push({deliveryId, stepId, state});
     }
-    public async update(delivery: Delivery): Promise<void> {
-        const stateIndex = this.updateStepState.findIndex(state => state.deliveryId === delivery.id);
 
-        if (stateIndex === -1)
-            await this.backendClientFacade.UpdateEndpoint(delivery);
-        else {
-            const step = delivery.steps.find(step => step.id === this.updateStepState[stateIndex].stepId)
-            if (!step)
-                throw new Error(`Step with ID ${this.updateStepState[stateIndex].stepId} not found in delivery ${delivery.id}`);
+    public async update(delivery: Delivery): Promise<void> {
+        let completeUpdate: boolean = true;
+        for (let i = 0; i < this.updateStepState.length; i++) {
+            if (this.updateStepState[i].deliveryId !== delivery.id)
+                continue;
             
-            switch (this.updateStepState[stateIndex].state) {
+            const step = delivery.steps.find(step => step.id === this.updateStepState[i].stepId)
+            if (!step)
+                throw new Error(`Step with ID ${this.updateStepState[i].stepId} not found in delivery ${delivery.id}`);
+
+            switch (this.updateStepState[i].state) {
                 case deliveryOperationAction.patchTime:
                     let patchTimeJson = new JsonPatchDocument();
                     patchTimeJson.addOperation(
@@ -52,12 +54,21 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                     );
                     await this.customClientFacade.PatchStepEndpoint(step, patchOrderJson);
                     break;
+                case deliveryOperationAction.postCourier:
+                    await this.customClientFacade.PostStepCourierEndpoint(step);
+                    break;
+                case deliveryOperationAction.deleteCourier:
+                    await this.customClientFacade.DeleteStepCourierEndpoint(step);
+                    break;
                 default:
-                    throw new Error(`Unsupported update action: ${this.updateStepState[stateIndex].state}`);
+                    throw new Error(`Unsupported update action: ${this.updateStepState[i].state}`);
             }
         }
+
+        if (completeUpdate)
+            await this.backendClientFacade.UpdateEndpoint(delivery);
         
-        this.updateStepState.splice(stateIndex, 1);
-    } 
-    
+        this.updateStepState = this.updateStepState.filter(state => state.deliveryId === delivery.id);
+    }
+
 }

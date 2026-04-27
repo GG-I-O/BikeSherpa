@@ -14,7 +14,7 @@ export function DeliveryListView() {
     const theme = useTheme();
 
     const [isAssigning, setIsAssigning] = useState<boolean>(false);
-    const [assignDropdown, setAssignDropdown] = useState<string>('NONE');
+    const [courierToAssign, setCourierToAssign] = useState<string>('');
     const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
     
     const viewModel = useDeliveryListViewModel();
@@ -61,10 +61,11 @@ export function DeliveryListView() {
                             ]}
                         />
                         <Dropdown
+                            key={`courier-filter-${viewModel.courierFilter || 'empty'}`}
                             label="Assignées à"
-                            options={[]}
+                            options={viewModel.couriers}
                             value={viewModel.courierFilter}
-                            onSelect={(value) => viewModel.setCourierFilter(value ?? 'NONE')}
+                            onSelect={(value) => viewModel.setCourierFilter(value ?? '')}
                             mode="outlined"
                         />
                         <Button
@@ -85,10 +86,12 @@ export function DeliveryListView() {
                 ) : (
                     <>
                         <Dropdown
+                            key={`courier-filter-${courierToAssign || 'empty'}`}
                             label="Assigner à"
-                            options={[]}
-                            value={assignDropdown}
-                            onSelect={(value) => setAssignDropdown(value ?? 'NONE')}
+                            options={viewModel.couriers}
+                            value={courierToAssign}
+                            onSelect={(value) => setCourierToAssign(value ?? '')}
+                            mode="outlined"
                         />
                         <Button
                             style={{
@@ -97,6 +100,10 @@ export function DeliveryListView() {
                                 borderColor: theme.colors.onBackground
                             }}
                             onPress={() => {
+                                if (courierToAssign)
+                                    viewModel.assignCourier(selectedSteps, courierToAssign);
+                                else 
+                                    viewModel.unassignCourier(selectedSteps);
                                 clearSelection();
                                 setIsAssigning(false);
                             }}
@@ -120,7 +127,7 @@ export function DeliveryListView() {
                 )}
 
             </ScrollView>
-            {viewModel.courierFilter === 'NONE' ? (
+            {viewModel.courierFilter === '' ? (
                 <DeliveryDataTable
                     deliveries={viewModel.deliveries}
                     isDeliverySelected={isAssigning ? isDeliverySelected : undefined}
@@ -149,17 +156,7 @@ export function DeliveryListView() {
                 <StepDataTableAssign
                     steps={viewModel.steps}
                     isStepSelected={isAssigning ? isStepSelected : undefined}
-                    onRowPress={(step) => {
-                        const delivery = viewModel.deliveries.find((d) => d.code === step.id);
-                        if (!delivery) return
-                        if (isAssigning)
-                            toggleStepSelection(step, delivery);
-                        else
-                            navigate({
-                                pathname: '/(tabs)/(deliveries)/[deliveryId]',
-                                params: {deliveryId: delivery.id}
-                            })
-                    }}
+                    onRowPress={isAssigning ? toggleStepSelection : undefined}
                     canChangeDate={true}
                     showHeader={true}
                 />

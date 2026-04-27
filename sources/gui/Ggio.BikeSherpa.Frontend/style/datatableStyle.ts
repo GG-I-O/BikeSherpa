@@ -35,6 +35,10 @@ const datatableStyle = StyleSheet.create({
         minWidth: 100,
         maxWidth: 100
     },
+    width110: {
+        minWidth: 110,
+        maxWidth: 110
+    },
     width130: {
         minWidth: 130,
         maxWidth: 130
