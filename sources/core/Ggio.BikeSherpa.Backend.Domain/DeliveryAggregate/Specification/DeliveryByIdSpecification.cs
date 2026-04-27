@@ -6,6 +6,8 @@ public class DeliveryByIdSpecification : SingleResultSpecification<Delivery>
 {
      public DeliveryByIdSpecification(Guid id)
      {
-          Query.Where(x => x.Id == id);
+          Query
+               .Where(x => x.Id == id)
+               .Include(x => x.Steps.OrderBy(s => s.Order));
      }
 }

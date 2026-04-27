@@ -9,11 +9,12 @@ export default class DeliveryMapper {
             ...deliveryCrud,
             steps: deliveryDto.data.steps.map((step => {
                 return {
-                    ...step,
+                    ...step.data,
                     stepAddress: {
-                        ...step.stepAddress,
-                        fullAddress: `${step.stepAddress.streetInfo} ${step.stepAddress.postcode} ${step.stepAddress.city}`,
-                    }
+                        ...step.data.stepAddress,
+                        fullAddress: `${step.data.stepAddress.streetInfo} ${step.data.stepAddress.postcode} ${step.data.stepAddress.city}`,
+                    },
+                    links: step.links ?? []
                 }
             })),
             links: deliveryDto.links ?? []
@@ -36,6 +37,7 @@ export default class DeliveryMapper {
             steps: delivery.steps?.map((step) => ({
                 id: step.id,
                 type: step.stepType,
+                order: step.order,
                 completed: step.completed,
                 address: step.stepAddress,
                 courierCode: step.courierId ? getCourierCode(step.courierId) : undefined,

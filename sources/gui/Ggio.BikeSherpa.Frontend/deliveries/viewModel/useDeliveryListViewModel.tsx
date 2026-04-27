@@ -2,7 +2,6 @@ import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import {useEffect, useState} from "react";
-import Delivery from "@/deliveries/models/Delivery";
 import {navigate} from "expo-router/build/global-state/routing";
 import {observe} from "@legendapp/state";
 import DeliveryListViewModel from "@/deliveries/viewModel/DeliveryListViewModel";
