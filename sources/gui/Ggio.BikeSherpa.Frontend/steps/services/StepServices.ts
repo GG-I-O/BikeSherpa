@@ -9,6 +9,7 @@ import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServi
 import deliveryOperationAction from "@/steps/constants/deliveryOperationAction";
 import {Step} from "@/steps/models/Step";
 import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddleware";
+import {hateoasRel} from "@/models/HateoasLink";
 
 @injectable()
 export default class StepServices implements IStepServices {
@@ -42,7 +43,7 @@ export default class StepServices implements IStepServices {
 
         // Test if the user got the rights to do this action
         const step = observables.step$.get();
-        if (!step.links || !step.links.some((link) => link.rel === deliveryOperationAction.patchTime)) {
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.patch)) {
             this.logger.error(`Cannot patch ${stepId}`);
             return
         }
@@ -72,7 +73,7 @@ export default class StepServices implements IStepServices {
 
         // Test if the user got the rights to do this action
         const step = observables.step$.get();
-        if (!step.links || !step.links.some((link) => link.rel === deliveryOperationAction.patchOrder)) {
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.patch)) {
             this.logger.error(`Cannot patch ${stepId}`);
             return
         }

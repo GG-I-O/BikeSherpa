@@ -4,7 +4,7 @@ import Delivery, {DeliveryCrud} from "../models/Delivery";
 import {createApiClient, schemas} from "@/infra/openAPI/client";
 import axios from "axios";
 import DeliveryMapper from "./DeliveryMapper";
-import {Link} from "@/models/HateoasLink";
+import {hateoasRel, Link} from "@/models/HateoasLink";
 import deliveryOperationAction from "@/steps/constants/deliveryOperationAction";
 import {ILogger} from "@/spi/LogsSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
@@ -138,48 +138,17 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         );
     }
 
-    public async PatchStepTimeEndpoint(step: Step): Promise<void> {
+    public async PatchStepEndpoint(step: Step, json: JsonPatchDocument): Promise<void> {
         if (!step.links)
             throw new Error(`Step links empty`);
 
-        const link = step.links.find(link => link.rel === deliveryOperationAction.patchTime);
+        const link = step.links.find(link => link.rel === hateoasRel.patch);
         if (!link)
-            throw new Error(`Step link for '${deliveryOperationAction.patchTime}' not found`);
-
-        let jsonPatchDocument = new JsonPatchDocument();
-        jsonPatchDocument.addOperation(
-            "/estimatedDeliveryDate",
-            "replace",
-            new Date(step.estimatedDeliveryDate).toISOString()
-        );
+            throw new Error(`Step link for '${hateoasRel.patch}' not found`);
+        
         await axios.patch(
             link.href,
-            jsonPatchDocument.getOperations(),
-            {
-                headers: {
-                    "Content-Type": "application/json-patch+json"
-                }
-            }
-        );
-    }
-
-    public async PatchStepOrderEndpoint(step: Step): Promise<void> {
-        if (!step.links)
-            throw new Error(`Step links empty`);
-
-        const link = step.links.find(link => link.rel === deliveryOperationAction.patchOrder);
-        if (!link)
-            throw new Error(`Step link for '${deliveryOperationAction.patchOrder}' not found`);
-
-        let jsonPatchDocument = new JsonPatchDocument();
-        jsonPatchDocument.addOperation(
-            "/order",
-            "replace",
-            step.order
-        );
-        await axios.patch(
-            link.href,
-            jsonPatchDocument.getOperations(),
+            json.getOperations(),
             {
                 headers: {
                     "Content-Type": "application/json-patch+json"

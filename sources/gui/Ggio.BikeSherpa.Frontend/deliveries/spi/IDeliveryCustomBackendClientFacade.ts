@@ -1,6 +1,6 @@
 import {Step} from "@/steps/models/Step";
+import JsonPatchDocument from "@/models/JsonPatchDocument";
 
 export interface IDeliveryCustomBackendClientFacade {
-    PatchStepTimeEndpoint(step: Step): Promise<void>
-    PatchStepOrderEndpoint(step: Step): Promise<void>
+    PatchStepEndpoint(step: Step, patch: JsonPatchDocument): Promise<void>
 }

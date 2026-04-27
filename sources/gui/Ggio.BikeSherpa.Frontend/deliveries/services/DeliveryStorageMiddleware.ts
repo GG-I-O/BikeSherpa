@@ -5,6 +5,7 @@ import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServi
 import deliveryOperationAction from "@/steps/constants/deliveryOperationAction";
 import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCustomBackendClientFacade";
 import {IBackendClient} from "@/spi/BackendClientSPI";
+import JsonPatchDocument from "@/models/JsonPatchDocument";
 
 @injectable()
 export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddleware {
@@ -34,10 +35,22 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
             
             switch (this.updateStepState[stateIndex].state) {
                 case deliveryOperationAction.patchTime:
-                    await this.customClientFacade.PatchStepTimeEndpoint(step);
+                    let patchTimeJson = new JsonPatchDocument();
+                    patchTimeJson.addOperation(
+                        "/estimatedDeliveryDate",
+                        "replace",
+                        new Date(step.estimatedDeliveryDate).toISOString()
+                    );
+                    await this.customClientFacade.PatchStepEndpoint(step, patchTimeJson);
                     break;
                 case deliveryOperationAction.patchOrder:
-                    await this.customClientFacade.PatchStepOrderEndpoint(step);
+                    let patchOrderJson = new JsonPatchDocument();
+                    patchOrderJson.addOperation(
+                        "/order",
+                        "replace",
+                        step.order
+                    );
+                    await this.customClientFacade.PatchStepEndpoint(step, patchOrderJson);
                     break;
                 default:
                     throw new Error(`Unsupported update action: ${this.updateStepState[stateIndex].state}`);
