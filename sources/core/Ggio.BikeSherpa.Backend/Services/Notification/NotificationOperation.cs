@@ -2,5 +2,5 @@
 
 public enum NotificationOperation
 {
-     Post, Put, Delete
+     Create, Update, Delete
 }

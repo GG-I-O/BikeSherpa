@@ -25,7 +25,7 @@ public abstract class NotifyCourierDeliveryEventBase<TEvent>(
                              .Distinct())
                {
                     await notificationService.NotifyResourceChangeToGroup(
-                         "courier", NotificationOperation.Put, courierId.ToString());
+                         "courier", NotificationOperation.Update, courierId.ToString());
                }
           }
      }
