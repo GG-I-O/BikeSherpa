@@ -114,6 +114,8 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             steps: item.steps.map(step => ({
                 data: {
                     ...step,
+                    estimatedDeliveryDate: new Date(step.estimatedDeliveryDate).toISOString(),
+                    realDeliveryDate: step.realDeliveryDate ? new Date(step.realDeliveryDate).toISOString() : null,
                     createdAt: step.createdAt ? step.createdAt : new Date().toISOString(),
                     updatedAt: step.updatedAt ? step.updatedAt : new Date().toISOString()
                 },

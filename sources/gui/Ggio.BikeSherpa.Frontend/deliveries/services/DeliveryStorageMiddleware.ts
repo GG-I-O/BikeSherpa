@@ -35,6 +35,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
             if (!step)
                 throw new Error(`Step with ID ${this.updateStepState[i].stepId} not found in delivery ${delivery.id}`);
 
+            completeUpdate = false;
             switch (this.updateStepState[i].state) {
                 case deliveryOperationAction.patchTime:
                     let patchTimeJson = new JsonPatchDocument();
