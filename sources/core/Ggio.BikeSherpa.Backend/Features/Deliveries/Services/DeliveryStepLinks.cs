@@ -15,24 +15,16 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
 
           if (scopes is null) return [];
 
-          var (canRead, canWrite) = scopes.Value;
+          var (_, canWrite) = scopes.Value;
           
           var links = new List<Link>();
           var routeValues = new { deliveryId, stepId };
           
-          // PATCH /delivery/{deliveryId}/step/{stepId}/time
+          // PATCH /delivery/{deliveryId}/step/{stepId}
           if (canWrite)
                links.Add(new Link {
-                    Href = hateoasService.GenerateLink(IEndpoint.GetName<PatchDeliveryStepTimeEndpoint>(), routeValues),
-                    Rel = "patchTime",
-                    Method = "PATCH" 
-               });
-          
-          // PATCH /delivery/{deliveryId}/step/{stepId}/order
-          if (canWrite)
-               links.Add(new Link {
-                    Href = hateoasService.GenerateLink(IEndpoint.GetName<PatchDeliveryStepOrderEndpoint>(), routeValues),
-                    Rel = "patchOrder",
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<PatchDeliveryStepEndpoint>(), routeValues),
+                    Rel = "patch",
                     Method = "PATCH" 
                });
           
