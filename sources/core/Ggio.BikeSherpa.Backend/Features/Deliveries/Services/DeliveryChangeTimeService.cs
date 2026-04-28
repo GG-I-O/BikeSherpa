@@ -20,7 +20,7 @@ public class DeliveryChangeTimeService(
 
           // If it does not disrupt the order, we change following step time
           // If not, we will only change the step asked and nothing else
-          if (!(steps[stepIndex - 1].EstimatedDeliveryDate > step.EstimatedDeliveryDate + timeOffset))
+          if (stepIndex - 1 <= 0 || !(steps[stepIndex - 1].EstimatedDeliveryDate > step.EstimatedDeliveryDate + timeOffset))
           {
                stepIndex++;
                for (; stepIndex < steps.Count; stepIndex++)
