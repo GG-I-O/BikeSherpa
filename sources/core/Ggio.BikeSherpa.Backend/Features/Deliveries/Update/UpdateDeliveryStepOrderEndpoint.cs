@@ -9,7 +9,7 @@ public class UpdateDeliveryStepOrderEndpoint(IMediator mediator) : Endpoint<Upda
 {
      public override void Configure()
      {
-          Put("/delivery/{deliveryId:guid}/step/{stepId:guid}/order");
+          Put("/delivery/{deliveryId:guid}/step/{stepId:guid}/changeOrder");
           Policies("write:deliveries");
           Description(x => x.WithTags("delivery"));
      }
@@ -19,7 +19,7 @@ public class UpdateDeliveryStepOrderEndpoint(IMediator mediator) : Endpoint<Upda
           var command = new UpdateDeliveryStepOrderCommand(
                Route<Guid>("deliveryId"),
                Route<Guid>("stepId"),
-               req.Order
+               req.Increment
           );
 
           var result = await mediator.Send(command, ct);

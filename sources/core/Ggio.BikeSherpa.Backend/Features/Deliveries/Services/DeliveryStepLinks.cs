@@ -2,6 +2,7 @@ using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Delete;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Patch;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 using Ggio.BikeSherpa.Backend.Model;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Microsoft.AspNetCore.Http;
@@ -49,6 +50,14 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                     Method = "DELETE" 
                });
 
+          // PUT /delivery/{deliveryId}/step/{stepId}/order
+          if (canWrite)
+               links.Add(new Link {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<UpdateDeliveryStepOrderEndpoint>(), routeValues),
+                    Rel = "putOrder",
+                    Method = "PUT" 
+               });
+          
           return links;
      }
 }
