@@ -20,10 +20,6 @@ export default class DateToolbox {
         // Week
         const endOfWeek = DateToolbox.getLastDayOfWeek(todayEnd);
         
-        console.log(`Date filter: ${dateFilter}, Today start: ${todayStart.valueOf()}, Today end: ${todayEnd.valueOf()},`);
-        console.log(`Date: ${date.toISOString()}, Value: ${date.valueOf()}`);
-        console.log('filter :' + (date.valueOf() >= todayStart.valueOf() && date.valueOf() <= todayEnd.valueOf()));
-        
         switch (dateFilter) {
             case '1':
                 return date.valueOf() >= todayStart.valueOf() && date.valueOf() <= todayEnd.valueOf();
