@@ -36,12 +36,18 @@ export default class DeliveryMapper {
             startTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
             steps: delivery.steps?.map((step) => ({
                 id: step.id,
+                deliveryId: delivery.id,
+                deliveryCode: delivery.code,
+                deliveryUrgency: delivery.urgency,
                 type: step.stepType,
                 order: step.order,
                 completed: step.completed,
                 address: step.stepAddress,
                 courierCode: step.courierId ? getCourierCode(step.courierId) : undefined,
                 comment: step.comment ?? '',
+                deliveryDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
+                deliveryTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
+                estimatedIsoDate: step.estimatedDeliveryDate,
                 estimatedDate: DateToolbox.getFormattedDateFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
                 estimatedTime: DateToolbox.getFormattedTimeFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
             }))

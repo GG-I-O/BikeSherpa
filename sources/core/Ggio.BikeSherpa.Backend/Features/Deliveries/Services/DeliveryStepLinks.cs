@@ -1,4 +1,6 @@
 using FastEndpoints;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Delete;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Patch;
 using Ggio.BikeSherpa.Backend.Model;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
@@ -18,9 +20,9 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
           var (_, canWrite) = scopes.Value;
           
           var links = new List<Link>();
-          var routeValues = new { deliveryId, stepId };
           
           // PATCH /delivery/{deliveryId}/step/{stepId}
+          var routeValues = new { deliveryId, stepId };
           if (canWrite)
                links.Add(new Link {
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<PatchDeliveryStepEndpoint>(), routeValues),
@@ -31,8 +33,21 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
           // PUT /delivery/{deliveryId}/step/{stepId}/complete
           
           // POST /delivery{deliveryId}/step/{stepId}/courier/{ID}
+          var postCourierRouteValues = new { deliveryId, stepId, courierId = Guid.Empty};
+          if (canWrite)
+               links.Add(new Link {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<AddDeliveryStepCourierEndpoint>(), postCourierRouteValues),
+                    Rel = "postCourier",
+                    Method = "POST" 
+               });
           
-          // Delete /delivery{deliveryId}/step/{stepId}/courier/{ID}
+          // Delete /delivery{deliveryId}/step/{stepId}/courier
+          if (canWrite)
+               links.Add(new Link {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<DeleteDeliveryStepCourierEndpoint>(), routeValues),
+                    Rel = "deleteCourier",
+                    Method = "DELETE" 
+               });
 
           return links;
      }

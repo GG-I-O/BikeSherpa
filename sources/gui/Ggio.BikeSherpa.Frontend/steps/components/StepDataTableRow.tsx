@@ -83,10 +83,8 @@ export default function StepDataTableRow({step, isSelected = false, onPress, can
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width40]}>
                 {
-                    step.completed ? (
+                    step.completed && (
                         <Icon source="check-circle-outline" size={28} color={theme.colors.onBackground}/>
-                    ) : (
-                        <></>
                     )
                 }
             </DataTable.Cell>

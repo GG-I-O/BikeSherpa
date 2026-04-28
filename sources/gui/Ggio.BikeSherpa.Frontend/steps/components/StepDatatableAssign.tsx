@@ -21,15 +21,16 @@ export default function StepDataTableAssign({ steps, isStepSelected, onRowPress,
             <DataTable style={{ backgroundColor: theme.colors.background }}>
                 {showHeader ? (
                     <DataTable.Header>
-                        <DataTable.Title style={[style.column, style.width40]}>Trier</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width40]}>Ordre</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.width100]}>Code</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.width90]}>Date</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.width60]}>Heure contrat</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.minWidth100]}>Description</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.minWidth100]}>Commentaire</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width110]}>Code</DataTable.Title>
                         <DataTable.Title style={[style.column, style.minWidth150]}>Adresse</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.width180]}>Heure</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.minWidth150]}>Commentaire</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width80]}>Urgence</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width90]}>Date</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width60]}>Heure début</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width40]}>Finis</DataTable.Title>
                     </DataTable.Header>
                 ) : (
                     <></>
@@ -42,6 +43,7 @@ export default function StepDataTableAssign({ steps, isStepSelected, onRowPress,
                         isSelected={isStepSelected ? isStepSelected(step) : false}
                         onPress={onRowPress}
                         canChangeDate={canChangeDate}
+                        listLength={steps.length}
                     />
                 ))}
             </DataTable>

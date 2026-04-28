@@ -32,18 +32,22 @@ export function useDeliverySelection() {
         }
     }, [selectedSteps, selectedDeliveries]);
 
-    const toggleStepSelection = useCallback((step: StepToDisplay, delivery: DeliveryToDisplay) => {
+    const toggleStepSelection = useCallback((step: StepToDisplay, delivery?: DeliveryToDisplay) => {
         const isSelected = selectedSteps.some((s: StepToDisplay) => s.id === step.id);
         if (isSelected) {
             setSelectedSteps(selectedSteps.filter((s: StepToDisplay) => s.id !== step.id));
-            setSelectedDeliveries(selectedDeliveries.filter((d: DeliveryToDisplay) => d.id !== delivery.id));
+            
+            delivery && setSelectedDeliveries(selectedDeliveries.filter((d: DeliveryToDisplay) => d.id !== delivery.id));
         }
         else {
             const tempSelectedSteps = selectedSteps.concat([step]);
             setSelectedSteps(tempSelectedSteps);
+            
+            if (delivery) {
             const doWeAddDelivery = delivery.steps?.every((s: StepToDisplay) => tempSelectedSteps.some((ss: StepToDisplay) => ss.id === s.id));
-            if (doWeAddDelivery)
-                setSelectedDeliveries(selectedDeliveries.concat([delivery]));
+                if (doWeAddDelivery)
+                    setSelectedDeliveries(selectedDeliveries.concat([delivery]));
+            }
         }
     }, [selectedSteps, selectedDeliveries]);
 

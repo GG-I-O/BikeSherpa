@@ -45,6 +45,18 @@ export default class CourierServices implements ICourierService {
         return this.courierStore$[courierId].peek();
     }
 
+    /**
+     * @param courierCode
+     * return courierId
+     */
+    public getCourierIdByCode(courierCode: string): string | undefined {
+        const courierList = Object.values(this.courierStore$.get());
+        const courier = courierList.find(
+            courier => courier.code === courierCode
+        );
+        return courier?.id;
+    }
+
     public deleteCourier(courierId: string): void {
         const courier = this.getCourier(courierId);
         const canDelete = courier.links?.some((link) => link.rel === hateoasRel.delete);

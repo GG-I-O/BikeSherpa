@@ -1,34 +1,29 @@
 import { DataTable, IconButton, Text, useTheme } from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import { useState } from "react";
+import React, { useState } from "react";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import TimePickerInput from "@/components/general/TimePickerInput";
 import { View } from "react-native";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
+import useStepDataTableRowViewModel from "@/steps/viewModel/useStepDataTableRowViewModel";
+import {Icon} from "react-native-paper/src";
 
 type Props = {
     step: StepToDisplay,
     isSelected?: boolean,
     onPress?: (step: StepToDisplay) => void,
-    canChangeDate?: boolean
+    canChangeDate?: boolean,
+    listLength?: number
 }
 
-export default function StepDataTableRowAssign({ step, isSelected = false, onPress, canChangeDate = false }: Props) {
+export default function StepDataTableRowAssign({step, isSelected = false, onPress, canChangeDate = false, listLength = 0}: Props) {
     const theme = useTheme();
     const style = datatableStyle;
 
     const splitTime = step.estimatedTime.split(':');
-    const [heureContrat, setHeureContrat] = useState<{ hours: number, minutes: number }>(
-        {
-            hours: parseInt(splitTime[0]) ?? 0,
-            minutes: parseInt(splitTime[1]) ?? 0
-        }
-    )
     const [isTimePickerOpen, setIsTimePickerOpen] = useState(false); // Disable onRowPress if we're picking time
 
-    const changeTime = (hours: number, minutes: number) => {
-        setHeureContrat({ hours, minutes });
-    }
+    const viewModel = useStepDataTableRowViewModel();
 
     return (
         <DataTable.Row
@@ -39,70 +34,65 @@ export default function StepDataTableRowAssign({ step, isSelected = false, onPre
             style={{ backgroundColor: isSelected ? theme.colors.primary : theme.colors.background }}
         >
             <DataTable.Cell style={[style.column, style.width40]}>
-                <View>
-                    <IconButton style={{ margin: 0, borderRadius: 5, height: '35%' }} mode='outlined' icon='arrow-up-thick' />
-                    <IconButton style={{ margin: 0, borderRadius: 5, height: '35%' }} mode='outlined' icon='arrow-down-thick' />
+                <View style={{flexDirection: "column", gap: 0}}>
+                    <IconButton
+                        style={{margin: 0}}
+                        icon="arrow-up-bold"
+                        onPress={() => viewModel.reorderStep(step.id, step.order - 1)}
+                        disabled={step.order <= 1}
+                    />
+                    <IconButton
+                        style={{margin: 0}}
+                        icon="arrow-down-bold"
+                        onPress={() => viewModel.reorderStep(step.id, step.order + 1)}
+                        disabled={step.order >= listLength}
+                    />
                 </View>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width40]}>
                 <DeliveryTypeIcon type={step.type} />
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width100]}>{step.id}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width90]}>{step.estimatedDate}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width60]}>{step.estimatedTime}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.minWidth100]}>
-                <Text numberOfLines={2}>{step.comment}</Text>
+            <DataTable.Cell style={[style.column, style.width110]}>
+                {step.deliveryCode}
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.minWidth100]}>{step.comment}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <Text numberOfLines={3}>{step.address.streetInfo}</Text>
                 <Text numberOfLines={3}>{`${step.address.postcode} ${step.address.city}`}</Text>
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width180]}>
+            <DataTable.Cell style={[style.column, style.minWidth150]}>
+                <Text numberOfLines={2}>{step.comment}</Text>
+            </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width80]}>
+                {step.deliveryUrgency}
+            </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width90]}>
+                {step.deliveryDate}
+            </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>
+                {step.deliveryTime}
+            </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>
                 {
                     !canChangeDate ? (
                         <Text>{step.estimatedTime}</Text>
                     ) : (
-                        <View style={{ flexDirection: 'row', gap: 4 }}>
-                            <IconButton
-                                style={{ margin: 0, borderRadius: 5, width: 30 }}
-                                mode='outlined'
-                                icon='minus'
-                                onPress={() => {
-                                    let hours = heureContrat.hours;
-                                    let minutes = heureContrat.minutes - 5;
-                                    if (minutes < 0) {
-                                        hours--;
-                                        minutes += 60;
-                                    }
-                                    changeTime(hours, minutes);
-                                }}
-                            />
-
-                            <TimePickerInput
-                                hours={heureContrat.hours}
-                                minutes={heureContrat.minutes}
-                                onOpen={() => setIsTimePickerOpen(true)}
-                                onClose={() => setIsTimePickerOpen(false)}
-                                onConfirm={({ hours, minutes }: { hours: number, minutes: number }): void => {
-                                    changeTime(hours, minutes);
-                                }}
-                            />
-                            <IconButton
-                                style={{ margin: 0, borderRadius: 5, width: 30 }}
-                                mode='outlined'
-                                icon='plus'
-                                onPress={() => {
-                                    let hours = heureContrat.hours;
-                                    let minutes = heureContrat.minutes + 5;
-                                    if (minutes >= 60) {
-                                        hours++;
-                                        minutes -= 60;
-                                    }
-                                    changeTime(hours, minutes);
-                                }}
-                            />
-                        </View>
+                        <TimePickerInput
+                            hours={parseInt(splitTime[0]) ?? 0}
+                            minutes={parseInt(splitTime[1]) ?? 0}
+                            onOpen={() => setIsTimePickerOpen(true)}
+                            onClose={() => setIsTimePickerOpen(false)}
+                            onConfirm={({hours, minutes}: {
+                                hours: number;
+                                minutes: number;
+                            }): void => viewModel.updateStepTime(step.id, hours, minutes)}
+                        />
+                    )
+                }
+            </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width40]}>
+                {
+                    step.completed && (
+                        <Icon source="check-circle-outline" size={28} color={theme.colors.onBackground}/>
                     )
                 }
             </DataTable.Cell>

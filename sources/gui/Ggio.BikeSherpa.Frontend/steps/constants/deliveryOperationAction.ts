@@ -1,6 +1,8 @@
 const deliveryOperationAction = {
     patchTime: "patchTime",
-    patchOrder: "patchOrder"
+    patchOrder: "patchOrder",
+    postCourier: "postCourier",
+    deleteCourier: "deleteCourier"
 }
 
 export default deliveryOperationAction;
