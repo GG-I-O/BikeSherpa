@@ -14,7 +14,7 @@ public static class Bootstrap
           {
                services.AddScoped<IDeliveryLinks, DeliveryLinks>();
                services.AddScoped<IDeliveryStepLinks, DeliveryStepLinks>();
-               services.AddScoped<IDeliveryChangeOrderService, DeliveryChangeOrderService>();
+               services.AddScoped<IDeliveryChangeTimeService, DeliveryChangeTimeService>();
                services.AddScoped<IValidator<AddDeliveryCommand>, AddDeliveryCommandValidator>();
                services.AddScoped<IValidator<AddDeliveryStepCommand>, AddDeliveryStepCommandValidator>();
                services.AddScoped<IValidator<UpdateDeliveryCommand>, UpdateDeliveryCommandValidator>();
@@ -22,6 +22,7 @@ public static class Bootstrap
                services.AddScoped<IValidator<UpdateDeliveryStepCompletionCommand>, UpdateDeliveryStepCompletionCommandValidator>();
                services.AddScoped<IValidator<UpdateDeliveryStepCourierCommand>, UpdateDeliveryStepCourierCommandValidator>();
                services.AddScoped<IValidator<UpdateDeliveryStepOrderCommand>, UpdateDeliveryStepOrderCommandValidator>();
+               services.AddScoped<IValidator<UpdateDeliveryStepTimeCommand>, UpdateDeliveryStepTimeCommandValidator>();
                return services;
           }
      }

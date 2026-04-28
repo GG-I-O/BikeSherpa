@@ -50,11 +50,19 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                     Method = "DELETE" 
                });
 
-          // PUT /delivery/{deliveryId}/step/{stepId}/order
+          // PUT /delivery/{deliveryId}/step/{stepId}/changeOrder
           if (canWrite)
                links.Add(new Link {
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<UpdateDeliveryStepOrderEndpoint>(), routeValues),
                     Rel = "putOrder",
+                    Method = "PUT" 
+               });
+          
+          // PUT /delivery/{deliveryId}/step/{stepId}/changeTime
+          if (canWrite)
+               links.Add(new Link {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<UpdateDeliveryStepTimeEndpoint>(), routeValues),
+                    Rel = "putTime",
                     Method = "PUT" 
                });
           

@@ -1,4 +1,4 @@
-﻿using Ardalis.Result;
+using Ardalis.Result;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
@@ -10,32 +10,32 @@ using Mediator;
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
 [UsedImplicitly]
-public record UpdateDeliveryStepOrderRequest(int Increment);
+public record UpdateDeliveryStepTimeRequest(DateTimeOffset Date);
 
-public record UpdateDeliveryStepOrderCommand(
+public record UpdateDeliveryStepTimeCommand(
      Guid DeliveryId,
      Guid StepId,
-     int Increment
+     DateTimeOffset Date
 ) : ICommand<Result>;
 
 [UsedImplicitly]
-public class UpdateDeliveryStepOrderCommandValidator : AbstractValidator<UpdateDeliveryStepOrderCommand>
+public class UpdateDeliveryStepTimeCommandValidator : AbstractValidator<UpdateDeliveryStepTimeCommand>
 {
-     public UpdateDeliveryStepOrderCommandValidator()
+     public UpdateDeliveryStepTimeCommandValidator()
      {
           RuleFor(x => x.DeliveryId).NotEmpty();
           RuleFor(x => x.StepId).NotEmpty();
-          RuleFor(x => x.Increment).NotEmpty();
+          RuleFor(x => x.Date).NotEmpty();
      }
 }
 
-public class UpdateDeliveryStepOrderHandler(
+public class UpdateDeliveryStepTimeHandler(
      IReadRepository<Delivery> deliveryRepository,
-     IValidator<UpdateDeliveryStepOrderCommand> validator,
+     IValidator<UpdateDeliveryStepTimeCommand> validator,
      IDeliveryChangeTimeService service
-) : ICommandHandler<UpdateDeliveryStepOrderCommand, Result>
+     ) : ICommandHandler<UpdateDeliveryStepTimeCommand, Result>
 {
-     public async ValueTask<Result> Handle(UpdateDeliveryStepOrderCommand command, CancellationToken cancellationToken)
+     public async ValueTask<Result> Handle(UpdateDeliveryStepTimeCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
 
@@ -45,7 +45,7 @@ public class UpdateDeliveryStepOrderHandler(
           var step = delivery.Steps.FirstOrDefault(s => s.Id == command.StepId);
           if (step is null) return Result.NotFound();
 
-          await service.ChangeOrder(delivery, step, command.Increment, cancellationToken);
+          await service.ChangeTime(delivery, step, command.Date, cancellationToken);
           
           return Result.Success();
      }
