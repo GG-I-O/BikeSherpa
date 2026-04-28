@@ -57,7 +57,7 @@ export default function useDeliveryListViewModel() {
             setCouriers(courierList);
         });
 
-    }, [deliveryStore$, customerStore$, courierStore$, setDeliveries, setSteps, dateFilter, courierFilter, viewModel]);
+    }, [deliveryStore$, customerStore$, courierStore$, setDeliveries, setSteps, dateFilter, courierFilter]);
 
     return {
         deliveries,

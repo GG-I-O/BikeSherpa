@@ -204,4 +204,20 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             }
         );
     }
+
+    public async PutStepTimeEndpoint(step: Step): Promise<void> {
+        if (!step.links)
+            throw new Error(`Step links empty`);
+
+        const link = step.links.find(link => link.rel === hateoasRel.stepTime.put);
+        if (!link)
+            throw new Error(`Step link for '${hateoasRel.stepTime.put}' not found`);
+
+        await axios.put(
+            link.href,
+            {
+                date: step.estimatedDeliveryDate
+            }
+        );
+    }
 }

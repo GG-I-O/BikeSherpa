@@ -53,7 +53,7 @@ export default function StepDataTableRowAssign(
                     <IconButton
                         style={{margin: 0}}
                         icon="arrow-down-bold"
-                        onPress={() => viewModel.reorderStep(step.id, 1)}
+                        onPress={() => viewModel.reorderStepForADay(step.id, 0)}
                         disabled={isLast}
                     />
                 </View>
