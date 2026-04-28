@@ -14,9 +14,12 @@ public class DeliveryChangeTimeService(
      public async Task ChangeTime(Delivery delivery, DeliveryStep step, DateTimeOffset date, CancellationToken cancellationToken)
      {
           var (deliveries, steps) = await GetDeliveriesAndSteps(step, date, cancellationToken);
-
-          var timeOffset = date - step.EstimatedDeliveryDate;
+          
           var stepIndex = steps.FindIndex(s => s.Id == step.Id);
+          if (stepIndex < 0 || stepIndex >= steps.Count)
+               return;
+          
+          var timeOffset = date - step.EstimatedDeliveryDate;
 
           // If it does not disrupt the order, we change following step time
           // If not, we will only change the step asked and nothing else
@@ -43,9 +46,9 @@ public class DeliveryChangeTimeService(
      public async Task ChangeOrder(Delivery delivery, DeliveryStep step, int increment, CancellationToken cancellationToken)
      {
           var (deliveries, steps) = await GetDeliveriesAndSteps(step, step.EstimatedDeliveryDate, cancellationToken);
-
+          
           var stepIndex = steps.FindIndex(s => s.Id == step.Id);
-          if (stepIndex + increment < 0 || stepIndex + increment >= steps.Count)
+          if (stepIndex < 0 || stepIndex + increment < 0 || stepIndex + increment >= steps.Count)
                return;
 
           var stepToMove = steps[stepIndex + increment];
