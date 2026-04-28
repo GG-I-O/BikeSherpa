@@ -10,6 +10,8 @@ export default function useStepDataTableRowViewModel() {
     
     return {
         updateStepTime: viewModel.updateStepTime,
-        reorderStep: viewModel.reorderStep
+        reorderStep: viewModel.reorderStep,
+        updateStepTimeForADay: viewModel.updateStepTimeForADay,
+        reorderStepForADay: viewModel.reorderStepForADay
     }
 }

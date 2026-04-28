@@ -15,6 +15,12 @@ export const hateoasRel = {
     patch: "patch",
     stepCourier: {
         post: "postCourier",
-        delete: "deleteCourier"
+        delete: "deleteCourier",
+    },
+    stepOrder: {
+        put: "putOrder"
+    },
+    stepTime: {
+        put: "putTime"
     }
 }

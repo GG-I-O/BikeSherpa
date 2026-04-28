@@ -188,4 +188,20 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             link.href
         );
     }
+    
+    public async PutStepOrderEndpoint(step: Step, increment: number): Promise<void> {
+        if (!step.links)
+            throw new Error(`Step links empty`);
+
+        const link = step.links.find(link => link.rel === hateoasRel.stepOrder.put);
+        if (!link)
+            throw new Error(`Step link for '${hateoasRel.stepOrder.put}' not found`);
+
+        await axios.put(
+            link.href,
+            {
+                increment
+            }
+        );
+    }
 }

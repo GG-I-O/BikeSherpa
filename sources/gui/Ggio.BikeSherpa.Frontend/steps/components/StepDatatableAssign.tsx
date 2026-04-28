@@ -1,7 +1,7 @@
-import { DataTable, useTheme } from "react-native-paper";
+import {DataTable, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
 import StepDataTableRowAssign from "./StepDataTableRowAssign";
-import { ScrollView } from "react-native";
+import {ScrollView} from "react-native";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 
 type Props = {
@@ -12,13 +12,23 @@ type Props = {
     showHeader?: boolean
 }
 
-export default function StepDataTableAssign({ steps, isStepSelected, onRowPress, canChangeDate = false, showHeader = false }: Props) {
+export default function StepDataTableAssign(
+    {
+        steps,
+        isStepSelected,
+        onRowPress,
+        canChangeDate = false,
+        showHeader = false
+    }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
 
+    // stepDate to decide first/last step for a date
+    let stepDate: string = '';
+
     return (
         <ScrollView>
-            <DataTable style={{ backgroundColor: theme.colors.background }}>
+            <DataTable style={{backgroundColor: theme.colors.background}}>
                 {showHeader ? (
                     <DataTable.Header>
                         <DataTable.Title style={[style.column, style.width40]}>Ordre</DataTable.Title>
@@ -36,16 +46,29 @@ export default function StepDataTableAssign({ steps, isStepSelected, onRowPress,
                     <></>
                 )}
 
-                {steps.map((step) => (
-                    <StepDataTableRowAssign
-                        key={`${step.id}`}
-                        step={step}
-                        isSelected={isStepSelected ? isStepSelected(step) : false}
-                        onPress={onRowPress}
-                        canChangeDate={canChangeDate}
-                        listLength={steps.length}
-                    />
-                ))}
+                {steps.map((step, index) => {
+                        let isFirst = false;
+                        let isLast = false;
+                        if (stepDate !== step.estimatedDate) {
+                            isFirst = true;
+                            stepDate = step.estimatedDate;
+                        }
+                        if (index + 1 >= steps.length || stepDate !== steps[index + 1].estimatedDate)
+                            isLast = true;
+
+                        return (
+                            <StepDataTableRowAssign
+                                key={`${step.id}`}
+                                step={step}
+                                isSelected={isStepSelected ? isStepSelected(step) : false}
+                                onPress={onRowPress}
+                                canChangeDate={canChangeDate}
+                                isFirst={isFirst}
+                                isLast={isLast}
+                            />
+                        )
+                    }
+                )}
             </DataTable>
         </ScrollView>
     );
