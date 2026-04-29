@@ -5,8 +5,8 @@ using Ardalis.Result;
 using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using JetBrains.Annotations;
 using Mediator;
 using Moq;
@@ -36,7 +36,8 @@ public class AddDeliveryStepEndpointTests
      {
           // Arrange
           _mockMediator.Reset();
-          var deliveryStep = _fixture.Create<DeliveryStep>();
+          var deliveryStep = _fixture.Build<DeliveryStepCrud>()
+               .Create();
           var deliveryId = Guid.NewGuid();
           var expectedStepId = Guid.NewGuid();
 

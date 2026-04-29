@@ -33,9 +33,12 @@ public class PatchDeliveryStepTimeHandlerTest
                .With(d => d.Steps, [])
                .Create();
 
-          mockDelivery.Steps.Add(_fixture.Build<DeliveryStep>()
+          var mockStep = _fixture.Build<DeliveryStep>()
                .With(s => s.Id, _stepId)
-               .Create());
+               .With(s => s.ParentDelivery, mockDelivery)
+               .Create();
+
+          mockDelivery.Steps.Add(mockStep);
 
           _mockDeliveryRepository
                .Setup(x => x.FirstOrDefaultAsync(

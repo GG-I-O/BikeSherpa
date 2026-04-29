@@ -21,7 +21,9 @@ public class DeliveryDeleteServiceTests
                .Setup(m => m.Publish(It.IsAny<AggregateRootDeletedEvent>(), It.IsAny<CancellationToken>()))
                .Returns(ValueTask.CompletedTask);
 
-          _delivery = _fixture.Create<Delivery>();
+          _delivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .Create();
           _sut = new DeliveryDeleteService(_mediatorMock.Object);
      }
 

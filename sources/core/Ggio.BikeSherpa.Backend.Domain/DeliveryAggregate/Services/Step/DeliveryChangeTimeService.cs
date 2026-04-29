@@ -1,14 +1,11 @@
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.DddCore;
 
-namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
+namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
 
 public class DeliveryChangeTimeService(
      IReadRepository<Delivery> deliveryRepository,
-     IApplicationTransaction transaction,
      IItinerarySpi itineraryService
 ) : IDeliveryChangeTimeService
 {
@@ -35,7 +32,6 @@ public class DeliveryChangeTimeService(
           }
 
           step.UpdateEstimatedDeliveryDate(date);
-          await transaction.CommitAsync(cancellationToken);
      }
      
      public async Task ChangeOrder(DeliveryStep step, MoveDirection moveDirection, CancellationToken cancellationToken)
@@ -61,8 +57,6 @@ public class DeliveryChangeTimeService(
                step.ParentDelivery.UpdateStepDeliveryTime(step.Id, stepToMove.EstimatedDeliveryDate);
                stepToMove.ParentDelivery.UpdateStepDeliveryTime(stepToMove.Id, oldDate);
           }
-
-          await transaction.CommitAsync(cancellationToken);
      }
 
      private async Task<List<DeliveryStep>> GetDeliveriesAndSteps(DeliveryStep step, DateTimeOffset date, CancellationToken cancellationToken)

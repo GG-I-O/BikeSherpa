@@ -2,20 +2,18 @@ using Ardalis.Specification;
 using AutoFixture;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
 using Ggio.DddCore;
 using Moq;
 
-namespace BackendTests.Features.Deliveries.Services;
+namespace Backend.Domain.Tests.DeliveryAggregate.Services.Step;
 
 public class DeliveryChangeTimeServiceTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
-     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly Mock<IItinerarySpi> _mockItineraryService = new();
      private readonly Fixture _fixture = new();
 
@@ -35,7 +33,6 @@ public class DeliveryChangeTimeServiceTests
      {
           return new DeliveryChangeTimeService(
                _mockDeliveryRepository.Object,
-               _mockTransaction.Object,
                _mockItineraryService.Object
           );
      }
@@ -50,6 +47,7 @@ public class DeliveryChangeTimeServiceTests
 
           return _fixture
                .Build<DeliveryStep>()
+               .Without(s => s.ParentDelivery)
                .With(s => s.Order, order)
                .With(s => s.CourierId, courierId)
                .With(s => s.EstimatedDeliveryDate, estimatedDeliveryDate)
@@ -62,17 +60,21 @@ public class DeliveryChangeTimeServiceTests
 
      private Delivery CreateDelivery(params DeliveryStep[] steps)
      {
+          
           var delivery = _fixture
                .Build<Delivery>()
-               .With(d => d.Steps, steps.ToList())
+               .With(d => d.Steps, [])
                .With(d => d.ContractDate, DateTimeOffset.UtcNow)
                .With(d => d.StartDate, DateTimeOffset.UtcNow)
                .With(d => d.CreatedAt, DateTimeOffset.UtcNow)
                .With(d => d.UpdatedAt, DateTimeOffset.UtcNow)
                .Create();
 
-          delivery.AttachSteps(steps);
-
+          foreach (var step in steps)
+          {
+               step.ParentDelivery = delivery;
+          }
+          delivery.Steps.AddRange(steps);
           return delivery;
      }
 
@@ -104,10 +106,6 @@ public class DeliveryChangeTimeServiceTests
 
           // Assert
           step.EstimatedDeliveryDate.Should().BeCloseTo(newDate, TimeSpan.FromSeconds(1));
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 
      [Fact]
@@ -135,10 +133,6 @@ public class DeliveryChangeTimeServiceTests
           firstStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(10), TimeSpan.FromSeconds(1));
           secondStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(11).AddMinutes(30), TimeSpan.FromSeconds(1));
           thirdStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(12).AddMinutes(30), TimeSpan.FromSeconds(1));
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 
      [Fact]
@@ -168,10 +162,6 @@ public class DeliveryChangeTimeServiceTests
           secondStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(10), TimeSpan.FromSeconds(1));
           thirdStep.EstimatedDeliveryDate.Should().BeCloseTo(newThirdStepDate, TimeSpan.FromSeconds(1));
           fourthStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(12), TimeSpan.FromSeconds(1));
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 
      [Fact]
@@ -195,10 +185,6 @@ public class DeliveryChangeTimeServiceTests
                x => x.ListAsync(
                     It.IsAny<ISpecification<Delivery>>(),
                     It.IsAny<CancellationToken>()),
-               Times.Never);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
                Times.Never);
      }
 
@@ -226,10 +212,6 @@ public class DeliveryChangeTimeServiceTests
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryStepByCourierAndDate),
                     It.IsAny<CancellationToken>()),
                Times.Once);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Never);
      }
 
      [Fact]
@@ -255,10 +237,6 @@ public class DeliveryChangeTimeServiceTests
           // Assert
           requestedStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(10), TimeSpan.FromSeconds(1));
           otherStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(11), TimeSpan.FromSeconds(1));
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Never);
      }
 
      [Fact]
@@ -294,10 +272,6 @@ public class DeliveryChangeTimeServiceTests
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()),
                Times.AtLeastOnce);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 
      [Fact]
@@ -333,10 +307,6 @@ public class DeliveryChangeTimeServiceTests
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()),
                Times.AtLeastOnce);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 
      [Fact]
@@ -368,10 +338,6 @@ public class DeliveryChangeTimeServiceTests
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 
      [Fact]
@@ -403,10 +369,6 @@ public class DeliveryChangeTimeServiceTests
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 
      [Fact]
@@ -440,10 +402,6 @@ public class DeliveryChangeTimeServiceTests
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Never);
      }
 
      [Fact]
@@ -476,10 +434,6 @@ public class DeliveryChangeTimeServiceTests
                     It.IsAny<GeoPoint>(),
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()),
-               Times.Never);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
                Times.Never);
      }
 
@@ -516,10 +470,6 @@ public class DeliveryChangeTimeServiceTests
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Never);
      }
 
      [Fact]
@@ -550,10 +500,6 @@ public class DeliveryChangeTimeServiceTests
                     It.IsAny<GeoPoint>(),
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()),
-               Times.Never);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
                Times.Never);
      }
 
@@ -586,10 +532,6 @@ public class DeliveryChangeTimeServiceTests
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Never);
      }
 
      [Fact]
@@ -616,10 +558,6 @@ public class DeliveryChangeTimeServiceTests
           // Assert
           requestedStep.EstimatedDeliveryDate.Should().BeCloseTo(newDate, TimeSpan.FromSeconds(1));
           sameCourierOtherDateStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddDays(1).AddHours(10), TimeSpan.FromSeconds(1));
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 
      [Fact]
@@ -646,9 +584,5 @@ public class DeliveryChangeTimeServiceTests
           // Assert
           requestedStep.EstimatedDeliveryDate.Should().BeCloseTo(newDate, TimeSpan.FromSeconds(1));
           otherCourierStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(11), TimeSpan.FromSeconds(1));
-
-          _mockTransaction.Verify(
-               x => x.CommitAsync(It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 }

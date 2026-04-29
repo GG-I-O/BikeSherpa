@@ -26,21 +26,23 @@ public class DeleteDeliveryStepCourierHandlerTest
 
      public DeleteDeliveryStepCourierHandlerTest()
      {
+          _mockDelivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .With(d => d.ContractDate, DateTime.UtcNow)
+               .With(d => d.StartDate, DateTime.UtcNow)
+               .With(d => d.CreatedAt, DateTime.UtcNow)
+               .With(d => d.UpdatedAt, DateTime.UtcNow)
+               .Create();
+          
           _mockStep = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _mockDelivery)
                .With(s => s.CourierId, _courierId)
                .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow)
                .With(s => s.RealDeliveryDate, (DateTimeOffset?)null)
                .With(s => s.CreatedAt, DateTime.UtcNow)
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .Create();
-
-          _mockDelivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [_mockStep])
-               .With(d => d.ContractDate, DateTime.UtcNow)
-               .With(d => d.StartDate, DateTime.UtcNow)
-               .With(d => d.CreatedAt, DateTime.UtcNow)
-               .With(d => d.UpdatedAt, DateTime.UtcNow)
-               .Create();
+          _mockDelivery.Steps.Add(_mockStep);
 
           _mockCommand = new DeleteDeliveryStepCourierCommand(
                _mockDelivery.Id,

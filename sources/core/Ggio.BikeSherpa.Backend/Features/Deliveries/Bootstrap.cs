@@ -14,7 +14,6 @@ public static class Bootstrap
           {
                services.AddScoped<IDeliveryLinks, DeliveryLinks>();
                services.AddScoped<IDeliveryStepLinks, DeliveryStepLinks>();
-               services.AddScoped<IDeliveryChangeTimeService, DeliveryChangeTimeService>();
                services.AddScoped<IValidator<AddDeliveryCommand>, AddDeliveryCommandValidator>();
                services.AddScoped<IValidator<AddDeliveryStepCommand>, AddDeliveryStepCommandValidator>();
                services.AddScoped<IValidator<UpdateDeliveryCommand>, UpdateDeliveryCommandValidator>();

@@ -32,8 +32,14 @@ public class PatchDeliveryStepOrderHandlerTests
 
           var mockDelivery = _fixture.Build<Delivery>()
                .With(d => d.Id, _deliveryId)
-               .With(d => d.Steps, _fixture.Build<DeliveryStep>().CreateMany(5).ToList())
+               .With(d => d.Steps, [])
                .Create();
+
+          var mockSteps = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, mockDelivery)
+               .CreateMany(5)
+               .ToList();
+          mockDelivery.Steps.AddRange(mockSteps);
 
           _stepId = mockDelivery.Steps.First().Id;
 

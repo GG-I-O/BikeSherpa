@@ -66,6 +66,7 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<WebApplicationFacto
 
           var step = _fixture
                .Build<DeliveryStep>()
+               .Without(s => s.ParentDelivery)
                .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow)
                .With(s => s.StepAddress, address)
                .Create();

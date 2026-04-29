@@ -36,8 +36,17 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
                .With(a => a.City, "Grenoble")
                .Create();
 
+          _delivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .With(d => d.ContractDate, DateTime.UtcNow)
+               .With(d => d.StartDate, DateTime.UtcNow)
+               .With(d => d.CreatedAt, DateTime.UtcNow)
+               .With(d => d.UpdatedAt, DateTime.UtcNow)
+               .Create();
+          
           var step = _fixture
                .Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _delivery)
                .With(s => s.Order, 1)
                .With(s => s.StepAddress, deliveryAddress)
                .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow)
@@ -45,14 +54,7 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
                .With(s => s.CreatedAt, DateTime.UtcNow)
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .Create();
-
-          _delivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [step])
-               .With(d => d.ContractDate, DateTime.UtcNow)
-               .With(d => d.StartDate, DateTime.UtcNow)
-               .With(d => d.CreatedAt, DateTime.UtcNow)
-               .With(d => d.UpdatedAt, DateTime.UtcNow)
-               .Create();
+          _delivery.Steps.Add(step);
 
           var courierAddress = _fixture
                .Build<Address>()

@@ -35,8 +35,17 @@ public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<WebApplic
                .With(a => a.City, "Grenoble")
                .Create();
 
+          _delivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .With(d => d.ContractDate, DateTime.UtcNow)
+               .With(d => d.StartDate, DateTime.UtcNow)
+               .With(d => d.CreatedAt, DateTime.UtcNow)
+               .With(d => d.UpdatedAt, DateTime.UtcNow)
+               .Create();
+          
           var step = _fixture
                .Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _delivery)
                .With(s => s.Order, 1)
                .With(s => s.CourierId, _courierId)
                .With(s => s.StepAddress, deliveryAddress)
@@ -45,14 +54,7 @@ public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<WebApplic
                .With(s => s.CreatedAt, DateTime.UtcNow)
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .Create();
-
-          _delivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [step])
-               .With(d => d.ContractDate, DateTime.UtcNow)
-               .With(d => d.StartDate, DateTime.UtcNow)
-               .With(d => d.CreatedAt, DateTime.UtcNow)
-               .With(d => d.UpdatedAt, DateTime.UtcNow)
-               .Create();
+          _delivery.Steps.Add(step);
 
           _factory = factory.WithWebHostBuilder(builder =>
           {

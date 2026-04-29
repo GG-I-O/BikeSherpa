@@ -33,7 +33,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      public DateTimeOffset? RealDeliveryDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
-     public Delivery ParentDelivery { get; private set; } = null!;
+     public required Delivery ParentDelivery { get; set; }
 
      public void Update(
           StepType stepType,
@@ -59,10 +59,5 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      {
           EstimatedDeliveryDate = estimatedDeliveryDate;
           RegisterDomainEvent(new DeliveryStepTimeChangeEvent(ParentDelivery.Id));
-     }
-
-     internal void SetParentDelivery(Delivery delivery)
-     {
-          ParentDelivery = delivery;
      }
 }

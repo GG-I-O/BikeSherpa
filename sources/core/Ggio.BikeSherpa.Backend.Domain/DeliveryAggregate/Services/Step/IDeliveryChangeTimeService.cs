@@ -1,7 +1,4 @@
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
-
-namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
+namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
 
 public interface IDeliveryChangeTimeService
 {

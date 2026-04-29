@@ -52,8 +52,17 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
                .With(a => a.City, "Lyon")
                .Create();
 
+          _delivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .With(d => d.ContractDate, DateTime.UtcNow)
+               .With(d => d.StartDate, DateTime.UtcNow)
+               .With(s => s.CreatedAt, DateTime.UtcNow)
+               .With(s => s.UpdatedAt, DateTime.UtcNow)
+               .Create();
+          
           var firstStep = _fixture
                .Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _delivery)
                .With(s => s.Order, 1)
                .With(s => s.CourierId, courierId)
                .With(s => s.EstimatedDeliveryDate, DateTimeOffset.UtcNow.AddHours(1))
@@ -62,9 +71,11 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .With(s => s.StepAddress, firstAddress)
                .Create();
+          _delivery.Steps.Add(firstStep);
 
           var secondStep = _fixture
                .Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _delivery)
                .With(s => s.Order, 2)
                .With(s => s.CourierId, courierId)
                .With(s => s.EstimatedDeliveryDate, DateTimeOffset.UtcNow.AddHours(2))
@@ -73,15 +84,8 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .With(s => s.StepAddress, secondAddress)
                .Create();
-
-          _delivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [firstStep, secondStep])
-               .With(d => d.ContractDate, DateTime.UtcNow)
-               .With(d => d.StartDate, DateTime.UtcNow)
-               .With(s => s.CreatedAt, DateTime.UtcNow)
-               .With(s => s.UpdatedAt, DateTime.UtcNow)
-               .Create();
-
+          _delivery.Steps.Add(secondStep);
+          
           _mockItineraryService
                .Setup(x => x.GetItineraryInfoAsync(
                     It.IsAny<GeoPoint>(),

@@ -56,24 +56,28 @@ public class UpdateDeliveryHandlerTests
                     It.IsAny<UpdateDeliveryCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ValidationResult());
+          
+          _delivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .Create();
 
           var firstStep = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _delivery)
                .With(s => s.Order, 1)
                .With(s => s.StepType, StepType.Pickup)
                .With(s => s.StepZone, _deliveryZone)
                .With(s => s.EstimatedDeliveryDate, DateTimeOffset.UtcNow.AddHours(1))
                .Create();
+          _delivery.Steps.Add(firstStep);
 
           var secondStep = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _delivery)
                .With(s => s.Order, 2)
                .With(s => s.StepType, StepType.Dropoff)
                .With(s => s.StepZone, _deliveryZone)
                .With(s => s.EstimatedDeliveryDate, DateTimeOffset.UtcNow.AddHours(2))
                .Create();
-
-          _delivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [firstStep, secondStep])
-               .Create();
+          _delivery.Steps.Add(secondStep);
 
           var commandSteps = _delivery.Steps
                .Select(step => _fixture.Build<DeliveryStepCrud>()

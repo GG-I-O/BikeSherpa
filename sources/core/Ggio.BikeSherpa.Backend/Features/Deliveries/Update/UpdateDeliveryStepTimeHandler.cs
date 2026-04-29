@@ -1,8 +1,8 @@
 using Ardalis.Result;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
 using Ggio.DddCore;
 using JetBrains.Annotations;
 using Mediator;
@@ -32,7 +32,8 @@ public class UpdateDeliveryStepTimeCommandValidator : AbstractValidator<UpdateDe
 public class UpdateDeliveryStepTimeHandler(
      IReadRepository<Delivery> deliveryRepository,
      IValidator<UpdateDeliveryStepTimeCommand> validator,
-     IDeliveryChangeTimeService service
+     IDeliveryChangeTimeService service,
+     IApplicationTransaction transaction
      ) : ICommandHandler<UpdateDeliveryStepTimeCommand, Result>
 {
      public async ValueTask<Result> Handle(UpdateDeliveryStepTimeCommand command, CancellationToken cancellationToken)
@@ -47,6 +48,7 @@ public class UpdateDeliveryStepTimeHandler(
 
           await service.ChangeTime(step, command.Date, cancellationToken);
           
+          await transaction.CommitAsync(cancellationToken);
           return Result.Success();
      }
 }

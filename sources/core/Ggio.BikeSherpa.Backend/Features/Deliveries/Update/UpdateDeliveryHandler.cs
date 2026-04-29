@@ -1,4 +1,5 @@
 ﻿using Ardalis.Result;
+using Facet.Mapping;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
@@ -90,8 +91,12 @@ public class UpdateDeliveryHandler(
           entity.InsulatedBox = command.InsulatedBox;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
+          
+          var steps = command.Steps
+               .Select(step => DeliveryStepCrudMapper.ToDomain(step, entity))
+               .ToList();
 
-          await entity.UpdateStepsAsync(command.Steps.ToDeliverySteps(deliveryZones), deliveryZones, pricingStrategyService, itineraryService);
+          await entity.UpdateStepsAsync(steps, deliveryZones, pricingStrategyService, itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

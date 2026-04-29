@@ -5,9 +5,8 @@ using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 using Ggio.DddCore;
 using Moq;
@@ -17,24 +16,30 @@ namespace BackendTests.Features.Deliveries.Update;
 public class UpdateDeliveryStepOrderHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
+     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly Mock<IValidator<UpdateDeliveryStepOrderCommand>> _mockValidator = new();
      private readonly Mock<IDeliveryChangeTimeService> _mockDeliveryChangeTimeService = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly Guid _deliveryId;
      private readonly Guid _stepId;
-     private readonly Delivery _delivery;
 
      public UpdateDeliveryStepOrderHandlerTests()
      {
           _deliveryId = Guid.NewGuid();
 
-          _delivery = _fixture.Build<Delivery>()
+          var delivery = _fixture.Build<Delivery>()
                .With(d => d.Id, _deliveryId)
-               .With(d => d.Steps, _fixture.Build<DeliveryStep>().CreateMany(3).ToList())
+               .With(d => d.Steps, [])
                .Create();
 
-          _stepId = _delivery.Steps.First().Id;
+          var steps = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, delivery)
+               .CreateMany(3)
+               .ToList();
+          delivery.Steps.AddRange(steps);
+
+          _stepId = delivery.Steps.First().Id;
 
           _mockValidator
                .Setup(x => x.ValidateAsync(
@@ -46,7 +51,7 @@ public class UpdateDeliveryStepOrderHandlerTests
                .Setup(x => x.FirstOrDefaultAsync(
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryByIdSpecification),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(_delivery);
+               .ReturnsAsync(delivery);
      }
 
      private UpdateDeliveryStepOrderHandler CreateSut()
@@ -54,7 +59,8 @@ public class UpdateDeliveryStepOrderHandlerTests
           return new UpdateDeliveryStepOrderHandler(
                _mockDeliveryRepository.Object,
                _mockValidator.Object,
-               _mockDeliveryChangeTimeService.Object
+               _mockDeliveryChangeTimeService.Object,
+               _mockTransaction.Object
           );
      }
 

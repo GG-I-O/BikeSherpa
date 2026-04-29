@@ -1,13 +1,14 @@
 ﻿using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 
-public class AddDeliveryStepEndpoint(IMediator mediator) : Endpoint<DeliveryStep, AddResult<Guid>>
+public class AddDeliveryStepEndpoint(IMediator mediator) : Endpoint<DeliveryStepCrud, AddResult<Guid>>
 {
      public override void Configure()
      {
@@ -16,7 +17,7 @@ public class AddDeliveryStepEndpoint(IMediator mediator) : Endpoint<DeliveryStep
           Description(x => x.WithTags("delivery"));
      }
 
-     public override async Task HandleAsync(DeliveryStep req, CancellationToken ct)
+     public override async Task HandleAsync(DeliveryStepCrud req, CancellationToken ct)
      {
           var command = new AddDeliveryStepCommand(
                Route<Guid>("deliveryId"),

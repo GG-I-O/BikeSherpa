@@ -55,22 +55,24 @@ public class GetDeliveryIntegrationTests : IClassFixture<WebApplicationFactory<P
                .With(a => a.City, "Grenoble")
                .Create();
 
+          var delivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .With(d => d.ContractDate, DateTime.UtcNow)
+               .With(d => d.StartDate, DateTime.UtcNow)
+               .With(d => d.CreatedAt, DateTime.UtcNow)
+               .With(d => d.UpdatedAt, DateTime.UtcNow)
+               .Create();
+          
           var step = _fixture
                .Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, delivery)
                .With(s => s.StepAddress, address)
                .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow)
                .With(s => s.RealDeliveryDate, DateTime.UtcNow)
                .With(s => s.CreatedAt, DateTime.UtcNow)
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .Create();
-          
-          var delivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [step])
-               .With(d => d.ContractDate, DateTime.UtcNow)
-               .With(d => d.StartDate, DateTime.UtcNow)
-               .With(d => d.CreatedAt, DateTime.UtcNow)
-               .With(d => d.UpdatedAt, DateTime.UtcNow)
-               .Create();
+          delivery.Steps.Add(step);
 
           await dbContext!.Deliveries.AddAsync(delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);

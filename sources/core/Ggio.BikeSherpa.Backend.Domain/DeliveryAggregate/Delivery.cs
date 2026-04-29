@@ -193,7 +193,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           {
                Id = Guid.NewGuid(),
                StepAddress = stepAddress,
-               StepZone = deliveryZones.GetByAddress(stepAddress.City)
+               StepZone = deliveryZones.GetByAddress(stepAddress.City),
+               ParentDelivery = this
           };
 
           newStep.Distance = await GetDistanceAsync(newStep, itineraryService);
@@ -209,7 +210,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
 
           Steps.Add(newStep);
-          newStep.SetParentDelivery(this);
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
 
           return newStep;
@@ -261,7 +261,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                     {
                          Id = Guid.NewGuid(),
                          StepAddress = steps[index].StepAddress,
-                         StepZone = deliveryZones.GetByAddress(steps[index].StepAddress.City)
+                         StepZone = deliveryZones.GetByAddress(steps[index].StepAddress.City),
+                         ParentDelivery = this
                     };
                }
                else
@@ -288,22 +289,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
           DeleteOldSteps(steps);
           Steps = steps;
-          foreach (var step in Steps)
-          {
-               step.SetParentDelivery(this);
-          }
           await RecalculateStepDistancesAsync(itineraryService);
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
-     }
-     
-     public void AttachSteps(IEnumerable<DeliveryStep> steps)
-     {
-          Steps = steps.ToList();
-
-          foreach (var step in Steps)
-          {
-               step.SetParentDelivery(this);
-          }
      }
 
      private void DeleteOldSteps(List<DeliveryStep> steps)

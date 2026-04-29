@@ -18,8 +18,12 @@ public class GetAllDeliveriesHandlerTests
 
      public GetAllDeliveriesHandlerTests()
      {
-          _mockDeliveryA = _fixture.Create<Delivery>();
-          _mockDeliveryB = _fixture.Create<Delivery>();
+          _mockDeliveryA = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .Create();
+          _mockDeliveryB = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .Create();
 
           _mockDeliveryA.Code = "AAA";
           _mockDeliveryA.PackingSize = "Xxl";
@@ -34,12 +38,24 @@ public class GetAllDeliveriesHandlerTests
      public async Task Handle_ShouldReturnAllDeliveries_WhenDeliveriesExist()
      {
           // Arrange
-          var mockStepA1 = _fixture.Build<DeliveryStep>().With(s => s.Order, 1).Create();
-          var mockStepA2 = _fixture.Build<DeliveryStep>().With(s => s.Order, 2).Create();
+          var mockStepA1 = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _mockDeliveryA)
+               .With(s => s.Order, 1)
+               .Create();
+          var mockStepA2 = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _mockDeliveryA)
+               .With(s => s.Order, 2)
+               .Create();
           _mockDeliveryA.Steps = [mockStepA1, mockStepA2];
           
-          var mockStepB1 = _fixture.Build<DeliveryStep>().With(s => s.Order, 1).Create();
-          var mockStepB2 = _fixture.Build<DeliveryStep>().With(s => s.Order, 2).Create();
+          var mockStepB1 = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _mockDeliveryB)
+               .With(s => s.Order, 1)
+               .Create();
+          var mockStepB2 = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _mockDeliveryB)
+               .With(s => s.Order, 2)
+               .Create();
           _mockDeliveryB.Steps = [mockStepB2, mockStepB1];
           
           var deliveries = new List<Delivery>

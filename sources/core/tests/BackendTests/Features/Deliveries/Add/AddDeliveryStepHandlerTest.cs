@@ -31,10 +31,11 @@ public class AddDeliveryStepHandlerTest
      public AddDeliveryStepHandlerTest()
      {
           var mockCustomer = _fixture.Create<Customer>();
-          _mockDelivery = _fixture.Create<Delivery>();
+          _mockDelivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .Create();
           _mockDelivery.GenerateReportId(mockCustomer);
           _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
-          _mockDelivery.Steps = [];
           
           _mockCommand = _fixture.Build<AddDeliveryStepCommand>().Create();
 

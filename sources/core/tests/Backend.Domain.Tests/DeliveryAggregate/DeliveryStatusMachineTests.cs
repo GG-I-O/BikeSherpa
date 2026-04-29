@@ -25,6 +25,7 @@ public class DeliveryStatusMachineTests
     private static DeliveryStep CreateStep(StepType type, bool completed = false)
     {
         var deliveryStep = Fixture.Build<DeliveryStep>()
+            .Without(s => s.ParentDelivery)
             .With(x => x.StepType, type)
             .With(x => x.Completed, completed)
             .Create();

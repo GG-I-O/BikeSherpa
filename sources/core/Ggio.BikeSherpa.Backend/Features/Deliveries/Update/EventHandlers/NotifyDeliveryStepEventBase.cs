@@ -14,7 +14,7 @@ public abstract class NotifyDeliveryStepEventBase<TEvent>(
 {
      override protected async ValueTask HandleInternal(TEvent notification, CancellationToken cancellationToken)
      {
-          var delivery = await dbContext.Deliveries.FindAsync(notification.DeliveryId, cancellationToken);
+          var delivery = await dbContext.Deliveries.FindAsync([notification.DeliveryId], cancellationToken);
 
           if (delivery is not null)
           {

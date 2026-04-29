@@ -20,14 +20,17 @@ public class DeliveryTests
 
     private Delivery MakeSut()
     {
-        var delivery = _fixture.Create<Delivery>();
-        delivery.Steps = [];
+        var delivery = _fixture.Build<Delivery>()
+            .With(d => d.Steps, [])
+            .Create();
         return delivery;
     }
 
     private DeliveryStep CreatePickupStep(bool completed = false)
     {
-        var deliveryStep = _fixture.Create<DeliveryStep>();
+        var deliveryStep = _fixture.Build<DeliveryStep>()
+            .Without(s => s.ParentDelivery)
+            .Create();
         deliveryStep.Id = Guid.NewGuid();
         deliveryStep.StepType = StepType.Pickup;
         deliveryStep.Completed = completed;
@@ -38,7 +41,9 @@ public class DeliveryTests
 
     private DeliveryStep CreateDropoffStep(bool completed = false)
     {
-        var deliveryStep = _fixture.Create<DeliveryStep>();
+        var deliveryStep = _fixture.Build<DeliveryStep>()
+            .Without(s => s.ParentDelivery)
+            .Create();
         deliveryStep.Id = Guid.NewGuid();
         deliveryStep.StepType = StepType.Dropoff;
         deliveryStep.Completed = completed;
@@ -483,7 +488,8 @@ public class DeliveryTests
         {
             Id = existingStep.Id,
             StepAddress = existingStep.StepAddress,
-            StepZone = zone
+            StepZone = zone,
+            ParentDelivery = delivery
         };
 
         await delivery.UpdateStepsAsync(
@@ -526,7 +532,8 @@ public class DeliveryTests
                 StepZone = zone,
                 Distance = 12.5,
                 EstimatedDeliveryDate = existingStep.EstimatedDeliveryDate,
-                Completed = true
+                Completed = true,
+                ParentDelivery = delivery
             };
 
             var newStep = CreateDropoffStep();

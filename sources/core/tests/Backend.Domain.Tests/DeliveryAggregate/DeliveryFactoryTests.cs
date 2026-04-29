@@ -45,6 +45,7 @@ public class DeliveryFactoryTests
                .ReturnsAsync(fakeCustomer);
 
           var fakeDelivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
                .With(d => d.Code, $"{CustomerCode}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-1")
                .Create();
           _deliveryRepositoryMock
