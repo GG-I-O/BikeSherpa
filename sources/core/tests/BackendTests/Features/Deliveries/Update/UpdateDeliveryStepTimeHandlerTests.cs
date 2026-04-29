@@ -73,7 +73,6 @@ public class UpdateDeliveryStepTimeHandlerTests
 
           _mockDeliveryChangeTimeService.Verify(
                x => x.ChangeTime(
-                    _delivery,
                     It.Is<DeliveryStep>(s => s.Id == _stepId),
                     command.Date,
                     It.IsAny<CancellationToken>()),
@@ -102,7 +101,6 @@ public class UpdateDeliveryStepTimeHandlerTests
 
           _mockDeliveryChangeTimeService.Verify(
                x => x.ChangeTime(
-                    It.IsAny<Delivery>(),
                     It.IsAny<DeliveryStep>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<CancellationToken>()),
@@ -125,7 +123,6 @@ public class UpdateDeliveryStepTimeHandlerTests
 
           _mockDeliveryChangeTimeService.Verify(
                x => x.ChangeTime(
-                    It.IsAny<Delivery>(),
                     It.IsAny<DeliveryStep>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<CancellationToken>()),

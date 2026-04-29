@@ -42,7 +42,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public void GenerateCode(Customer customer, int increment)
      {
-          Code = $"{customer.Code}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-{increment}";
+          
+          Code = $"{StartDate.Year.ToString()[^1..]}{StartDate.Month.ToString().PadLeft(2, '0')}{StartDate.Day.ToString().PadLeft(2, '0')}-{customer.Code}-{increment}";
      }
 
      // Methods allowing to change the delivery status
@@ -153,23 +154,14 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           existingStep.CourierId = courierId;
      }
 
-     public void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset updatedDeliveryDate, bool changeOtherSteps = true, bool sendNotification = false)
+     public void UpdateStepDeliveryTime(Guid stepId, DateTimeOffset updatedDeliveryDate)
      {
           var existingStep = Steps.Single(s => s.Id == stepId);
           var timeOffset = updatedDeliveryDate - existingStep.EstimatedDeliveryDate;
           existingStep.EstimatedDeliveryDate = updatedDeliveryDate;
-
-          if (changeOtherSteps)
+          foreach (var step in Steps.Where(s => s.Order > existingStep.Order))
           {
-               foreach (var step in Steps.Where(s => s.Order > existingStep.Order))
-               {
-                    step.EstimatedDeliveryDate += timeOffset;
-               }
-          }
-
-          if (sendNotification)
-          {
-               RegisterDomainEvent(new DeliveryStepTimeEvent(Id));
+               step.EstimatedDeliveryDate += timeOffset;
           }
      }
 
@@ -217,6 +209,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
 
           Steps.Add(newStep);
+          newStep.SetParentDelivery(this);
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
 
           return newStep;
@@ -295,8 +288,22 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
           DeleteOldSteps(steps);
           Steps = steps;
+          foreach (var step in Steps)
+          {
+               step.SetParentDelivery(this);
+          }
           await RecalculateStepDistancesAsync(itineraryService);
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+     }
+     
+     public void AttachSteps(IEnumerable<DeliveryStep> steps)
+     {
+          Steps = steps.ToList();
+
+          foreach (var step in Steps)
+          {
+               step.SetParentDelivery(this);
+          }
      }
 
      private void DeleteOldSteps(List<DeliveryStep> steps)

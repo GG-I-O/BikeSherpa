@@ -1,6 +1,7 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.DddCore;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
@@ -11,9 +12,10 @@ public class DeliveryChangeTimeService(
      IItinerarySpi itineraryService
 ) : IDeliveryChangeTimeService
 {
-     public async Task ChangeTime(Delivery delivery, DeliveryStep step, DateTimeOffset date, CancellationToken cancellationToken)
+     public async Task ChangeTime(DeliveryStep step, DateTimeOffset date, CancellationToken cancellationToken)
      {
-          var (deliveries, steps) = await GetDeliveriesAndSteps(step, date, cancellationToken);
+          var steps = await GetDeliveriesAndSteps(step, date, cancellationToken);
+          if (steps.Count == 0) return;
           
           var stepIndex = steps.FindIndex(s => s.Id == step.Id);
           if (stepIndex < 0 || stepIndex >= steps.Count)
@@ -28,24 +30,20 @@ public class DeliveryChangeTimeService(
                stepIndex++;
                for (; stepIndex < steps.Count; stepIndex++)
                {
-                    var stepToMove = steps[stepIndex];
-                    deliveries.Find(d => d.Steps.Any(s => s.Id == stepToMove.Id))!
-                         .UpdateStepDeliveryTime(
-                              stepToMove.Id,
-                              stepToMove.EstimatedDeliveryDate + timeOffset,
-                              false,
-                              true
-                         );
+                    steps[stepIndex].UpdateEstimatedDeliveryDate(steps[stepIndex].EstimatedDeliveryDate + timeOffset);
                }
           }
 
-          delivery.UpdateStepDeliveryTime(step.Id, date, false, true);
+          step.UpdateEstimatedDeliveryDate(date);
           await transaction.CommitAsync(cancellationToken);
      }
      
-     public async Task ChangeOrder(Delivery delivery, DeliveryStep step, int increment, CancellationToken cancellationToken)
+     public async Task ChangeOrder(DeliveryStep step, MoveDirection moveDirection, CancellationToken cancellationToken)
      {
-          var (deliveries, steps) = await GetDeliveriesAndSteps(step, step.EstimatedDeliveryDate, cancellationToken);
+          var steps = await GetDeliveriesAndSteps(step, step.EstimatedDeliveryDate, cancellationToken);
+          if (steps.Count == 0) return;
+          
+          var increment = (int)moveDirection;
           
           var stepIndex = steps.FindIndex(s => s.Id == step.Id);
           if (stepIndex < 0 || stepIndex + increment < 0 || stepIndex + increment >= steps.Count)
@@ -53,27 +51,26 @@ public class DeliveryChangeTimeService(
 
           var stepToMove = steps[stepIndex + increment];
 
-          if (delivery.Steps.Any(s => s.Id == stepToMove.Id))
+          if (step.ParentDelivery.Id == stepToMove.ParentDelivery.Id)
           {
-               await delivery.ReorderStepsAsync(step.Id, step.Order + increment, itineraryService);
+               await step.ParentDelivery.ReorderStepsAsync(step.Id, step.Order + increment, itineraryService);
           }
           else
           {
                var oldDate = step.EstimatedDeliveryDate;
-               delivery.UpdateStepDeliveryTime(step.Id, stepToMove.EstimatedDeliveryDate, false, true);
-               deliveries.Find(d => d.Steps.Any(s => s.Id == stepToMove.Id))!
-                    .UpdateStepDeliveryTime(stepToMove.Id, oldDate, false, true);
+               step.ParentDelivery.UpdateStepDeliveryTime(step.Id, stepToMove.EstimatedDeliveryDate);
+               stepToMove.ParentDelivery.UpdateStepDeliveryTime(stepToMove.Id, oldDate);
           }
 
           await transaction.CommitAsync(cancellationToken);
      }
 
-     private async Task<(List<Delivery>, List<DeliveryStep>)> GetDeliveriesAndSteps(DeliveryStep step, DateTimeOffset date, CancellationToken cancellationToken)
+     private async Task<List<DeliveryStep>> GetDeliveriesAndSteps(DeliveryStep step, DateTimeOffset date, CancellationToken cancellationToken)
      {
           if (step.CourierId is null)
-               return ([], []);
+               return [];
 
-          var courierId = (Guid)step.CourierId;
+          var courierId = step.CourierId.Value;
 
           var deliveries = await deliveryRepository.ListAsync(new DeliveryStepByCourierAndDate(courierId, date), cancellationToken);
 
@@ -83,6 +80,6 @@ public class DeliveryChangeTimeService(
                .OrderBy(s => s.EstimatedDeliveryDate)
                .ToList();
 
-          return (deliveries, steps);
+          return steps;
      }
 }

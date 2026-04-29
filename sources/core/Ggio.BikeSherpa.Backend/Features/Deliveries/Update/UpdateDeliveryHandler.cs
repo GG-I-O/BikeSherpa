@@ -6,6 +6,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.DddCore;
 using Mediator;
 
@@ -21,7 +22,7 @@ public record UpdateDeliveryCommand(
      double? TotalPrice,
      double? Discount,
      string ReportId,
-     List<DeliveryStep> Steps,
+     List<DeliveryStepCrud> Steps,
      string[] Details,
      string PackingSize,
      bool InsulatedBox,
@@ -90,7 +91,7 @@ public class UpdateDeliveryHandler(
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
 
-          await entity.UpdateStepsAsync(command.Steps, deliveryZones, pricingStrategyService, itineraryService);
+          await entity.UpdateStepsAsync(command.Steps.ToDeliverySteps(deliveryZones), deliveryZones, pricingStrategyService, itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

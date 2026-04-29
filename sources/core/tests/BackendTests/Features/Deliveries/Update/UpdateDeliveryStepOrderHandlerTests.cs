@@ -6,6 +6,7 @@ using AwesomeAssertions;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 using Ggio.DddCore;
@@ -72,9 +73,8 @@ public class UpdateDeliveryStepOrderHandlerTests
 
           _mockDeliveryChangeTimeService.Verify(
                x => x.ChangeOrder(
-                    _delivery,
                     It.Is<DeliveryStep>(s => s.Id == _stepId),
-                    command.Increment,
+                    command.Increment < 0 ? MoveDirection.Up : MoveDirection.Down,
                     It.IsAny<CancellationToken>()),
                Times.Once);
      }
@@ -101,9 +101,8 @@ public class UpdateDeliveryStepOrderHandlerTests
 
           _mockDeliveryChangeTimeService.Verify(
                x => x.ChangeOrder(
-                    It.IsAny<Delivery>(),
                     It.IsAny<DeliveryStep>(),
-                    It.IsAny<int>(),
+                    It.IsAny<MoveDirection>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
      }
@@ -124,9 +123,8 @@ public class UpdateDeliveryStepOrderHandlerTests
 
           _mockDeliveryChangeTimeService.Verify(
                x => x.ChangeOrder(
-                    It.IsAny<Delivery>(),
                     It.IsAny<DeliveryStep>(),
-                    It.IsAny<int>(),
+                    It.IsAny<MoveDirection>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
      }

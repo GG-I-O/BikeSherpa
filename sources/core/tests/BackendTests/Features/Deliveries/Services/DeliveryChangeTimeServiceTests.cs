@@ -5,6 +5,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
 using Ggio.DddCore;
 using Moq;
@@ -61,7 +62,7 @@ public class DeliveryChangeTimeServiceTests
 
      private Delivery CreateDelivery(params DeliveryStep[] steps)
      {
-          return _fixture
+          var delivery = _fixture
                .Build<Delivery>()
                .With(d => d.Steps, steps.ToList())
                .With(d => d.ContractDate, DateTimeOffset.UtcNow)
@@ -69,6 +70,10 @@ public class DeliveryChangeTimeServiceTests
                .With(d => d.CreatedAt, DateTimeOffset.UtcNow)
                .With(d => d.UpdatedAt, DateTimeOffset.UtcNow)
                .Create();
+
+          delivery.AttachSteps(steps);
+
+          return delivery;
      }
 
      private void SetupRepositoryDeliveries(params Delivery[] deliveries)
@@ -95,7 +100,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeTime(delivery, step, newDate, CancellationToken.None);
+          await sut.ChangeTime(step, newDate, CancellationToken.None);
 
           // Assert
           step.EstimatedDeliveryDate.Should().BeCloseTo(newDate, TimeSpan.FromSeconds(1));
@@ -124,7 +129,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeTime(delivery, secondStep, newSecondStepDate, CancellationToken.None);
+          await sut.ChangeTime(secondStep, newSecondStepDate, CancellationToken.None);
 
           // Assert
           firstStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(10), TimeSpan.FromSeconds(1));
@@ -156,7 +161,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeTime(delivery, thirdStep, newThirdStepDate, CancellationToken.None);
+          await sut.ChangeTime(thirdStep, newThirdStepDate, CancellationToken.None);
 
           // Assert
           firstStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(9), TimeSpan.FromSeconds(1));
@@ -177,12 +182,11 @@ public class DeliveryChangeTimeServiceTests
           var newDate = initialDate.AddHours(1);
 
           var step = CreateStep(1, initialDate);
-          var delivery = CreateDelivery(step);
 
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeTime(delivery, step, newDate, CancellationToken.None);
+          await sut.ChangeTime(step, newDate, CancellationToken.None);
 
           // Assert
           step.EstimatedDeliveryDate.Should().BeCloseTo(initialDate, TimeSpan.FromSeconds(1));
@@ -206,14 +210,13 @@ public class DeliveryChangeTimeServiceTests
           var newDate = initialDate.AddHours(1);
 
           var step = CreateStep(1, initialDate, _courierId);
-          var delivery = CreateDelivery(step);
 
           SetupRepositoryDeliveries();
 
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeTime(delivery, step, newDate, CancellationToken.None);
+          await sut.ChangeTime(step, newDate, CancellationToken.None);
 
           // Assert
           step.EstimatedDeliveryDate.Should().BeCloseTo(initialDate, TimeSpan.FromSeconds(1));
@@ -236,7 +239,6 @@ public class DeliveryChangeTimeServiceTests
           var date = DateTimeOffset.UtcNow.Date;
 
           var requestedStep = CreateStep(1, date.AddHours(10), _courierId);
-          var requestedDelivery = CreateDelivery(requestedStep);
 
           var otherStep = CreateStep(1, date.AddHours(11), _courierId);
           var otherDelivery = CreateDelivery(otherStep);
@@ -248,7 +250,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeTime(requestedDelivery, requestedStep, newDate, CancellationToken.None);
+          await sut.ChangeTime(requestedStep, newDate, CancellationToken.None);
 
           // Assert
           requestedStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(10), TimeSpan.FromSeconds(1));
@@ -276,7 +278,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeOrder(delivery, firstStep, 1, CancellationToken.None);
+          await sut.ChangeOrder(firstStep, MoveDirection.Down, CancellationToken.None);
 
           // Assert
           var orderedSteps = delivery.Steps.OrderBy(s => s.Order).ToList();
@@ -315,7 +317,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeOrder(delivery, thirdStep, -1, CancellationToken.None);
+          await sut.ChangeOrder(thirdStep, MoveDirection.Up, CancellationToken.None);
 
           // Assert
           var orderedSteps = delivery.Steps.OrderBy(s => s.Order).ToList();
@@ -354,7 +356,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeOrder(firstDelivery, firstDeliveryStep, 1, CancellationToken.None);
+          await sut.ChangeOrder(firstDeliveryStep, MoveDirection.Down, CancellationToken.None);
 
           // Assert
           firstDeliveryStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(11), TimeSpan.FromSeconds(1));
@@ -389,7 +391,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeOrder(secondDelivery, secondDeliveryStep, -1, CancellationToken.None);
+          await sut.ChangeOrder(secondDeliveryStep, MoveDirection.Up, CancellationToken.None);
 
           // Assert
           firstDeliveryStep.EstimatedDeliveryDate.Should().BeCloseTo(date.AddHours(11), TimeSpan.FromSeconds(1));
@@ -423,7 +425,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeOrder(delivery, firstStep, -1, CancellationToken.None);
+          await sut.ChangeOrder(firstStep, MoveDirection.Up, CancellationToken.None);
 
           // Assert
           firstStep.Order.Should().Be(1);
@@ -460,7 +462,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeOrder(delivery, secondStep, 1, CancellationToken.None);
+          await sut.ChangeOrder(secondStep, MoveDirection.Down, CancellationToken.None);
 
           // Assert
           firstStep.Order.Should().Be(1);
@@ -490,12 +492,10 @@ public class DeliveryChangeTimeServiceTests
           var firstStep = CreateStep(1, date.AddHours(10));
           var secondStep = CreateStep(2, date.AddHours(11));
 
-          var delivery = CreateDelivery(firstStep, secondStep);
-
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeOrder(delivery, firstStep, 1, CancellationToken.None);
+          await sut.ChangeOrder(firstStep, MoveDirection.Down, CancellationToken.None);
 
           // Assert
           firstStep.Order.Should().Be(1);
@@ -531,14 +531,12 @@ public class DeliveryChangeTimeServiceTests
           var firstStep = CreateStep(1, date.AddHours(10), _courierId);
           var secondStep = CreateStep(2, date.AddHours(11), _courierId);
 
-          var delivery = CreateDelivery(firstStep, secondStep);
-
           SetupRepositoryDeliveries();
 
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeOrder(delivery, firstStep, 1, CancellationToken.None);
+          await sut.ChangeOrder(firstStep, MoveDirection.Down, CancellationToken.None);
 
           // Assert
           firstStep.Order.Should().Be(1);
@@ -566,7 +564,6 @@ public class DeliveryChangeTimeServiceTests
           var date = DateTimeOffset.UtcNow.Date;
 
           var requestedStep = CreateStep(1, date.AddHours(10), _courierId);
-          var requestedDelivery = CreateDelivery(requestedStep);
 
           var otherStep = CreateStep(1, date.AddHours(11), _courierId);
           var otherDelivery = CreateDelivery(otherStep);
@@ -576,7 +573,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeOrder(requestedDelivery, requestedStep, 1, CancellationToken.None);
+          await sut.ChangeOrder(requestedStep, MoveDirection.Down, CancellationToken.None);
 
           // Assert
           requestedStep.Order.Should().Be(1);
@@ -614,7 +611,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeTime(requestedDelivery, requestedStep, newDate, CancellationToken.None);
+          await sut.ChangeTime(requestedStep, newDate, CancellationToken.None);
 
           // Assert
           requestedStep.EstimatedDeliveryDate.Should().BeCloseTo(newDate, TimeSpan.FromSeconds(1));
@@ -644,7 +641,7 @@ public class DeliveryChangeTimeServiceTests
           var sut = CreateSut();
 
           // Act
-          await sut.ChangeTime(delivery, requestedStep, newDate, CancellationToken.None);
+          await sut.ChangeTime(requestedStep, newDate, CancellationToken.None);
 
           // Assert
           requestedStep.EstimatedDeliveryDate.Should().BeCloseTo(newDate, TimeSpan.FromSeconds(1));

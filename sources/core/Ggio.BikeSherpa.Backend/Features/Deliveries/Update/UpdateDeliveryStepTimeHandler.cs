@@ -45,7 +45,7 @@ public class UpdateDeliveryStepTimeHandler(
           var step = delivery.Steps.FirstOrDefault(s => s.Id == command.StepId);
           if (step is null) return Result.NotFound();
 
-          await service.ChangeTime(delivery, step, command.Date, cancellationToken);
+          await service.ChangeTime(step, command.Date, cancellationToken);
           
           return Result.Success();
      }

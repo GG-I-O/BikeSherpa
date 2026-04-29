@@ -23,7 +23,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           builder.Property(d => d.StartDate).IsRequired();
           builder.OwnsMany(d => d.Steps, steps =>
           {
-               steps.WithOwner().HasForeignKey("DeliveryId");
+               steps.WithOwner(s => s.ParentDelivery).HasForeignKey("DeliveryId");
                steps.HasKey("Id");
                steps.Property(s => s.Id).ValueGeneratedNever();
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();

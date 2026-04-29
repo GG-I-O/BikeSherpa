@@ -2,6 +2,7 @@
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
 using Ggio.DddCore;
 using JetBrains.Annotations;
@@ -45,7 +46,11 @@ public class UpdateDeliveryStepOrderHandler(
           var step = delivery.Steps.FirstOrDefault(s => s.Id == command.StepId);
           if (step is null) return Result.NotFound();
 
-          await service.ChangeOrder(delivery, step, command.Increment, cancellationToken);
+          await service.ChangeOrder(
+               step,
+               command.Increment < 0 ? MoveDirection.Up : MoveDirection.Down,
+               cancellationToken
+               );
           
           return Result.Success();
      }
