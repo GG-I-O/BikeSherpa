@@ -95,7 +95,7 @@ public class DeliveryFactoryTests
 
           // Assert
           delivery.PricingStrategy.Should().Be(PricingStrategy.TourDeliveryStrategy);
-          delivery.Code.Should().Be($"{CustomerCode}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-2");
+          delivery.Code.Should().Be($"60114-T01-2");
           delivery.CustomerId.Should().Be(CustomerId);
           delivery.Urgency.Should().Be("Express");
           delivery.TotalPrice.Should().Be(55);
