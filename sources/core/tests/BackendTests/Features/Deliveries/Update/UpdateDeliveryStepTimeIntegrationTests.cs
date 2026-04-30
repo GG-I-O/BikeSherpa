@@ -22,7 +22,7 @@ namespace BackendTests.Features.Deliveries.Update;
 [TestSubject(typeof(UpdateDeliveryStepTimeEndpoint))]
 [TestSubject(typeof(UpdateDeliveryStepTimeHandler))]
 [Trait("Category", "Integration")]
-public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
      private readonly Fixture _fixture = new();
@@ -37,7 +37,7 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
           PropertyNamingPolicy = JsonNamingPolicy.CamelCase
      };
 
-     public UpdateDeliveryStepTimeIntegrationTests(WebApplicationFactory<Program> factory)
+     public UpdateDeliveryStepTimeIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
           var courierId = Guid.NewGuid();
 

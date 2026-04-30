@@ -25,7 +25,7 @@ namespace BackendTests.Features.Deliveries.Patch;
 [TestSubject(typeof(PatchDeliveryStepOrderHandler))]
 [TestSubject(typeof(PatchDeliveryStepTimeHandler))]
 [Trait("Category", "Integration")]
-public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
      private readonly Fixture _fixture = new();
@@ -40,7 +40,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
           PropertyNamingPolicy = JsonNamingPolicy.CamelCase
      };
 
-     public PatchDeliveryStepIntegrationTests(WebApplicationFactory<Program> factory)
+     public PatchDeliveryStepIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
           var firstAddress = _fixture
                .Build<Address>()
