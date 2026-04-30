@@ -8,6 +8,8 @@ export default class InputDelivery {
     public urgency: string;
     public totalPrice: number | null;
     public discount: number | null;
+    public extraCost: number | null;
+    public distance: number | null;
     public reportId: string | null;
     public steps: Step[];
     public details: string[];
@@ -24,6 +26,8 @@ export default class InputDelivery {
         urgency: string,
         totalPrice: number, 
         discount: number,
+        extraCost: number,
+        distance: number,
         reportId: string,
         steps: Step[],
         details: string[],
@@ -39,6 +43,8 @@ export default class InputDelivery {
         this.urgency = urgency;
         this.totalPrice = totalPrice;
         this.discount = discount;
+        this.extraCost = extraCost;
+        this.distance = distance;
         this.reportId = reportId;
         this.steps = steps;
         this.details = details;

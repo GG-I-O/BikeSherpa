@@ -4,6 +4,7 @@ import {IOCContainer} from '@/bootstrapper/constants/IOCContainer';
 import {IAddressService} from '@/spi/AddressSPI';
 import {ServicesIdentifiers} from '@/bootstrapper/constants/ServicesIdentifiers';
 import {ThemedRHFSuggestiveInput} from "@/components/themed/ThemedRHFSuggestiveInput";
+import {Address} from "@/models/Address";
 
 interface ThemedAddressInputProps {
     name: string;
@@ -27,7 +28,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = (
     const addressService = IOCContainer.get<IAddressService>(ServicesIdentifiers.AddressService);
 
     return (
-        <ThemedRHFSuggestiveInput
+        <ThemedRHFSuggestiveInput<Address, Address>
             name={name}
             control={control}
             label={label}
@@ -35,7 +36,8 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = (
             placeholder={placeholder}
             error={error}
             fetchSuggestions={(q) => addressService.fetchAddress(q)}
-            renderLabel={(a) => a.fullAddress}
+            getOptionLabel={(a) => a.fullAddress}
+            getOptionValue={(a) => a}
         />
     );
 };

@@ -10,6 +10,8 @@ import ThemedDateInput from "@/components/themed/ThemedDateInput";
 import {DropdownOptions} from "@/models/DropdownOptions";
 import StepInputDataTable from "@/steps/components/inputs/StepInputDataTable";
 import ThemedTimeInput from "@/components/themed/ThemedTimeInput";
+import {ThemedRHFSuggestiveInput} from "@/components/themed/ThemedRHFSuggestiveInput";
+import Customer from "@/customers/models/Customer";
 
 interface DeliveryFormProps<T extends FieldValues> {
     update?: boolean;
@@ -17,6 +19,7 @@ interface DeliveryFormProps<T extends FieldValues> {
     handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
     errors: FieldErrors<T>;
     buttonName: string;
+    getCustomerOptions: (query: string) => Promise<Customer[]>;
     urgencies: DropdownOptions[];
     pricingStrategies: DropdownOptions[];
     packingSizes: DropdownOptions[];
@@ -46,6 +49,17 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 placeholder="CL1"
                 required
                 disabled={props.update}
+            />
+            <ThemedRHFSuggestiveInput<Customer, string>
+                name="customerId"
+                control={control}
+                label="Code client"
+                required
+                placeholder="CL1"
+                error={errors.customerId as FieldError | undefined}
+                fetchSuggestions={props.getCustomerOptions}
+                getOptionLabel={(customer: Customer) => `${customer.code} - ${customer.name}`}
+                getOptionValue={customer => customer.id}
             />
             <ThemedDropdownInput
                 testID="deliveryFormPricingStrategyInput"
@@ -81,15 +95,32 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 control={control}
                 name="discount"
                 error={errors.discount as FieldError | undefined}
-                label="Remise"
+                label="Remise (en €)"
                 placeholder="0"
+            />
+            <ThemedInput
+                testID="deliveryFormDiscountInput"
+                control={control}
+                name="extraCost"
+                error={errors.discount as FieldError | undefined}
+                label="Surcout (en €)"
+                placeholder="0"
+            />
+            <ThemedInput
+                testID="deliveryFormDetailsInput"
+                control={control}
+                name="distance"
+                error={errors.details as FieldError | undefined}
+                label="Distance"
+                placeholder="Message lambda"
+                isAnArray
             />
             <ThemedInput
                 testID="deliveryFormDetailsInput"
                 control={control}
                 name="details"
                 error={errors.details as FieldError | undefined}
-                label="Details"
+                label="Infos de la course"
                 placeholder="Message lambda"
                 isAnArray
             />
@@ -107,32 +138,42 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 control={control}
                 name="insulatedBox"
                 error={errors.insulatedBox as FieldError | undefined}
-                label="Boite isolée"
+                label="Caisson isotherme"
                 required
             />
-            <ThemedDateInput
-                testID="deliveryFormContractDateInput"
-                control={control}
-                name="contractDate"
-                error={errors.contractDate as FieldError | undefined}
-                label="Date de la demande"
-                required
-                disabled={props.update}
-            />
-            <ThemedDateInput
-                testID="deliveryFormStartDateInput"
-                control={control}
-                name="startDate"
-                error={errors.startDate as FieldError | undefined}
-                label="Date de livraison"
-                required
-            />
-            <ThemedTimeInput
-                control={control}
-                name="startDate"
-                label="Heure de livraison"
-                required
-            />
+            <View style={{width: '100%', flexDirection: 'row'}}>
+                <ThemedDateInput
+                    testID="deliveryFormContractDateInput"
+                    control={control}
+                    name="contractDate"
+                    error={errors.contractDate as FieldError | undefined}
+                    label="Date de la demande"
+                    required
+                    disabled={props.update}
+                />
+                <ThemedTimeInput
+                    control={control}
+                    name="contractDate"
+                    label="Heure de la demande"
+                    required
+                />
+            </View>
+            <View style={{width: '100%', flexDirection: 'row'}}>
+                <ThemedDateInput
+                    testID="deliveryFormStartDateInput"
+                    control={control}
+                    name="startDate"
+                    error={errors.startDate as FieldError | undefined}
+                    label="Date de livraison"
+                    required
+                />
+                <ThemedTimeInput
+                    control={control}
+                    name="startDate"
+                    label="Heure de livraison"
+                    required
+                />
+            </View>
             <StepInputDataTable
                 control={control}
                 name="steps"

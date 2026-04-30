@@ -1,25 +1,12 @@
-import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
-import {ICustomerService} from "@/spi/CustomerSPI";
-import {deliveryFormBaseSchema, DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
-import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
-import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
-import {inject} from "inversify";
+import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 import Delivery from "@/deliveries/models/Delivery";
 import * as Crypto from "expo-crypto";
+import AbstractFormViewModel from "@/deliveries/viewModel/AbstractFormViewModel";
 
-export default class DeliveryEditFormViewModel {
-    private deliveryServices: IDeliveryServices;
-    private customerServices: ICustomerService;
+export default class DeliveryEditFormViewModel extends AbstractFormViewModel {
 
-    constructor(
-        @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
-        @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService
-    ) {
-        this.deliveryServices = deliveryServices;
-        this.customerServices = customerServices;
-    }
-
-    // Keep it as a lambda to be able to use "this". Don't ask me why, JavaScript things
+    // Keep it as a lambda to be able to use "this" on services.
+    // JavaScript does not bind "this" to the instance of the class if declared as a method
     public onSubmit = (delivery: DeliveryFormValues, oldDelivery: Delivery): void => {
         const customerCode = delivery.customerId;
         const customerId = this.customerServices.getCustomerIdByCode(customerCode);
@@ -68,22 +55,5 @@ export default class DeliveryEditFormViewModel {
         };
 
         this.deliveryServices.updateDelivery(deliveryObject);
-    }
-
-    public getEditDeliverySchema() {
-        // Asking user to input the customer code, so that's what we validate
-        // We convert it onsubmit later
-        const customerList = Object.values(
-            this.customerServices.getCustomerList$().get()
-        );
-
-        return deliveryFormBaseSchema.extend({
-            customerId: deliveryFormBaseSchema.shape.code.refine(
-                (value) => customerList.some(
-                    (customer) => customer.code === value
-                ),
-                "Code client inexistant"
-            )
-        });
     }
 }

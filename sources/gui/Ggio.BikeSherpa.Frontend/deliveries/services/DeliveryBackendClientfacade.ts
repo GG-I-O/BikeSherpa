@@ -77,7 +77,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             };
-            const parsedStep = schemas.DeliveryStep.safeParse(step);
+            const parsedStep = schemas.DeliveryStepCrud.safeParse(step);
             if (!parsedStep.success) {
                 this.logger.error("Parsing Create Step error:");
                 this.logger.error(parsedStep.error.format());

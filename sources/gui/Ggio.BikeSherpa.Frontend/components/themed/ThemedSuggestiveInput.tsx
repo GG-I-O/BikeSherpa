@@ -7,19 +7,23 @@ import {FieldError} from "react-hook-form";
 export type SuggestionFetcher<T> = (query: string) => Promise<T[] | null>;
 export type SuggestionRenderer<T> = (item: T) => string;
 
-export interface SuggestiveInputProps<T> {
-    value: T | null;
-    onChange: (value: T | null) => void;
+export interface SuggestiveInputProps<T, V> {
+    value: V | null;
+    onChange: (value: V | null) => void;
+    
     label?: string;
     required?: boolean;
     placeholder?: string;
     error?: FieldError | undefined
+    
     fetchSuggestions: SuggestionFetcher<T>;
-    renderLabel: SuggestionRenderer<T>;
+    getOptionLabel: SuggestionRenderer<T>;
+    getOptionValue: (item: T) => V;
+    
     minLength?: number;
 }
 
-export function ThemedSuggestiveInput<T>(
+export function ThemedSuggestiveInput<T, V>(
     {
         value,
         onChange,
@@ -28,9 +32,10 @@ export function ThemedSuggestiveInput<T>(
         placeholder,
         error,
         fetchSuggestions,
-        renderLabel,
+        getOptionLabel,
+        getOptionValue,
         minLength = 3
-    }: SuggestiveInputProps<T>
+    }: SuggestiveInputProps<T, V>
 ) {
     const theme = useTheme();
 
@@ -99,7 +104,7 @@ export function ThemedSuggestiveInput<T>(
             >
                 <TextInput
                     testID="themedSuggestiveTextInput"
-                    value={value ? renderLabel(value) : query}
+                    value={query}
                     placeholder={placeholder}
                     onFocus={measure}
                     mode='outlined'
@@ -141,11 +146,12 @@ export function ThemedSuggestiveInput<T>(
                                 <Button
                                     testID="themedSuggestiveInputSuggestionButton"
                                     onPress={() => {
-                                        onChange(item);
+                                        onChange(getOptionValue(item));
+                                        setQuery(getOptionLabel(item));
                                         setOpen(false);
                                     }}
                                 >
-                                    <Text>{renderLabel(item)}</Text>
+                                    <Text>{getOptionLabel(item)}</Text>
                                 </Button>
                             )}
                         />

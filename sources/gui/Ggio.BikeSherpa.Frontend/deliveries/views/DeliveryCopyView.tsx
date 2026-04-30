@@ -10,6 +10,7 @@ export default function DeliveryCopyView() {
         control,
         errors,
         handleSubmit,
+        getCustomerOptions,
         urgencies,
         pricingStrategies,
         packingSizes
@@ -21,6 +22,7 @@ export default function DeliveryCopyView() {
             errors={errors}
             handleSubmit={handleSubmit}
             buttonName="Copier la course"
+            getCustomerOptions={getCustomerOptions}
             urgencies={urgencies}
             pricingStrategies={pricingStrategies}
             packingSizes={packingSizes}
