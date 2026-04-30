@@ -12,9 +12,24 @@ services:
       - postgres_data:/var/lib/postgresql/18/data
     networks:
       - ggio_network
+  
+  postgres_tests:
+    image: postgres:latest
+    container_name: postgres_tests_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ggio_tests_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_tests_data:/var/lib/postgresql/18/data
+    networks:
+      - ggio_network
 
 volumes:
   postgres_data:
+  postgres_tests_data:
 
 networks:
   ggio_network:

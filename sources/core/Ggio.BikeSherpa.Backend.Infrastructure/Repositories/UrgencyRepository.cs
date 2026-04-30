@@ -15,6 +15,6 @@ public class UrgencyRepository(BackendDbContext context) : IUrgencyRepository
      {
           Guard.Against.NullOrEmpty(name);
 
-          return context.Urgencies.SingleOrDefault(u => string.Equals(u.Name, name, StringComparison.CurrentCultureIgnoreCase));
+          return context.Urgencies.SingleOrDefault(u => u.Name == name);
      }
 }

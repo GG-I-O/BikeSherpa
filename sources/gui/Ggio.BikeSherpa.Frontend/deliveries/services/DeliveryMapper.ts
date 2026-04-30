@@ -32,6 +32,7 @@ export default class DeliveryMapper {
             code: delivery.code,
             customerName: getCustomerName(delivery.customerId),
             urgency: delivery.urgency,
+            totalPrice: `${delivery.totalPrice ?? 0}€`,
             startDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
             startTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
             steps: delivery.steps?.map((step) => ({

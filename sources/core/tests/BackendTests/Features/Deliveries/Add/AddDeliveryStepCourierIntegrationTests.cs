@@ -19,7 +19,7 @@ namespace BackendTests.Features.Deliveries.Add;
 [TestSubject(typeof(AddDeliveryStepCourierEndpoint))]
 [TestSubject(typeof(AddDeliveryStepCourierHandler))]
 [Trait("Category", "Integration")]
-public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class AddDeliveryStepCourierIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
      private readonly Fixture _fixture = new();
@@ -29,7 +29,7 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
 
      private const string Scope = "write:deliveries";
 
-     public AddDeliveryStepCourierIntegrationTests(WebApplicationFactory<Program> factory)
+     public AddDeliveryStepCourierIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
           var deliveryAddress = _fixture
                .Build<Address>()
