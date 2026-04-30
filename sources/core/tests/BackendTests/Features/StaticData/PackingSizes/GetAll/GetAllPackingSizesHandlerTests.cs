@@ -39,7 +39,7 @@ public class GetAllPackingSizesHandlerTests
           // Assert
           result.Should().NotBeNull();
           result.Count.Should().Be(2);
-          result[0].Label.Should().Be(_mockPackingSizeA.Name);
+          result[0].Label.Should().Be(_mockPackingSizeA.Label);
           result[1].Value.Should().Be(_mockPackingSizeB.Name);
           VerifyRepositoryCalledOnce();
      }

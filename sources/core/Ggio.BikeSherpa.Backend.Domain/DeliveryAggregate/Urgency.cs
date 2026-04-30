@@ -2,5 +2,7 @@
 
 public record Urgency(
      string Name,
+     int Order,
+     string Label,
      double PriceCoefficient
 );

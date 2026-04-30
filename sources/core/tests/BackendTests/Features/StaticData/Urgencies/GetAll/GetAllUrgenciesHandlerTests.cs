@@ -39,7 +39,7 @@ public class GetAllUrgenciesHandlerTests
           // Assert
           result.Should().NotBeNull();
           result.Count.Should().Be(2);
-          result[0].Label.Should().Be(_mockUrgencyA.Name);
+          result[0].Label.Should().Be(_mockUrgencyA.Label);
           result[1].Value.Should().Be(_mockUrgencyB.Name);
           VerifyRepositoryCalledOnce();
      }

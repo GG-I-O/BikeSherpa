@@ -8,7 +8,7 @@ public class PackingSizeRepository(BackendDbContext context) : IPackingSizeRepos
 {
      public IReadOnlyList<PackingSize> GetAll()
      {
-          return context.PackingSizes.ToList();
+          return context.PackingSizes.OrderBy(p => p.Order).ToList();
      }
 
      public PackingSize? GetByName(string name)

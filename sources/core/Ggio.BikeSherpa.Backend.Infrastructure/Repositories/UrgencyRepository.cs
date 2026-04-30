@@ -8,7 +8,7 @@ public class UrgencyRepository(BackendDbContext context) : IUrgencyRepository
 {
      public IReadOnlyList<Urgency> GetAll()
      {
-          return context.Urgencies.ToList();
+          return context.Urgencies.OrderBy(u => u.Order).ToList();
      }
 
      public Urgency? GetByName(string name)

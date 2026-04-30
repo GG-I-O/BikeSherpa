@@ -15,7 +15,7 @@ public class GetAllUrgenciesHandler(IUrgencyRepository repository) : IQueryHandl
           return await Task.FromResult(
                urgencies.Select(urgency => new UrgencyDto
                     {
-                         Label = urgency.Name,
+                         Label = urgency.Label,
                          Value = urgency.Name
                     }
                ).ToList()
