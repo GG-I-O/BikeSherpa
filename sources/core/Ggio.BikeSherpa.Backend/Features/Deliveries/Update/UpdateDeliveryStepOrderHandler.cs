@@ -25,7 +25,7 @@ public class UpdateDeliveryStepOrderCommandValidator : AbstractValidator<UpdateD
      {
           RuleFor(x => x.DeliveryId).NotEmpty();
           RuleFor(x => x.StepId).NotEmpty();
-          RuleFor(x => x.Increment).NotEmpty();
+          RuleFor(x => x.Increment).NotEmpty().Must(x => x is 1 or -1);
      }
 }
 
@@ -48,7 +48,7 @@ public class UpdateDeliveryStepOrderHandler(
 
           await service.ChangeOrder(
                step,
-               command.Increment < 0 ? MoveDirection.Up : MoveDirection.Down,
+               (MoveDirection) command.Increment,
                cancellationToken
                );
           

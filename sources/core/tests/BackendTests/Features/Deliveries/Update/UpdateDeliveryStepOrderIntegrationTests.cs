@@ -18,6 +18,7 @@ using Moq;
 
 namespace BackendTests.Features.Deliveries.Update;
 
+[Collection("Database integration tests")]
 [TestSubject(typeof(UpdateDeliveryStepOrderEndpoint))]
 [TestSubject(typeof(UpdateDeliveryStepOrderHandler))]
 [Trait("Category", "Integration")]
@@ -111,24 +112,26 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<WebApplicat
           });
      }
 
-     private async Task ClearDatabaseAsync(BackendDbContext dbContext)
+     private async static Task ResetDatabaseAsync(BackendDbContext dbContext)
      {
-          await dbContext.Deliveries
-               .Where(d => d.Id == _delivery.Id)
-               .ExecuteDeleteAsync(CancellationToken.None);
+          await dbContext.Database.EnsureDeletedAsync();
+          await dbContext.Database.MigrateAsync();
      }
 
      [Fact]
      public async Task ShouldUpdateDeliveryStepOrder_WhenIncrementIsPositive()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
           var secondStep = _delivery.Steps[1];
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var request = new UpdateDeliveryStepOrderRequest(1);
@@ -166,7 +169,7 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<WebApplicat
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -197,10 +200,13 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<WebApplicat
      public async Task ShouldReturnNotFound_WhenStepDoesNotExist()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var request = new UpdateDeliveryStepOrderRequest(1);
@@ -221,7 +227,7 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<WebApplicat
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -229,12 +235,15 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<WebApplicat
      public async Task ShouldReturnBadRequest_WhenIncrementIsZero()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var request = new UpdateDeliveryStepOrderRequest(0);
@@ -255,7 +264,7 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<WebApplicat
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 }

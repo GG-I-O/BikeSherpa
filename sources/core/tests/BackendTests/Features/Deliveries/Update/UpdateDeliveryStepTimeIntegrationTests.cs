@@ -18,6 +18,7 @@ using Moq;
 
 namespace BackendTests.Features.Deliveries.Update;
 
+[Collection("Database integration tests")]
 [TestSubject(typeof(UpdateDeliveryStepTimeEndpoint))]
 [TestSubject(typeof(UpdateDeliveryStepTimeHandler))]
 [Trait("Category", "Integration")]
@@ -111,25 +112,27 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
           });
      }
 
-     private async Task ClearDatabaseAsync(BackendDbContext dbContext)
+     private async static Task ResetDatabaseAsync(BackendDbContext dbContext)
      {
-          await dbContext.Deliveries
-               .Where(d => d.Id == _delivery.Id)
-               .ExecuteDeleteAsync(CancellationToken.None);
+          await dbContext.Database.EnsureDeletedAsync();
+          await dbContext.Database.MigrateAsync();
      }
 
      [Fact]
      public async Task ShouldUpdateDeliveryStepTime()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
           var secondStep = _delivery.Steps[1];
           var newEstimatedDeliveryDate = firstStep.EstimatedDeliveryDate.AddMinutes(30);
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var request = new UpdateDeliveryStepTimeRequest(newEstimatedDeliveryDate);
@@ -164,7 +167,7 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -195,10 +198,13 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
      public async Task ShouldReturnNotFound_WhenStepDoesNotExist()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var request = new UpdateDeliveryStepTimeRequest(DateTimeOffset.UtcNow.AddHours(1));
@@ -219,7 +225,7 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -227,12 +233,15 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
      public async Task ShouldReturnBadRequest_WhenDateIsMissing()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           using var content = new StringContent("{}", Encoding.UTF8, "application/json");
@@ -251,7 +260,7 @@ public class UpdateDeliveryStepTimeIntegrationTests : IClassFixture<WebApplicati
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 }

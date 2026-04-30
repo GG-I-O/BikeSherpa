@@ -9,10 +9,12 @@ using Ggio.BikeSherpa.Backend.Infrastructure;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendTests.Features.Deliveries.Get;
 
+[Collection("Database integration tests")]
 [TestSubject(typeof(GetDeliveryEndpoint))]
 [Trait("Category", "Integration")]
 public class GetDeliveryIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
@@ -40,12 +42,21 @@ public class GetDeliveryIntegrationTests : IClassFixture<WebApplicationFactory<P
                }
           );
      }
+     
+     private async static Task ResetDatabaseAsync(BackendDbContext dbContext)
+     {
+          await dbContext.Database.EnsureDeletedAsync();
+          await dbContext.Database.MigrateAsync();
+     }
 
      [Fact]
      public async Task ShouldReturnDelivery_WithSteps()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
           
           var address = _fixture
@@ -74,7 +85,7 @@ public class GetDeliveryIntegrationTests : IClassFixture<WebApplicationFactory<P
                .Create();
           delivery.Steps.Add(step);
 
-          await dbContext!.Deliveries.AddAsync(delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           try
@@ -96,8 +107,7 @@ public class GetDeliveryIntegrationTests : IClassFixture<WebApplicationFactory<P
           finally
           {
                // Clean
-               dbContext.Deliveries.Remove(delivery);
-               await dbContext.SaveChangesAsync(CancellationToken.None);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 }

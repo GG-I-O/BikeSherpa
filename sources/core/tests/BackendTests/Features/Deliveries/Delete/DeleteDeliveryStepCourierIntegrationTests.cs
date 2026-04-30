@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendTests.Features.Deliveries.Delete;
 
+[Collection("Database integration tests")]
 [TestSubject(typeof(DeleteDeliveryStepCourierEndpoint))]
 [TestSubject(typeof(DeleteDeliveryStepCourierHandler))]
 [Trait("Category", "Integration")]
@@ -72,23 +73,25 @@ public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<WebApplic
           });
      }
 
-     private async Task ClearDatabaseAsync(BackendDbContext dbContext)
+     private async static Task ResetDatabaseAsync(BackendDbContext dbContext)
      {
-          await dbContext.Deliveries
-               .Where(d => d.Id == _delivery.Id)
-               .ExecuteDeleteAsync(CancellationToken.None);
+          await dbContext.Database.EnsureDeletedAsync();
+          await dbContext.Database.MigrateAsync();
      }
 
      [Fact]
      public async Task ShouldDeleteCourierFromDeliveryStep()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var step = _delivery.Steps[0];
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           try
@@ -115,7 +118,7 @@ public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<WebApplic
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
