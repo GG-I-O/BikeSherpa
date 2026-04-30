@@ -18,14 +18,14 @@ namespace BackendTests.Features.Deliveries.Add;
 [Collection("Database integration tests")]
 [TestSubject(typeof(AddDeliveryStepEndpoint))]
 [Trait("Category", "Integration")]
-public class AddDeliveryStepIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class AddDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
      private readonly Fixture _fixture = new();
 
      private const string Scope = "write:deliveries";
 
-     public AddDeliveryStepIntegrationTests(WebApplicationFactory<Program> factory)
+     public AddDeliveryStepIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
           _factory = factory.WithWebHostBuilder(builder =>
           {

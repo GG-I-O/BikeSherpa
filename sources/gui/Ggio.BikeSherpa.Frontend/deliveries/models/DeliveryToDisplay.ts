@@ -6,6 +6,7 @@ export interface DeliveryToDisplay {
     customerName: string;
     urgency: string;
     steps: StepToDisplay[];
+    totalPrice: string;
     startDate: string;
     startTime: string;
 }

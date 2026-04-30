@@ -15,6 +15,6 @@ public class PackingSizeRepository(BackendDbContext context) : IPackingSizeRepos
      {
           Guard.Against.NullOrEmpty(name);
 
-          return context.PackingSizes.SingleOrDefault(s => string.Equals(s.Name, name, StringComparison.InvariantCultureIgnoreCase));
+          return context.PackingSizes.SingleOrDefault(s => s.Name == name);
      }
 }

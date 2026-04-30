@@ -18,7 +18,7 @@ namespace BackendTests.Features.Deliveries.Delete;
 [TestSubject(typeof(DeleteDeliveryStepCourierEndpoint))]
 [TestSubject(typeof(DeleteDeliveryStepCourierHandler))]
 [Trait("Category", "Integration")]
-public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
      private readonly Fixture _fixture = new();
@@ -28,7 +28,7 @@ public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<WebApplic
 
      private const string Scope = "write:deliveries";
 
-     public DeleteDeliveryStepCourierIntegrationTests(WebApplicationFactory<Program> factory)
+     public DeleteDeliveryStepCourierIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
           var deliveryAddress = _fixture
                .Build<Address>()
