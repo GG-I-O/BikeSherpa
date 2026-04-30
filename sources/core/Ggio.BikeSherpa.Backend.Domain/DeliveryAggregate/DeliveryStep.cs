@@ -1,4 +1,5 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 using JetBrains.Annotations;
@@ -32,6 +33,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      public DateTimeOffset? RealDeliveryDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
+     public required Delivery ParentDelivery { get; set; }
 
      public void Update(
           StepType stepType,
@@ -51,5 +53,11 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           Distance = distance;
           Comment = comment;
           EstimatedDeliveryDate = estimatedDeliveryDate;
+     }
+
+     public void UpdateEstimatedDeliveryDate(DateTimeOffset estimatedDeliveryDate)
+     {
+          EstimatedDeliveryDate = estimatedDeliveryDate;
+          RegisterDomainEvent(new DeliveryStepTimeChangeEvent(ParentDelivery.Id));
      }
 }

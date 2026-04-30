@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendTests.Features.Deliveries.Add;
 
+[Collection("Database integration tests")]
 [TestSubject(typeof(AddDeliveryStepCourierEndpoint))]
 [TestSubject(typeof(AddDeliveryStepCourierHandler))]
 [Trait("Category", "Integration")]
@@ -36,8 +37,17 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
                .With(a => a.City, "Grenoble")
                .Create();
 
+          _delivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .With(d => d.ContractDate, DateTime.UtcNow)
+               .With(d => d.StartDate, DateTime.UtcNow)
+               .With(d => d.CreatedAt, DateTime.UtcNow)
+               .With(d => d.UpdatedAt, DateTime.UtcNow)
+               .Create();
+          
           var step = _fixture
                .Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _delivery)
                .With(s => s.Order, 1)
                .With(s => s.StepAddress, deliveryAddress)
                .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow)
@@ -45,14 +55,7 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
                .With(s => s.CreatedAt, DateTime.UtcNow)
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .Create();
-
-          _delivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [step])
-               .With(d => d.ContractDate, DateTime.UtcNow)
-               .With(d => d.StartDate, DateTime.UtcNow)
-               .With(d => d.CreatedAt, DateTime.UtcNow)
-               .With(d => d.UpdatedAt, DateTime.UtcNow)
-               .Create();
+          _delivery.Steps.Add(step);
 
           var courierAddress = _fixture
                .Build<Address>()
@@ -82,27 +85,25 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
           });
      }
 
-     private async Task ClearDatabaseAsync(BackendDbContext dbContext)
+     private async static Task ResetDatabaseAsync(BackendDbContext dbContext)
      {
-          await dbContext.Deliveries
-               .Where(d => d.Id == _delivery.Id)
-               .ExecuteDeleteAsync(CancellationToken.None);
-
-          await dbContext.Couriers
-               .Where(c => c.Id == _courier.Id)
-               .ExecuteDeleteAsync(CancellationToken.None);
+          await dbContext.Database.EnsureDeletedAsync();
+          await dbContext.Database.MigrateAsync();
      }
 
      [Fact]
      public async Task ShouldAddCourierToDeliveryStep()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var step = _delivery.Steps[0];
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.Couriers.AddAsync(_courier, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
@@ -125,13 +126,13 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
 
                dbDelivery.Should().NotBeNull();
 
-               var dbStep = dbDelivery!.Steps.Single(s => s.Id == step.Id);
+               var dbStep = dbDelivery.Steps.Single(s => s.Id == step.Id);
                dbStep.CourierId.Should().Be(_courier.Id);
           }
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -139,10 +140,13 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
      public async Task ShouldReturnNotFoundWhenDeliveryDoesNotExist()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
-          await dbContext!.Couriers.AddAsync(_courier, CancellationToken.None);
+          await dbContext.Couriers.AddAsync(_courier, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           try
@@ -159,7 +163,7 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -167,12 +171,15 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
      public async Task ShouldReturnNotFoundWhenCourierDoesNotExist()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var step = _delivery.Steps[0];
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           try
@@ -189,7 +196,7 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<WebApplicati
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 }

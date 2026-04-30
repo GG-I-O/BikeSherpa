@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendTests.Features.Deliveries.Add;
 
+[Collection("Database integration tests")]
 [TestSubject(typeof(AddDeliveryStepEndpoint))]
 [Trait("Category", "Integration")]
 public class AddDeliveryStepIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
@@ -41,12 +42,21 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<WebApplicationFacto
                });
           });
      }
+     
+     private async static Task ResetDatabaseAsync(BackendDbContext dbContext)
+     {
+          await dbContext.Database.EnsureDeletedAsync();
+          await dbContext.Database.MigrateAsync();
+     }
 
      [Fact]
      public async Task ShouldAddDeliveryStep()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var delivery = _fixture.Build<Delivery>()
@@ -55,7 +65,7 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<WebApplicationFacto
                .With(d => d.StartDate, DateTime.UtcNow)
                .Create();
 
-          await dbContext!.Deliveries.AddAsync(delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var address = _fixture
@@ -66,6 +76,7 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<WebApplicationFacto
 
           var step = _fixture
                .Build<DeliveryStep>()
+               .Without(s => s.ParentDelivery)
                .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow)
                .With(s => s.StepAddress, address)
                .Create();
@@ -89,8 +100,7 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<WebApplicationFacto
           finally
           {
                // Clean
-               dbContext.Deliveries.Remove(delivery);
-               await dbContext.SaveChangesAsync(CancellationToken.None);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 }

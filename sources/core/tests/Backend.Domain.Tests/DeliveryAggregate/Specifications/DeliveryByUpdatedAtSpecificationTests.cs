@@ -10,8 +10,16 @@ namespace Backend.Domain.Tests.DeliveryAggregate.Specifications;
 public class DeliveryByUpdatedAtSpecificationTests
 {
      private readonly static IFixture Fixture = new Fixture().Customize(new AutoMoqCustomization());
-     private readonly static List<Delivery> Delivery = Fixture.CreateMany<Delivery>(1).ToList();
-     private readonly static List<Delivery> Deliveries = Fixture.CreateMany<Delivery>(10).ToList();
+     private readonly static List<Delivery> Delivery = Fixture
+          .Build<Delivery>()
+          .With(d => d.Steps, [])
+          .CreateMany(1)
+          .ToList();
+     private readonly static List<Delivery> Deliveries = Fixture
+          .Build<Delivery>()
+          .With(d => d.Steps, [])
+          .CreateMany(10)
+          .ToList();
      private readonly static DateTimeOffset UpdateDate = Fixture.Create<DateTimeOffset>();
      
      [Fact]

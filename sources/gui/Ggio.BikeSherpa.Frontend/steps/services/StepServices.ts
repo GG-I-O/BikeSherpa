@@ -60,6 +60,36 @@ export default class StepServices implements IStepServices {
         observables.step$!.estimatedDeliveryDate.set(date.toISOString());
     }
 
+    public updateTimeForADay(stepId: string, hours: number, minutes: number): void {
+        const observables = this.getDeliveryFromStep(stepId);
+        if (!observables.delivery$) {
+            this.logger.error(`updateTimeForADay : Parent delivery not found for step ${stepId}`);
+            return;
+        }
+        if (!observables.step$) {
+            this.logger.error(`updateTimeForADay : Step ${stepId} not found in delivery ${observables.delivery$.peek().id}`);
+            return;
+        }
+
+        // Test if the user got the rights to do this action
+        const step = observables.step$.get();
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.stepTime.put)) {
+            this.logger.error(`Cannot put time for ${stepId}`);
+            return
+        }
+
+        const date = new Date(observables.step$.estimatedDeliveryDate.peek());
+        date.setHours(hours, minutes);
+
+        this.deliveryStorageMiddleware.addUpdateStepState(
+            observables.delivery$.peek().id,
+            observables.step$.peek().id,
+            deliveryOperationAction.putTime
+        );
+
+        observables.step$!.estimatedDeliveryDate.set(date.toISOString());
+    }
+
     public reorderStep(stepId: string, newOrder: number): void {
         const observables = this.getDeliveryFromStep(stepId);
         if (!observables.delivery$) {
@@ -85,6 +115,33 @@ export default class StepServices implements IStepServices {
         );
 
         observables.step$!.order.set(newOrder);
+    }
+
+    public reorderStepForADay(stepId: string, increment: number): void {
+        const observables = this.getDeliveryFromStep(stepId);
+        if (!observables.delivery$) {
+            this.logger.error(`reorderStepForADay : Parent delivery not found for step ${stepId}`);
+            return;
+        }
+        if (!observables.step$) {
+            this.logger.error(`reorderStepForADay: Step ${stepId} not found in delivery ${observables.delivery$.peek().id}`);
+            return;
+        }
+
+        // Test if the user got the rights to do this action
+        const step = observables.step$.get();
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.stepOrder.put)) {
+            this.logger.error(`Cannot put order for ${stepId}`);
+            return
+        }
+
+        this.deliveryStorageMiddleware.addUpdateStepState(
+            observables.delivery$.peek().id,
+            observables.step$.peek().id,
+            deliveryOperationAction.putOrder
+        );
+
+        observables.step$!.order.set(increment);
     }
 
     private getDeliveryFromStep(stepId: string): {

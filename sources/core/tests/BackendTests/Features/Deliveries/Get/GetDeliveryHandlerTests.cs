@@ -20,7 +20,9 @@ public class GetDeliveryHandlerTests
 
      public GetDeliveryHandlerTests()
      {
-          _mockDelivery = _fixture.Create<Delivery>();
+          _mockDelivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .Create();
      }
 
      [Fact]

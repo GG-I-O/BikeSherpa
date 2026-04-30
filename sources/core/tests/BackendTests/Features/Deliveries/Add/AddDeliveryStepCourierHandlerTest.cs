@@ -29,13 +29,18 @@ public class AddDeliveryStepCourierHandlerTest
 
      public AddDeliveryStepCourierHandlerTest()
      {
-          _mockStep = _fixture.Create<DeliveryStep>();
 
           _mockDelivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [_mockStep])
+               .With(d => d.Steps, [])
                .With(d => d.ContractDate, DateTime.UtcNow)
                .With(d => d.StartDate, DateTime.UtcNow)
                .Create();
+          
+          _mockStep = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _mockDelivery)
+               .Create();
+          
+          _mockDelivery.Steps.Add(_mockStep);
 
           _mockCourier = _fixture.Create<Courier>();
 

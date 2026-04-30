@@ -37,8 +37,14 @@ export default class DeliveryEditFormViewModel {
                 const oldStep = oldDelivery.steps.find(s => s.id === step.id);
                 
                 if (oldStep) {
+                    const stepDate = new Date(oldStep.estimatedDeliveryDate);
+                    const deliveryDate = new Date(delivery.startDate);
+                    stepDate.setDate(deliveryDate.getDate());
+                    stepDate.setMonth(deliveryDate.getMonth());
+                    stepDate.setFullYear(deliveryDate.getFullYear());
                     return {
                         ... oldStep,
+                        estimatedDeliveryDate: stepDate.toISOString(),
                         stepType: step.stepType,
                         stepAddress: step.stepAddress,
                         comment: step.comment ?? null

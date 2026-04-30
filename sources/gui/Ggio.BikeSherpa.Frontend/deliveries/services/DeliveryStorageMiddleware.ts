@@ -61,6 +61,12 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                 case deliveryOperationAction.deleteCourier:
                     await this.customClientFacade.DeleteStepCourierEndpoint(step);
                     break;
+                case deliveryOperationAction.putOrder:
+                    await this.customClientFacade.PutStepOrderEndpoint(step, step.order >= 0 ? 1 : -1);
+                    break;
+                case deliveryOperationAction.putTime:
+                    await this.customClientFacade.PutStepTimeEndpoint(step);
+                    break;
                 default:
                     throw new Error(`Unsupported update action: ${this.updateStepState[i].state}`);
             }
@@ -69,7 +75,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
         if (completeUpdate)
             await this.backendClientFacade.UpdateEndpoint(delivery);
         
-        this.updateStepState = this.updateStepState.filter(state => state.deliveryId === delivery.id);
+        this.updateStepState = this.updateStepState.filter(state => state.deliveryId !== delivery.id);
     }
 
 }

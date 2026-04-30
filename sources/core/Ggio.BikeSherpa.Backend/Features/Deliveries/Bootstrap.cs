@@ -21,6 +21,7 @@ public static class Bootstrap
                services.AddScoped<IValidator<UpdateDeliveryStepCompletionCommand>, UpdateDeliveryStepCompletionCommandValidator>();
                services.AddScoped<IValidator<UpdateDeliveryStepCourierCommand>, UpdateDeliveryStepCourierCommandValidator>();
                services.AddScoped<IValidator<UpdateDeliveryStepOrderCommand>, UpdateDeliveryStepOrderCommandValidator>();
+               services.AddScoped<IValidator<UpdateDeliveryStepTimeCommand>, UpdateDeliveryStepTimeCommandValidator>();
                return services;
           }
      }

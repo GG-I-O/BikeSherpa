@@ -45,6 +45,7 @@ public class DeliveryFactoryTests
                .ReturnsAsync(fakeCustomer);
 
           var fakeDelivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
                .With(d => d.Code, $"{CustomerCode}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-1")
                .Create();
           _deliveryRepositoryMock
@@ -95,7 +96,7 @@ public class DeliveryFactoryTests
 
           // Assert
           delivery.PricingStrategy.Should().Be(PricingStrategy.TourDeliveryStrategy);
-          delivery.Code.Should().Be($"{CustomerCode}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-2");
+          delivery.Code.Should().Be($"60114-T01-2");
           delivery.CustomerId.Should().Be(CustomerId);
           delivery.Urgency.Should().Be("Express");
           delivery.TotalPrice.Should().Be(55);

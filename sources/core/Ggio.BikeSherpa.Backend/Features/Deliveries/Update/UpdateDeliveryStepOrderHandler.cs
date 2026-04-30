@@ -1,8 +1,8 @@
 ﻿using Ardalis.Result;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.DddCore;
 using JetBrains.Annotations;
 using Mediator;
@@ -10,12 +10,12 @@ using Mediator;
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
 [UsedImplicitly]
-public record UpdateDeliveryStepOrderRequest(int Order);
+public record UpdateDeliveryStepOrderRequest(int Increment);
 
 public record UpdateDeliveryStepOrderCommand(
      Guid DeliveryId,
      Guid StepId,
-     int Order
+     int Increment
 ) : ICommand<Result>;
 
 [UsedImplicitly]
@@ -25,15 +25,15 @@ public class UpdateDeliveryStepOrderCommandValidator : AbstractValidator<UpdateD
      {
           RuleFor(x => x.DeliveryId).NotEmpty();
           RuleFor(x => x.StepId).NotEmpty();
-          RuleFor(x => x.Order).NotEmpty();
+          RuleFor(x => x.Increment).NotEmpty().Must(x => x is 1 or -1);
      }
 }
 
 public class UpdateDeliveryStepOrderHandler(
      IReadRepository<Delivery> deliveryRepository,
      IValidator<UpdateDeliveryStepOrderCommand> validator,
-     IApplicationTransaction transaction,
-     IItinerarySpi itineraryService
+     IDeliveryChangeTimeService service,
+     IApplicationTransaction transaction
 ) : ICommandHandler<UpdateDeliveryStepOrderCommand, Result>
 {
      public async ValueTask<Result> Handle(UpdateDeliveryStepOrderCommand command, CancellationToken cancellationToken)
@@ -41,14 +41,17 @@ public class UpdateDeliveryStepOrderHandler(
           await validator.ValidateAndThrowAsync(command, cancellationToken);
 
           var delivery = await deliveryRepository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.DeliveryId), cancellationToken);
+          if (delivery is null) return Result.NotFound();
 
-          if (delivery is null)
-          {
-               return Result.NotFound();
-          }
+          var step = delivery.Steps.FirstOrDefault(s => s.Id == command.StepId);
+          if (step is null) return Result.NotFound();
 
-          await delivery.ReorderStepsAsync(command.StepId, command.Order, itineraryService);
-
+          await service.ChangeOrder(
+               step,
+               (MoveDirection) command.Increment,
+               cancellationToken
+               );
+          
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
      }

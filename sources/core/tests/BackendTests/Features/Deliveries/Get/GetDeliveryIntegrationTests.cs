@@ -9,10 +9,12 @@ using Ggio.BikeSherpa.Backend.Infrastructure;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BackendTests.Features.Deliveries.Get;
 
+[Collection("Database integration tests")]
 [TestSubject(typeof(GetDeliveryEndpoint))]
 [Trait("Category", "Integration")]
 public class GetDeliveryIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
@@ -40,12 +42,21 @@ public class GetDeliveryIntegrationTests : IClassFixture<WebApplicationFactory<P
                }
           );
      }
+     
+     private async static Task ResetDatabaseAsync(BackendDbContext dbContext)
+     {
+          await dbContext.Database.EnsureDeletedAsync();
+          await dbContext.Database.MigrateAsync();
+     }
 
      [Fact]
      public async Task ShouldReturnDelivery_WithSteps()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
           
           var address = _fixture
@@ -55,24 +66,26 @@ public class GetDeliveryIntegrationTests : IClassFixture<WebApplicationFactory<P
                .With(a => a.City, "Grenoble")
                .Create();
 
+          var delivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .With(d => d.ContractDate, DateTime.UtcNow)
+               .With(d => d.StartDate, DateTime.UtcNow)
+               .With(d => d.CreatedAt, DateTime.UtcNow)
+               .With(d => d.UpdatedAt, DateTime.UtcNow)
+               .Create();
+          
           var step = _fixture
                .Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, delivery)
                .With(s => s.StepAddress, address)
                .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow)
                .With(s => s.RealDeliveryDate, DateTime.UtcNow)
                .With(s => s.CreatedAt, DateTime.UtcNow)
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .Create();
-          
-          var delivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [step])
-               .With(d => d.ContractDate, DateTime.UtcNow)
-               .With(d => d.StartDate, DateTime.UtcNow)
-               .With(d => d.CreatedAt, DateTime.UtcNow)
-               .With(d => d.UpdatedAt, DateTime.UtcNow)
-               .Create();
+          delivery.Steps.Add(step);
 
-          await dbContext!.Deliveries.AddAsync(delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           try
@@ -94,8 +107,7 @@ public class GetDeliveryIntegrationTests : IClassFixture<WebApplicationFactory<P
           finally
           {
                // Clean
-               dbContext.Deliveries.Remove(delivery);
-               await dbContext.SaveChangesAsync(CancellationToken.None);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 }

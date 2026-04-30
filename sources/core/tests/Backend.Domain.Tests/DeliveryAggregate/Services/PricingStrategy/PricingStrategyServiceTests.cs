@@ -80,14 +80,15 @@ public class PricingStrategyServiceTests
             TotalPrice = totalPrice
         };
 
-    private static DeliveryStep MakeStep(StepType type, DeliveryZone zone, double distance = 0)
+    private static DeliveryStep MakeStep(Delivery parentDelivery, StepType type, DeliveryZone zone, double distance = 0)
     {
         return new DeliveryStep(type, 1, _defaultAddress!)
         {
             Id = Guid.NewGuid(),
             StepAddress = _defaultAddress!,
             StepZone = zone,
-            Distance = distance
+            Distance = distance,
+            ParentDelivery = parentDelivery
         };
     }
 
@@ -169,15 +170,18 @@ public class PricingStrategyServiceTests
     [Fact]
     public void CalculatePrice_CountsOnlyPickupStepsAsPickups()
     {
-        // Arrange & Act
+        // Arrange
+        var delivery = MakeDelivery();
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepType.Pickup, CoreZone),
-            MakeStep(StepType.Pickup, CoreZone),
-            MakeStep(StepType.Dropoff, CoreZone),
+            MakeStep(delivery, StepType.Pickup, CoreZone),
+            MakeStep(delivery, StepType.Pickup, CoreZone),
+            MakeStep(delivery, StepType.Dropoff, CoreZone),
         };
+        delivery.Steps = steps;
 
-        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
+        // Act
+        _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
         // Assert
         _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
@@ -190,18 +194,20 @@ public class PricingStrategyServiceTests
     public void CalculatePrice_CountsDropoffStepsPerZone()
     {
         // Arrange
+        var delivery = MakeDelivery();
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepType.Dropoff, CoreZone),
-            MakeStep(StepType.Dropoff, CoreZone),
-            MakeStep(StepType.Dropoff, BorderZone),
-            MakeStep(StepType.Dropoff, PeripheryZone),
-            MakeStep(StepType.Dropoff, OutsideZone),
-            MakeStep(StepType.Dropoff, OutsideZone),
+            MakeStep(delivery, StepType.Dropoff, CoreZone),
+            MakeStep(delivery, StepType.Dropoff, CoreZone),
+            MakeStep(delivery, StepType.Dropoff, BorderZone),
+            MakeStep(delivery, StepType.Dropoff, PeripheryZone),
+            MakeStep(delivery, StepType.Dropoff, OutsideZone),
+            MakeStep(delivery, StepType.Dropoff, OutsideZone),
         };
+        delivery.Steps = steps;
 
         // Act
-        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
+        _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
         // Assert
         _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
@@ -216,14 +222,16 @@ public class PricingStrategyServiceTests
         // Arrange
         var distance1 = _fixture.Create<double>();
         var distance2 = _fixture.Create<double>();
+        var delivery = MakeDelivery();
         var steps = new List<DeliveryStep>
         {
-            MakeStep(StepType.Pickup, CoreZone, distance: distance1),
-            MakeStep(StepType.Dropoff, CoreZone, distance: distance2),
+            MakeStep(delivery, StepType.Pickup, CoreZone, distance: distance1),
+            MakeStep(delivery, StepType.Dropoff, CoreZone, distance: distance2),
         };
+        delivery.Steps = steps;
 
         // Act
-        _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(steps: steps));
+        _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
         // Assert
         _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(

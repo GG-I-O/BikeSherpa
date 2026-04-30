@@ -22,7 +22,9 @@ public class DeleteDeliveryHandlerTests
      public DeleteDeliveryHandlerTests()
      {
           _mockCommand = _fixture.Create<DeleteDeliveryCommand>();
-          var mockDelivery = _fixture.Create<Delivery>();
+          var mockDelivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .Create();
 
           _mockRepository
                .Setup(x => x.FirstOrDefaultAsync(

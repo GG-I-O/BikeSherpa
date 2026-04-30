@@ -1,9 +1,9 @@
-import { DataTable, IconButton, Text, useTheme } from "react-native-paper";
+import {DataTable, IconButton, Text, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import React, { useState } from "react";
+import React, {useState} from "react";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import TimePickerInput from "@/components/general/TimePickerInput";
-import { View } from "react-native";
+import {View} from "react-native";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import useStepDataTableRowViewModel from "@/steps/viewModel/useStepDataTableRowViewModel";
 import {Icon} from "react-native-paper/src";
@@ -13,10 +13,19 @@ type Props = {
     isSelected?: boolean,
     onPress?: (step: StepToDisplay) => void,
     canChangeDate?: boolean,
-    listLength?: number
+    isFirst: boolean,
+    isLast: boolean
 }
 
-export default function StepDataTableRowAssign({step, isSelected = false, onPress, canChangeDate = false, listLength = 0}: Props) {
+export default function StepDataTableRowAssign(
+    {
+        step,
+        isSelected = false,
+        onPress,
+        canChangeDate = false,
+        isFirst = false,
+        isLast = false
+    }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
 
@@ -31,26 +40,26 @@ export default function StepDataTableRowAssign({step, isSelected = false, onPres
                 if (isTimePickerOpen) return;
                 if (onPress) onPress(step);
             }}
-            style={{ backgroundColor: isSelected ? theme.colors.primary : theme.colors.background }}
+            style={{backgroundColor: isSelected ? theme.colors.primary : theme.colors.background}}
         >
             <DataTable.Cell style={[style.column, style.width40]}>
                 <View style={{flexDirection: "column", gap: 0}}>
                     <IconButton
                         style={{margin: 0}}
                         icon="arrow-up-bold"
-                        onPress={() => viewModel.reorderStep(step.id, step.order - 1)}
-                        disabled={step.order <= 1}
+                        onPress={() => viewModel.reorderStepForADay(step.id, -1)}
+                        disabled={isFirst}
                     />
                     <IconButton
                         style={{margin: 0}}
                         icon="arrow-down-bold"
-                        onPress={() => viewModel.reorderStep(step.id, step.order + 1)}
-                        disabled={step.order >= listLength}
+                        onPress={() => viewModel.reorderStepForADay(step.id, 0)}
+                        disabled={isLast}
                     />
                 </View>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width40]}>
-                <DeliveryTypeIcon type={step.type} />
+                <DeliveryTypeIcon type={step.type}/>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width110]}>
                 {step.deliveryCode}
@@ -84,7 +93,7 @@ export default function StepDataTableRowAssign({step, isSelected = false, onPres
                             onConfirm={({hours, minutes}: {
                                 hours: number;
                                 minutes: number;
-                            }): void => viewModel.updateStepTime(step.id, hours, minutes)}
+                            }): void => viewModel.updateStepTimeForADay(step.id, hours, minutes)}
                         />
                     )
                 }
@@ -96,6 +105,6 @@ export default function StepDataTableRowAssign({step, isSelected = false, onPres
                     )
                 }
             </DataTable.Cell>
-        </DataTable.Row >
+        </DataTable.Row>
     );
 }

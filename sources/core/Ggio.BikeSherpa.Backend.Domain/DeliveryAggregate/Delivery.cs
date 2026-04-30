@@ -42,7 +42,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public void GenerateCode(Customer customer, int increment)
      {
-          Code = $"{customer.Code}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-{increment}";
+          
+          Code = $"{StartDate.Year.ToString()[^1..]}{StartDate.Month.ToString().PadLeft(2, '0')}{StartDate.Day.ToString().PadLeft(2, '0')}-{customer.Code}-{increment}";
      }
 
      // Methods allowing to change the delivery status
@@ -192,7 +193,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           {
                Id = Guid.NewGuid(),
                StepAddress = stepAddress,
-               StepZone = deliveryZones.GetByAddress(stepAddress.City)
+               StepZone = deliveryZones.GetByAddress(stepAddress.City),
+               ParentDelivery = this
           };
 
           newStep.Distance = await GetDistanceAsync(newStep, itineraryService);
@@ -259,7 +261,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                     {
                          Id = Guid.NewGuid(),
                          StepAddress = steps[index].StepAddress,
-                         StepZone = deliveryZones.GetByAddress(steps[index].StepAddress.City)
+                         StepZone = deliveryZones.GetByAddress(steps[index].StepAddress.City),
+                         ParentDelivery = this
                     };
                }
                else

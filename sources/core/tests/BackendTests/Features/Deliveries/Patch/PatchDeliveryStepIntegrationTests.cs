@@ -20,6 +20,7 @@ using Moq;
 
 namespace BackendTests.Features.Deliveries.Patch;
 
+[Collection("Database integration tests")]
 [TestSubject(typeof(PatchDeliveryStepEndpoint))]
 [TestSubject(typeof(PatchDeliveryStepOrderHandler))]
 [TestSubject(typeof(PatchDeliveryStepTimeHandler))]
@@ -52,9 +53,18 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
                .With(a => a.Postcode, "69000")
                .With(a => a.City, "Lyon")
                .Create();
+          
+          _delivery = _fixture.Build<Delivery>()
+               .With(d => d.Steps, [])
+               .With(d => d.ContractDate, DateTime.UtcNow)
+               .With(d => d.StartDate, DateTime.UtcNow)
+               .With(s => s.CreatedAt, DateTime.UtcNow)
+               .With(s => s.UpdatedAt, DateTime.UtcNow)
+               .Create();
 
           var firstStep = _fixture
                .Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _delivery)
                .With(s => s.Order, 1)
                .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow)
                .With(s => s.RealDeliveryDate, (DateTimeOffset?)null)
@@ -62,9 +72,11 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .With(s => s.StepAddress, firstAddress)
                .Create();
+          _delivery.Steps.Add(firstStep);
 
           var secondStep = _fixture
                .Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, _delivery)
                .With(s => s.Order, 2)
                .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow.AddHours(1))
                .With(s => s.RealDeliveryDate, (DateTimeOffset?)null)
@@ -72,14 +84,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .With(s => s.StepAddress, secondAddress)
                .Create();
-
-          _delivery = _fixture.Build<Delivery>()
-               .With(d => d.Steps, [firstStep, secondStep])
-               .With(d => d.ContractDate, DateTime.UtcNow)
-               .With(d => d.StartDate, DateTime.UtcNow)
-               .With(s => s.CreatedAt, DateTime.UtcNow)
-               .With(s => s.UpdatedAt, DateTime.UtcNow)
-               .Create();
+          _delivery.Steps.Add(secondStep);
           
           _mockItineraryService
                .Setup(x => x.GetItineraryInfoAsync(
@@ -106,23 +111,25 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
           });
      }
 
-     private async Task ClearDatabaseAsync(BackendDbContext dbContext)
+     private async static Task ResetDatabaseAsync(BackendDbContext dbContext)
      {
-          await dbContext.Deliveries
-               .Where(d => d.Id == _delivery.Id)
-               .ExecuteDeleteAsync(CancellationToken.None);
+          await dbContext.Database.EnsureDeletedAsync();
+          await dbContext.Database.MigrateAsync();
      }
 
      [Fact]
      public async Task ShouldPatchDeliveryStepOrderWithCamelCasePath()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
           var secondStep = _delivery.Steps[1];
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var patchDocument = new JsonPatchDocument<object>();
@@ -167,7 +174,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -175,11 +182,14 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
      public async Task ShouldPatchDeliveryStepEstimatedDeliveryDateWithCamelCasePath()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var newEstimatedDeliveryDate = DateTimeOffset.UtcNow.AddHours(1);
@@ -220,7 +230,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -230,10 +240,14 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
           // Arrange
           var firstStep = _delivery.Steps[0];
           var secondStep = _delivery.Steps[1];
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var patchDocument = new JsonPatchDocument<object>();
@@ -278,7 +292,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -316,11 +330,14 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
      public async Task ShouldReturnBadRequestWhenPatchPathIsInvalid()
      {
           // Arrange
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var patchDocument = new JsonPatchDocument<object>();
@@ -348,7 +365,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -357,10 +374,14 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
      {
           // Arrange
           var firstStep = _delivery.Steps[0];
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var patchDocument = new JsonPatchDocument<object>();
@@ -388,7 +409,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 
@@ -397,7 +418,11 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
      {
           // Arrange
           var firstStep = _delivery.Steps[0];
-          var dbContext = _factory.Services.CreateAsyncScope().ServiceProvider.GetService<BackendDbContext>();
+          
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+          
           var client = _factory.CreateClient();
 
           await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
@@ -428,7 +453,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<WebApplicationFac
           finally
           {
                // Clean
-               await ClearDatabaseAsync(dbContext);
+               await ResetDatabaseAsync(dbContext);
           }
      }
 }
