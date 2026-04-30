@@ -1,4 +1,5 @@
 ﻿using Ardalis.Result;
+using Facet.Extensions;
 using Facet.Mapping;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
@@ -43,6 +44,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                .NotEmpty()
                .Must(urgency => urgencies.GetAll().Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
                .WithMessage("Valeur d'urgence saisie invalide.");
+
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.Discount).NotEmpty();
           RuleForEach(x => x.Steps)
@@ -52,10 +54,12 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                     step.RuleFor(s => s.StepType).IsInEnum().WithMessage("Type d'étape invalide.");
                     step.RuleFor(s => s.EstimatedDeliveryDate).NotEmpty();
                });
+
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
           RuleFor(x => x.PackingSize).NotEmpty().Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
                .WithMessage("Taille de colis saisie invalide.");
+
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
@@ -91,9 +95,25 @@ public class UpdateDeliveryHandler(
           entity.InsulatedBox = command.InsulatedBox;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
-          
+
           var steps = command.Steps
-               .Select(step => DeliveryStepCrudMapper.ToDomain(step, entity))
+               .Select(step =>
+               {
+                    var deliveryStep = new DeliveryStep(
+                         step.StepType,
+                         step.Order,
+                         step.StepAddress,
+                         step.Comment)
+                    {
+                         Id = step.Id,
+                         StepAddress = step.StepAddress,
+                         StepZone = step.StepZone,
+                         ParentDelivery = entity,
+                    };
+                    
+                    DeliveryStepCrudMapper.Map(step, deliveryStep);
+                    return deliveryStep;
+               })
                .ToList();
 
           await entity.UpdateStepsAsync(steps, deliveryZones, pricingStrategyService, itineraryService);

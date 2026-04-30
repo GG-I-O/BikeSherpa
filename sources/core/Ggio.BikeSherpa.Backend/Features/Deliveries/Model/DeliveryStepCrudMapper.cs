@@ -3,33 +3,19 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 
-public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStep, DeliveryStepCrud>
+public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStep, DeliveryStepCrud>, IFacetMapConfiguration<DeliveryStepCrud, DeliveryStep>
 {
-     public static void Map(DeliveryStep source, DeliveryStepCrud target)
-     {
-          
-     }
+     public static void Map(DeliveryStep source, DeliveryStepCrud target){}
 
-     public static DeliveryStep ToDomain(DeliveryStepCrud source, Delivery parentDelivery)
+     public static void Map(DeliveryStepCrud source, DeliveryStep target)
      {
-          return new DeliveryStep(
-               source.StepType,
-               parentDelivery.Steps.Count + 1,
-               source.StepAddress,
-               source.Comment)
-          {
-               Id = source.Id,
-               StepAddress = source.StepAddress,
-               StepZone = source.StepZone,
-               ParentDelivery = parentDelivery,
-               Completed = source.Completed,
-               Distance = source.Distance,
-               CourierId = source.CourierId,
-               AttachmentFilePaths = source.AttachmentFilePaths,
-               EstimatedDeliveryDate = source.EstimatedDeliveryDate,
-               RealDeliveryDate = source.RealDeliveryDate,
-               CreatedAt = source.CreatedAt,
-               UpdatedAt = source.UpdatedAt
-          };
+          target.Completed = source.Completed;
+          target.Distance = source.Distance;
+          target.CourierId = source.CourierId;
+          target.AttachmentFilePaths = source.AttachmentFilePaths;
+          target.EstimatedDeliveryDate = source.EstimatedDeliveryDate;
+          target.RealDeliveryDate = source.RealDeliveryDate;
+          target.CreatedAt = source.CreatedAt;
+          target.UpdatedAt = source.UpdatedAt;
      }
 }
