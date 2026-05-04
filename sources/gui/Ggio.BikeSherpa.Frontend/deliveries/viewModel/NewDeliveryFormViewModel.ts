@@ -10,13 +10,6 @@ export default class NewDeliveryFormViewModel extends AbstractFormViewModel {
     // Keep it as a lambda to be able to use "this" on services.
     // JavaScript does not bind "this" to the instance of the class if declared as a method
     public onSubmit = (delivery: DeliveryFormValues): void => {
-        const customerCode = delivery.customerId;
-        const customerId = this.customerServices.getCustomerIdByCode(customerCode);
-
-        if (!customerId)
-            return;
-        delivery.customerId = customerId;
-
         // Mapping
         const deliveryObject: Delivery = {
             id: Crypto.randomUUID(),

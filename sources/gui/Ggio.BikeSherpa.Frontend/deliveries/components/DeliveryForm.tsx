@@ -20,6 +20,7 @@ interface DeliveryFormProps<T extends FieldValues> {
     errors: FieldErrors<T>;
     buttonName: string;
     getCustomerOptions: (query: string) => Promise<Customer[]>;
+    getCustomer?: (id: string) => Customer;
     urgencies: DropdownOptions[];
     pricingStrategies: DropdownOptions[];
     packingSizes: DropdownOptions[];
@@ -40,16 +41,6 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
             style={[formStyle.container, {backgroundColor: theme.colors.background}]}
             contentContainerStyle={formStyle.elements}
         >
-            <ThemedInput
-                testID="deliveryFormCustomerInput"
-                control={control}
-                name="customerId"
-                error={errors.customerId as FieldError | undefined}
-                label="Code client"
-                placeholder="CL1"
-                required
-                disabled={props.update}
-            />
             <ThemedRHFSuggestiveInput<Customer, string>
                 name="customerId"
                 control={control}
@@ -58,8 +49,16 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 placeholder="CL1"
                 error={errors.customerId as FieldError | undefined}
                 fetchSuggestions={props.getCustomerOptions}
+                minLength={1}
                 getOptionLabel={(customer: Customer) => `${customer.code} - ${customer.name}`}
                 getOptionValue={customer => customer.id}
+                getLabelFromValue={
+                    props.getCustomer ?
+                        customerId => {
+                            const customer = props.getCustomer!(customerId);
+                            return `${customer.code} - ${customer.name}`
+                        } : undefined
+                }
             />
             <ThemedDropdownInput
                 testID="deliveryFormPricingStrategyInput"
@@ -113,7 +112,6 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 error={errors.details as FieldError | undefined}
                 label="Distance"
                 placeholder="Message lambda"
-                isAnArray
             />
             <ThemedInput
                 testID="deliveryFormDetailsInput"
@@ -141,15 +139,15 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 label="Caisson isotherme"
                 required
             />
-            <View style={{width: '100%', flexDirection: 'row'}}>
+            <View style={[formStyle.intputContainer, {flexDirection: 'row'}]}>
                 <ThemedDateInput
+                    style={{marginRight: 16}}
                     testID="deliveryFormContractDateInput"
                     control={control}
                     name="contractDate"
                     error={errors.contractDate as FieldError | undefined}
                     label="Date de la demande"
                     required
-                    disabled={props.update}
                 />
                 <ThemedTimeInput
                     control={control}
@@ -158,8 +156,9 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                     required
                 />
             </View>
-            <View style={{width: '100%', flexDirection: 'row'}}>
+            <View style={[formStyle.intputContainer, {flexDirection: 'row'}]}>
                 <ThemedDateInput
+                    style={{marginRight: 16}}
                     testID="deliveryFormStartDateInput"
                     control={control}
                     name="startDate"

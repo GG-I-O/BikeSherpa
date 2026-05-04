@@ -35,7 +35,7 @@ export function useNewDeliveryFormViewModel() {
             reportId: '',
             steps: [],
             details: [""],
-            packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'L',
+            packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
             insulatedBox: false,
             startDate: new Date().toISOString(),
             contractDate: new Date().toISOString(),

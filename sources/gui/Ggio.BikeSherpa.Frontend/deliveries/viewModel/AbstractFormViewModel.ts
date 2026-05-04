@@ -18,9 +18,8 @@ export default abstract class AbstractFormViewModel {
         this.customerServices = customerServices;
     }
 
+    // Add Customer validation
     public getDeliverySchema = () => {
-        // Asking user to input the customer code, so that's what we validate
-        // We convert it onsubmit later
         const customerList = Object.values(
             this.customerServices.getCustomerList$().get()
         );
@@ -28,14 +27,14 @@ export default abstract class AbstractFormViewModel {
         return deliveryFormBaseSchema.extend({
             customerId: deliveryFormBaseSchema.shape.code.refine(
                 (value) => customerList.some(
-                    (customer) => customer.code === value
+                    (customer) => customer.id === value
                 ),
                 "Code client inexistant"
             )
         });
     }
     
-    public getCustomerOptions = async (query: string): Promise<Customer[]> => {
+    public getCustomerOptions = async (query: string): Promise<Customer[]>  => {
         const customerList = Object.values(
             this.customerServices.getCustomerList$().get()
         );

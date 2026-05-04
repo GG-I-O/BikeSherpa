@@ -19,6 +19,8 @@ export interface SuggestiveInputProps<T, V> {
     fetchSuggestions: SuggestionFetcher<T>;
     getOptionLabel: SuggestionRenderer<T>;
     getOptionValue: (item: T) => V;
+
+    getLabelFromValue?: (value: V) => string;
     
     minLength?: number;
 }
@@ -34,6 +36,7 @@ export function ThemedSuggestiveInput<T, V>(
         fetchSuggestions,
         getOptionLabel,
         getOptionValue,
+        getLabelFromValue,
         minLength = 3
     }: SuggestiveInputProps<T, V>
 ) {
@@ -49,6 +52,13 @@ export function ThemedSuggestiveInput<T, V>(
 
     const containerRef = useRef<View>(null);
     const timerRef = useRef<number | null>(null);
+
+    // Hydrate default value
+    useEffect(() => {
+        if (value && getLabelFromValue) {
+            setQuery(getLabelFromValue(value));
+        }
+    }, [value, getLabelFromValue]);
 
     // Debounce
     const updateQuery = (text: string) => {
@@ -148,6 +158,7 @@ export function ThemedSuggestiveInput<T, V>(
                                     onPress={() => {
                                         onChange(getOptionValue(item));
                                         setQuery(getOptionLabel(item));
+                                        setDebouncedQuery('');
                                         setOpen(false);
                                     }}
                                 >

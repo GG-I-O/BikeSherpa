@@ -27,7 +27,7 @@ export function useDeliveryEditFormViewModel(deliveryId: string) {
         defaultValues: {
             code: delivery.code,
             status: delivery.status,
-            customerId: customerServices.getCustomer$(delivery.customerId).get().code,
+            customerId: customerServices.getCustomer$(delivery.customerId).get().id,
             pricingStrategy: delivery.pricingStrategy,
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,
@@ -60,6 +60,7 @@ export function useDeliveryEditFormViewModel(deliveryId: string) {
         urgencies,
         pricingStrategies,
         packingSizes,
-        getCustomerOptions: viewModel.getCustomerOptions
+        getCustomerOptions: viewModel.getCustomerOptions,
+        getCustomer: (id: string) => customerServices.getCustomer$(id).peek(),
     };
 }

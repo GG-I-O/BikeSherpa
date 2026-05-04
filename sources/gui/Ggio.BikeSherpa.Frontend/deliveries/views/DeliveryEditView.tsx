@@ -11,6 +11,7 @@ export default function DeliveryEditView() {
         errors,
         handleSubmit,
         getCustomerOptions,
+        getCustomer,
         urgencies,
         pricingStrategies,
         packingSizes
@@ -23,6 +24,7 @@ export default function DeliveryEditView() {
             handleSubmit={handleSubmit}
             buttonName="Mettre à jour la course"
             getCustomerOptions={getCustomerOptions}
+            getCustomer={getCustomer}
             urgencies={urgencies}
             pricingStrategies={pricingStrategies}
             packingSizes={packingSizes}

@@ -38,6 +38,7 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = (
             fetchSuggestions={(q) => addressService.fetchAddress(q)}
             getOptionLabel={(a) => a.fullAddress}
             getOptionValue={(a) => a}
+            getLabelFromValue={a => a.fullAddress}
         />
     );
 };

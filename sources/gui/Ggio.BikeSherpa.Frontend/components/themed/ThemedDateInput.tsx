@@ -2,7 +2,7 @@ import React from 'react';
 import {Control, FieldError, useController} from 'react-hook-form';
 import {Text, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
-import {View} from 'react-native';
+import {StyleProp, View, ViewStyle} from 'react-native';
 import {DatePickerInput} from "react-native-paper-dates";
 
 interface CustomDateInputProps {
@@ -13,6 +13,7 @@ interface CustomDateInputProps {
     required?: boolean;
     testID?: string;
     disabled?: boolean;
+    style?: StyleProp<ViewStyle>
 }
 
 const ThemedDateInput: React.FC<CustomDateInputProps> = (
@@ -22,7 +23,8 @@ const ThemedDateInput: React.FC<CustomDateInputProps> = (
         label,
         error,
         required = false,
-        disabled
+        disabled,
+        style
     }) => {
     const theme = useTheme();
 
@@ -32,7 +34,7 @@ const ThemedDateInput: React.FC<CustomDateInputProps> = (
     });
 
     return (
-        <View style={formStyle.intputContainer}>
+        <View style={style ? style : formStyle.intputContainer}>
             <Text
                 style={[formStyle.label, {color: theme.colors.onBackground}, theme.fonts.labelLarge]}>{label}{required &&
                 <Text style={{color: theme.colors.error}}> *</Text>}
