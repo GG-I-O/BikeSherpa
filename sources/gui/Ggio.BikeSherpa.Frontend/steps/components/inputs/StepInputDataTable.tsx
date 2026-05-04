@@ -22,6 +22,7 @@ export default function StepInputDataTable({name, control}: Props) {
         append({
             stepType: 0,
             comment: '',
+            notBilled: false,
             address: {
                 name: '',
                 fullAddress: '',
@@ -54,6 +55,9 @@ export default function StepInputDataTable({name, control}: Props) {
                     </DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>
                         <Text>Adresse</Text>
+                    </DataTable.Title>
+                    <DataTable.Title style={[datatableStyle.column, datatableStyle.width90]}>
+                        <Text>Retour dispatch</Text>
                     </DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>
                         <Text>Infos livraison</Text>

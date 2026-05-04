@@ -17,7 +17,8 @@ public record AddDeliveryStepCommand(
      Guid DeliveryId,
      StepType StepType,
      Address StepAddress,
-     string? comment
+     string? Comment,
+     bool NotBilled
      ) : ICommand<Result<Guid>>;
 
 [UsedImplicitly]
@@ -51,7 +52,7 @@ public class AddDeliveryStepHandler(
                return Result<Guid>.NotFound();
           }
 
-          var deliveryStep = await delivery.AddStepAsync(command.StepType, command.StepAddress, command.comment, deliveryZones, pricingStrategyService, itineraryService);
+          var deliveryStep = await delivery.AddStepAsync(command.StepType, command.StepAddress, command.Comment, command.NotBilled, deliveryZones, pricingStrategyService, itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);

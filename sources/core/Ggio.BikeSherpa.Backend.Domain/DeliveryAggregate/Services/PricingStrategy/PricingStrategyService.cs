@@ -36,7 +36,7 @@ public class PricingStrategyService(
           var dropoffsInBorder = delivery.Steps.Count(s => s.StepZone.Name == "Limitrophe");
           var dropoffsInPeriphery = delivery.Steps.Count(s => s.StepZone.Name == "Périphérie");
           var dropoffsOutside = delivery.Steps.Count(s => s.StepZone.Name == "Extérieur");
-          var totalDistance = delivery.Steps.Sum(s => s.Distance);
+          var totalDistance = delivery.Steps.Where(s => !s.NotBilled).Sum(s => s.Distance);
           
           return strategy.CalculateDeliveryPriceWithoutVat(
                delivery.StartDate,

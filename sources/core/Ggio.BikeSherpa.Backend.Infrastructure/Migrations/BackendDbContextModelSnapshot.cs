@@ -56,7 +56,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Couriers", (string)null);
+                    b.ToTable("Couriers");
                 });
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer", b =>
@@ -95,7 +95,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.City", b =>
@@ -475,7 +475,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.HasKey("CourierId");
 
-                            b1.ToTable("Couriers", (string)null);
+                            b1.ToTable("Couriers");
 
                             b1.WithOwner()
                                 .HasForeignKey("CourierId");
@@ -522,7 +522,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.HasKey("CustomerId");
 
-                            b1.ToTable("Customers", (string)null);
+                            b1.ToTable("Customers");
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerId");
@@ -570,6 +570,9 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.Property<DateTimeOffset>("EstimatedDeliveryDate")
                                 .HasColumnType("timestamp with time zone");
+
+                            b1.Property<bool>("NotBilled")
+                                .HasColumnType("boolean");
 
                             b1.Property<int>("Order")
                                 .HasColumnType("integer");
@@ -639,7 +642,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                                     b2.HasKey("DeliveryStepId");
 
-                                    b2.ToTable("DeliverySteps", (string)null);
+                                    b2.ToTable("DeliverySteps");
 
                                     b2.WithOwner()
                                         .HasForeignKey("DeliveryStepId");

@@ -93,22 +93,4 @@ public class AddDeliveryStepHandlerTest
           result.IsSuccess.Should().BeFalse();
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
      }
-
-     [Fact]
-     public void Handle_ShouldThrowValidationException_WhenDeliveryIdIsEmpty()
-     {
-
-     }
-
-     [Fact]
-     public void Handle_ShouldThrowValidationException_WhenStepTypeIsInvalid()
-     {
-
-     }
-
-     [Fact]
-     public void Handle_ShouldThrowValidationException_WhenStepAddressIsEmpty()
-     {
-
-     }
 }

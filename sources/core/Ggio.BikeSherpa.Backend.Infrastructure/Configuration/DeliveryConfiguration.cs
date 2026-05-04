@@ -47,6 +47,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                steps.Property(s => s.Distance).IsRequired();
                steps.Property(s => s.EstimatedDeliveryDate).IsRequired();
                steps.Property(s => s.RealDeliveryDate);
+               steps.Property(s => s.NotBilled).IsRequired();
                steps.ToTable("DeliverySteps");
           });
      }

@@ -316,6 +316,7 @@ public class DeliveryTests
             StepType.Pickup,
             address,
             "CommentPickup",
+            false,
             mockDeliveryZoneRepository.Object,
             mockPricingStrategyService.Object,
             mockItineraryService.Object
@@ -324,6 +325,7 @@ public class DeliveryTests
             StepType.Dropoff,
             address,
             "CommentDropoff",
+            false,
             mockDeliveryZoneRepository.Object,
             mockPricingStrategyService.Object,
             mockItineraryService.Object
@@ -336,6 +338,8 @@ public class DeliveryTests
         delivery.Steps[0].StepAddress.Should().Be(address);
         delivery.Steps[0].StepZone.Should().NotBe(null);
         delivery.Steps[0].Id.Should().NotBeEmpty();
+        delivery.Steps[0].Comment.Should().Be("CommentPickup");
+        delivery.Steps[0].NotBilled.Should().BeFalse();
         delivery.Steps[0].EstimatedDeliveryDate.Should().Be(delivery.StartDate);
         delivery.Steps[1].EstimatedDeliveryDate.Should().Be(delivery.StartDate.AddMinutes(15));
     }
@@ -352,6 +356,7 @@ public class DeliveryTests
             StepType.Dropoff,
             address,
             "CommentDropoff",
+            false,
             mockDeliveryZoneRepository.Object,
             mockPricingStrategyService.Object,
             mockItineraryService.Object);
@@ -373,6 +378,7 @@ public class DeliveryTests
         await delivery.AddStepAsync(StepType.Pickup,
             address,
             "CommentPickup",
+            false,
             mockDeliveryZoneRepository.Object,
             mockPricingStrategyService.Object,
             mockItineraryService.Object);
@@ -392,6 +398,7 @@ public class DeliveryTests
         await delivery.AddStepAsync(StepType.Pickup,
             address,
             "CommentPickup",
+            false,
             mockDeliveryZoneRepository.Object,
             mockPricingStrategyService.Object,
             mockItineraryService.Object);

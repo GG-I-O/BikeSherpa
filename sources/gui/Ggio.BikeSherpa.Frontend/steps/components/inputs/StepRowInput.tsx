@@ -6,6 +6,8 @@ import React from "react";
 import ThemedInput from "@/components/themed/ThemedInput";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";
+import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
+import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 
 type Props = {
     control: Control<any>;
@@ -56,6 +58,14 @@ export default function StepRowInput({control, name, index, deleteRow, moveRow, 
                     name={`${name}.${index}.stepAddress`}
                     label=""
                     placeholder="Adresse..."
+                />
+            </DataTable.Cell>
+            <DataTable.Cell style={[datatableStyle.column, datatableStyle.width90]}>
+                <ThemedCheckboxInput
+                    testID="StepNotBilledInput"
+                    control={control}
+                    name={`${name}.${index}.notBilled`}
+                    label=""
                 />
             </DataTable.Cell>
             <DataTable.Cell style={[datatableStyle.column]}>

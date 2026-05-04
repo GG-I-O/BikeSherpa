@@ -21,6 +21,7 @@ export class Step extends InputStep implements Storable, HateoasLinks {
         distance: number,
         courierId: string,
         comment: string,
+        notBilled: boolean,
         attachmentFilePaths: string[],
         estimatedDeliveryDate: string,
         realDeliveryDate: string
@@ -34,6 +35,7 @@ export class Step extends InputStep implements Storable, HateoasLinks {
             distance,
             courierId,
             comment,
+            notBilled,
             attachmentFilePaths,
             estimatedDeliveryDate,
             realDeliveryDate
