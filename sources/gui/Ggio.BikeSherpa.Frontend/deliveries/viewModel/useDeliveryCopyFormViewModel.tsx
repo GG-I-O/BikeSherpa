@@ -3,19 +3,18 @@ import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import {ICustomerService} from "@/spi/CustomerSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
-import DeliveryEditFormViewModel from "@/deliveries/viewModel/DeliveryEditFormViewModel";
 import useDeliveryDropdown from "@/deliveries/hooks/useDeliveryDropdown";
 import Delivery from "@/deliveries/models/Delivery";
 import {useForm} from "react-hook-form";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 import {zodResolver} from "@hookform/resolvers/zod";
-import DeliveryCopyFormViewModel from "@/deliveries/viewModel/DeliveryCopyFormViewModel";
 import {navigate} from "expo-router/build/global-state/routing";
+import NewDeliveryFormViewModel from "@/deliveries/viewModel/NewDeliveryFormViewModel";
 
 export function useDeliveryCopyFormViewModel(deliveryId: string) {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
-    const viewModel = new DeliveryCopyFormViewModel(deliveryServices, customerServices);
+    const viewModel = new NewDeliveryFormViewModel(deliveryServices, customerServices);
 
     const {urgencies, pricingStrategies, packingSizes} = useDeliveryDropdown();
 
@@ -29,11 +28,13 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
         defaultValues: {
             code: delivery.code,
             status: delivery.status,
-            customerId: customerServices.getCustomer$(delivery.customerId).get().code,
+            customerId: customerServices.getCustomer$(delivery.customerId).get().id,
             pricingStrategy: delivery.pricingStrategy,
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,
             discount: delivery.discount ?? 0,
+            extraCost: delivery.extraCost ?? 0,
+            distance: delivery.distance ?? 0,
             reportId: delivery.reportId ?? '',
             steps: delivery.steps,
             details: delivery.details,
@@ -42,7 +43,7 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
             startDate: delivery.startDate,
             contractDate: delivery.contractDate,
         },
-        resolver: zodResolver(viewModel.getCopyDeliverySchema())
+        resolver: zodResolver(viewModel.getDeliverySchema())
     });
 
     return {
@@ -62,6 +63,8 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
         errors,
         urgencies,
         pricingStrategies,
-        packingSizes
+        packingSizes,
+        getCustomerOptions: viewModel.getCustomerOptions,
+        getCustomer: (id: string) => customerServices.getCustomer$(id).peek(),
     };
 }

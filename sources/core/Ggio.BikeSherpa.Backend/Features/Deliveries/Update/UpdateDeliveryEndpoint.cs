@@ -28,6 +28,8 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
                req.Urgency,
                req.TotalPrice,
                req.Discount,
+               req.ExtraCost,
+               req.Distance,
                req.ReportId!,
                req.Steps.Select(dto => dto.Data).ToList(),
                req.Details,

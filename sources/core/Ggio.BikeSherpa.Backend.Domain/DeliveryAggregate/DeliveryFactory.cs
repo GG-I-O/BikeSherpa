@@ -16,6 +16,8 @@ public interface IDeliveryFactory
           string urgency,
           double? totalPrice,
           double? discount,
+          double? extraCost,
+          double? distance,
           string[] details,
           string packingSize,
           bool insulatedBox,
@@ -31,8 +33,20 @@ public class DeliveryFactory(
      IPricingStrategyService pricingStrategyService
 ) : FactoryBase(mediator), IDeliveryFactory
 {
-     public async Task<Delivery> CreateDeliveryAsync(PricingStrategy pricingStrategy, Guid customerId, string urgency, double? totalPrice, double? discount, string[] details, string packingSize,
-          bool insulatedBox, DateTimeOffset contractDate, DateTimeOffset startDate)
+     public async Task<Delivery> CreateDeliveryAsync(
+          PricingStrategy pricingStrategy,
+          Guid customerId,
+          string urgency,
+          double? totalPrice,
+          double? discount,
+          double? extraCost,
+          double? distance,
+          string[] details,
+          string packingSize,
+          bool insulatedBox,
+          DateTimeOffset contractDate,
+          DateTimeOffset startDate
+     )
      {
           var delivery = new Delivery
           {
@@ -43,6 +57,8 @@ public class DeliveryFactory(
                Urgency = urgency,
                TotalPrice = totalPrice,
                Discount = discount,
+               ExtraCost = extraCost,
+               Distance = distance,
                Details = details,
                Steps = [],
                PackingSize = packingSize,

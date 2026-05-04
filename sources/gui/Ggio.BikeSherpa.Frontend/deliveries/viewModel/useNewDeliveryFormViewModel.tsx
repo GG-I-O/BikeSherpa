@@ -12,7 +12,7 @@ import useDeliveryDropdown from "@/deliveries/hooks/useDeliveryDropdown";
 export function useNewDeliveryFormViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
-    const newDeliveryViewModel = new NewDeliveryFormViewModel(deliveryServices, customerServices);
+    const viewModel = new NewDeliveryFormViewModel(deliveryServices, customerServices);
 
     const { urgencies, pricingStrategies, packingSizes } = useDeliveryDropdown();
 
@@ -30,24 +30,26 @@ export function useNewDeliveryFormViewModel() {
             urgency: urgencies.length > 0 ? urgencies[0].value : 'Standard',
             totalPrice: 0,
             discount: 0,
+            extraCost: 0,
+            distance: 0,
             reportId: '',
             steps: [],
             details: [""],
-            packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'L',
+            packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
             insulatedBox: false,
             startDate: new Date().toISOString(),
             contractDate: new Date().toISOString(),
         },
-        resolver: zodResolver(newDeliveryViewModel.getNewDeliverySchema())
+        resolver: zodResolver(viewModel.getDeliverySchema())
     });
 
-    newDeliveryViewModel.setResetCallback(reset);
+    viewModel.setResetCallback(reset);
 
     return {
         control,
         handleSubmit: handleSubmit(
             (data) => {
-                newDeliveryViewModel.onSubmit(data);
+                viewModel.onSubmit(data);
             },
             (errors) => {
                 console.error("Invalid delivery for creation");
@@ -57,6 +59,7 @@ export function useNewDeliveryFormViewModel() {
         errors,
         urgencies,
         pricingStrategies,
-        packingSizes
+        packingSizes,
+        getCustomerOptions: viewModel.getCustomerOptions
     };
 }

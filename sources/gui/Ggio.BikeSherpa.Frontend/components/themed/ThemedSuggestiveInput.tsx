@@ -7,19 +7,25 @@ import {FieldError} from "react-hook-form";
 export type SuggestionFetcher<T> = (query: string) => Promise<T[] | null>;
 export type SuggestionRenderer<T> = (item: T) => string;
 
-export interface SuggestiveInputProps<T> {
-    value: T | null;
-    onChange: (value: T | null) => void;
+export interface SuggestiveInputProps<T, V> {
+    value: V | null;
+    onChange: (value: V | null) => void;
+    
     label?: string;
     required?: boolean;
     placeholder?: string;
     error?: FieldError | undefined
+    
     fetchSuggestions: SuggestionFetcher<T>;
-    renderLabel: SuggestionRenderer<T>;
+    getOptionLabel: SuggestionRenderer<T>;
+    getOptionValue: (item: T) => V;
+
+    getLabelFromValue?: (value: V) => string;
+    
     minLength?: number;
 }
 
-export function ThemedSuggestiveInput<T>(
+export function ThemedSuggestiveInput<T, V>(
     {
         value,
         onChange,
@@ -28,9 +34,11 @@ export function ThemedSuggestiveInput<T>(
         placeholder,
         error,
         fetchSuggestions,
-        renderLabel,
+        getOptionLabel,
+        getOptionValue,
+        getLabelFromValue,
         minLength = 3
-    }: SuggestiveInputProps<T>
+    }: SuggestiveInputProps<T, V>
 ) {
     const theme = useTheme();
 
@@ -44,6 +52,13 @@ export function ThemedSuggestiveInput<T>(
 
     const containerRef = useRef<View>(null);
     const timerRef = useRef<number | null>(null);
+
+    // Hydrate default value
+    useEffect(() => {
+        if (value && getLabelFromValue) {
+            setQuery(getLabelFromValue(value));
+        }
+    }, [value, getLabelFromValue]);
 
     // Debounce
     const updateQuery = (text: string) => {
@@ -99,7 +114,7 @@ export function ThemedSuggestiveInput<T>(
             >
                 <TextInput
                     testID="themedSuggestiveTextInput"
-                    value={value ? renderLabel(value) : query}
+                    value={query}
                     placeholder={placeholder}
                     onFocus={measure}
                     mode='outlined'
@@ -141,11 +156,13 @@ export function ThemedSuggestiveInput<T>(
                                 <Button
                                     testID="themedSuggestiveInputSuggestionButton"
                                     onPress={() => {
-                                        onChange(item);
+                                        onChange(getOptionValue(item));
+                                        setQuery(getOptionLabel(item));
+                                        setDebouncedQuery('');
                                         setOpen(false);
                                     }}
                                 >
-                                    <Text>{renderLabel(item)}</Text>
+                                    <Text>{getOptionLabel(item)}</Text>
                                 </Button>
                             )}
                         />

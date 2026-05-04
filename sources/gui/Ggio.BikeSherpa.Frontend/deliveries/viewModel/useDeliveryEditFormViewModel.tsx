@@ -5,9 +5,6 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {ICustomerService} from "@/spi/CustomerSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
-import {useEffect, useState} from "react";
-import {DropdownOptions} from "@/models/DropdownOptions";
-import {IDropdownOptions} from "@/spi/IDropdownOptions";
 import Delivery from "@/deliveries/models/Delivery";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 import useDeliveryDropdown from "@/deliveries/hooks/useDeliveryDropdown";
@@ -30,11 +27,13 @@ export function useDeliveryEditFormViewModel(deliveryId: string) {
         defaultValues: {
             code: delivery.code,
             status: delivery.status,
-            customerId: customerServices.getCustomer$(delivery.customerId).get().code,
+            customerId: customerServices.getCustomer$(delivery.customerId).get().id,
             pricingStrategy: delivery.pricingStrategy,
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,
             discount: delivery.discount ?? 0,
+            extraCost: delivery.extraCost ?? 0,
+            distance: delivery.distance ?? 0,
             reportId: delivery.reportId ?? '',
             steps: delivery.steps,
             details: delivery.details,
@@ -43,7 +42,7 @@ export function useDeliveryEditFormViewModel(deliveryId: string) {
             startDate: delivery.startDate,
             contractDate: delivery.contractDate,
         },
-        resolver: zodResolver(viewModel.getEditDeliverySchema())
+        resolver: zodResolver(viewModel.getDeliverySchema())
     });
 
     return {
@@ -60,6 +59,8 @@ export function useDeliveryEditFormViewModel(deliveryId: string) {
         errors,
         urgencies,
         pricingStrategies,
-        packingSizes
+        packingSizes,
+        getCustomerOptions: viewModel.getCustomerOptions,
+        getCustomer: (id: string) => customerServices.getCustomer$(id).peek(),
     };
 }

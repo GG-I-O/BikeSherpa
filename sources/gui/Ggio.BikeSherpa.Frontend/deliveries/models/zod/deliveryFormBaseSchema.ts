@@ -30,6 +30,14 @@ const deliveryFormBaseSchema = zod
             .number()
             .gte(0, "La remise ne peut pas être négative")
             .nullable(),
+        extraCost: zod
+            .number()
+            .gte(0, "Le surcout ne peut pas être négatif")
+            .nullable(),
+        distance: zod
+            .number()
+            .gte(0, "La distance ne peut pas être négative")
+            .nullable(),
         reportId: zod
             .string()
             .nullable(),

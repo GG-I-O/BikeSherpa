@@ -8,8 +8,6 @@ const PricingStrategyDto = z.object({
   value: PricingStrategy,
 });
 const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
-const HasDomainEventsBase = z.object({});
-const EntityBaseOfGuid = HasDomainEventsBase.and(z.object({ id: z.string() }));
 const StepType = z.union([z.literal(0), z.literal(1)]);
 const GeoPoint = z.object({ longitude: z.number(), latitude: z.number() });
 const Address = z.object({
@@ -22,30 +20,29 @@ const Address = z.object({
 });
 const City = z.object({ name: z.string() });
 const DeliveryZone = z.object({ name: z.string(), cities: z.array(City) });
-const DeliveryStep = EntityBaseOfGuid.and(
-  z.object({
-    stepType: StepType,
-    order: z.number().int(),
-    completed: z.boolean(),
-    stepAddress: Address,
-    stepZone: DeliveryZone,
-    distance: z.number(),
-    courierId: z.string().nullable(),
-    comment: z.string().nullable(),
-    attachmentFilePaths: z.array(z.string()).nullable(),
-    estimatedDeliveryDate: z.string().datetime({ offset: true }),
-    realDeliveryDate: z.string().datetime({ offset: true }).nullable(),
-    createdAt: z.string().datetime({ offset: true }),
-    updatedAt: z.string().datetime({ offset: true }),
-  })
-);
+const DeliveryStepCrud = z.object({
+  stepType: StepType,
+  order: z.number().int(),
+  completed: z.boolean(),
+  stepAddress: Address,
+  stepZone: DeliveryZone,
+  distance: z.number(),
+  courierId: z.string().nullable(),
+  comment: z.string().nullable(),
+  attachmentFilePaths: z.array(z.string()).nullable(),
+  estimatedDeliveryDate: z.string().datetime({ offset: true }),
+  realDeliveryDate: z.string().datetime({ offset: true }).nullable(),
+  createdAt: z.string().datetime({ offset: true }),
+  updatedAt: z.string().datetime({ offset: true }),
+  id: z.string(),
+});
 const Link = z.object({
   href: z.string(),
   rel: z.string(),
   method: z.string(),
 });
 const DeliveryStepDto = z.object({
-  data: DeliveryStep,
+  data: DeliveryStepCrud,
   links: z.array(Link).nullable(),
 });
 const DeliveryStatus = z.union([
@@ -63,6 +60,8 @@ const DeliveryCrud = z.object({
   urgency: z.string(),
   totalPrice: z.number().nullable(),
   discount: z.number().nullable(),
+  extraCost: z.number().nullable(),
+  distance: z.number().nullable(),
   reportId: z.string().nullable(),
   details: z.array(z.string()),
   packingSize: z.string(),
@@ -81,7 +80,12 @@ const UpdateDeliveryStepCompletionRequest = z.object({
   completed: z.boolean(),
 });
 const UpdateDeliveryStepCourierRequest = z.object({ courierId: z.string() });
-const UpdateDeliveryStepOrderRequest = z.object({ order: z.number().int() });
+const UpdateDeliveryStepOrderRequest = z.object({
+  increment: z.number().int(),
+});
+const UpdateDeliveryStepTimeRequest = z.object({
+  date: z.string().datetime({ offset: true }),
+});
 const OperationBase = z.object({
   path: z.string(),
   op: z.string(),
@@ -138,14 +142,12 @@ export const schemas = {
   PricingStrategy,
   PricingStrategyDto,
   PackingSizeDto,
-  HasDomainEventsBase,
-  EntityBaseOfGuid,
   StepType,
   GeoPoint,
   Address,
   City,
   DeliveryZone,
-  DeliveryStep,
+  DeliveryStepCrud,
   Link,
   DeliveryStepDto,
   DeliveryStatus,
@@ -154,6 +156,7 @@ export const schemas = {
   UpdateDeliveryStepCompletionRequest,
   UpdateDeliveryStepCourierRequest,
   UpdateDeliveryStepOrderRequest,
+  UpdateDeliveryStepTimeRequest,
   OperationBase,
   Operation,
   OperationOfDeliveryStep,
@@ -624,7 +627,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: DeliveryStep,
+        schema: DeliveryStepCrud,
       },
       {
         name: "deliveryId",
@@ -647,12 +650,123 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "patch",
+    path: "/delivery/:deliveryId/step/:stepId",
+    alias: "PatchDeliveryStepEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: JsonPatchDocumentOfDeliveryStep,
+      },
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "stepId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "delete",
     path: "/delivery/:deliveryId/step/:stepId",
     alias: "DeleteDeliveryStepEndpoint",
     tags: ["delivery"],
     requestFormat: "json",
     parameters: [
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "stepId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "put",
+    path: "/delivery/:deliveryId/step/:stepId/changeOrder",
+    alias: "UpdateDeliveryStepOrderEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ increment: z.number().int() }),
+      },
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "stepId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "put",
+    path: "/delivery/:deliveryId/step/:stepId/changeTime",
+    alias: "UpdateDeliveryStepTimeEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ date: z.string().datetime({ offset: true }) }),
+      },
       {
         name: "deliveryId",
         type: "Path",
@@ -753,17 +867,12 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "put",
-    path: "/delivery/:deliveryId/step/:stepId/order",
-    alias: "UpdateDeliveryStepOrderEndpoint",
+    method: "delete",
+    path: "/delivery/:deliveryId/step/:stepId/courier",
+    alias: "DeleteDeliveryStepCourierEndpoint",
     tags: ["delivery"],
     requestFormat: "json",
     parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: z.object({ order: z.number().int() }),
-      },
       {
         name: "deliveryId",
         type: "Path",
@@ -790,17 +899,12 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "patch",
-    path: "/delivery/:deliveryId/step/:stepId/order",
-    alias: "PatchDeliveryStepOrderEndpoint",
+    method: "post",
+    path: "/delivery/:deliveryId/step/:stepId/courier/:courierId",
+    alias: "AddDeliveryStepCourierEndpoint",
     tags: ["delivery"],
     requestFormat: "json",
     parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: JsonPatchDocumentOfDeliveryStep,
-      },
       {
         name: "deliveryId",
         type: "Path",
@@ -811,40 +915,8 @@ const endpoints = makeApi([
         type: "Path",
         schema: z.string(),
       },
-    ],
-    response: z.void(),
-    errors: [
       {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
-  },
-  {
-    method: "patch",
-    path: "/delivery/:deliveryId/step/:stepId/time",
-    alias: "PatchDeliveryStepTimeEndpoint",
-    tags: ["delivery"],
-    requestFormat: "json",
-    parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: JsonPatchDocumentOfDeliveryStep,
-      },
-      {
-        name: "deliveryId",
-        type: "Path",
-        schema: z.string(),
-      },
-      {
-        name: "stepId",
+        name: "courierId",
         type: "Path",
         schema: z.string(),
       },

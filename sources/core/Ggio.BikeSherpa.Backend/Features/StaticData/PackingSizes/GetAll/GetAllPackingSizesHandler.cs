@@ -15,7 +15,7 @@ public class GetAllPackingSizesHandler(IPackingSizeRepository repository) : IQue
           return await Task.FromResult(
                packingSizes.Select(packingSize => new PackingSizeDto
                     {
-                         Label = packingSize.Name,
+                         Label = packingSize.Label,
                          Value = packingSize.Name
                     }
                ).ToList()

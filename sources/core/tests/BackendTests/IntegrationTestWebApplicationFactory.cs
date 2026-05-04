@@ -26,7 +26,10 @@ public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Progra
                }
 
                services.AddDbContext<BackendDbContext>(options =>
-                    options.UseNpgsql(TestConnectionString));
+               {
+                    options.UseNpgsql(TestConnectionString);
+               });
+
           });
      }
 }

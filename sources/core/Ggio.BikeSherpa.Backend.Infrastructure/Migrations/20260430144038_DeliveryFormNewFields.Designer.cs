@@ -3,6 +3,7 @@ using System;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(BackendDbContext))]
-    partial class BackendDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430144038_DeliveryFormNewFields")]
+    partial class DeliveryFormNewFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +59,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Couriers", (string)null);
+                    b.ToTable("Couriers");
                 });
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer", b =>
@@ -95,7 +98,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.City", b =>
@@ -475,7 +478,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.HasKey("CourierId");
 
-                            b1.ToTable("Couriers", (string)null);
+                            b1.ToTable("Couriers");
 
                             b1.WithOwner()
                                 .HasForeignKey("CourierId");
@@ -522,7 +525,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.HasKey("CustomerId");
 
-                            b1.ToTable("Customers", (string)null);
+                            b1.ToTable("Customers");
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerId");
@@ -639,7 +642,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                                     b2.HasKey("DeliveryStepId");
 
-                                    b2.ToTable("DeliverySteps", (string)null);
+                                    b2.ToTable("DeliverySteps");
 
                                     b2.WithOwner()
                                         .HasForeignKey("DeliveryStepId");

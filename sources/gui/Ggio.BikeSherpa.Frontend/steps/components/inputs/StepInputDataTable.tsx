@@ -56,7 +56,7 @@ export default function StepInputDataTable({name, control}: Props) {
                         <Text>Adresse</Text>
                     </DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>
-                        <Text>Commentaire</Text>
+                        <Text>Infos livraison</Text>
                     </DataTable.Title>
                 </DataTable.Header>
 

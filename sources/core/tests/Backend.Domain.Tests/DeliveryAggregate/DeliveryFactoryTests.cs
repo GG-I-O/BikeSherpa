@@ -48,6 +48,7 @@ public class DeliveryFactoryTests
                .With(d => d.Steps, [])
                .With(d => d.Code, $"{CustomerCode}-{ContractDate.Day}{ContractDate.Month}{ContractDate.Year}-1")
                .Create();
+
           _deliveryRepositoryMock
                .Setup(d => d.ListAsync(It.IsAny<ISpecification<Delivery>>()))
                .ReturnsAsync([fakeDelivery]);
@@ -71,10 +72,18 @@ public class DeliveryFactoryTests
           DateTimeOffset? contractDate = null,
           DateTimeOffset? startDate = null) =>
           _sut.CreateDeliveryAsync(
-               strategy, customerId ?? CustomerId, urgency,
-               totalPrice, discount, details ?? [], packingSize,
+               strategy,
+               customerId ?? CustomerId,
+               urgency,
+               totalPrice,
+               discount,
+               extraCost: 0,
+               distance: 0,
+               details ?? [], packingSize,
                insulatedBox,
-               contractDate ?? ContractDate, startDate ?? StartDate);
+               contractDate ?? ContractDate,
+               startDate ?? StartDate
+          );
 
      [Fact]
      public async Task CreateDelivery_MapsAllPropertiesOntoTheReturnedDelivery()

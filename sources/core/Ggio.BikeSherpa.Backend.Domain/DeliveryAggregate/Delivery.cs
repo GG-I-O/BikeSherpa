@@ -18,6 +18,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required string Urgency { get; set; }
      public double? TotalPrice { get; set; }
      public double? Discount { get; set; }
+     public double? ExtraCost { get; set; }
+     public double? Distance { get; set; }
      public string? ReportId { get; set; }
      public required List<DeliveryStep> Steps { get; set; } = [];
      public string[] Details { get; set; } = [];

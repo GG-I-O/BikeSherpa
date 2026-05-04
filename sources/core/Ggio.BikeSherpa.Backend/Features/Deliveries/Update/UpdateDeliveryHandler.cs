@@ -23,6 +23,8 @@ public record UpdateDeliveryCommand(
      string Urgency,
      double? TotalPrice,
      double? Discount,
+     double? ExtraCost,
+     double? Distance,
      string ReportId,
      List<DeliveryStepCrud> Steps,
      string[] Details,
@@ -89,6 +91,8 @@ public class UpdateDeliveryHandler(
           entity.Urgency = command.Urgency;
           entity.TotalPrice = command.TotalPrice;
           entity.Discount = command.Discount;
+          entity.ExtraCost = command.ExtraCost;
+          entity.Distance = command.Distance;
           entity.ReportId = command.ReportId;
           entity.Details = command.Details;
           entity.PackingSize = command.PackingSize;

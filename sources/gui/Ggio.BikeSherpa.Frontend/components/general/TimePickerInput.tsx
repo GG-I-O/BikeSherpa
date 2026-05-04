@@ -34,7 +34,7 @@ export default function TimePickerInput({ hours, minutes, onConfirm, onOpen, onC
         onConfirm({ hours: hoursAndMinutes.hours, minutes: hoursAndMinutes.minutes });
         setVisible(false);
         onClose?.();
-    }, [localHours, localMinutes, onConfirm, onClose]);
+    }, [onConfirm, onClose]);
 
     return (
         <SafeAreaProvider>
