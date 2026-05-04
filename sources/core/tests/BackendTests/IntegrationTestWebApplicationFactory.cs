@@ -28,8 +28,6 @@ public class IntegrationTestWebApplicationFactory : WebApplicationFactory<Progra
                services.AddDbContext<BackendDbContext>(options =>
                {
                     options.UseNpgsql(TestConnectionString);
-                    options.ConfigureWarnings(w =>
-                         w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
                });
 
           });
