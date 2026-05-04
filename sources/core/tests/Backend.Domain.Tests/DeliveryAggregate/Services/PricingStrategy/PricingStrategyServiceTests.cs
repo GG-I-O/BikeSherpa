@@ -80,7 +80,7 @@ public class PricingStrategyServiceTests
             TotalPrice = totalPrice
         };
 
-    private static DeliveryStep MakeStep(Delivery parentDelivery, StepType type, DeliveryZone zone, double distance = 0)
+    private static DeliveryStep MakeStep(Delivery parentDelivery, StepType type, DeliveryZone zone, double distance = 0, bool notBilled = false)
     {
         return new DeliveryStep(type, 1, _defaultAddress!)
         {
@@ -88,7 +88,8 @@ public class PricingStrategyServiceTests
             StepAddress = _defaultAddress!,
             StepZone = zone,
             Distance = distance,
-            ParentDelivery = parentDelivery
+            ParentDelivery = parentDelivery,
+            NotBilled = notBilled
         };
     }
 
@@ -226,6 +227,31 @@ public class PricingStrategyServiceTests
         var steps = new List<DeliveryStep>
         {
             MakeStep(delivery, StepType.Pickup, CoreZone, distance: distance1),
+            MakeStep(delivery, StepType.Dropoff, CoreZone, distance: distance2),
+        };
+        delivery.Steps = steps;
+
+        // Act
+        _sut.CalculateDeliveryPriceWithoutVat(delivery);
+
+        // Assert
+        _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), It.IsAny<double>(), distance1 + distance2), Times.Once);
+    }
+    
+    [Fact]
+    public void CalculatePrice_SumsDistanceAcrossAllSteps_WhileIgnoringNotBilledSteps()
+    {
+        // Arrange
+        var distance1 = _fixture.Create<double>();
+        var distance2 = _fixture.Create<double>();
+        var delivery = MakeDelivery();
+        var steps = new List<DeliveryStep>
+        {
+            MakeStep(delivery, StepType.Pickup, CoreZone, distance: distance1),
+            MakeStep(delivery, StepType.Dropoff, CoreZone, distance: distance2, notBilled: true),
             MakeStep(delivery, StepType.Dropoff, CoreZone, distance: distance2),
         };
         delivery.Steps = steps;
