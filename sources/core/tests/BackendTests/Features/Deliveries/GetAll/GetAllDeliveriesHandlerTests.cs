@@ -2,6 +2,7 @@
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 using Ggio.DddCore;
 using Moq;
@@ -11,6 +12,7 @@ namespace BackendTests.Features.Deliveries.GetAll;
 public class GetAllDeliveriesHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
+     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly Delivery _mockDeliveryA;
@@ -108,8 +110,12 @@ public class GetAllDeliveriesHandlerTests
           _mockRepository
                .Setup(repo => repo.ListAsync(It.IsAny<CancellationToken>()))
                .ReturnsAsync(returnDeliveries);
+          
+          _mockUrgencyRepository
+               .Setup(repo => repo.GetByName(It.IsAny<string>()))
+               .Returns((string name) => new Urgency(name, 1, name, 1, null, null));
 
-          return new GetAllDeliveriesHandler(_mockRepository.Object);
+          return new GetAllDeliveriesHandler(_mockRepository.Object, _mockUrgencyRepository.Object);
      }
 
      private void VerifyRepositoryCalledOnce()

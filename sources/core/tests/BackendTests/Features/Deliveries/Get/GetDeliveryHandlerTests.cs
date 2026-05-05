@@ -4,6 +4,7 @@ using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.DddCore;
@@ -14,6 +15,7 @@ namespace BackendTests.Features.Deliveries.Get;
 public class GetDeliveryHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
+     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly Delivery _mockDelivery;
@@ -76,7 +78,12 @@ public class GetDeliveryHandlerTests
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryByIdSpecification && existingDelivery != null && s.IsSatisfiedBy(existingDelivery)),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(existingDelivery);
-          return new GetDeliveryHandler(_mockRepository.Object);
+          
+          _mockUrgencyRepository
+               .Setup(repo => repo.GetByName(It.IsAny<string>()))
+               .Returns((string name) => new Urgency(name, 1, name, 1, null, null));
+
+          return new GetDeliveryHandler(_mockRepository.Object, _mockUrgencyRepository.Object);
      }
 
      private void VerifyRepositoryCalledOnce()

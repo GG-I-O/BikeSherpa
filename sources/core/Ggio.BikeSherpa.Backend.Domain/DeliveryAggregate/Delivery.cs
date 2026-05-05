@@ -304,4 +304,27 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           var incomingIds = steps.Select(s => s.Id).ToHashSet();
           Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
      }
+
+     public DateTimeOffset? GetLimitDate(IUrgencyRepository urgencyRepository)
+     {
+          var urgency = urgencyRepository.GetByName(Urgency);
+          if (urgency is null) return null;
+          
+          if (urgency.FixedTimeLimit != null)
+          {
+               return new DateTimeOffset(
+                    StartDate.Year,
+                    StartDate.Month,
+                    StartDate.Day,
+                    urgency.FixedTimeLimit.Value.Hours,
+                    urgency.FixedTimeLimit.Value.Minutes,
+                    urgency.FixedTimeLimit.Value.Seconds,
+                    StartDate.Offset);
+          }
+          if (urgency.AddTimeLimit != null)
+          {
+               return StartDate + urgency.AddTimeLimit.Value;
+          }
+          return null;
+     }
 }

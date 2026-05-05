@@ -7,4 +7,5 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 public partial record DeliveryCrud
 {
      public List<DeliveryStepDto> Steps { get; set; } = [];
+     public DateTimeOffset? LimitDate { get; set; }
 }
