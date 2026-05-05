@@ -79,6 +79,20 @@ public class PricingStrategyServiceTests
             Steps = steps ?? [],
             TotalPrice = totalPrice
         };
+    
+    private Delivery MakeDeliveryWithAdjustments(
+        double? discount = null,
+        double? extraCost = null,
+        double? distance = null,
+        double? totalPrice = null)
+    {
+        var delivery = MakeDelivery(totalPrice: totalPrice);
+        delivery.Discount = discount;
+        delivery.ExtraCost = extraCost;
+        delivery.Distance = distance;
+
+        return delivery;
+    }
 
     private static DeliveryStep MakeStep(Delivery parentDelivery, StepType type, DeliveryZone zone, double distance = 0, bool notBilled = false)
     {
@@ -154,7 +168,7 @@ public class PricingStrategyServiceTests
     }
 
     [Fact]
-    public void CalculatePrice_WhenNoStrategyMatches_Throws()
+    public void CalculatePrice_WhenNoStrategyMatches_ReturnsTotalPrice()
     {
         // Arrange
         var tourMock = new Mock<IPricingStrategy>();
@@ -162,10 +176,14 @@ public class PricingStrategyServiceTests
         var sut = MakeSutWith(strategies: [tourMock.Object]);
 
         // Act
-        var act = () => sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
+        var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(totalPrice: 123.45));
 
         // Assert
-        act.Should().Throw<InvalidOperationException>();
+        result.Should().Be(123.45);
+        tourMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>()), Times.Never);
     }
 
     [Fact]
@@ -265,6 +283,53 @@ public class PricingStrategyServiceTests
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
             It.IsAny<PackingSize>(), It.IsAny<double>(), distance1 + distance2), Times.Once);
     }
+    
+    [Fact]
+    public void CalculatePrice_WhenDeliveryDistanceIsProvided_UsesDeliveryDistanceInsteadOfStepsDistance()
+    {
+        // Arrange
+        const double deliveryDistance = 24.5;
+        var delivery = MakeDeliveryWithAdjustments(distance: deliveryDistance);
+        var steps = new List<DeliveryStep>
+        {
+            MakeStep(delivery, StepType.Pickup, CoreZone, distance: 10),
+            MakeStep(delivery, StepType.Dropoff, CoreZone, distance: 15),
+        };
+        delivery.Steps = steps;
+
+        // Act
+        _sut.CalculateDeliveryPriceWithoutVat(delivery);
+
+        // Assert
+        _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), It.IsAny<double>(), deliveryDistance), Times.Once);
+    }
+    
+    [Fact]
+    public void CalculatePrice_WhenDeliveryDistanceIsZero_SumsBillableStepsDistance()
+    {
+        // Arrange
+        const double billableDistance = 12.5;
+        const double ignoredDistance = 8.5;
+        var delivery = MakeDeliveryWithAdjustments(distance: 0);
+        var steps = new List<DeliveryStep>
+        {
+            MakeStep(delivery, StepType.Pickup, CoreZone, distance: billableDistance),
+            MakeStep(delivery, StepType.Dropoff, CoreZone, distance: ignoredDistance, notBilled: true),
+        };
+        delivery.Steps = steps;
+
+        // Act
+        _sut.CalculateDeliveryPriceWithoutVat(delivery);
+
+        // Assert
+        _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), It.IsAny<double>(), billableDistance), Times.Once);
+    }
 
     [Fact]
     public void CalculatePrice_PassesUrgencyCoefficientFromRepository()
@@ -297,5 +362,85 @@ public class PricingStrategyServiceTests
             It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
             It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
             large, It.IsAny<double>(), It.IsAny<double>()), Times.Once);
+    }
+    
+    [Fact]
+    public void CalculatePrice_SubtractsDiscountFromCalculatedPrice()
+    {
+        // Arrange
+        _mockPricingStrategy.Setup(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>())).Returns(100);
+
+        var delivery = MakeDeliveryWithAdjustments(discount: 12.5);
+
+        // Act
+        var result = _sut.CalculateDeliveryPriceWithoutVat(delivery);
+
+        // Assert
+        result.Should().Be(87.5);
+    }
+
+    [Fact]
+    public void CalculatePrice_AddsExtraCostToCalculatedPrice()
+    {
+        // Arrange
+        _mockPricingStrategy.Setup(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>())).Returns(100);
+
+        var delivery = MakeDeliveryWithAdjustments(extraCost: 12.5);
+
+        // Act
+        var result = _sut.CalculateDeliveryPriceWithoutVat(delivery);
+
+        // Assert
+        result.Should().Be(112.5);
+    }
+
+    [Fact]
+    public void CalculatePrice_AppliesDiscountAndExtraCostToCalculatedPrice()
+    {
+        // Arrange
+        _mockPricingStrategy.Setup(s => s.CalculateDeliveryPriceWithoutVat(
+            It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>(),
+            It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>(),
+            It.IsAny<PackingSize>(), It.IsAny<double>(), It.IsAny<double>())).Returns(100);
+
+        var delivery = MakeDeliveryWithAdjustments(discount: 15, extraCost: 7.5);
+
+        // Act
+        var result = _sut.CalculateDeliveryPriceWithoutVat(delivery);
+
+        // Assert
+        result.Should().Be(92.5);
+    }
+    
+    [Fact]
+    public void CalculatePrice_WhenPackingSizeDoesNotExist_Throws()
+    {
+        // Arrange
+        _mockPackingSizeRepository.Setup(r => r.GetByName(It.IsAny<string>())).Returns((PackingSize?)null);
+
+        // Act
+        var act = () => _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
+
+        // Assert
+        act.Should().Throw<Exception>().WithMessage("Taille de colis invalide");
+    }
+
+    [Fact]
+    public void CalculatePrice_WhenUrgencyDoesNotExist_Throws()
+    {
+        // Arrange
+        _mockUrgencyRepository.Setup(r => r.GetByName(It.IsAny<string>())).Returns((Urgency?)null);
+
+        // Act
+        var act = () => _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
+
+        // Assert
+        act.Should().Throw<Exception>().WithMessage("Urgence invalide");
     }
 }
