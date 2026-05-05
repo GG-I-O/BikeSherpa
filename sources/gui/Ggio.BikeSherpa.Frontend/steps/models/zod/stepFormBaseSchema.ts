@@ -14,7 +14,9 @@ const stepFormBaseSchema = zod.object({
     comment: zod
         .string()
         .optional()
-        .nullable()
+        .nullable(),
+    notBilled: zod
+        .boolean()
 });
 
 type StepFormValues = zod.infer<typeof stepFormBaseSchema>;

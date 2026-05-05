@@ -9,6 +9,7 @@ export default class InputStep {
     public distance: number;
     public courierId: string | null;
     public comment: string | null;
+    public notBilled: boolean;
     public attachmentFilePaths: string[] | null;
     public estimatedDeliveryDate: string;
     public realDeliveryDate: string | null;
@@ -22,6 +23,7 @@ export default class InputStep {
         distance: number,
         courierId: string | null,
         comment: string | null,
+        notBilled: boolean,
         attachmentFilePaths: string[] | null,
         estimatedDeliveryDate: string,
         realDeliveryDate: string
@@ -34,6 +36,7 @@ export default class InputStep {
         this.distance = distance;
         this.courierId = courierId;
         this.comment = comment;
+        this.notBilled = notBilled;
         this.attachmentFilePaths = attachmentFilePaths;
         this.estimatedDeliveryDate = estimatedDeliveryDate;
         this.realDeliveryDate = realDeliveryDate;

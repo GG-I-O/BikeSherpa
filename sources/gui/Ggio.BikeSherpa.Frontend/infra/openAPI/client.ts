@@ -30,6 +30,7 @@ const DeliveryStepCrud = z.object({
   courierId: z.string().nullable(),
   comment: z.string().nullable(),
   attachmentFilePaths: z.array(z.string()).nullable(),
+  notBilled: z.boolean(),
   estimatedDeliveryDate: z.string().datetime({ offset: true }),
   realDeliveryDate: z.string().datetime({ offset: true }).nullable(),
   createdAt: z.string().datetime({ offset: true }),

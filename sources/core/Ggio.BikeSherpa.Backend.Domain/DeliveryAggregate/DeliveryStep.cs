@@ -29,6 +29,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      public Guid? CourierId { get; set; }
      public string? Comment { get; set; }
      public string[]? AttachmentFilePaths { get; set; }
+     public bool NotBilled { get; set; }
      public DateTimeOffset EstimatedDeliveryDate { get; set; }
      public DateTimeOffset? RealDeliveryDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
@@ -43,6 +44,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           DeliveryZone deliveryZone,
           double distance,
           string? comment,
+          bool notBilled,
           DateTimeOffset estimatedDeliveryDate)
      {
           StepType = stepType;
@@ -52,6 +54,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           StepZone = deliveryZone;
           Distance = distance;
           Comment = comment;
+          NotBilled = notBilled;
           EstimatedDeliveryDate = estimatedDeliveryDate;
      }
 

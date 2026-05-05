@@ -183,6 +183,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           StepType stepType,
           Address stepAddress,
           string? comment,
+          bool notBilled,
           IDeliveryZoneRepository deliveryZones,
           IPricingStrategyService pricingStrategyService,
           IItinerarySpi itineraryService)
@@ -196,7 +197,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                Id = Guid.NewGuid(),
                StepAddress = stepAddress,
                StepZone = deliveryZones.GetByAddress(stepAddress.City),
-               ParentDelivery = this
+               ParentDelivery = this,
+               NotBilled = notBilled
           };
 
           newStep.Distance = await GetDistanceAsync(newStep, itineraryService);
@@ -264,7 +266,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          Id = Guid.NewGuid(),
                          StepAddress = steps[index].StepAddress,
                          StepZone = deliveryZones.GetByAddress(steps[index].StepAddress.City),
-                         ParentDelivery = this
+                         ParentDelivery = this,
+                         NotBilled = steps[index].NotBilled
                     };
                }
                else
@@ -277,6 +280,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          deliveryZones.GetByAddress(steps[index].StepAddress.City),
                          steps[index].Distance,
                          steps[index].Comment,
+                         steps[index].NotBilled,
                          steps[index].EstimatedDeliveryDate);
 
                     steps[index] = existing;

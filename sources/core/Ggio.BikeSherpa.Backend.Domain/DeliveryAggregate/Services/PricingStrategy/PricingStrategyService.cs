@@ -36,9 +36,13 @@ public class PricingStrategyService(
           var dropoffsInBorder = delivery.Steps.Count(s => s.StepZone.Name == "Limitrophe");
           var dropoffsInPeriphery = delivery.Steps.Count(s => s.StepZone.Name == "Périphérie");
           var dropoffsOutside = delivery.Steps.Count(s => s.StepZone.Name == "Extérieur");
-          var totalDistance = delivery.Steps.Sum(s => s.Distance);
+
+          var totalDistance = delivery.Distance ?? 0;
           
-          return strategy.CalculateDeliveryPriceWithoutVat(
+          if (totalDistance == 0)
+               totalDistance = delivery.Steps.Where(s => !s.NotBilled).Sum(s => s.Distance);
+          
+          var price = strategy.CalculateDeliveryPriceWithoutVat(
                delivery.StartDate,
                delivery.ContractDate,
                pickupCount,
@@ -50,5 +54,9 @@ public class PricingStrategyService(
                urgencyPriceCoefficient,
                totalDistance
           );
+          
+          price -= delivery.Discount ?? 0;
+          price += delivery.ExtraCost ?? 0;
+          return price;
      }
 }
