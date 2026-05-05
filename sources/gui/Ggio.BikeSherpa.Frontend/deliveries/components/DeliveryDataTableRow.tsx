@@ -51,7 +51,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     {delivery.startTime}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.urgency}
+                    {delivery.limitTime}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width180]}>
                     <IconButton style={{ margin: 0 }} icon="magnify" onPress={() => onDetails ? onDetails(delivery) : {}} />

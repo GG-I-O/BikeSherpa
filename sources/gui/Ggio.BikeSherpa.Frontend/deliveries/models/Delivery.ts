@@ -30,7 +30,8 @@ export default class Delivery extends InputDelivery implements Storable, Hateoas
         packingSize: string,
         insulatedBox: boolean,
         contractDate: string,
-        startDate: string
+        startDate: string,
+        limitDate: string
     ) {
         super(
             code,
@@ -48,7 +49,8 @@ export default class Delivery extends InputDelivery implements Storable, Hateoas
             packingSize,
             insulatedBox,
             contractDate,
-            startDate
+            startDate,
+            limitDate
         )
         this.id = Crypto.randomUUID();
         this.links = [];

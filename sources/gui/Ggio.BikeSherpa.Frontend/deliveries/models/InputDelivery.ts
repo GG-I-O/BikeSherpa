@@ -17,6 +17,7 @@ export default class InputDelivery {
     public insulatedBox: boolean;
     public contractDate: string;
     public startDate: string;
+    public limitDate: string | null;
 
     public constructor(
         code: string,
@@ -35,6 +36,7 @@ export default class InputDelivery {
         insulatedBox: boolean,
         contractDate: string,
         startDate: string,
+        limitDate: string
     ) {
         this.code = code;
         this.status = status;
@@ -52,5 +54,6 @@ export default class InputDelivery {
         this.insulatedBox = insulatedBox;
         this.contractDate = contractDate;
         this.startDate = startDate;
+        this.limitDate = limitDate;
     }
 }
