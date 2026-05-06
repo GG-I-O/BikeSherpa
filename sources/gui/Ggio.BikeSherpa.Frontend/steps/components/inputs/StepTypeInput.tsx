@@ -1,6 +1,6 @@
 import {Control, useController} from "react-hook-form";
 import React from "react";
-import {Button, Text, useTheme} from "react-native-paper";
+import {Button, Text} from "react-native-paper";
 import {View} from "react-native";
 import formStyle from "@/style/formStyle";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
@@ -19,8 +19,6 @@ const StepTypeInput: React.FC<CustomStepTypeInputProps> = (
         testID
     }
 ) => {
-    const theme = useTheme();
-
     const {field} = useController({
         control,
         name,

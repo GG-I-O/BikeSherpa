@@ -6,7 +6,7 @@ import {IDropdownOptions} from "@/spi/IDropdownOptions";
 import Delivery from "@/deliveries/models/Delivery";
 
 @injectable()
-export default class DeliveryDropdownOptionsService implements IDropdownOptions<Delivery> {
+export default class DeliveryDropdownOptionsService implements IDropdownOptions {
     private apiClient;
     
     private options: Record<string, DropdownOptions[]> = {};

@@ -114,7 +114,7 @@ export default class DeliveryListViewModel {
             if (stepA.courierCode !== "???" && stepB.courierCode === "???") return -1;
             
             // Normal sorting
-            if (stepA.courierCode != stepB.courierCode)
+            if (stepA.courierCode !== stepB.courierCode)
                 return stepA.courierCode.localeCompare(stepB.courierCode);
             return (
                 new Date(stepA.estimatedIsoDate).valueOf()

@@ -26,7 +26,7 @@ export default class DeliveryBootstrapper {
         IOCContainer.bind<IDeliveryCustomBackendClientFacade>(DeliveryServiceIdentifier.CustomBackendClientFacade).to(DeliveryBackendClientFacade).inSingletonScope();
 
         // DropdownOptionsService
-        IOCContainer.bind<IDropdownOptions<Delivery>>(DeliveryServiceIdentifier.DropdownOptionsService).to(DeliveryDropdownOptionsService).inSingletonScope();
+        IOCContainer.bind<IDropdownOptions>(DeliveryServiceIdentifier.DropdownOptionsService).to(DeliveryDropdownOptionsService).inSingletonScope();
         
         // StorageMiddleware
         IOCContainer.bind<IDeliveryStorageMiddleware>(DeliveryServiceIdentifier.StorageMiddleware).to(DeliveryStorageMiddleware).inSingletonScope();
