@@ -7,6 +7,7 @@ export default class DeliveryMapper {
         const deliveryCrud = deliveryDto.data;
         let delivery: Delivery = {
             ...deliveryCrud,
+            limitDate: deliveryCrud.limitDate,
             steps: deliveryDto.data.steps.map((step => {
                 return {
                     ...step.data,
@@ -35,6 +36,7 @@ export default class DeliveryMapper {
             totalPrice: `${delivery.totalPrice ?? 0}€`,
             startDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
             startTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
+            limitTime: !delivery.limitDate ? '???' : DateToolbox.getFormattedTimeFromISO(new Date(delivery.limitDate).toISOString()),
             steps: delivery.steps?.map((step) => ({
                 id: step.id,
                 deliveryId: delivery.id,

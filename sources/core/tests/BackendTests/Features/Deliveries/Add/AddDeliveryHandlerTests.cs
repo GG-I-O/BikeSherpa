@@ -40,6 +40,9 @@ public class AddDeliveryHandlerTests
           _mockUrgencyRepository
                .Setup(x => x.GetAll())
                .Returns(urgencies);
+          _mockUrgencyRepository
+               .Setup(x => x.GetByName(It.IsAny<string>()))
+               .Returns(urgencies[0]);
 
           var packingSizes = new List<PackingSize>(_fixture.CreateMany<PackingSize>(2));
           _mockPackingSizeRepository
@@ -55,7 +58,7 @@ public class AddDeliveryHandlerTests
                .Setup(x => x.CreateDeliveryAsync(
                     It.IsAny<PricingStrategy>(),
                     It.IsAny<Guid>(),
-                    It.IsAny<string>(),
+                    It.IsAny<Urgency>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
@@ -72,7 +75,7 @@ public class AddDeliveryHandlerTests
      private AddDeliveryHandler CreateSut()
      {
           var validator = new AddDeliveryCommandValidator(_mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
-          return new AddDeliveryHandler(_mockFactory.Object, validator, _mockTransaction.Object);
+          return new AddDeliveryHandler(_mockFactory.Object, _mockUrgencyRepository.Object, validator, _mockTransaction.Object);
      }
 
      private void SetupRepositoryTestingIfCodeExists(bool doesCodeExist)
@@ -90,7 +93,7 @@ public class AddDeliveryHandlerTests
                x => x.CreateDeliveryAsync(
                     It.IsAny<PricingStrategy>(),
                     It.IsAny<Guid>(),
-                    It.IsAny<string>(),
+                    It.IsAny<Urgency>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
@@ -142,7 +145,7 @@ public class AddDeliveryHandlerTests
                x => x.CreateDeliveryAsync(
                     It.IsAny<PricingStrategy>(),
                     It.IsAny<Guid>(),
-                    It.IsAny<string>(),
+                    It.IsAny<Urgency>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),

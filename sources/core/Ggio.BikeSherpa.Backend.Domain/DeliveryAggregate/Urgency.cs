@@ -4,5 +4,7 @@ public record Urgency(
      string Name,
      int Order,
      string Label,
-     double PriceCoefficient
+     double PriceCoefficient,
+     TimeSpan? AddTimeLimit,
+     TimeSpan? FixedTimeLimit
 );

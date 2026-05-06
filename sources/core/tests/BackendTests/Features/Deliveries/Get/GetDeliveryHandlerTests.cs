@@ -76,6 +76,7 @@ public class GetDeliveryHandlerTests
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryByIdSpecification && existingDelivery != null && s.IsSatisfiedBy(existingDelivery)),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(existingDelivery);
+
           return new GetDeliveryHandler(_mockRepository.Object);
      }
 

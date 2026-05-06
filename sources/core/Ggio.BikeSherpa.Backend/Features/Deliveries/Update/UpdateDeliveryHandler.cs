@@ -70,6 +70,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
 
 public class UpdateDeliveryHandler(
      IReadRepository<Delivery> repository,
+     IUrgencyRepository urgencyRepository,
      IValidator<UpdateDeliveryCommand> validator,
      IApplicationTransaction transaction,
      IDeliveryZoneRepository deliveryZones,
@@ -84,11 +85,15 @@ public class UpdateDeliveryHandler(
           if (entity is null)
                return Result.NotFound();
 
+          var urgency = urgencyRepository.GetByName(command.Urgency);
+          if (urgency is null)
+               return Result.Invalid();
+
           entity.PricingStrategy = command.PricingStrategy;
           entity.Status = command.Status;
           entity.Code = command.Code;
           entity.CustomerId = command.CustomerId;
-          entity.Urgency = command.Urgency;
+          entity.Urgency = urgency;
           entity.TotalPrice = command.TotalPrice;
           entity.Discount = command.Discount;
           entity.ExtraCost = command.ExtraCost;

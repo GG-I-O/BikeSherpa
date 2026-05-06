@@ -15,7 +15,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public DeliveryStatus Status { get; set; } = DeliveryStatus.Pending;
      public required string Code { get; set; }
      public required Guid CustomerId { get; set; }
-     public required string Urgency { get; set; }
+     public required Urgency Urgency { get; set; }
      public double? TotalPrice { get; set; }
      public double? Discount { get; set; }
      public double? ExtraCost { get; set; }
@@ -303,5 +303,25 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      {
           var incomingIds = steps.Select(s => s.Id).ToHashSet();
           Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
+     }
+
+     public DateTimeOffset? GetLimitDate()
+     {
+          if (Urgency.FixedTimeLimit != null)
+          {
+               return new DateTimeOffset(
+                    StartDate.Year,
+                    StartDate.Month,
+                    StartDate.Day,
+                    Urgency.FixedTimeLimit.Value.Hours,
+                    Urgency.FixedTimeLimit.Value.Minutes,
+                    Urgency.FixedTimeLimit.Value.Seconds,
+                    StartDate.Offset);
+          }
+          if (Urgency.AddTimeLimit != null)
+          {
+               return StartDate + Urgency.AddTimeLimit.Value;
+          }
+          return null;
      }
 }

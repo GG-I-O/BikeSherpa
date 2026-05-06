@@ -9,11 +9,13 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 
 public record GetDeliveryQuery(Guid Id) : IQuery<DeliveryCrud?>;
 
-public class GetDeliveryHandler(IReadRepository<Delivery> deliveryRepository) : IQueryHandler<GetDeliveryQuery, DeliveryCrud?>
+public class GetDeliveryHandler(
+     IReadRepository<Delivery> deliveryRepository
+     ) : IQueryHandler<GetDeliveryQuery, DeliveryCrud?>
 {
      public async ValueTask<DeliveryCrud?> Handle(GetDeliveryQuery query, CancellationToken ct)
      {
-          var entity = await deliveryRepository.FirstOrDefaultAsync(new DeliveryByIdSpecification(query.Id), ct);
-          return entity?.ToFacet<DeliveryCrud>();
+          var delivery = await deliveryRepository.FirstOrDefaultAsync(new DeliveryByIdSpecification(query.Id), ct);
+          return delivery?.ToFacet<Delivery, DeliveryCrud>();
      }
 }

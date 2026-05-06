@@ -9,4 +9,5 @@ export interface DeliveryToDisplay {
     totalPrice: string;
     startDate: string;
     startTime: string;
+    limitTime: string;
 }

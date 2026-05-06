@@ -54,11 +54,12 @@ const DeliveryStatus = z.union([
 ]);
 const DeliveryCrud = z.object({
   steps: z.array(DeliveryStepDto),
+  urgency: z.string(),
+  limitDate: z.string().datetime({ offset: true }).nullable(),
   pricingStrategy: PricingStrategy,
   status: DeliveryStatus,
   code: z.string(),
   customerId: z.string(),
-  urgency: z.string(),
   totalPrice: z.number().nullable(),
   discount: z.number().nullable(),
   extraCost: z.number().nullable(),

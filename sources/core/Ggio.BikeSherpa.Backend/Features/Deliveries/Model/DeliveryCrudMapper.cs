@@ -14,5 +14,7 @@ public class DeliveryCrudMapper : IFacetMapConfiguration<Delivery, DeliveryCrud>
                     Data = step.ToFacet<DeliveryStep, DeliveryStepCrud>()
                })
                .ToList();
+          target.Urgency = source.Urgency.Name;
+          target.LimitDate = source.GetLimitDate();
      }
 }

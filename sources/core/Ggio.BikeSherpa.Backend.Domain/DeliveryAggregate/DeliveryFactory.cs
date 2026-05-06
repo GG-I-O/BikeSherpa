@@ -13,7 +13,7 @@ public interface IDeliveryFactory
      Task<Delivery> CreateDeliveryAsync(
           PricingStrategy pricingStrategy,
           Guid customerId,
-          string urgency,
+          Urgency urgency,
           double? totalPrice,
           double? discount,
           double? extraCost,
@@ -36,7 +36,7 @@ public class DeliveryFactory(
      public async Task<Delivery> CreateDeliveryAsync(
           PricingStrategy pricingStrategy,
           Guid customerId,
-          string urgency,
+          Urgency urgency,
           double? totalPrice,
           double? discount,
           double? extraCost,

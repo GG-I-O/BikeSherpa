@@ -3,6 +3,7 @@ using System;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(BackendDbContext))]
-    partial class BackendDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505080848_UrgencyLimitTimespan")]
+    partial class UrgencyLimitTimespan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -254,13 +257,11 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("UrgencyName")
+                    b.Property<string>("Urgency")
                         .IsRequired()
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UrgencyName");
 
                     b.ToTable("Deliveries", (string)null);
                 });
@@ -553,12 +554,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery", b =>
                 {
-                    b.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Urgency", "Urgency")
-                        .WithMany()
-                        .HasForeignKey("UrgencyName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.OwnsMany("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryStep", "Steps", b1 =>
                         {
                             b1.Property<Guid>("Id")
@@ -674,8 +669,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         });
 
                     b.Navigation("Steps");
-
-                    b.Navigation("Urgency");
                 });
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryZone", b =>

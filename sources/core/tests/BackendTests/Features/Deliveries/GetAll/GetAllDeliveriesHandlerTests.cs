@@ -2,6 +2,7 @@
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 using Ggio.DddCore;
 using Moq;
@@ -27,11 +28,9 @@ public class GetAllDeliveriesHandlerTests
 
           _mockDeliveryA.Code = "AAA";
           _mockDeliveryA.PackingSize = "Xxl";
-          _mockDeliveryA.Urgency = "Standard";
 
           _mockDeliveryB.Code = "BBB";
           _mockDeliveryB.PackingSize = "Xl";
-          _mockDeliveryB.Urgency = "Urgent";
      }
 
      [Fact]
@@ -77,11 +76,9 @@ public class GetAllDeliveriesHandlerTests
           var deliveryB = result.Single(d => d.Code == "BBB");
 
           deliveryA.PackingSize.Should().Be("Xxl");
-          deliveryA.Urgency.Should().Be("Standard");
           deliveryA.Steps.Select(s => s.Data.Order).Should().Equal(1, 2);
 
           deliveryB.PackingSize.Should().Be("Xl");
-          deliveryB.Urgency.Should().Be("Urgent");
           deliveryB.Steps.Select(s => s.Data.Order).Should().Equal(1, 2);
 
           VerifyRepositoryCalledOnce();

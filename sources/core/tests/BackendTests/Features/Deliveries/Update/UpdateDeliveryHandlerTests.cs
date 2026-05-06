@@ -21,6 +21,7 @@ namespace BackendTests.Features.Deliveries.Update;
 public class UpdateDeliveryHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
+     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
      private readonly Mock<IValidator<UpdateDeliveryCommand>> _mockValidator = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
@@ -31,6 +32,7 @@ public class UpdateDeliveryHandlerTests
      private readonly DeliveryZone _deliveryZone;
      private readonly Delivery _delivery;
      private readonly UpdateDeliveryCommand _command;
+     private readonly static Urgency Urgency = new Urgency("urgency", 1, "urgency", 1, null, null);
 
      public UpdateDeliveryHandlerTests()
      {
@@ -39,6 +41,10 @@ public class UpdateDeliveryHandlerTests
           _mockDeliveryZoneRepository
                .Setup(x => x.GetByAddress(It.IsAny<string>()))
                .Returns(_deliveryZone);
+          
+          _mockUrgencyRepository
+               .Setup(x => x.GetByName(It.IsAny<string>()))
+               .Returns(Urgency);
 
           _mockPricingStrategyService
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
@@ -110,6 +116,7 @@ public class UpdateDeliveryHandlerTests
      {
           return new UpdateDeliveryHandler(
                _mockDeliveryRepository.Object,
+               _mockUrgencyRepository.Object,
                _mockValidator.Object,
                _mockTransaction.Object,
                _mockDeliveryZoneRepository.Object,
@@ -167,7 +174,7 @@ public class UpdateDeliveryHandlerTests
           _delivery.Status.Should().Be(_command.Status);
           _delivery.Code.Should().Be(_command.Code);
           _delivery.CustomerId.Should().Be(_command.CustomerId);
-          _delivery.Urgency.Should().Be(_command.Urgency);
+          _delivery.Urgency.Should().Be(Urgency);
           _delivery.TotalPrice.Should().Be(123.45);
           _delivery.Discount.Should().Be(_command.Discount);
           _delivery.ReportId.Should().Be(_command.ReportId);
