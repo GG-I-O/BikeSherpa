@@ -254,11 +254,13 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Urgency")
+                    b.Property<string>("UrgencyName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UrgencyName");
 
                     b.ToTable("Deliveries", (string)null);
                 });
@@ -551,6 +553,12 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery", b =>
                 {
+                    b.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Urgency", "Urgency")
+                        .WithMany()
+                        .HasForeignKey("UrgencyName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsMany("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryStep", "Steps", b1 =>
                         {
                             b1.Property<Guid>("Id")
@@ -666,6 +674,8 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         });
 
                     b.Navigation("Steps");
+
+                    b.Navigation("Urgency");
                 });
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryZone", b =>

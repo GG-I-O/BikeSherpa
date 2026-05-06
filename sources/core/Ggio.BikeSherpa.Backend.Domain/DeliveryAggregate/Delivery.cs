@@ -15,7 +15,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public DeliveryStatus Status { get; set; } = DeliveryStatus.Pending;
      public required string Code { get; set; }
      public required Guid CustomerId { get; set; }
-     public required string Urgency { get; set; }
+     public required Urgency Urgency { get; set; }
      public double? TotalPrice { get; set; }
      public double? Discount { get; set; }
      public double? ExtraCost { get; set; }
@@ -305,25 +305,22 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           Steps.RemoveAll(s => !incomingIds.Contains(s.Id));
      }
 
-     public DateTimeOffset? GetLimitDate(IUrgencyRepository urgencyRepository)
+     public DateTimeOffset? GetLimitDate()
      {
-          var urgency = urgencyRepository.GetByName(Urgency);
-          if (urgency is null) return null;
-          
-          if (urgency.FixedTimeLimit != null)
+          if (Urgency.FixedTimeLimit != null)
           {
                return new DateTimeOffset(
                     StartDate.Year,
                     StartDate.Month,
                     StartDate.Day,
-                    urgency.FixedTimeLimit.Value.Hours,
-                    urgency.FixedTimeLimit.Value.Minutes,
-                    urgency.FixedTimeLimit.Value.Seconds,
+                    Urgency.FixedTimeLimit.Value.Hours,
+                    Urgency.FixedTimeLimit.Value.Minutes,
+                    Urgency.FixedTimeLimit.Value.Seconds,
                     StartDate.Offset);
           }
-          if (urgency.AddTimeLimit != null)
+          if (Urgency.AddTimeLimit != null)
           {
-               return StartDate + urgency.AddTimeLimit.Value;
+               return StartDate + Urgency.AddTimeLimit.Value;
           }
           return null;
      }

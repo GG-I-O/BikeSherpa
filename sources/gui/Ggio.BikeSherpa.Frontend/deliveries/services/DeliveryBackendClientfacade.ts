@@ -53,6 +53,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             ...item,
             contractDate: new Date(item.contractDate).toISOString(),
             startDate: new Date(item.startDate).toISOString(),
+            limitDate: null,
             steps: []
         };
         const parsedDelivery = schemas.DeliveryCrud.safeParse(deliveryData);
@@ -111,6 +112,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             ...item,
             contractDate: new Date(item.contractDate).toISOString(),
             startDate: new Date(item.startDate).toISOString(),
+            limitDate: null,
             steps: item.steps.map(step => ({
                 data: {
                     ...step,

@@ -1,6 +1,5 @@
 using Facet.Extensions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
 using Mediator;
@@ -10,26 +9,19 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 public record GetAllDeliveriesQuery(DateTimeOffset? LastSync) : IQuery<List<Model.DeliveryCrud>>;
 
 public class GetAllDeliveriesHandler(
-     IReadRepository<Delivery> repository,
-     IUrgencyRepository urgencyRepository
+     IReadRepository<Delivery> repository
      ) : IQueryHandler<GetAllDeliveriesQuery, List<Model.DeliveryCrud>>
 {
      public async ValueTask<List<Model.DeliveryCrud>> Handle(GetAllDeliveriesQuery query, CancellationToken cancellationToken)
      {
-          var deliveries = query.LastSync is null
-               ? await repository.ListAsync(cancellationToken)
-               : await repository.ListAsync(new DeliveryByUpdatedAtSpecification(query.LastSync.Value), cancellationToken);
-
-          var orderedDeliveries = deliveries
-               .Select(delivery =>
+          var allDeliveries = query.LastSync is null ?
+               (await repository.ListAsync(cancellationToken)).SelectFacets<Delivery, Model.DeliveryCrud>() :
+               (await repository.ListAsync(new DeliveryByUpdatedAtSpecification(query.LastSync!.Value), cancellationToken)).SelectFacets<Delivery, Model.DeliveryCrud>();
+          
+          var orderedDeliveries = allDeliveries
+               .Select(delivery => delivery with
                {
-                    var deliveryCrud = delivery.ToFacet<Delivery, Model.DeliveryCrud>();
-
-                    return deliveryCrud with
-                    {
-                         LimitDate = delivery.GetLimitDate(urgencyRepository),
-                         Steps = deliveryCrud.Steps.OrderBy(s => s.Data.Order).ToList()
-                    };
+                    Steps = delivery.Steps.OrderBy(s => s.Data.Order).ToList()
                })
                .ToList();
 

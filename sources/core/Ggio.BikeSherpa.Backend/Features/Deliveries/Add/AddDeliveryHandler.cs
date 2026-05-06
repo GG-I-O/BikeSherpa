@@ -30,8 +30,8 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
           RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.Urgency)
-               .NotEmpty().
-               Must(urgency => urgencies.GetAll().Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
+               .NotEmpty()
+               .Must(urgency => urgencies.GetAll().Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
                .WithMessage("Valeur d'urgence saisie invalide.");
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
@@ -44,6 +44,7 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 
 public class AddDeliveryHandler(
      IDeliveryFactory factory,
+     IUrgencyRepository urgencyRepository,
      IValidator<AddDeliveryCommand> validator,
      IApplicationTransaction transaction
      ) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
@@ -51,11 +52,15 @@ public class AddDeliveryHandler(
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
+          
+          var urgency = urgencyRepository.GetByName(command.Urgency);
+          if (urgency is null)
+               return Result.Invalid();
 
           var delivery = await factory.CreateDeliveryAsync(
                command.PricingStrategy,
                command.CustomerId,
-               command.Urgency,
+               urgency,
                command.TotalPrice,
                command.Discount,
                command.ExtraCost,

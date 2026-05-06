@@ -12,7 +12,6 @@ namespace BackendTests.Features.Deliveries.GetAll;
 public class GetAllDeliveriesHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
-     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly Delivery _mockDeliveryA;
@@ -29,11 +28,9 @@ public class GetAllDeliveriesHandlerTests
 
           _mockDeliveryA.Code = "AAA";
           _mockDeliveryA.PackingSize = "Xxl";
-          _mockDeliveryA.Urgency = "Standard";
 
           _mockDeliveryB.Code = "BBB";
           _mockDeliveryB.PackingSize = "Xl";
-          _mockDeliveryB.Urgency = "Urgent";
      }
 
      [Fact]
@@ -79,11 +76,9 @@ public class GetAllDeliveriesHandlerTests
           var deliveryB = result.Single(d => d.Code == "BBB");
 
           deliveryA.PackingSize.Should().Be("Xxl");
-          deliveryA.Urgency.Should().Be("Standard");
           deliveryA.Steps.Select(s => s.Data.Order).Should().Equal(1, 2);
 
           deliveryB.PackingSize.Should().Be("Xl");
-          deliveryB.Urgency.Should().Be("Urgent");
           deliveryB.Steps.Select(s => s.Data.Order).Should().Equal(1, 2);
 
           VerifyRepositoryCalledOnce();
@@ -110,12 +105,8 @@ public class GetAllDeliveriesHandlerTests
           _mockRepository
                .Setup(repo => repo.ListAsync(It.IsAny<CancellationToken>()))
                .ReturnsAsync(returnDeliveries);
-          
-          _mockUrgencyRepository
-               .Setup(repo => repo.GetByName(It.IsAny<string>()))
-               .Returns((string name) => new Urgency(name, 1, name, 1, null, null));
 
-          return new GetAllDeliveriesHandler(_mockRepository.Object, _mockUrgencyRepository.Object);
+          return new GetAllDeliveriesHandler(_mockRepository.Object);
      }
 
      private void VerifyRepositoryCalledOnce()

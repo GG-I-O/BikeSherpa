@@ -17,7 +17,7 @@ export default class InputDelivery {
     public insulatedBox: boolean;
     public contractDate: string;
     public startDate: string;
-    public limitDate: string | null;
+    public limitDate?: string | null;
 
     public constructor(
         code: string,

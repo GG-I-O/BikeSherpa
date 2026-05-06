@@ -16,6 +16,7 @@ public class DeliveryFactoryTests
 {
      private readonly static Guid CustomerId = Guid.NewGuid();
      private readonly static string CustomerCode = "T01";
+     private readonly static Urgency Urgency = new Urgency("urgency", 1, "urgency", 1, null, null);
      private readonly static DateTimeOffset ContractDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
      private readonly Mock<IReadRepository<Customer>> _customerRepositoryMock = new();
@@ -61,9 +62,9 @@ public class DeliveryFactoryTests
      }
 
      private Task<Delivery> CreateDefault(
+          Urgency? urgency = null,
           PricingStrategy strategy = PricingStrategy.SimpleDeliveryStrategy,
           Guid? customerId = null,
-          string urgency = "Normal",
           double? totalPrice = null,
           double? discount = null,
           string[]? details = null,
@@ -74,7 +75,7 @@ public class DeliveryFactoryTests
           _sut.CreateDeliveryAsync(
                strategy,
                customerId ?? CustomerId,
-               urgency,
+               urgency ?? Urgency,
                totalPrice,
                discount,
                extraCost: 0,
@@ -93,9 +94,9 @@ public class DeliveryFactoryTests
 
           // Act
           var delivery = await CreateDefault(
+               Urgency,
                PricingStrategy.TourDeliveryStrategy,
                CustomerId,
-               "Express",
                discount: 5.0,
                details: details,
                packingSize: "Large",
@@ -107,7 +108,7 @@ public class DeliveryFactoryTests
           delivery.PricingStrategy.Should().Be(PricingStrategy.TourDeliveryStrategy);
           delivery.Code.Should().Be($"60114-T01-2");
           delivery.CustomerId.Should().Be(CustomerId);
-          delivery.Urgency.Should().Be("Express");
+          delivery.Urgency.Should().Be(Urgency);
           delivery.TotalPrice.Should().Be(55);
           delivery.Discount.Should().Be(5.0);
           delivery.Details.Should().BeEquivalentTo(details);

@@ -24,13 +24,7 @@ public class PricingStrategyService(
                throw new Exception("Taille de colis invalide");
           }
 
-          var urgency = urgencies.GetByName(delivery.Urgency);
-          if (urgency is null)
-          {
-               throw new Exception("Urgence invalide");
-          }
-
-          var urgencyPriceCoefficient = urgency.PriceCoefficient;
+          var urgencyPriceCoefficient = delivery.Urgency.PriceCoefficient;
           var pickupCount = delivery.Steps.Count(s => s.StepType == StepType.Pickup);
           var dropoffsInCore = delivery.Steps.Count(s => s.StepZone.Name == "Centre");
           var dropoffsInBorder = delivery.Steps.Count(s => s.StepZone.Name == "Limitrophe");
