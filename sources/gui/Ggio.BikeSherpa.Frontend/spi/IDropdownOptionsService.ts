@@ -1,5 +1,5 @@
 import {DropdownOptions} from "@/models/DropdownOptions";
 
-export interface IDropdownOptions {
+export interface IDropdownOptionsService {
     GetOptions(): Promise<Record<string, DropdownOptions[]>>;
 }

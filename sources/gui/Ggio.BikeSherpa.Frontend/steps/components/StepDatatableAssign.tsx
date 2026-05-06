@@ -23,9 +23,6 @@ export default function StepDataTableAssign(
     const theme = useTheme();
     const style = datatableStyle;
 
-    // stepDate to decide first/last step for a date
-    let stepDate: string = '';
-
     return (
         <ScrollView>
             <DataTable style={{backgroundColor: theme.colors.background}}>

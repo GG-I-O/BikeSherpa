@@ -12,6 +12,8 @@ import DeliveryMapper from "@/deliveries/services/DeliveryMapper";
 import {IStepServices} from "@/steps/spi/IStepServices";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
 import {Step} from "@/steps/models/Step";
+import unassignedCourierDisplay from "@/deliveries/data/unassignedCourierDisplay";
+import defaultCourierDropdown from "@/deliveries/data/defaultCourierDropdown";
 
 export default class DeliveryListViewModel {
     private readonly deliveryServices: IDeliveryServices;
@@ -85,7 +87,7 @@ export default class DeliveryListViewModel {
                     DateToolbox.dateFilterFunction(dateFilter, new Date(step.estimatedDeliveryDate))
                     &&
                     (
-                        courierFilter.some(courier => courier === 'ALL')
+                        courierFilter.some(courier => courier === defaultCourierDropdown[0].value)
                         ||
                         courierFilter.some(courier => courier === step.courierId))
                 ) {
@@ -109,9 +111,9 @@ export default class DeliveryListViewModel {
         });
 
         return filteredDeliveries.flatMap(delivery => delivery.steps).sort((stepA, stepB) => {
-            // Code ??? comes last
-            if (stepA.courierCode === "???" && stepB.courierCode !== "???") return 1;
-            if (stepA.courierCode !== "???" && stepB.courierCode === "???") return -1;
+            // Unassigned comes last
+            if (stepA.courierCode === unassignedCourierDisplay && stepB.courierCode !== unassignedCourierDisplay) return 1;
+            if (stepA.courierCode !== unassignedCourierDisplay && stepB.courierCode === unassignedCourierDisplay) return -1;
             
             // Normal sorting
             if (stepA.courierCode !== stepB.courierCode)

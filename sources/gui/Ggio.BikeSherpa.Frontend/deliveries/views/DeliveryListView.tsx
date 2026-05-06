@@ -10,6 +10,8 @@ import useDeliveryListViewModel from "@/deliveries/viewModel/useDeliveryListView
 import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import {DatePickerInput} from "react-native-paper-dates";
+import dateFilterDropdown from "@/deliveries/data/dateFilterDropdown";
+import dateFilterEnum from "@/deliveries/data/dateFilterEnum";
 
 export function DeliveryListView() {
     const theme = useTheme();
@@ -46,23 +48,14 @@ export function DeliveryListView() {
                             style={{height: "auto", flex: 1, alignItems: "center"}}
                             value={viewModel.dateFilter}
                             onValueChange={viewModel.setDateFilter}
-                            buttons={[
-                                {
-                                    value: '1',
-                                    label: 'Dates'
-                                },
-                                {
-                                    value: '365',
-                                    label: 'Toutes'
-                                }
-                            ]}
+                            buttons={dateFilterDropdown}
                         />
                         <DatePickerInput
                             locale={"fr"}
                             inputMode={"start"}
                             onChange={(date: Date | undefined): void => viewModel.setDatePicker(date)}
                             value={viewModel.datePicker}
-                            disabled={viewModel.dateFilter !== '1'}
+                            disabled={viewModel.dateFilter !== dateFilterEnum.Date}
                         />
                         <MultiSelectDropdown
                             key={`courier-filter-${viewModel.courierFilter || 'empty'}`}

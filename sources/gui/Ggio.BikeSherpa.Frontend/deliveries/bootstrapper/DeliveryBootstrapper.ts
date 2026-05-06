@@ -7,11 +7,11 @@ import DeliveryStorageContext from "../services/DeliveryStorageContext";
 import DeliveryBackendClientFacade from "../services/DeliveryBackendClientfacade";
 import DeliveryServices from "../services/DeliveryServices";
 import { IDeliveryServices } from "../spi/IDeliveryServices";
-import {IDropdownOptions} from "@/spi/IDropdownOptions";
-import DeliveryDropdownOptionsService from "@/deliveries/services/DeliveryDropdownOptionsService";
+import DropdownOptionsService from "../services/DropdownOptionsService";
 import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddleware";
 import DeliveryStorageMiddleware from "@/deliveries/services/DeliveryStorageMiddleware";
 import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCustomBackendClientFacade";
+import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
 
 export default class DeliveryBootstrapper {
     public static init(IOCContainer: Container) {
@@ -26,7 +26,7 @@ export default class DeliveryBootstrapper {
         IOCContainer.bind<IDeliveryCustomBackendClientFacade>(DeliveryServiceIdentifier.CustomBackendClientFacade).to(DeliveryBackendClientFacade).inSingletonScope();
 
         // DropdownOptionsService
-        IOCContainer.bind<IDropdownOptions>(DeliveryServiceIdentifier.DropdownOptionsService).to(DeliveryDropdownOptionsService).inSingletonScope();
+        IOCContainer.bind<IDropdownOptionsService>(DeliveryServiceIdentifier.DropdownOptionsService).to(DropdownOptionsService).inSingletonScope();
         
         // StorageMiddleware
         IOCContainer.bind<IDeliveryStorageMiddleware>(DeliveryServiceIdentifier.StorageMiddleware).to(DeliveryStorageMiddleware).inSingletonScope();

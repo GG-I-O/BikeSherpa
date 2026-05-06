@@ -12,6 +12,8 @@ import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import {IStepServices} from "@/steps/spi/IStepServices";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
+import defaultCourierList from "@/deliveries/data/defaultCourierDropdown";
+import dateFilterEnum from "@/deliveries/data/dateFilterEnum";
 
 export default function useDeliveryListViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -31,7 +33,7 @@ export default function useDeliveryListViewModel() {
     const [couriers, setCouriers] = useState<{ label: string, value: string }[]>([]);
 
     const [datePicker, setDatePicker] = useState<Date|undefined>(new Date());
-    const [dateFilter, setDateFilter] = useState<string>('1');
+    const [dateFilter, setDateFilter] = useState<string>(dateFilterEnum.Date);
     const [courierFilter, setCourierFilter] = useState<string[]>([]);
 
     function displayEditForm(id: string) {
@@ -48,10 +50,11 @@ export default function useDeliveryListViewModel() {
 
     useEffect(() => {
         return observe(() => {
-            setDeliveries(viewModel.getFilteredDeliveries(dateFilter === '1' ? datePicker : undefined));
-            setSteps(viewModel.getFilteredStepList(dateFilter === '1' ? datePicker : undefined, courierFilter));
+            setDeliveries(viewModel.getFilteredDeliveries(dateFilter === dateFilterEnum.Date ? datePicker : undefined));
+            setSteps(viewModel.getFilteredStepList(dateFilter === dateFilterEnum.Date ? datePicker : undefined, courierFilter));
 
-            let courierList: { label: string, value: string }[] = [{ label: "Tous", value: "ALL"}];
+            let courierList: { label: string, value: string }[] = [];
+            courierList.push(...defaultCourierList);
             Object.values(courierStore$.peek()).forEach(courier =>
                 courierList.push({label: courier.code, value: courier.id})
             );
