@@ -55,6 +55,15 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                     );
                     await this.customClientFacade.PatchStepEndpoint(step, patchOrderJson);
                     break;
+                case deliveryOperationAction.patchComment:
+                    let patchCommentJson = new JsonPatchDocument();
+                    patchCommentJson.addOperation(
+                        "/comment",
+                        "replace",
+                        step.comment
+                    );
+                    await this.customClientFacade.PatchStepEndpoint(step, patchCommentJson);
+                    break;
                 case deliveryOperationAction.postCourier:
                     await this.customClientFacade.PostStepCourierEndpoint(step);
                     break;

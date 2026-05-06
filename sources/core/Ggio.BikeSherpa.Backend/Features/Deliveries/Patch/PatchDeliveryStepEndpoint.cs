@@ -33,6 +33,11 @@ public class PatchDeliveryStepEndpoint(IMediator mediator): Endpoint<PatchDelive
                     var timeResult = await mediator.Send(timeCommand, ct);
                     await Send.ToEndpointResult(timeResult, ct);
                     return;
+               case var _ when requestPath.Equals(nameof(DeliveryStep.Comment), StringComparison.OrdinalIgnoreCase):
+                    var commentCommand = new PatchDeliveryStepCommentCommand(req);
+                    var commentResult = await mediator.Send(commentCommand, ct);
+                    await Send.ToEndpointResult(commentResult, ct);
+                    return;
                default:
                     ThrowError("Invalid patch path");
                     break;

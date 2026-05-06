@@ -1,4 +1,4 @@
-import {DataTable, IconButton, Text, useTheme} from "react-native-paper";
+import {DataTable, IconButton, Text, TextInput, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
 import React, {useState} from "react";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
@@ -16,14 +16,21 @@ type Props = {
     listLength?: number
 }
 
-export default function StepDataTableRow({step, isSelected = false, onPress, canChangeDate = false, listLength = 0}: Props) {
+export default function StepDataTableRow(
+    {
+        step,
+        isSelected = false,
+        onPress,
+        canChangeDate = false,
+        listLength = 0
+    }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
 
-    const splitTime = step.estimatedTime.split(':');
+    
     const [isTimePickerOpen, setIsTimePickerOpen] = useState(false); // Disable onRowPress if we're picking time
 
-    const viewModel = useStepDataTableRowViewModel();
+    const viewModel = useStepDataTableRowViewModel(step);
 
     return (
         <DataTable.Row
@@ -60,7 +67,11 @@ export default function StepDataTableRow({step, isSelected = false, onPress, can
                 <Text numberOfLines={3}>{`${step.address.postcode} ${step.address.city}`}</Text>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
-                <Text numberOfLines={2}>{step.comment}</Text>
+                <TextInput
+                    value={viewModel.comment}
+                    onChangeText={viewModel.setComment}
+                    mode="outlined"
+                />
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>{step.courierCode}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>
@@ -69,8 +80,8 @@ export default function StepDataTableRow({step, isSelected = false, onPress, can
                         <Text>{step.estimatedTime}</Text>
                     ) : (
                         <TimePickerInput
-                            hours={parseInt(splitTime[0]) ?? 0}
-                            minutes={parseInt(splitTime[1]) ?? 0}
+                            hours={parseInt(viewModel.splitTime[0]) ?? 0}
+                            minutes={parseInt(viewModel.splitTime[1]) ?? 0}
                             onOpen={() => setIsTimePickerOpen(true)}
                             onClose={() => setIsTimePickerOpen(false)}
                             onConfirm={({hours, minutes}: {

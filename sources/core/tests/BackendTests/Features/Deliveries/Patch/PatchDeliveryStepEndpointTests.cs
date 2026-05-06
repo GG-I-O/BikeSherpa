@@ -108,6 +108,49 @@ public class PatchDeliveryStepEndpointTests
                m => m.Send(It.IsAny<PatchDeliveryStepOrderCommand>(), It.IsAny<CancellationToken>()),
                Times.Never);
      }
+     
+     [Fact]
+     public async Task PatchDeliveryStep_CommentPatch_ReturnsOk()
+     {
+          // Arrange
+          _mockMediator.Reset();
+
+          var deliveryId = Guid.NewGuid();
+          var stepId = Guid.NewGuid();
+
+          var patchDocument = new JsonPatchDocument<PatchDeliveryRequest>();
+          patchDocument.Operations.Add(new Operation<PatchDeliveryRequest>()
+          {
+               op = "replace",
+               path = "/Comment",
+               value = "Leave at the reception desk."
+          });
+
+          _mockMediator
+               .Setup(m => m.Send(It.IsAny<PatchDeliveryStepCommentCommand>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(Result.Success());
+
+          var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
+          using var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+
+          // Act
+          var response = await _client.PatchAsync($"/api/delivery/{deliveryId}/step/{stepId}", content, _cancellationToken);
+
+          // Assert
+          response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+          _mockMediator.Verify(
+               m => m.Send(It.IsAny<PatchDeliveryStepCommentCommand>(), It.IsAny<CancellationToken>()),
+               Times.Once);
+
+          _mockMediator.Verify(
+               m => m.Send(It.IsAny<PatchDeliveryStepOrderCommand>(), It.IsAny<CancellationToken>()),
+               Times.Never);
+
+          _mockMediator.Verify(
+               m => m.Send(It.IsAny<PatchDeliveryStepTimeCommand>(), It.IsAny<CancellationToken>()),
+               Times.Never);
+     }
 
      [Fact]
      public async Task PatchDeliveryStep_InvalidPatchPath_ReturnsBadRequest()
