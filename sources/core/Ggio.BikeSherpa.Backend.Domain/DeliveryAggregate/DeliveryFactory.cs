@@ -73,7 +73,10 @@ public class DeliveryFactory(
           {
                delivery.GenerateReportId(customer);
 
-               var deliveries = await deliveryRepository.ListAsync(new DeliveryByCodeStartsWithSpecification(customer.Code));
+               delivery.GenerateCode(customer, 0);
+               var splitCode = delivery.Code.Split('-');
+               var codeStart = $"{splitCode[0]}-{splitCode[1]}";
+               var deliveries = await deliveryRepository.ListAsync(new DeliveryByCodeStartsWithSpecification(codeStart));
                delivery.GenerateCode(customer, deliveries.Count + 1);
           }
 

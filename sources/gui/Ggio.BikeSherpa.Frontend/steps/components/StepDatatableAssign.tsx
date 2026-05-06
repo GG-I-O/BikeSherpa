@@ -3,6 +3,7 @@ import datatableStyle from "@/style/datatableStyle";
 import StepDataTableRowAssign from "./StepDataTableRowAssign";
 import {ScrollView} from "react-native";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
+import {Step} from "@/steps/models/Step";
 
 type Props = {
     steps: StepToDisplay[],
@@ -34,11 +35,12 @@ export default function StepDataTableAssign(
                         <DataTable.Title style={[style.column, style.width40]}>Ordre</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width110]}>Code</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.minWidth150]}>Adresse</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width180]}>Adresse</DataTable.Title>
                         <DataTable.Title style={[style.column, style.minWidth150]}>Commentaire</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.width80]}>Urgence</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width90]}>Date</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width60]}>Heure début</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width60]}>Heure limite</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width60]}>Livreur</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width40]}>Finis</DataTable.Title>
                     </DataTable.Header>
@@ -47,14 +49,17 @@ export default function StepDataTableAssign(
                 )}
 
                 {steps.map((step, index) => {
-                        let isFirst = false;
-                        let isLast = false;
-                        if (stepDate !== step.estimatedDate) {
-                            isFirst = true;
-                            stepDate = step.estimatedDate;
-                        }
-                        if (index + 1 >= steps.length || stepDate !== steps[index + 1].estimatedDate)
-                            isLast = true;
+                        const prev = steps[index - 1];
+                        const next = steps[index + 1];
+
+                        const isSameGroup = (a: StepToDisplay, b: StepToDisplay) =>
+                            a &&
+                            b &&
+                            a.courierCode === b.courierCode &&
+                            a.estimatedDate === b.estimatedDate;
+
+                        const isFirst = !isSameGroup(step, prev);
+                        const isLast = !isSameGroup(step, next);
 
                         return (
                             <StepDataTableRowAssign

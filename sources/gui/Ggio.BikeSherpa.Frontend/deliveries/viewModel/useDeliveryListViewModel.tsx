@@ -30,8 +30,9 @@ export default function useDeliveryListViewModel() {
     const [steps, setSteps] = useState<StepToDisplay[]>([]);
     const [couriers, setCouriers] = useState<{ label: string, value: string }[]>([]);
 
+    const [datePicker, setDatePicker] = useState<Date|undefined>(new Date());
     const [dateFilter, setDateFilter] = useState<string>('1');
-    const [courierFilter, setCourierFilter] = useState<string>('');
+    const [courierFilter, setCourierFilter] = useState<string[]>([]);
 
     function displayEditForm(id: string) {
         navigate({
@@ -47,17 +48,17 @@ export default function useDeliveryListViewModel() {
 
     useEffect(() => {
         return observe(() => {
-            setDeliveries(viewModel.getFilteredDeliveries(dateFilter, courierFilter));
-            setSteps(viewModel.getFilteredStepList(dateFilter, courierFilter));
+            setDeliveries(viewModel.getFilteredDeliveries(dateFilter === '1' ? datePicker : undefined));
+            setSteps(viewModel.getFilteredStepList(dateFilter === '1' ? datePicker : undefined, courierFilter));
 
-            let courierList: { label: string, value: string }[] = [];
+            let courierList: { label: string, value: string }[] = [{ label: "Tous", value: "ALL"}];
             Object.values(courierStore$.peek()).forEach(courier =>
                 courierList.push({label: courier.code, value: courier.id})
             );
             setCouriers(courierList);
         });
 
-    }, [deliveryStore$, customerStore$, courierStore$, setDeliveries, setSteps, dateFilter, courierFilter]);
+    }, [deliveryStore$, customerStore$, courierStore$, setDeliveries, setSteps, dateFilter, datePicker, courierFilter]);
 
     return {
         deliveries,
@@ -65,6 +66,8 @@ export default function useDeliveryListViewModel() {
         couriers,
         dateFilter,
         setDateFilter,
+        datePicker,
+        setDatePicker,
         courierFilter,
         setCourierFilter,
         displayEditForm,

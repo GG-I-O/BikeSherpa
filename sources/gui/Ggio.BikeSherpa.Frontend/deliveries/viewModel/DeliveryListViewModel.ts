@@ -31,7 +31,7 @@ export default class DeliveryListViewModel {
         this.customerServices = customerServices;
     }
 
-    public getFilteredDeliveries = (dateFilter: string, courierFilter: string): DeliveryToDisplay[] => {
+    public getFilteredDeliveries = (dateFilter: Date | undefined): DeliveryToDisplay[] => {
         if (!this.deliveryServices || !this.courierServices)
             return [];
 
@@ -41,14 +41,7 @@ export default class DeliveryListViewModel {
         const filteredDeliveries = deliveries.filter((delivery) => {
             if (!delivery.steps)
                 return false;
-
-            return delivery.steps.some((step) => {
-                return (
-                    DateToolbox.dateFilterFunction(dateFilter, new Date(step.estimatedDeliveryDate))
-                    &&
-                    ((courierFilter === '' && step.courierId === null) || courierFilter === step.courierId)
-                );
-            });
+            return delivery.steps.some((step) => DateToolbox.dateFilterFunction(dateFilter, new Date(step.estimatedDeliveryDate)));
         });
 
         const sortedDeliveries: Delivery[] = [...filteredDeliveries].sort((deliveryA, deliveryB) => {
@@ -77,7 +70,7 @@ export default class DeliveryListViewModel {
         });
     }
 
-    public getFilteredStepList = (dateFilter: string, courierFilter: string): StepToDisplay[] => {
+    public getFilteredStepList = (dateFilter: Date | undefined, courierFilter: string[]): StepToDisplay[] => {
         if (!this.deliveryServices || !this.courierServices)
             return [];
 
@@ -91,7 +84,10 @@ export default class DeliveryListViewModel {
                 if (
                     DateToolbox.dateFilterFunction(dateFilter, new Date(step.estimatedDeliveryDate))
                     &&
-                    ((courierFilter === '' && step.courierId === null) || courierFilter === step.courierId)
+                    (
+                        courierFilter.some(courier => courier === 'ALL')
+                        ||
+                        courierFilter.some(courier => courier === step.courierId))
                 ) {
                     filteredSteps.push(step);
                 }
@@ -113,6 +109,13 @@ export default class DeliveryListViewModel {
         });
 
         return filteredDeliveries.flatMap(delivery => delivery.steps).sort((stepA, stepB) => {
+            // Code ??? comes last
+            if (stepA.courierCode === "???" && stepB.courierCode !== "???") return 1;
+            if (stepA.courierCode !== "???" && stepB.courierCode === "???") return -1;
+            
+            // Normal sorting
+            if (stepA.courierCode != stepB.courierCode)
+                return stepA.courierCode.localeCompare(stepB.courierCode);
             return (
                 new Date(stepA.estimatedIsoDate).valueOf()
                 -

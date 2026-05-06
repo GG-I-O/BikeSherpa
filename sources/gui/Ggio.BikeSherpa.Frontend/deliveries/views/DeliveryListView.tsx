@@ -1,14 +1,15 @@
 import {navigate} from "expo-router/build/global-state/routing";
-import {useState} from "react";
+import React, {useState} from "react";
 import {ScrollView} from "react-native";
 import {Button, SegmentedButtons, Text, useTheme} from 'react-native-paper';
-import {Dropdown} from 'react-native-paper-dropdown';
+import {Dropdown, MultiSelectDropdown} from 'react-native-paper-dropdown';
 import DeliveryDataTable from "../components/DeliveryDataTable";
 import StepDataTableAssign from "@/steps/components/StepDatatableAssign";
 import {useDeliverySelection} from "../hooks/useDeliverySelection";
 import useDeliveryListViewModel from "@/deliveries/viewModel/useDeliveryListViewModel";
 import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
+import {DatePickerInput} from "react-native-paper-dates";
 
 export function DeliveryListView() {
     const theme = useTheme();
@@ -48,11 +49,7 @@ export function DeliveryListView() {
                             buttons={[
                                 {
                                     value: '1',
-                                    label: 'Aujourd\'hui'
-                                },
-                                {
-                                    value: '7',
-                                    label: 'Semaine'
+                                    label: 'Dates'
                                 },
                                 {
                                     value: '365',
@@ -60,12 +57,19 @@ export function DeliveryListView() {
                                 }
                             ]}
                         />
-                        <Dropdown
+                        <DatePickerInput
+                            locale={"fr"}
+                            inputMode={"start"}
+                            onChange={(date: Date | undefined): void => viewModel.setDatePicker(date)}
+                            value={viewModel.datePicker}
+                            disabled={viewModel.dateFilter !== '1'}
+                        />
+                        <MultiSelectDropdown
                             key={`courier-filter-${viewModel.courierFilter || 'empty'}`}
                             label="Assignées à"
                             options={viewModel.couriers}
                             value={viewModel.courierFilter}
-                            onSelect={(value) => viewModel.setCourierFilter(value ?? '')}
+                            onSelect={(value) => viewModel.setCourierFilter(value)}
                             mode="outlined"
                         />
                         <Button
@@ -88,7 +92,7 @@ export function DeliveryListView() {
                         <Dropdown
                             key={`courier-filter-${courierToAssign || 'empty'}`}
                             label="Assigner à"
-                            options={viewModel.couriers}
+                            options={viewModel.couriers.slice(1)}
                             value={courierToAssign}
                             onSelect={(value) => setCourierToAssign(value ?? '')}
                             mode="outlined"
@@ -127,7 +131,7 @@ export function DeliveryListView() {
                 )}
 
             </ScrollView>
-            {viewModel.courierFilter === '' ? (
+            {viewModel.courierFilter.length === 0 ? (
                 <DeliveryDataTable
                     deliveries={viewModel.deliveries}
                     isDeliverySelected={isAssigning ? isDeliverySelected : undefined}

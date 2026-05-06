@@ -5,12 +5,12 @@ export interface StepToDisplay {
     id: string;
     deliveryId: string;
     deliveryCode: string;
-    deliveryUrgency: string;
+    deliveryLimitDate: string;
     type: number;
     order: number;
     completed: boolean;
     address: Address;
-    courierCode?: string;
+    courierCode: string;
     comment: string;
     deliveryDate: string;
     deliveryTime: string;
