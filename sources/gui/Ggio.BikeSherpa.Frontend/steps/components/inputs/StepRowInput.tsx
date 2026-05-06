@@ -1,4 +1,4 @@
-import {DataTable, IconButton, Text} from "react-native-paper";
+import {DataTable, IconButton} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
 import {Control} from "react-hook-form";
 import StepTypeInput from "@/steps/components/inputs/StepTypeInput";
@@ -6,7 +6,6 @@ import React from "react";
 import ThemedInput from "@/components/themed/ThemedInput";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";
-import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
 import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 
 type Props = {

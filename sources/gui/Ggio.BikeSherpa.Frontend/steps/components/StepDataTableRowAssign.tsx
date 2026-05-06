@@ -64,21 +64,24 @@ export default function StepDataTableRowAssign(
             <DataTable.Cell style={[style.column, style.width110]}>
                 {step.deliveryCode}
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.minWidth150]}>
+            <DataTable.Cell style={[style.column, style.width180]}>
                 <Text numberOfLines={3}>{step.address.streetInfo}</Text>
                 <Text numberOfLines={3}>{`${step.address.postcode} ${step.address.city}`}</Text>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <Text numberOfLines={2}>{step.comment}</Text>
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width80]}>
-                {step.deliveryUrgency}
-            </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width90]}>
                 {step.deliveryDate}
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>
                 {step.deliveryTime}
+            </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>
+                {step.deliveryLimitDate}
+            </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>
+                <Text style={{textAlign: 'center', width: '100%'}}>{step.courierCode}</Text>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>
                 {

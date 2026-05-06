@@ -2,11 +2,11 @@ import {createApiClient} from "@/infra/openAPI/client";
 import axios from "axios";
 import {DropdownOptions} from "@/models/DropdownOptions";
 import {injectable} from "inversify";
-import {IDropdownOptions} from "@/spi/IDropdownOptions";
-import Delivery from "@/deliveries/models/Delivery";
+import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
+
 
 @injectable()
-export default class DeliveryDropdownOptionsService implements IDropdownOptions<Delivery> {
+export default class DropdownOptionsService implements IDropdownOptionsService {
     private apiClient;
     
     private options: Record<string, DropdownOptions[]> = {};

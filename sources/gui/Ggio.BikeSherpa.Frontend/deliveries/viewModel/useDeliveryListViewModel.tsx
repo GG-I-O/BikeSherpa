@@ -12,6 +12,8 @@ import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import {IStepServices} from "@/steps/spi/IStepServices";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
+import defaultCourierList from "@/deliveries/data/defaultCourierDropdown";
+import dateFilterEnum from "@/deliveries/data/dateFilterEnum";
 
 export default function useDeliveryListViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -30,8 +32,9 @@ export default function useDeliveryListViewModel() {
     const [steps, setSteps] = useState<StepToDisplay[]>([]);
     const [couriers, setCouriers] = useState<{ label: string, value: string }[]>([]);
 
-    const [dateFilter, setDateFilter] = useState<string>('1');
-    const [courierFilter, setCourierFilter] = useState<string>('');
+    const [datePicker, setDatePicker] = useState<Date|undefined>(new Date());
+    const [dateFilter, setDateFilter] = useState<string>(dateFilterEnum.Date);
+    const [courierFilter, setCourierFilter] = useState<string[]>([]);
 
     function displayEditForm(id: string) {
         navigate({
@@ -47,17 +50,18 @@ export default function useDeliveryListViewModel() {
 
     useEffect(() => {
         return observe(() => {
-            setDeliveries(viewModel.getFilteredDeliveries(dateFilter, courierFilter));
-            setSteps(viewModel.getFilteredStepList(dateFilter, courierFilter));
+            setDeliveries(viewModel.getFilteredDeliveries(dateFilter === dateFilterEnum.Date ? datePicker : undefined));
+            setSteps(viewModel.getFilteredStepList(dateFilter === dateFilterEnum.Date ? datePicker : undefined, courierFilter));
 
             let courierList: { label: string, value: string }[] = [];
+            courierList.push(...defaultCourierList);
             Object.values(courierStore$.peek()).forEach(courier =>
                 courierList.push({label: courier.code, value: courier.id})
             );
             setCouriers(courierList);
         });
 
-    }, [deliveryStore$, customerStore$, courierStore$, setDeliveries, setSteps, dateFilter, courierFilter]);
+    }, [deliveryStore$, customerStore$, courierStore$, setDeliveries, setSteps, dateFilter, datePicker, courierFilter]);
 
     return {
         deliveries,
@@ -65,6 +69,8 @@ export default function useDeliveryListViewModel() {
         couriers,
         dateFilter,
         setDateFilter,
+        datePicker,
+        setDatePicker,
         courierFilter,
         setCourierFilter,
         displayEditForm,

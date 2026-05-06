@@ -1,12 +1,11 @@
-import Delivery from "@/deliveries/models/Delivery";
 import {useEffect, useState} from "react";
 import {DropdownOptions} from "@/models/DropdownOptions";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
-import {IDropdownOptions} from "@/spi/IDropdownOptions";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
+import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
 
 export default function useDeliveryDropdown() {
-    const dropdownService = IOCContainer.get<IDropdownOptions<Delivery>>(DeliveryServiceIdentifier.DropdownOptionsService);
+    const dropdownService = IOCContainer.get<IDropdownOptionsService>(DeliveryServiceIdentifier.DropdownOptionsService);
     const [urgencies, setUrgencies] = useState<DropdownOptions[]>([]);
     const [pricingStrategies, setPricingStrategies] = useState<DropdownOptions[]>([]);
     const [packingSizes, setPackingSizes] = useState<DropdownOptions[]>([]);
