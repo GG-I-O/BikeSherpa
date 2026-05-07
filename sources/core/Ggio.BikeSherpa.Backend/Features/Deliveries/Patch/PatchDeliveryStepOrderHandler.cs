@@ -2,13 +2,16 @@ using Ardalis.Result;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.DddCore;
 using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Patch;
 
-public record PatchDeliveryStepOrderCommand(PatchDeliveryRequest Request) : ICommand<Result>;
+public record PatchDeliveryStepOrderCommand(
+     Guid DeliveryId,
+     Guid StepId,
+     int Order
+     ) : ICommand<Result>;
 
 public class PatchDeliveryStepOrderHandler(
      IReadRepository<Delivery> deliveryRepository,
@@ -18,21 +21,13 @@ public class PatchDeliveryStepOrderHandler(
 {
      public async ValueTask<Result> Handle(PatchDeliveryStepOrderCommand command, CancellationToken cancellationToken)
      {
-          var delivery = await deliveryRepository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.Request.DeliveryId), cancellationToken);
+          var delivery = await deliveryRepository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.DeliveryId), cancellationToken);
           if (delivery is null)
                return Result.NotFound();
-
-          var rawValue = command.Request.Patches.Operations[0].value?.ToString();
-          if (!int.TryParse(
-                   rawValue,
-                   out var newOrder))
-          {
-               return Result.Error("Invalid step order value provided.");
-          }
           
           await delivery.ReorderStepsAsync(
-               command.Request.StepId,
-               newOrder,
+               command.StepId,
+               command.Order,
                itineraryService
           );
 

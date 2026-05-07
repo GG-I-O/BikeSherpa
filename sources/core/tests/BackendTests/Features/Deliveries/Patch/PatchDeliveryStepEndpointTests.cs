@@ -49,7 +49,12 @@ public class PatchDeliveryStepEndpointTests
           });
 
           _mockMediator
-               .Setup(m => m.Send(It.IsAny<PatchDeliveryStepOrderCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(m => m.Send(
+                    It.Is<PatchDeliveryStepOrderCommand>(command =>
+                         command.DeliveryId == deliveryId &&
+                         command.StepId == stepId &&
+                         command.Order == 3),
+                    It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
@@ -62,7 +67,12 @@ public class PatchDeliveryStepEndpointTests
           response.StatusCode.Should().Be(HttpStatusCode.OK);
 
           _mockMediator.Verify(
-               m => m.Send(It.IsAny<PatchDeliveryStepOrderCommand>(), It.IsAny<CancellationToken>()),
+               m => m.Send(
+                    It.Is<PatchDeliveryStepOrderCommand>(command =>
+                         command.DeliveryId == deliveryId &&
+                         command.StepId == stepId &&
+                         command.Order == 3),
+                    It.IsAny<CancellationToken>()),
                Times.Once);
 
           _mockMediator.Verify(
@@ -78,17 +88,23 @@ public class PatchDeliveryStepEndpointTests
 
           var deliveryId = Guid.NewGuid();
           var stepId = Guid.NewGuid();
+          var estimatedDeliveryDate = DateTimeOffset.UtcNow.AddDays(1);
 
           var patchDocument = new JsonPatchDocument<PatchDeliveryRequest>();
           patchDocument.Operations.Add(new Operation<PatchDeliveryRequest>()
           {
                op = "replace",
                path = "/EstimatedDeliveryDate",
-               value = DateTime.UtcNow.AddDays(1).ToString("O")
+               value = estimatedDeliveryDate.ToString("O")
           });
 
           _mockMediator
-               .Setup(m => m.Send(It.IsAny<PatchDeliveryStepTimeCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(m => m.Send(
+                    It.Is<PatchDeliveryStepTimeCommand>(command =>
+                         command.DeliveryId == deliveryId &&
+                         command.StepId == stepId &&
+                         command.EstimatedDeliveryDate == estimatedDeliveryDate),
+                    It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
@@ -101,7 +117,12 @@ public class PatchDeliveryStepEndpointTests
           response.StatusCode.Should().Be(HttpStatusCode.OK);
 
           _mockMediator.Verify(
-               m => m.Send(It.IsAny<PatchDeliveryStepTimeCommand>(), It.IsAny<CancellationToken>()),
+               m => m.Send(
+                    It.Is<PatchDeliveryStepTimeCommand>(command =>
+                         command.DeliveryId == deliveryId &&
+                         command.StepId == stepId &&
+                         command.EstimatedDeliveryDate == estimatedDeliveryDate),
+                    It.IsAny<CancellationToken>()),
                Times.Once);
 
           _mockMediator.Verify(
@@ -117,17 +138,23 @@ public class PatchDeliveryStepEndpointTests
 
           var deliveryId = Guid.NewGuid();
           var stepId = Guid.NewGuid();
+          const string comment = "Leave at the reception desk.";
 
           var patchDocument = new JsonPatchDocument<PatchDeliveryRequest>();
           patchDocument.Operations.Add(new Operation<PatchDeliveryRequest>()
           {
                op = "replace",
                path = "/Comment",
-               value = "Leave at the reception desk."
+               value = comment
           });
 
           _mockMediator
-               .Setup(m => m.Send(It.IsAny<PatchDeliveryStepCommentCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(m => m.Send(
+                    It.Is<PatchDeliveryStepCommentCommand>(command =>
+                         command.DeliveryId == deliveryId &&
+                         command.StepId == stepId &&
+                         command.Comment == comment),
+                    It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
@@ -140,7 +167,12 @@ public class PatchDeliveryStepEndpointTests
           response.StatusCode.Should().Be(HttpStatusCode.OK);
 
           _mockMediator.Verify(
-               m => m.Send(It.IsAny<PatchDeliveryStepCommentCommand>(), It.IsAny<CancellationToken>()),
+               m => m.Send(
+                    It.Is<PatchDeliveryStepCommentCommand>(command =>
+                         command.DeliveryId == deliveryId &&
+                         command.StepId == stepId &&
+                         command.Comment == comment),
+                    It.IsAny<CancellationToken>()),
                Times.Once);
 
           _mockMediator.Verify(
@@ -181,6 +213,68 @@ public class PatchDeliveryStepEndpointTests
           _mockMediator.Verify(
                m => m.Send(It.IsAny<PatchDeliveryStepOrderCommand>(), It.IsAny<CancellationToken>()),
                Times.Never);
+
+          _mockMediator.Verify(
+               m => m.Send(It.IsAny<PatchDeliveryStepTimeCommand>(), It.IsAny<CancellationToken>()),
+               Times.Never);
+     }
+     
+     [Fact]
+     public async Task PatchDeliveryStep_InvalidOrderValue_ReturnsBadRequest()
+     {
+          // Arrange
+          _mockMediator.Reset();
+
+          var deliveryId = Guid.NewGuid();
+          var stepId = Guid.NewGuid();
+
+          var patchDocument = new JsonPatchDocument<PatchDeliveryRequest>();
+          patchDocument.Operations.Add(new Operation<PatchDeliveryRequest>()
+          {
+               op = "replace",
+               path = "/Order",
+               value = "not-an-int"
+          });
+
+          var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
+          using var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+
+          // Act
+          var response = await _client.PatchAsync($"/api/delivery/{deliveryId}/step/{stepId}", content, _cancellationToken);
+
+          // Assert
+          response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+          _mockMediator.Verify(
+               m => m.Send(It.IsAny<PatchDeliveryStepOrderCommand>(), It.IsAny<CancellationToken>()),
+               Times.Never);
+     }
+
+     [Fact]
+     public async Task PatchDeliveryStep_InvalidEstimatedDeliveryDateValue_ReturnsBadRequest()
+     {
+          // Arrange
+          _mockMediator.Reset();
+
+          var deliveryId = Guid.NewGuid();
+          var stepId = Guid.NewGuid();
+
+          var patchDocument = new JsonPatchDocument<PatchDeliveryRequest>();
+          patchDocument.Operations.Add(new Operation<PatchDeliveryRequest>()
+          {
+               op = "replace",
+               path = "/EstimatedDeliveryDate",
+               value = "not-a-date"
+          });
+
+          var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
+          using var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+
+          // Act
+          var response = await _client.PatchAsync($"/api/delivery/{deliveryId}/step/{stepId}", content, _cancellationToken);
+
+          // Assert
+          response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
           _mockMediator.Verify(
                m => m.Send(It.IsAny<PatchDeliveryStepTimeCommand>(), It.IsAny<CancellationToken>()),

@@ -5,11 +5,8 @@ using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Patch;
 using Ggio.DddCore;
-using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
-using Microsoft.AspNetCore.JsonPatch.SystemTextJson.Operations;
 using Moq;
 
 namespace BackendTests.Features.Deliveries.Patch;
@@ -55,31 +52,13 @@ public class PatchDeliveryStepTimeHandlerTest
           );
      }
 
-     private static PatchDeliveryRequest CreateRequest(Guid deliveryId, Guid stepId, string patchValue)
-     {
-          var patchDocument = new JsonPatchDocument<DeliveryStep>();
-          patchDocument.Operations.Add(new Operation<DeliveryStep>()
-          {
-               op = "replace",
-               path = "/estimatedDeliveryDate",
-               value = patchValue
-          });
-
-          return new PatchDeliveryRequest
-          {
-               DeliveryId = deliveryId,
-               StepId = stepId,
-               Patches = patchDocument
-          };
-     }
-
      [Fact]
      public async Task Handle_ShouldReturnSuccess_WhenRequestIsValid()
      {
           // Arrange
           var sut = CreateSut();
-          var request = CreateRequest(_deliveryId, _stepId, DateTimeOffset.UtcNow.ToString("O"));
-          var command = new PatchDeliveryStepTimeCommand(request);
+          var estimatedDeliveryDate = DateTimeOffset.UtcNow.AddHours(1);
+          var command = new PatchDeliveryStepTimeCommand(_deliveryId, _stepId, estimatedDeliveryDate);
 
           // Act
           var result = await sut.Handle(command, CancellationToken.None);
@@ -100,8 +79,7 @@ public class PatchDeliveryStepTimeHandlerTest
                .ReturnsAsync(null as Delivery);
 
           var sut = CreateSut();
-          var request = CreateRequest(_deliveryId, _stepId, DateTimeOffset.UtcNow.ToString("O"));
-          var command = new PatchDeliveryStepTimeCommand(request);
+          var command = new PatchDeliveryStepTimeCommand(_deliveryId, _stepId, DateTimeOffset.UtcNow.AddHours(1));
 
           // Act
           var result = await sut.Handle(command, CancellationToken.None);
@@ -109,24 +87,6 @@ public class PatchDeliveryStepTimeHandlerTest
           // Assert
           result.IsSuccess.Should().BeFalse();
           result.IsNotFound().Should().BeTrue();
-          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
-     }
-
-     [Fact]
-     public async Task Handle_ShouldReturnError_WhenPatchValueIsNotADateTime()
-     {
-          // Arrange
-          var sut = CreateSut();
-          var request = CreateRequest(_deliveryId, _stepId, "not-a-date");
-          var command = new PatchDeliveryStepTimeCommand(request);
-
-          // Act
-          var result = await sut.Handle(command, CancellationToken.None);
-
-          // Assert
-          result.IsSuccess.Should().BeFalse();
-          result.IsError().Should().BeTrue();
-          result.Errors.Should().Contain("estimatedDeliveryDate must be a valid ISO-8601 datetime.");
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
      }
 }

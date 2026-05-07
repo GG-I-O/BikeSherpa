@@ -6,11 +6,8 @@ using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Patch;
 using Ggio.DddCore;
-using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
-using Microsoft.AspNetCore.JsonPatch.SystemTextJson.Operations;
 using Moq;
 
 namespace BackendTests.Features.Deliveries.Patch;
@@ -28,7 +25,6 @@ public class PatchDeliveryStepOrderHandlerTests
      public PatchDeliveryStepOrderHandlerTests()
      {
           _deliveryId = Guid.NewGuid();
-          _stepId = Guid.NewGuid();
 
           var mockDelivery = _fixture.Build<Delivery>()
                .With(d => d.Id, _deliveryId)
@@ -39,8 +35,8 @@ public class PatchDeliveryStepOrderHandlerTests
                .With(s => s.ParentDelivery, mockDelivery)
                .CreateMany(5)
                .ToList();
-          mockDelivery.Steps.AddRange(mockSteps);
 
+          mockDelivery.Steps.AddRange(mockSteps);
           _stepId = mockDelivery.Steps.First().Id;
 
           _mockDeliveryRepository
@@ -48,7 +44,7 @@ public class PatchDeliveryStepOrderHandlerTests
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryByIdSpecification),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(mockDelivery);
-          
+
           _mockItineraryService
                .Setup(x => x.GetItineraryInfoAsync(
                     It.IsAny<GeoPoint>(),
@@ -66,31 +62,12 @@ public class PatchDeliveryStepOrderHandlerTests
           );
      }
 
-     private static PatchDeliveryRequest CreateRequest(Guid deliveryId, Guid stepId, int newOrder)
-     {
-          var patchDocument = new JsonPatchDocument<DeliveryStep>();
-          patchDocument.Operations.Add(new Operation<DeliveryStep>()
-          {
-               op = "replace",
-               path = "/order",
-               value = newOrder.ToString()
-          });
-
-          return new PatchDeliveryRequest
-          {
-               DeliveryId = deliveryId,
-               StepId = stepId,
-               Patches = patchDocument
-          };
-     }
-
      [Fact]
      public async Task Handle_ShouldReturnSuccess_WhenRequestIsValid()
      {
           // Arrange
           var sut = CreateSut();
-          var request = CreateRequest(_deliveryId, _stepId, 4);
-          var command = new PatchDeliveryStepOrderCommand(request);
+          var command = new PatchDeliveryStepOrderCommand(_deliveryId, _stepId, 4);
 
           // Act
           var result = await sut.Handle(command, CancellationToken.None);
@@ -111,8 +88,7 @@ public class PatchDeliveryStepOrderHandlerTests
                .ReturnsAsync(null as Delivery);
 
           var sut = CreateSut();
-          var request = CreateRequest(_deliveryId, _stepId, 4);
-          var command = new PatchDeliveryStepOrderCommand(request);
+          var command = new PatchDeliveryStepOrderCommand(_deliveryId, _stepId, 4);
 
           // Act
           var result = await sut.Handle(command, CancellationToken.None);
@@ -120,25 +96,6 @@ public class PatchDeliveryStepOrderHandlerTests
           // Assert
           result.IsSuccess.Should().BeFalse();
           result.IsNotFound().Should().BeTrue();
-          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
-     }
-
-     [Fact]
-     public async Task Handle_ShouldReturnError_WhenPatchValueIsNotAnInteger()
-     {
-          // Arrange
-          var sut = CreateSut();
-          var request = CreateRequest(_deliveryId, _stepId, 0);
-          request.Patches.Operations[0].value = "not-an-int";
-          var command = new PatchDeliveryStepOrderCommand(request);
-
-          // Act
-          var result = await sut.Handle(command, CancellationToken.None);
-
-          // Assert
-          result.IsSuccess.Should().BeFalse();
-          result.IsError().Should().BeTrue();
-          result.Errors.Should().Contain("Invalid step order value provided.");
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
      }
 }
