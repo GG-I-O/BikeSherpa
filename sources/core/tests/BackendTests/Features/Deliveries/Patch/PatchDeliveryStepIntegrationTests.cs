@@ -24,6 +24,7 @@ namespace BackendTests.Features.Deliveries.Patch;
 [TestSubject(typeof(PatchDeliveryStepEndpoint))]
 [TestSubject(typeof(PatchDeliveryStepOrderHandler))]
 [TestSubject(typeof(PatchDeliveryStepTimeHandler))]
+[TestSubject(typeof(PatchDeliveryStepCommentHandler))]
 [Trait("Category", "Integration")]
 public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
@@ -53,7 +54,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
                .With(a => a.Postcode, "69000")
                .With(a => a.City, "Lyon")
                .Create();
-          
+
           _delivery = _fixture.Build<Delivery>()
                .With(d => d.Steps, [])
                .With(d => d.ContractDate, DateTime.UtcNow)
@@ -72,6 +73,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .With(s => s.StepAddress, firstAddress)
                .Create();
+
           _delivery.Steps.Add(firstStep);
 
           var secondStep = _fixture
@@ -84,15 +86,16 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .With(s => s.StepAddress, secondAddress)
                .Create();
+
           _delivery.Steps.Add(secondStep);
-          
+
           _mockItineraryService
                .Setup(x => x.GetItineraryInfoAsync(
                     It.IsAny<GeoPoint>(),
                     It.IsAny<GeoPoint>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ItineraryResult(12.3, 45));
-          
+
           _factory = factory.WithWebHostBuilder(builder =>
           {
                builder.UseEnvironment("Development");
@@ -105,7 +108,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
 
                     services.AddAuthorizationBuilder()
                          .AddPolicy(Scope, policy => policy.RequireClaim("scope", Scope));
-                    
+
                     services.AddSingleton(_mockItineraryService.Object);
                });
           });
@@ -124,7 +127,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-          
+
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
@@ -179,72 +182,16 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
      }
 
      [Fact]
-     public async Task ShouldPatchDeliveryStepEstimatedDeliveryDateWithCamelCasePath()
-     {
-          // Arrange
-          await using var scope = _factory.Services.CreateAsyncScope();
-          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
-          await ResetDatabaseAsync(dbContext);
-          
-          var client = _factory.CreateClient();
-
-          var firstStep = _delivery.Steps[0];
-          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
-          await dbContext.SaveChangesAsync(CancellationToken.None);
-
-          var newEstimatedDeliveryDate = DateTimeOffset.UtcNow.AddHours(1);
-
-          var patchDocument = new JsonPatchDocument<object>();
-          patchDocument.Operations.Add(new Operation<object>
-          {
-               op = "replace",
-               path = "/estimatedDeliveryDate",
-               value = newEstimatedDeliveryDate.ToString("O")
-          });
-
-          var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
-          using var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
-
-          try
-          {
-               // Act
-               var response = await client.PatchAsync(
-                    $"/api/delivery/{_delivery.Id}/step/{firstStep.Id}",
-                    content,
-                    CancellationToken.None);
-
-               // Assert
-               response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-               dbContext.ChangeTracker.Clear();
-
-               var dbDelivery = await dbContext.Deliveries
-                    .Include(d => d.Steps)
-                    .FirstOrDefaultAsync(d => d.Id == _delivery.Id, CancellationToken.None);
-
-               dbDelivery.Should().NotBeNull();
-
-               var dbStep = dbDelivery.Steps.Single(s => s.Id == firstStep.Id);
-               dbStep.EstimatedDeliveryDate.Should().BeCloseTo(newEstimatedDeliveryDate, TimeSpan.FromSeconds(1));
-          }
-          finally
-          {
-               // Clean
-               await ResetDatabaseAsync(dbContext);
-          }
-     }
-
-     [Fact]
      public async Task ShouldPatchDeliveryStepOrderWithPascalCasePath()
      {
           // Arrange
           var firstStep = _delivery.Steps[0];
           var secondStep = _delivery.Steps[1];
-          
+
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-          
+
           var client = _factory.CreateClient();
 
           await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
@@ -297,6 +244,174 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
      }
 
      [Fact]
+     public async Task ShouldPatchDeliveryStepEstimatedDeliveryDateWithCamelCasePath()
+     {
+          // Arrange
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+
+          var client = _factory.CreateClient();
+
+          var firstStep = _delivery.Steps[0];
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.SaveChangesAsync(CancellationToken.None);
+
+          var newEstimatedDeliveryDate = DateTimeOffset.UtcNow.AddHours(1);
+
+          var patchDocument = new JsonPatchDocument<object>();
+          patchDocument.Operations.Add(new Operation<object>
+          {
+               op = "replace",
+               path = "/estimatedDeliveryDate",
+               value = newEstimatedDeliveryDate.ToString("O")
+          });
+
+          var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
+          using var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+
+          try
+          {
+               // Act
+               var response = await client.PatchAsync(
+                    $"/api/delivery/{_delivery.Id}/step/{firstStep.Id}",
+                    content,
+                    CancellationToken.None);
+
+               // Assert
+               response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+               dbContext.ChangeTracker.Clear();
+
+               var dbDelivery = await dbContext.Deliveries
+                    .Include(d => d.Steps)
+                    .FirstOrDefaultAsync(d => d.Id == _delivery.Id, CancellationToken.None);
+
+               dbDelivery.Should().NotBeNull();
+
+               var dbStep = dbDelivery.Steps.Single(s => s.Id == firstStep.Id);
+               dbStep.EstimatedDeliveryDate.Should().BeCloseTo(newEstimatedDeliveryDate, TimeSpan.FromSeconds(1));
+          }
+          finally
+          {
+               // Clean
+               await ResetDatabaseAsync(dbContext);
+          }
+     }
+
+     [Fact]
+     public async Task ShouldPatchDeliveryStepCommentWithCamelCasePath()
+     {
+          // Arrange
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+
+          var client = _factory.CreateClient();
+
+          var firstStep = _delivery.Steps[0];
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.SaveChangesAsync(CancellationToken.None);
+
+          const string newComment = "Leave the package with the front desk.";
+
+          var patchDocument = new JsonPatchDocument<object>();
+          patchDocument.Operations.Add(new Operation<object>
+          {
+               op = "replace",
+               path = "/comment",
+               value = newComment
+          });
+
+          var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
+          using var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+
+          try
+          {
+               // Act
+               var response = await client.PatchAsync(
+                    $"/api/delivery/{_delivery.Id}/step/{firstStep.Id}",
+                    content,
+                    CancellationToken.None);
+
+               // Assert
+               response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+               dbContext.ChangeTracker.Clear();
+
+               var dbDelivery = await dbContext.Deliveries
+                    .Include(d => d.Steps)
+                    .FirstOrDefaultAsync(d => d.Id == _delivery.Id, CancellationToken.None);
+
+               dbDelivery.Should().NotBeNull();
+
+               var dbStep = dbDelivery.Steps.Single(s => s.Id == firstStep.Id);
+               dbStep.Comment.Should().Be(newComment);
+          }
+          finally
+          {
+               // Clean
+               await ResetDatabaseAsync(dbContext);
+          }
+     }
+
+     [Fact]
+     public async Task ShouldPatchDeliveryStepCommentWithPascalCasePath()
+     {
+          // Arrange
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+
+          var client = _factory.CreateClient();
+
+          var firstStep = _delivery.Steps[0];
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.SaveChangesAsync(CancellationToken.None);
+
+          const string newComment = "Call customer before arrival.";
+
+          var patchDocument = new JsonPatchDocument<object>();
+          patchDocument.Operations.Add(new Operation<object>
+          {
+               op = "replace",
+               path = "/Comment",
+               value = newComment
+          });
+
+          var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
+          using var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+
+          try
+          {
+               // Act
+               var response = await client.PatchAsync(
+                    $"/api/delivery/{_delivery.Id}/step/{firstStep.Id}",
+                    content,
+                    CancellationToken.None);
+
+               // Assert
+               response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+               dbContext.ChangeTracker.Clear();
+
+               var dbDelivery = await dbContext.Deliveries
+                    .Include(d => d.Steps)
+                    .FirstOrDefaultAsync(d => d.Id == _delivery.Id, CancellationToken.None);
+
+               dbDelivery.Should().NotBeNull();
+
+               var dbStep = dbDelivery.Steps.Single(s => s.Id == firstStep.Id);
+               dbStep.Comment.Should().Be(newComment);
+          }
+          finally
+          {
+               // Clean
+               await ResetDatabaseAsync(dbContext);
+          }
+     }
+
+     [Fact]
      public async Task ShouldReturnNotFoundWhenDeliveryDoesNotExist()
      {
           // Arrange
@@ -333,7 +448,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-          
+
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
@@ -374,11 +489,11 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
      {
           // Arrange
           var firstStep = _delivery.Steps[0];
-          
+
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-          
+
           var client = _factory.CreateClient();
 
           await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
@@ -418,11 +533,11 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
      {
           // Arrange
           var firstStep = _delivery.Steps[0];
-          
+
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-          
+
           var client = _factory.CreateClient();
 
           await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);

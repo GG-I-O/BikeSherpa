@@ -89,9 +89,10 @@ builder.Services.AddCors(options =>
 // Authentification
 if (!builder.Environment.IsEnvironment("IntegrationTest"))
 {
+     const string scopeName = "scope";
+     const string emailScopeName = "email_claim";
      builder.Services.AddAuthorization(options =>
      {
-          const string scopeName = "scope";
           options.AddPolicy("read:customers", policy => policy.RequireClaim(scopeName, "read:customers"));
           options.AddPolicy("write:customers", policy => policy.RequireClaim(scopeName, "write:customers"));
           options.AddPolicy("read:couriers", policy => policy.RequireClaim(scopeName, "read:couriers"));
@@ -123,11 +124,18 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                     {
                          if (context.Principal?.Identity is ClaimsIdentity claimsIdentity)
                          {
-                              var scopeClaims = claimsIdentity.FindFirst("scope");
+                              var scopeClaims = claimsIdentity.FindFirst(scopeName);
                               if (scopeClaims is not null)
                               {
                                    claimsIdentity.RemoveClaim(scopeClaims);
-                                   claimsIdentity.AddClaims(scopeClaims.Value.Split(' ').Select(scope => new Claim("scope", scope)));
+                                   claimsIdentity.AddClaims(scopeClaims.Value.Split(' ').Select(scope => new Claim(scopeName, scope)));
+                              }
+
+                              var customEmailClaim = claimsIdentity.FindFirst(emailScopeName);
+                              if (customEmailClaim is not null)
+                              {
+                                   claimsIdentity.RemoveClaim(customEmailClaim);
+                                   claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, customEmailClaim.Value));
                               }
                          }
 

@@ -3,6 +3,7 @@ import {View, FlatList} from 'react-native';
 import {TextInput, Text, Button, Portal, useTheme} from 'react-native-paper';
 import formStyle from "@/style/formStyle";
 import {FieldError} from "react-hook-form";
+import {useDebounce} from "@/hooks/useDebounce";
 
 export type SuggestionFetcher<T> = (query: string) => Promise<T[] | null>;
 export type SuggestionRenderer<T> = (item: T) => string;
@@ -51,7 +52,6 @@ export function ThemedSuggestiveInput<T, V>(
     const [position, setPosition] = useState({top: 0, left: 0});
 
     const containerRef = useRef<View>(null);
-    const timerRef = useRef<number | null>(null);
 
     // Hydrate default value
     useEffect(() => {
@@ -60,16 +60,17 @@ export function ThemedSuggestiveInput<T, V>(
         }
     }, [value, getLabelFromValue]);
 
-    // Debounce
-    const updateQuery = (text: string) => {
-        setQuery(text);
-
-        if (timerRef.current) clearTimeout(timerRef.current);
-
-        timerRef.current = setTimeout(() => {
-            setDebouncedQuery(text);
-        }, 400);
-    };
+    useDebounce(() => {
+        if (!query || query.length < minLength) {
+            setSuggestions([]);
+            setOpen(false);
+            return;
+        }
+        fetchSuggestions(query).then((res) => {
+            setSuggestions(res);
+            setOpen(true);
+        });
+    }, 400, [query]);
 
     // Fetch suggestions
     useEffect(() => {
@@ -127,7 +128,7 @@ export function ThemedSuggestiveInput<T, V>(
                     ]}
                     onChangeText={(text) => {
                         onChange(null);
-                        updateQuery(text);
+                        setQuery(text);
                     }}
                 />
                 {error && (<Text style={{color: theme.colors.error}}>{error.message}</Text>)}

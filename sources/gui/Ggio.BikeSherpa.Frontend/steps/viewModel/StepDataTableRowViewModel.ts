@@ -24,4 +24,8 @@ export default class StepDataTableRowViewModel {
     public reorderStepForADay = (stepId: string, increment: number): void => {
         this.stepServices.reorderStepForADay(stepId, increment);
     }
+    
+    public updateComment = (stepId: string, comment: string): void => {
+        this.stepServices.updateComment(stepId, comment);
+    }
 }

@@ -11,7 +11,7 @@ using Moq;
 
 namespace BackendTests.Features.Deliveries.Patch;
 
-public class PatchDeliveryStepTimeHandlerTest
+public class PatchDeliveryStepCommentHandlerTests
 {
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
@@ -19,8 +19,9 @@ public class PatchDeliveryStepTimeHandlerTest
 
      private readonly Guid _deliveryId;
      private readonly Guid _stepId;
+     private readonly DeliveryStep _mockStep;
 
-     public PatchDeliveryStepTimeHandlerTest()
+     public PatchDeliveryStepCommentHandlerTests()
      {
           _deliveryId = Guid.NewGuid();
           _stepId = Guid.NewGuid();
@@ -30,12 +31,12 @@ public class PatchDeliveryStepTimeHandlerTest
                .With(d => d.Steps, [])
                .Create();
 
-          var mockStep = _fixture.Build<DeliveryStep>()
+          _mockStep = _fixture.Build<DeliveryStep>()
                .With(s => s.Id, _stepId)
                .With(s => s.ParentDelivery, mockDelivery)
                .Create();
 
-          mockDelivery.Steps.Add(mockStep);
+          mockDelivery.Steps.Add(_mockStep);
 
           _mockDeliveryRepository
                .Setup(x => x.FirstOrDefaultAsync(
@@ -44,9 +45,9 @@ public class PatchDeliveryStepTimeHandlerTest
                .ReturnsAsync(mockDelivery);
      }
 
-     private PatchDeliveryStepTimeHandler CreateSut()
+     private PatchDeliveryStepCommentHandler CreateSut()
      {
-          return new PatchDeliveryStepTimeHandler(
+          return new PatchDeliveryStepCommentHandler(
                _mockDeliveryRepository.Object,
                _mockTransaction.Object
           );
@@ -57,14 +58,32 @@ public class PatchDeliveryStepTimeHandlerTest
      {
           // Arrange
           var sut = CreateSut();
-          var estimatedDeliveryDate = DateTimeOffset.UtcNow.AddHours(1);
-          var command = new PatchDeliveryStepTimeCommand(_deliveryId, _stepId, estimatedDeliveryDate);
+          const string comment = "Leave the package at the reception desk.";
+          var command = new PatchDeliveryStepCommentCommand(_deliveryId, _stepId, comment);
 
           // Act
           var result = await sut.Handle(command, CancellationToken.None);
 
           // Assert
           result.IsSuccess.Should().BeTrue();
+          _mockStep.Comment.Should().Be(comment);
+          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
+     }
+
+     [Fact]
+     public async Task Handle_ShouldReturnSuccess_AndSetCommentToNull_WhenPatchValueIsNull()
+     {
+          // Arrange
+          var sut = CreateSut();
+          _mockStep.Comment = "Existing comment";
+          var command = new PatchDeliveryStepCommentCommand(_deliveryId, _stepId, null);
+
+          // Act
+          var result = await sut.Handle(command, CancellationToken.None);
+
+          // Assert
+          result.IsSuccess.Should().BeTrue();
+          _mockStep.Comment.Should().BeNull();
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
      }
 
@@ -79,7 +98,23 @@ public class PatchDeliveryStepTimeHandlerTest
                .ReturnsAsync(null as Delivery);
 
           var sut = CreateSut();
-          var command = new PatchDeliveryStepTimeCommand(_deliveryId, _stepId, DateTimeOffset.UtcNow.AddHours(1));
+          var command = new PatchDeliveryStepCommentCommand(_deliveryId, _stepId, "Comment");
+
+          // Act
+          var result = await sut.Handle(command, CancellationToken.None);
+
+          // Assert
+          result.IsSuccess.Should().BeFalse();
+          result.IsNotFound().Should().BeTrue();
+          _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
+     }
+
+     [Fact]
+     public async Task Handle_ShouldReturnNotFound_WhenStepDoesNotExist()
+     {
+          // Arrange
+          var sut = CreateSut();
+          var command = new PatchDeliveryStepCommentCommand(_deliveryId, Guid.NewGuid(), "Comment");
 
           // Act
           var result = await sut.Handle(command, CancellationToken.None);
