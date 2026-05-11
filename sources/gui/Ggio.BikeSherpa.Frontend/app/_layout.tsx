@@ -14,7 +14,7 @@ registerTranslation('fr', fr);
 AppBootstrapper.init();
 
 function AppStack() {
-    const {user, getCredentials} = useAuth0();
+    const {user, getCredentials, getApiCredentials} = useAuth0();
 
     const loggedIn = user !== null && user !== undefined;
 
@@ -23,6 +23,7 @@ function AppStack() {
     useEffect(() => {
         userService.setCurrentUser(user);
         authService.setCredentialMethod(getCredentials);
+        authService.setAPICredentialMethod(getApiCredentials);
     }, [userService, authService, user, getCredentials]);
 
     return (

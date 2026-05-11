@@ -1,4 +1,4 @@
-import { User } from "react-native-auth0";
+import {User} from "react-native-auth0";
 
 export interface UserLogInfo {
     name?: string;
@@ -13,5 +13,7 @@ export interface IUserService {
 
 export interface IAuthService {
     setCredentialMethod: (method: (params: any) => Promise<any>) => void;
+    setAPICredentialMethod: (method: (params: any) => Promise<any>) => void;
     getToken: () => Promise<string | null>;
+    verifyScope: (scope: string) => Promise<boolean>;
 }
