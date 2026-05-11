@@ -8,20 +8,24 @@ import Delivery from "@/deliveries/models/Delivery";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import DeliveryMapper from "@/deliveries/services/DeliveryMapper";
+import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
 
 export default class MyDeliveriesViewModel {
     private readonly deliveryServices: IDeliveryServices;
     private readonly courierServices: ICourierService;
     private readonly customerServices: ICustomerService;
+    private readonly dropdownOptionsService: IDropdownOptionsService;
 
     constructor(
         @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
         @inject(ServicesIdentifiers.CourierServices) courierServices: ICourierService,
-        @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService
+        @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService,
+        @inject(DeliveryServiceIdentifier.DropdownOptionsService) dropdownOptionsService: IDropdownOptionsService
     ) {
         this.deliveryServices = deliveryServices;
         this.courierServices = courierServices;
         this.customerServices = customerServices;
+        this.dropdownOptionsService = dropdownOptionsService;
     }
     
     public loadMyDeliveries = (date: Date): void => {
@@ -41,7 +45,8 @@ export default class MyDeliveriesViewModel {
                 (id: string) => {
                     const courier = this.courierServices.getCourier$(id).get();
                     return courier?.code ?? "";
-                }
+                },
+                this.dropdownOptionsService.GetPackingLabel,
             );
         });
         

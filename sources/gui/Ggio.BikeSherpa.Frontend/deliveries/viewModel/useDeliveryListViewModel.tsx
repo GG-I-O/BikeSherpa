@@ -14,13 +14,15 @@ import {IStepServices} from "@/steps/spi/IStepServices";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
 import defaultCourierList from "@/deliveries/data/defaultCourierDropdown";
 import dateFilterEnum from "@/deliveries/data/dateFilterEnum";
+import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
 
 export default function useDeliveryListViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
     const stepServices = IOCContainer.get<IStepServices>(StepServiceIdentifier.Services);
     const courierServices = IOCContainer.get<ICourierService>(ServicesIdentifiers.CourierServices);
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
-    const viewModel = new DeliveryListViewModel(deliveryServices, stepServices, courierServices, customerServices);
+    const dropdownOptionsService = IOCContainer.get<IDropdownOptionsService>(DeliveryServiceIdentifier.DropdownOptionsService);
+    const viewModel = new DeliveryListViewModel(deliveryServices, stepServices, courierServices, customerServices, dropdownOptionsService);
 
     const deliveryStore$ = deliveryServices.getDeliveryList$();
     const customerStore$ = customerServices.getCustomerList$();

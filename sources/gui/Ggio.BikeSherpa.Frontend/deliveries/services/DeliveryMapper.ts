@@ -1,6 +1,7 @@
 import Delivery, {DeliveryDto} from "../models/Delivery";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import DateToolbox from "@/services/DateToolbox";
+import StepMapper from "@/steps/services/StepMapper";
 
 export default class DeliveryMapper {
     public static DeliveryDtoToDelivery(deliveryDto: DeliveryDto) {
@@ -26,7 +27,8 @@ export default class DeliveryMapper {
     public static DeliveryToDeliveryToDisplay(
         delivery: Delivery,
         getCustomerName: (id: string) => string,
-        getCourierCode: (id: string) => string
+        getCourierCode: (id: string) => string,
+        getPackingLabel: (packing: string) => string
         ): DeliveryToDisplay {
         return {
             id: delivery.id,
@@ -37,23 +39,9 @@ export default class DeliveryMapper {
             startDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
             startTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
             limitTime: !delivery.limitDate ? '???' : DateToolbox.getFormattedTimeFromISO(new Date(delivery.limitDate).toISOString()),
-            steps: delivery.steps?.map((step) => ({
-                id: step.id,
-                deliveryId: delivery.id,
-                deliveryCode: delivery.code,
-                deliveryLimitDate: !delivery.limitDate ? '???' : DateToolbox.getFormattedTimeFromISO(new Date(delivery.limitDate).toISOString()),
-                type: step.stepType,
-                order: step.order,
-                completed: step.completed,
-                address: step.stepAddress,
-                courierCode: step.courierId ? getCourierCode(step.courierId) : "???",
-                comment: step.comment ?? '',
-                deliveryDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
-                deliveryTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
-                estimatedIsoDate: step.estimatedDeliveryDate,
-                estimatedDate: DateToolbox.getFormattedDateFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
-                estimatedTime: DateToolbox.getFormattedTimeFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
-            }))
+            steps: delivery.steps?.map((step) => (
+                StepMapper.StepToStepToDisplay(delivery, step, getCourierCode, getPackingLabel)
+            ))
         }
     }
 }

@@ -35,6 +35,12 @@ export default class DropdownOptionsService implements IDropdownOptionsService {
         
         return this.options;
     }
+    
+    public GetPackingLabel = (packing: string): string => {
+        if (!this.options)
+            return packing;
+        return this.options["packingsSizes"].find((option) => option.value === packing)?.label ?? 'Unknown';
+    }
 
     private async getAllPricingStrategies(): Promise<{ label: string, value: string }[]> {
         const data = await this.apiClient.GetAllPricingStrategiesEndpoint();
