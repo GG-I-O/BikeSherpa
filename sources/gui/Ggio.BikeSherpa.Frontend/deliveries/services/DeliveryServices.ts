@@ -7,19 +7,23 @@ import { Observable } from "@legendapp/state";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { DeliveryServiceIdentifier } from "../bootstrapper/DeliveryServiceIdentifier";
 import { hateoasRel } from "@/models/HateoasLink";
+import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddleware";
 
 @injectable()
 export default class DeliveryServices implements IDeliveryServices {
     private logger: ILogger;
+    private readonly storageMiddleware: IDeliveryStorageMiddleware;
     private storage: IStorageContext<Delivery>;
     private readonly deliveryStore$: Observable<Record<string, Delivery>>;
 
     public constructor(
         @inject(ServicesIdentifiers.Logger) logger: ILogger,
-        @inject(DeliveryServiceIdentifier.Storage) deliveryStorage: IStorageContext<Delivery>
+        @inject(DeliveryServiceIdentifier.StorageMiddleware) storageMiddleware: IDeliveryStorageMiddleware,
+        @inject(DeliveryServiceIdentifier.Storage) deliveryStorage: IStorageContext<Delivery>,
     ) {
         this.logger = logger;
         this.logger = this.logger.extend("Delivery");
+        this.storageMiddleware = storageMiddleware;
         this.storage = deliveryStorage;
         this.deliveryStore$ = this.storage.getStore();
     }
@@ -36,6 +40,14 @@ export default class DeliveryServices implements IDeliveryServices {
      */
     public getDelivery$(deliveryId: string): Observable<Delivery> {
         return this.deliveryStore$[deliveryId];
+    }
+
+    /**
+     * Load deliveries with StorageMiddleware
+     */
+    public loadMyDeliveries(date: string): void {
+        this.storageMiddleware.setGetAllDateForDailySteps(date);
+        this.storage.forceRefresh().then();
     }
 
     /**

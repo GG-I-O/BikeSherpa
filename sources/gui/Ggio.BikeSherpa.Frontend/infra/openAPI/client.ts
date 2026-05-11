@@ -480,6 +480,33 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "get",
+    path: "/deliveries/dailySteps/:date",
+    alias: "GetAllDailyStepsEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "date",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.array(DeliveryDto),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "post",
     path: "/delivery",
     alias: "AddDeliveryEndpoint",

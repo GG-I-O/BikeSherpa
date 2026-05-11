@@ -13,14 +13,12 @@ type Props = {
 }
 
 export default function StepDetailView({ canEdit = false }: Props) {
-    const theme = useTheme();
+    return <Text>StepDetailView</Text>;
+   /* const theme = useTheme();
 
     const { stepId } = useLocalSearchParams<{ stepId: string }>();
 
     const viewModel = useDeliveryViewModel();
-
-    const [step, setStep] = useState<Step | undefined>()
-    const [delivery, setDelivery] = useState<Delivery | undefined>();
 
     useEffect(() => {
         if (!step)
@@ -86,7 +84,7 @@ export default function StepDetailView({ canEdit = false }: Props) {
                         <Text>38000 Grenoble</Text>
                     </View>
                 </View>
-                {/*<View style={{ justifyContent: 'center' }}>
+                {/!*<View style={{ justifyContent: 'center' }}>
                     <View style={{ justifyContent: 'flex-start', gap: 4 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <Text>{step.type === StepType.PickUp ? 'Heure mini' : 'Heure max'} : {step.getContractTime()}</Text>
@@ -96,7 +94,7 @@ export default function StepDetailView({ canEdit = false }: Props) {
                         <Text style={[AppStyle.textStyle.h3, { textAlign: 'center' }]}>Infos livreur :</Text>
                         <Text style={{ textAlign: 'center', fontStyle: 'italic' }}>{step.comment}</Text>
                     </View>
-                </View>*/}
+                </View>*!/}
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', gap: 8, marginTop: 32 }}>
                 <Button
@@ -119,5 +117,5 @@ export default function StepDetailView({ canEdit = false }: Props) {
                 </Button>
             </View>
         </View >
-    );
+    );*/
 }

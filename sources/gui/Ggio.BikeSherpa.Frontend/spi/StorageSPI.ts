@@ -3,6 +3,7 @@ import { HubConnection } from "@microsoft/signalr";
 
 export interface IStorageContext<T> {
     getStore(): Observable<Record<T extends { id: number } ? number : string, T>>;
+    forceRefresh(): Promise<void>;
     subscribeToOnErrorEvent(callback: (error: string) => void): string;
     unsubscribeFromOnErrorEvent(id: string): void;
 }

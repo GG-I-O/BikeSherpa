@@ -140,6 +140,18 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             }
         );
     }
+    
+    public async GetAllDailyStepsEndpoint(date: string): Promise<Delivery[]> {
+        const data = await this.apiClient.GetAllDailyStepsEndpoint({
+            params: {date: date}
+        });
+
+        const deliveries = data.map((deliveryDto: { data: DeliveryCrud, links: Link[] | null }) => {
+            return DeliveryMapper.DeliveryDtoToDelivery(deliveryDto);
+        });
+
+        return deliveries || [];
+    }
 
     public async PatchStepEndpoint(step: Step, json: JsonPatchDocument): Promise<void> {
         if (!step.links)

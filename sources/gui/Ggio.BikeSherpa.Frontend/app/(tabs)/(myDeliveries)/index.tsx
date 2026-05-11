@@ -1,6 +1,6 @@
-import { MyDeliveryView } from '@/steps/views/MyDeliveryView';
+import { MyDeliveriesView } from '@/steps/views/MyDeliveriesView';
 import React from 'react';
 
 export default function MyDelivery() {
-    return <MyDeliveryView />
+    return <MyDeliveriesView />
 }
