@@ -10,7 +10,7 @@ import dispatcherScope from "@/infra/auth/dispatcherScope";
 export default function TabLayout() {
     const theme = useTheme();
 
-    const [userIsDispatcher, setUserIsDispatcher] = useState(false);
+    const [userIsDispatcher, setUserIsDispatcher] = useState<boolean | null>(null);
 
     const authService = IOCContainer.get<IAuthService>(ServicesIdentifiers.AuthService);
     useEffect(() => {
@@ -18,9 +18,13 @@ export default function TabLayout() {
             .then((result) => setUserIsDispatcher(result))
             .catch((error) => console.error("Error verifying scope:", error));
     }, [authService, setUserIsDispatcher]);
+    
+    if (userIsDispatcher === null)
+        return <></>;
 
     return (
         <Tabs
+            initialRouteName={userIsDispatcher ? "(deliveries)" : "(myDeliveries)"}
             screenOptions={{
                 tabBarActiveTintColor: theme.colors.background,
                 tabBarActiveBackgroundColor: theme.colors.primary,
@@ -42,7 +46,6 @@ export default function TabLayout() {
                     href: userIsDispatcher ? "/(tabs)/(deliveries)" : null,
                     title: 'Courses',
                     tabBarIcon: ({color}) => <Icon source="calendar" size={28} color={color}/>
-
                 }}
             />
             <Tabs.Screen
@@ -59,7 +62,6 @@ export default function TabLayout() {
                     href: userIsDispatcher ? "/(tabs)/(customers)" : null,
                     title: 'Clients',
                     tabBarIcon: ({color}) => <Icon source="card-account-details" size={28} color={color}/>
-                    
                 }}
             />
             <Tabs.Screen
@@ -68,7 +70,14 @@ export default function TabLayout() {
                     href: userIsDispatcher ? "/(tabs)/(reports)" : null,
                     title: 'Rapports',
                     tabBarIcon: ({color}) => <Icon source="file-document" size={28} color={color}/>
-
+                }}
+            />
+            <Tabs.Screen
+                name="(profile)"
+                options={{
+                    href: "/(tabs)/(profile)",
+                    title: 'Profil',
+                    tabBarIcon: ({color}) => <Icon source="account" size={28} color={color}/>
                 }}
             />
         </Tabs>
