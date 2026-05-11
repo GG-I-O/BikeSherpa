@@ -99,6 +99,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
           options.AddPolicy("write:couriers", policy => policy.RequireClaim(scopeName, "write:couriers"));
           options.AddPolicy("read:deliveries", policy => policy.RequireClaim(scopeName, "read:deliveries"));
           options.AddPolicy("write:deliveries", policy => policy.RequireClaim(scopeName, "write:deliveries"));
+          options.AddPolicy("read:steps", policy => policy.RequireClaim(scopeName, "read:steps"));
      });
 
      builder.Services.AddAuth0ApiAuthentication(options =>
