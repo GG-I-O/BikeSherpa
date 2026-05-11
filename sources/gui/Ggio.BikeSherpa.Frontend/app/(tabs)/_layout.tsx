@@ -31,7 +31,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="(myDeliveries)"
                 options={{
-                    href: "/(tabs)/(myDeliveries)",
+                    href: userIsDispatcher ? null : "/(tabs)/(myDeliveries)",
                     title: 'Mes courses',
                     tabBarIcon: ({color}) => <Icon source="bicycle-cargo" size={28} color={color}/>
                 }}
