@@ -36,11 +36,11 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         storageMode: StorageMode = StorageMode.merge
     ) {
         this.logger = logger.extend(storeName);
-        this.store = this.initStore(storeName);
-
-        this.canSync$ = observable(false);
         this.storageMode = storageMode;
+        this.canSync$ = observable(false);
 
+        this.store = this.initStore(storeName);
+        
         this.resourceName = storeName.toLocaleLowerCase();
         this.notificationService = notificationService;
         this.onErrorEventType = `${this.resourceName}StorageError`;
