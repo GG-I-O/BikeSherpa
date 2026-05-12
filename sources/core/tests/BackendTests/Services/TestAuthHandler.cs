@@ -9,6 +9,7 @@ namespace BackendTests.Services;
 public class TestAuthSchemeOptions : AuthenticationSchemeOptions
 {
      public string? Scope { get; set; }
+     public string? Email { get; set; }
 }
 
 public class TestAuthHandler(
@@ -23,6 +24,10 @@ public class TestAuthHandler(
           if (Options.Scope != null)
           {
                identity.AddClaim(new Claim("scope", Options.Scope));
+          }
+          if (Options.Email != null)
+          {
+               identity.AddClaim(new Claim(ClaimTypes.Email, Options.Email));
           }
 
           var principal = new ClaimsPrincipal(identity);
