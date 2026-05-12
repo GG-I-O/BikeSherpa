@@ -29,7 +29,8 @@ export default class MyDeliveriesViewModel {
     }
     
     public loadMyDeliveries = (date: Date): void => {
-        this.deliveryServices.loadMyDeliveries(date.toISOString());
+        const rawDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0));
+        this.deliveryServices.loadMyDeliveries(rawDate.toISOString());
     }
 
     public getSteps = (): StepToDisplay[] => {
