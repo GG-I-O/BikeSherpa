@@ -1,6 +1,6 @@
 import AppStyle from "@/constants/AppStyle";
 import {useLocalSearchParams} from "expo-router";
-import {View} from "react-native";
+import {Linking, View} from "react-native";
 import {Button, Divider, Text, useTheme} from "react-native-paper";
 import useStepDetailViewModel from "@/steps/viewModel/useStepDetailViewModel";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
@@ -84,6 +84,7 @@ export default function StepDetailView() {
                     </View>
                     <Button
                         mode="outlined"
+                        onPress={() => Linking.openURL(`tel:${"06 45 45 45 45"}`)}
                     >
                         <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
                         <Icon source="phone" size={24} color={theme.colors.onBackground}/>
