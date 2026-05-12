@@ -12,7 +12,7 @@ using Moq;
 namespace BackendTests.Features.StaticData.PricingStrategies.GetAll;
 
 [UsedImplicitly]
-public class GetAllPricingStrategiesWebApplicationFactory() : TestWebApplicationFactory("read:deliveries", "read:deliveries");
+public class GetAllPricingStrategiesWebApplicationFactory() : TestWebApplicationFactory("read:steps", "read:deliveries");
 
 public class GetAllPricingStrategiesEndpointTests(
      GetAllPricingStrategiesWebApplicationFactory factory,

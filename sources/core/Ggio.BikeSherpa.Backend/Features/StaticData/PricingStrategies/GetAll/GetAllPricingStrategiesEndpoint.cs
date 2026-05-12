@@ -10,7 +10,7 @@ public class GetAllPricingStrategiesEndpoint(IMediator mediator): EndpointWithou
      public override void Configure()
      {
           Get("/public/pricingStrategies");
-          Policies("read:deliveries");
+          Policies("read:steps");
           Description(x => x.WithTags("public"));
      }
 

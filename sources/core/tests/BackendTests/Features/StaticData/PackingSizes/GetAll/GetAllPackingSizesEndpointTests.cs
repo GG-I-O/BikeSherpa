@@ -11,7 +11,7 @@ using Moq;
 
 namespace BackendTests.Features.StaticData.PackingSizes.GetAll;
 [UsedImplicitly]
-public class GetAllPackingSizesWebApplicationFactory() : TestWebApplicationFactory("read:deliveries", "read:deliveries");
+public class GetAllPackingSizesWebApplicationFactory() : TestWebApplicationFactory("read:steps", "read:deliveries");
 
 public class GetAllPackingSizesEndpointTests(
      GetAllPackingSizesWebApplicationFactory factory,

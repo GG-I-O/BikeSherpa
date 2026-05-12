@@ -10,7 +10,7 @@ public class GetAllPackingSizesEndpoint(IMediator mediator) : EndpointWithoutReq
      public override void Configure()
      {
           Get("/public/packingSizes");
-          Policies("read:deliveries");
+          Policies("read:steps");
           Description(x => x.WithTags("public"));
      }
 

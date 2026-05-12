@@ -10,7 +10,7 @@ public class GetAllUrgenciesEndpoint(IMediator mediator) : EndpointWithoutReques
      public override void Configure()
      {
           Get("/public/urgencies");
-          Policies("read:deliveries");
+          Policies("read:steps");
           Description(x => x.WithTags("public"));
      }
 

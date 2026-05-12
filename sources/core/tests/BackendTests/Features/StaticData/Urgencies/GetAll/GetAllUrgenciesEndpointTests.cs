@@ -12,7 +12,7 @@ using Moq;
 namespace BackendTests.Features.StaticData.Urgencies.GetAll;
 
 [UsedImplicitly]
-public class GetAllUrgenciesWebApplicationFactory() : TestWebApplicationFactory("read:deliveries", "read:deliveries");
+public class GetAllUrgenciesWebApplicationFactory() : TestWebApplicationFactory("read:steps", "read:deliveries");
 
 public class GetAllUrgenciesEndpointTests(
      GetAllUrgenciesWebApplicationFactory factory,
