@@ -24,7 +24,7 @@ function AppStack() {
         userService.setCurrentUser(user);
         authService.setCredentialMethod(getCredentials);
         authService.setAPICredentialMethod(getApiCredentials);
-    }, [userService, authService, user, getCredentials]);
+    }, [userService, authService, user, getCredentials, getApiCredentials]);
 
     return (
         <Stack>

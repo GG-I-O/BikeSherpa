@@ -6,7 +6,6 @@ import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
 import { IAddressService } from "@/spi/AddressSPI";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
-import {StepType} from "@/steps/models/StepType";
 
 type Props = {
     step: StepToDisplay,
