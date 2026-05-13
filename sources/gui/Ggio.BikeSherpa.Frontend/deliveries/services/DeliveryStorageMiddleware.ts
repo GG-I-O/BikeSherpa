@@ -21,19 +21,16 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
         this.backendClientFacade = backendClientFacade;
         this.customClientFacade = customClientFacade;
     }
-    
-    public setGetAllDateForDailySteps(date: string) {
+
+    public setGetAllDateForDailySteps(date: string | null) {
         this.getAllDailyStepsDate = date;
     }
-    
+
     public async getAll(date?: string): Promise<Delivery[]> {
         if (!this.getAllDailyStepsDate)
             return await this.backendClientFacade.GetAllEndpoint(date);
-        else {
-            const deliveries = await this.customClientFacade.GetAllDailyStepsEndpoint(this.getAllDailyStepsDate);
-            this.getAllDailyStepsDate = null;
-            return deliveries;
-        }
+        else
+            return await this.customClientFacade.GetAllDailyStepsEndpoint(this.getAllDailyStepsDate);
     }
 
     public addUpdateStepState(deliveryId: string, stepId: string, state: string): void {
@@ -45,7 +42,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
         for (let i = 0; i < this.updateStepState.length; i++) {
             if (this.updateStepState[i].deliveryId !== delivery.id)
                 continue;
-            
+
             const step = delivery.steps.find(step => step.id === this.updateStepState[i].stepId)
             if (!step)
                 throw new Error(`Step with ID ${this.updateStepState[i].stepId} not found in delivery ${delivery.id}`);
@@ -98,7 +95,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
 
         if (completeUpdate)
             await this.backendClientFacade.UpdateEndpoint(delivery);
-        
+
         this.updateStepState = this.updateStepState.filter(state => state.deliveryId !== delivery.id);
     }
 

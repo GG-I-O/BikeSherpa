@@ -45,7 +45,7 @@ export default class DeliveryServices implements IDeliveryServices {
     /**
      * Load deliveries with StorageMiddleware
      */
-    public loadMyDeliveries(date: string): void {
+    public loadMyDeliveries(date: string | null): void {
         this.storageMiddleware.setGetAllDateForDailySteps(date);
         this.storage.forceRefresh().then();
     }
