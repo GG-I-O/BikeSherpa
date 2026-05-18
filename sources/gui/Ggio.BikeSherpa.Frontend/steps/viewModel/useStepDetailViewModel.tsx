@@ -3,17 +3,15 @@ import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
-import {ICourierService} from "@/spi/CourierSPI";
-import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import StepDetailViewModel from "@/steps/viewModel/StepDetailViewModel";
 import {observe} from "@legendapp/state";
-import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
+import IStepMapper from "@/steps/spi/IStepMapper";
+import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
 
 export default function useStepDetailViewModel(stepId: string) {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
-    const courierServices = IOCContainer.get<ICourierService>(ServicesIdentifiers.CourierServices);
-    const dropdownOptionsService = IOCContainer.get<IDropdownOptionsService>(DeliveryServiceIdentifier.DropdownOptionsService);
-    const viewModel = new StepDetailViewModel(deliveryServices, courierServices, dropdownOptionsService);
+    const stepMapper = IOCContainer.get<IStepMapper>(StepServiceIdentifier.Mapper);
+    const viewModel = new StepDetailViewModel(deliveryServices, stepMapper);
 
     const deliveryStore$ = deliveryServices.getDeliveryList$();
     

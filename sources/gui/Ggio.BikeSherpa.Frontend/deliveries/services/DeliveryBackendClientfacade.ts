@@ -3,27 +3,31 @@ import {inject, injectable} from "inversify";
 import Delivery, {DeliveryCrud} from "../models/Delivery";
 import {createApiClient, schemas} from "@/infra/openAPI/client";
 import axios from "axios";
-import DeliveryMapper from "./DeliveryMapper";
 import {hateoasRel, Link} from "@/models/HateoasLink";
 import {ILogger} from "@/spi/LogsSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {Step} from "@/steps/models/Step";
 import JsonPatchDocument from "@/models/JsonPatchDocument";
 import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCustomBackendClientFacade";
+import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
+import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 
 @injectable()
 export default class DeliveryBackendClientFacade implements IBackendClient<Delivery>, IDeliveryCustomBackendClientFacade {
     private apiClient;
     private logger: ILogger;
+    private readonly deliveryMapper: IDeliveryMapper;
 
     public constructor(
-        @inject(ServicesIdentifiers.Logger) logger: ILogger
+        @inject(ServicesIdentifiers.Logger) logger: ILogger,
+        @inject(DeliveryServiceIdentifier.Mapper) deliveryMapper: IDeliveryMapper
     ) {
         this.apiClient = createApiClient(axios.defaults.baseURL || '', {
             axiosInstance: axios
         });
         this.logger = logger;
         this.logger = this.logger.extend("DeliveryBackendClientFacade");
+        this.deliveryMapper = deliveryMapper;
     }
 
     public async GetAllEndpoint(lastSync?: string): Promise<Delivery[]> {
@@ -32,7 +36,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         });
 
         const deliveries = data.map((deliveryDto: { data: DeliveryCrud, links: Link[] | null }) => {
-            return DeliveryMapper.DeliveryDtoToDelivery(deliveryDto);
+            return this.deliveryMapper.DeliveryDtoToDelivery(deliveryDto);
         });
 
         return deliveries || [];
@@ -42,7 +46,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         const response = await this.apiClient.GetDeliveryEndpoint({
             params: {deliveryId: id}
         });
-        return DeliveryMapper.DeliveryDtoToDelivery(response);
+        return this.deliveryMapper.DeliveryDtoToDelivery(response);
     }
 
     public async AddEndpoint(item: Delivery): Promise<string> {
@@ -147,7 +151,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         });
 
         const deliveries = data.map((deliveryDto: { data: DeliveryCrud, links: Link[] | null }) => {
-            return DeliveryMapper.DeliveryDtoToDelivery(deliveryDto);
+            return this.deliveryMapper.DeliveryDtoToDelivery(deliveryDto);
         });
 
         return deliveries || [];

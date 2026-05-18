@@ -1,44 +1,34 @@
 import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
-import {ICourierService} from "@/spi/CourierSPI";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import {inject} from "inversify";
-import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import Delivery from "@/deliveries/models/Delivery";
 import DateToolbox from "@/services/DateToolbox";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
-import {ICustomerService} from "@/spi/CustomerSPI";
-import DeliveryMapper from "@/deliveries/services/DeliveryMapper";
 import {IStepServices} from "@/steps/spi/IStepServices";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
 import {Step} from "@/steps/models/Step";
 import unassignedCourierDisplay from "@/deliveries/data/unassignedCourierDisplay";
-import defaultCourierDropdown from "@/deliveries/data/defaultCourierDropdown";
-import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
+import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
+import DefaultDropdownOption from "@/deliveries/data/defaultDropdownOption";
 
 export default class DeliveryListViewModel {
     private readonly deliveryServices: IDeliveryServices;
     private readonly stepServices: IStepServices;
-    private readonly courierServices: ICourierService;
-    private readonly customerServices: ICustomerService;
-    private readonly dropdownOptionsService: IDropdownOptionsService;
+    private readonly deliveryMapper: IDeliveryMapper;
 
     constructor(
         @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
         @inject(StepServiceIdentifier.Services) stepServices: IStepServices,
-        @inject(ServicesIdentifiers.CourierServices) courierServices: ICourierService,
-        @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService,
-        @inject(DeliveryServiceIdentifier.DropdownOptionsService) dropdownOptionsService: IDropdownOptionsService,
+        @inject(DeliveryServiceIdentifier.Mapper) deliveryMapper: IDeliveryMapper
     ) {
         this.deliveryServices = deliveryServices;
         this.stepServices = stepServices;
-        this.courierServices = courierServices;
-        this.customerServices = customerServices;
-        this.dropdownOptionsService = dropdownOptionsService;
+        this.deliveryMapper = deliveryMapper;
     }
 
     public getFilteredDeliveries = (dateFilter: Date | undefined): DeliveryToDisplay[] => {
-        if (!this.deliveryServices || !this.courierServices)
+        if (!this.deliveryServices)
             return [];
 
         const deliveries: Delivery[] = Object.values(this.deliveryServices.getDeliveryList$().get());
@@ -62,23 +52,12 @@ export default class DeliveryListViewModel {
         });
 
         return sortedDeliveries.map((delivery) => {
-            return DeliveryMapper.DeliveryToDeliveryToDisplay(
-                delivery,
-                (id: string) => {
-                    const customer = this.customerServices.getCustomer$(id).get();
-                    return customer?.name ?? "";
-                },
-                (id: string) => {
-                    const courier = this.courierServices.getCourier$(id).get();
-                    return courier?.code ?? "";
-                },
-                this.dropdownOptionsService.GetPackingLabel,
-            );
+            return this.deliveryMapper.DeliveryToDeliveryToDisplay(delivery);
         });
     }
 
     public getFilteredStepList = (dateFilter: Date | undefined, courierFilter: string[]): StepToDisplay[] => {
-        if (!this.deliveryServices || !this.courierServices)
+        if (!this.deliveryServices)
             return [];
 
         const deliveries: Delivery[] = Object.values(this.deliveryServices.getDeliveryList$().get());
@@ -92,28 +71,18 @@ export default class DeliveryListViewModel {
                     DateToolbox.dateFilterFunction(dateFilter, new Date(step.estimatedDeliveryDate))
                     &&
                     (
-                        courierFilter.some(courier => courier === defaultCourierDropdown[0].value)
+                        courierFilter.some(courier => courier === DefaultDropdownOption[0].value)
                         ||
                         courierFilter.some(courier => courier === step.courierId))
                 ) {
                     filteredSteps.push(step);
                 }
             });
-            filteredDeliveries.push(DeliveryMapper.DeliveryToDeliveryToDisplay(
+            filteredDeliveries.push(this.deliveryMapper.DeliveryToDeliveryToDisplay(
                 {
                     ...delivery,
                     steps: filteredSteps
-                },
-                (id: string) => {
-                    const customer = this.customerServices.getCustomer$(id).get();
-                    return customer?.name ?? "";
-                },
-                (id: string) => {
-                    const courier = this.courierServices.getCourier$(id).get();
-                    return courier?.code ?? "";
-                },
-                this.dropdownOptionsService.GetPackingLabel,
-            ));
+                }));
         });
 
         return filteredDeliveries.flatMap(delivery => delivery.steps).sort((stepA, stepB) => {

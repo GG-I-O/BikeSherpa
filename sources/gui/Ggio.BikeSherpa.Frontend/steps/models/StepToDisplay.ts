@@ -18,4 +18,6 @@ export interface StepToDisplay {
     estimatedIsoDate: string;
     estimatedDate: string;
     estimatedTime: string;
+    distance: number;
+    notBilled: boolean;
 }

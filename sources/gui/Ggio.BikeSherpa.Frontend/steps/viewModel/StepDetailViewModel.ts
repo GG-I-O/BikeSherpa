@@ -1,31 +1,26 @@
 import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
-import {ICourierService} from "@/spi/CourierSPI";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
-import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {inject} from "inversify";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import Delivery from "@/deliveries/models/Delivery";
 import {Step} from "@/steps/models/Step";
-import StepMapper from "@/steps/services/StepMapper";
-import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
+import IStepMapper from "@/steps/spi/IStepMapper";
+import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
 
 export default class StepDetailViewModel {
     private readonly deliveryServices: IDeliveryServices;
-    private readonly courierServices: ICourierService;
-    private readonly dropdownOptionsService: IDropdownOptionsService;
+    private readonly stepMapper: IStepMapper;
 
     constructor(
         @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
-        @inject(ServicesIdentifiers.CourierServices) courierServices: ICourierService,
-        @inject(DeliveryServiceIdentifier.DropdownOptionsService) dropdownOptionsService: IDropdownOptionsService
+        @inject(StepServiceIdentifier.Mapper) stepMapper: IStepMapper
     ) {
         this.deliveryServices = deliveryServices;
-        this.courierServices = courierServices;
-        this.dropdownOptionsService = dropdownOptionsService;
+        this.stepMapper = stepMapper;
     }
 
     public getStep = (stepId: string): StepToDisplay | undefined => {
-        if (!this.deliveryServices || !this.courierServices)
+        if (!this.deliveryServices)
             return undefined;
 
         const deliveries: Delivery[] = Object.values(this.deliveryServices.getDeliveryList$().get());
@@ -42,14 +37,6 @@ export default class StepDetailViewModel {
         if (!delivery || !step)
             return undefined;
 
-        return StepMapper.StepToStepToDisplay(
-            delivery,
-            step,
-            (id: string) => {
-                const courier = this.courierServices.getCourier$(id).get();
-                return courier?.code ?? "";
-            },
-            this.dropdownOptionsService.GetPackingLabel
-        );
+        return this.stepMapper.StepToStepToDisplay(delivery, step);
     }
 }
