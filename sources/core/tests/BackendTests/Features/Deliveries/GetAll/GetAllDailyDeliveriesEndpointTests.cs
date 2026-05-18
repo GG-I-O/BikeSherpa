@@ -39,9 +39,9 @@ public class GetAllDailyDeliveriesEndpointTests(
 
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<GetAllDailyStepsQuery>(),
+                    It.IsAny<GetAllDailyDeliveriesQuery>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(Result<List<DeliveryCrud>>.Success(expectedDeliveries));
+               .ReturnsAsync(new GetAllDailyDeliveriesResult.Success(expectedDeliveries));
 
           // Act
           var response = await _client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", _cancellationToken);
@@ -51,7 +51,7 @@ public class GetAllDailyDeliveriesEndpointTests(
 
           _mockMediator.Verify(
                m => m.Send(
-                    It.Is<GetAllDailyStepsQuery>(q => q.Date == date),
+                    It.Is<GetAllDailyDeliveriesQuery>(q => q.Date == date),
                     It.IsAny<CancellationToken>()),
                Times.Once);
 
@@ -70,9 +70,9 @@ public class GetAllDailyDeliveriesEndpointTests(
 
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<GetAllDailyStepsQuery>(),
+                    It.IsAny<GetAllDailyDeliveriesQuery>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(Result<List<DeliveryCrud>>.Success([]));
+               .ReturnsAsync(new GetAllDailyDeliveriesResult.Success([]));
 
           // Act
           var response = await _client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", _cancellationToken);
@@ -82,7 +82,7 @@ public class GetAllDailyDeliveriesEndpointTests(
 
           _mockMediator.Verify(
                m => m.Send(
-                    It.Is<GetAllDailyStepsQuery>(q => q.Date == date),
+                    It.Is<GetAllDailyDeliveriesQuery>(q => q.Date == date),
                     It.IsAny<CancellationToken>()),
                Times.Once);
 
@@ -101,9 +101,9 @@ public class GetAllDailyDeliveriesEndpointTests(
 
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<GetAllDailyStepsQuery>(),
+                    It.IsAny<GetAllDailyDeliveriesQuery>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(Result<List<DeliveryCrud>>.NotFound());
+               .ReturnsAsync(new GetAllDailyDeliveriesResult.CourierNotFound());
 
           // Act
           var act = async () => await _client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", _cancellationToken);
@@ -114,7 +114,7 @@ public class GetAllDailyDeliveriesEndpointTests(
 
           _mockMediator.Verify(
                m => m.Send(
-                    It.IsAny<GetAllDailyStepsQuery>(),
+                    It.IsAny<GetAllDailyDeliveriesQuery>(),
                     It.IsAny<CancellationToken>()),
                Times.Once);
      }

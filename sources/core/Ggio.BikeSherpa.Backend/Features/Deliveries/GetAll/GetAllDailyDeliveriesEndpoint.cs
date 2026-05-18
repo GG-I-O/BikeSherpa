@@ -30,16 +30,17 @@ public class GetAllDailyDeliveriesEndpoint(
           {
                throw new ArgumentException("Invalid date format");
           }
-          var query = new GetAllDailyStepsQuery(
+          var query = new GetAllDailyDeliveriesQuery(
                UserEmail: userEmail,
                Date: DateTimeOffset.Parse(date)
           );
           
           var result = await mediator.Send(query, ct);
-          if (result.IsSuccess)
+          if (result is GetAllDailyDeliveriesResult.Success success)
           {
                var deliveryDtoList = new List<DeliveryDto>();
-               foreach (var delivery in result.Value)
+               
+               foreach (var delivery in success.Deliveries)
                {
                     var deliveryStepDtoList = delivery.Steps.Select(deliveryStep => new DeliveryStepDto
                     {
@@ -61,7 +62,7 @@ public class GetAllDailyDeliveriesEndpoint(
                return;
           }
 
-          if (result.Status == ResultStatus.NotFound)
+          if (result is GetAllDailyDeliveriesResult.CourierNotFound)
           {
                throw new UnauthorizedAccessException("User unauthorized");
           }

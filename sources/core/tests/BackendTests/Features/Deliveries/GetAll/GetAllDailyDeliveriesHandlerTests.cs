@@ -64,18 +64,19 @@ public class GetAllDailyDeliveriesHandlerTests
           _mockDelivery.Steps = [stepA, stepB, stepForAnotherDate, stepForAnotherCourier];
 
           var sut = CreateSut(_mockCourier, [_mockDelivery]);
-          var query = new GetAllDailyStepsQuery(_mockCourier.Email, date);
+          var query = new GetAllDailyDeliveriesQuery(_mockCourier.Email, date);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
 
           // Assert
           result.Should().NotBeNull();
-          result.Status.Should().Be(ResultStatus.Ok);
-          result.Value.Should().HaveCount(1);
+          result.Should().BeOfType<GetAllDailyDeliveriesResult.Success>();
 
-          var delivery = result.Value.Single();
+          var success = (GetAllDailyDeliveriesResult.Success)result;
+          success.Deliveries.Should().HaveCount(1);
 
+          var delivery = success.Deliveries.Single();
           delivery.Id.Should().Be(_mockDelivery.Id);
           delivery.Steps.Should().HaveCount(2);
           delivery.Steps.Select(s => s.Data.Id).Should().Equal(stepB.Id, stepA.Id);
@@ -90,14 +91,14 @@ public class GetAllDailyDeliveriesHandlerTests
           // Arrange
           var date = new DateTimeOffset(2026, 5, 12, 0, 0, 0, TimeSpan.Zero);
           var sut = CreateSut(null, []);
-          var query = new GetAllDailyStepsQuery("missing.courier@example.com", date);
+          var query = new GetAllDailyDeliveriesQuery("missing.courier@example.com", date);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
 
           // Assert
           result.Should().NotBeNull();
-          result.Status.Should().Be(ResultStatus.NotFound);
+          result.Should().BeOfType<GetAllDailyDeliveriesResult.CourierNotFound>();
 
           VerifyCourierRepositoryCalledOnce();
 
@@ -114,15 +115,17 @@ public class GetAllDailyDeliveriesHandlerTests
           // Arrange
           var date = new DateTimeOffset(2026, 5, 12, 0, 0, 0, TimeSpan.Zero);
           var sut = CreateSut(_mockCourier, []);
-          var query = new GetAllDailyStepsQuery(_mockCourier.Email, date);
+          var query = new GetAllDailyDeliveriesQuery(_mockCourier.Email, date);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
 
           // Assert
           result.Should().NotBeNull();
-          result.Status.Should().Be(ResultStatus.Ok);
-          result.Value.Should().BeEmpty();
+          result.Should().BeOfType<GetAllDailyDeliveriesResult.Success>();
+
+          var success = (GetAllDailyDeliveriesResult.Success)result;
+          success.Deliveries.Should().BeEmpty();
 
           VerifyCourierRepositoryCalledOnce();
           VerifyDeliveryRepositoryCalledOnce();

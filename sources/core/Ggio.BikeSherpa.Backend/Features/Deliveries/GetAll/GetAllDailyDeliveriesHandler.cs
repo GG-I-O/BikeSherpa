@@ -10,22 +10,22 @@ using Facet.Extensions;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 
-public record GetAllDailyStepsQuery(
+public record GetAllDailyDeliveriesQuery(
      string UserEmail,
      DateTimeOffset Date
-) : IQuery<Result<List<DeliveryCrud>>>;
+) : IQuery<GetAllDailyDeliveriesResult>;
 
 public class GetAllDailyDeliveriesHandler(
      IReadRepository<Courier> courierRepository,
      IReadRepository<Delivery> deliveryRepository
-     ): IQueryHandler<GetAllDailyStepsQuery, Result<List<DeliveryCrud>>>
+     ): IQueryHandler<GetAllDailyDeliveriesQuery, GetAllDailyDeliveriesResult>
 {
      
-     public async ValueTask<Result<List<DeliveryCrud>>> Handle(GetAllDailyStepsQuery request, CancellationToken cancellationToken)
+     public async ValueTask<GetAllDailyDeliveriesResult> Handle(GetAllDailyDeliveriesQuery request, CancellationToken cancellationToken)
      {
           var courier = await courierRepository.FirstOrDefaultAsync(new CourierByEmailSpecification(request.UserEmail), cancellationToken);
           if (courier is null)
-               return Result.NotFound();
+               return new GetAllDailyDeliveriesResult.CourierNotFound();
           
           var deliveries = (await deliveryRepository
                .ListAsync(new DeliveryStepByCourierAndDate(courier.Id, request.Date), cancellationToken))
@@ -40,6 +40,6 @@ public class GetAllDailyDeliveriesHandler(
                })
                .ToList();
           
-          return Result<List<DeliveryCrud>>.Success(deliveries);
+          return new GetAllDailyDeliveriesResult.Success(deliveries);
      }
 }
