@@ -23,11 +23,7 @@ public class GetAllDailyDeliveriesEndpoint(
 
      public override async Task HandleAsync(CancellationToken ct)
      {
-          var userEmail = User.FindFirst(ClaimTypes.Email)?.Value;
-          if (userEmail is null)
-          {
-               throw new UnauthorizedAccessException("User email claim is missing");
-          }
+          var userEmail = User.FindFirst(ClaimTypes.Email)!.Value;
           
           var date = Route<string>("date", isRequired: true);
           if (date is null || !DateTimeOffset.TryParse(date, out _))

@@ -27,6 +27,7 @@ public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<Integrati
      private readonly Guid _courierId = Guid.NewGuid();
 
      private const string Scope = "write:deliveries";
+     private const string UserEmail = "user@example.com";
 
      public DeleteDeliveryStepCourierIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
@@ -65,7 +66,11 @@ public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<Integrati
                {
                     services
                          .AddAuthentication("Test")
-                         .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options => options.Scope = Scope);
+                         .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options =>
+                         {
+                              options.Scope = Scope;
+                              options.Email = UserEmail;
+                         });
 
                     services.AddAuthorizationBuilder()
                          .AddPolicy(Scope, policy => policy.RequireClaim("scope", Scope));

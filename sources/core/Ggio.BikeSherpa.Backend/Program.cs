@@ -183,5 +183,6 @@ if (!app.Environment.IsEnvironment("IntegrationTest"))
 app.UseOperationIdMiddleware();
 app.UseResourceNotifications();
 app.UseValidationExceptionMiddleware();
+app.UseUserEmailClaimMiddleware();
 
 await app.RunAsync();
