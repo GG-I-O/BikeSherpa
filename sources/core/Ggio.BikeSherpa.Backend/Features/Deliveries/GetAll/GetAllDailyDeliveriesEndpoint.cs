@@ -12,8 +12,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 public class GetAllDailyDeliveriesEndpoint(
      IMediator mediator,
      IDeliveryLinks deliveryLinks,
-     IDeliveryStepLinks deliveryStepLinks,
-     UserContext userContext  
+     IDeliveryStepLinks deliveryStepLinks
      ) : EndpointWithoutRequest<List<DeliveryDto>>
 {
      public override void Configure()
@@ -25,7 +24,7 @@ public class GetAllDailyDeliveriesEndpoint(
 
      public override async Task HandleAsync(CancellationToken ct)
      {
-          var userEmail = userContext.Email;
+          var userEmail = HttpContext.User.FindFirstValue(ClaimTypes.Email);
           
           var date = Route<string>("date", isRequired: true);
           if (date is null || !DateTimeOffset.TryParse(date, out _))
@@ -33,7 +32,7 @@ public class GetAllDailyDeliveriesEndpoint(
                throw new ArgumentException("Invalid date format");
           }
           var query = new GetAllDailyDeliveriesQuery(
-               UserEmail: userEmail,
+               UserEmail: userEmail!,
                Date: DateTimeOffset.Parse(date)
           );
           

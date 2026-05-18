@@ -8,7 +8,6 @@ using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Deliveries;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Infrastructure;
-using Ggio.BikeSherpa.Backend.Model;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Middleware;
 using Ggio.BikeSherpa.Backend.Services.Notification;
@@ -63,9 +62,6 @@ builder.Services.AddScoped<IResourceNotificationService, ResourceNotificationSer
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IHateoasService, HateoasService>();
 
-// User context
-builder.Services.AddScoped<UserContext>();
-
 // Add DDD infrastructure services
 builder.Services.AddDddInfrastructureServices();
 
@@ -94,7 +90,6 @@ builder.Services.AddCors(options =>
 if (!builder.Environment.IsEnvironment("IntegrationTest"))
 {
      const string scopeName = "scope";
-     const string emailClaimName = "email_claim";
      builder.Services.AddAuthorization(options =>
      {
           options.AddPolicy("AuthenticatedUser", policy =>
@@ -139,15 +134,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                                    claimsIdentity.RemoveClaim(scopeClaims);
                                    claimsIdentity.AddClaims(scopeClaims.Value.Split(' ').Select(scope => new Claim(scopeName, scope)));
                               }
-
-                              var customEmailClaim = claimsIdentity.FindFirst(emailClaimName);
-                              if (customEmailClaim is not null)
-                              {
-                                   claimsIdentity.RemoveClaim(customEmailClaim);
-                                   claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, customEmailClaim.Value));
-                              }
                          }
-
                          await Task.CompletedTask;
                     }
                }
@@ -187,6 +174,5 @@ if (!app.Environment.IsEnvironment("IntegrationTest"))
 app.UseOperationIdMiddleware();
 app.UseResourceNotifications();
 app.UseValidationExceptionMiddleware();
-app.UseUserEmailClaimMiddleware();
 
 await app.RunAsync();
