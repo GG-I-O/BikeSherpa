@@ -141,8 +141,8 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         );
     }
     
-    public async GetAllDailyStepsEndpoint(date: string): Promise<Delivery[]> {
-        const data = await this.apiClient.GetAllDailyStepsEndpoint({
+    public async GetAllDailyDeliveriesEndpoint(date: string): Promise<Delivery[]> {
+        const data = await this.apiClient.GetAllDailyDeliveriesEndpoint({
             params: {date: date}
         });
 

@@ -13,9 +13,9 @@ using Moq;
 namespace BackendTests.Features.Deliveries.GetAll;
 
 [UsedImplicitly]
-public class GetAllDailyStepsWebApplicationFactory() : TestWebApplicationFactory("read:steps", "read:steps", "mockEmail@mail.com");
+public class GetAllDailyStepsWebApplicationFactory() : TestWebApplicationFactory("read:myDeliveries", "read:myDeliveries", "mockEmail@mail.com");
 
-public class GetAllDailyStepsEndpointTests(
+public class GetAllDailyDeliveriesEndpointTests(
      GetAllDailyStepsWebApplicationFactory factory,
      ITestContextAccessor testContextAccessor) : IClassFixture<GetAllDailyStepsWebApplicationFactory>
 {
@@ -44,7 +44,7 @@ public class GetAllDailyStepsEndpointTests(
                .ReturnsAsync(Result<List<DeliveryCrud>>.Success(expectedDeliveries));
 
           // Act
-          var response = await _client.GetAsync($"/api/deliveries/dailySteps/{date:O}", _cancellationToken);
+          var response = await _client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -75,7 +75,7 @@ public class GetAllDailyStepsEndpointTests(
                .ReturnsAsync(Result<List<DeliveryCrud>>.Success([]));
 
           // Act
-          var response = await _client.GetAsync($"/api/deliveries/dailySteps/{date:O}", _cancellationToken);
+          var response = await _client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -103,10 +103,10 @@ public class GetAllDailyStepsEndpointTests(
                .Setup(m => m.Send(
                     It.IsAny<GetAllDailyStepsQuery>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(Result<List<DeliveryCrud>>.Unauthorized());
+               .ReturnsAsync(Result<List<DeliveryCrud>>.NotFound());
 
           // Act
-          var act = async () => await _client.GetAsync($"/api/deliveries/dailySteps/{date:O}", _cancellationToken);
+          var act = async () => await _client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", _cancellationToken);
 
           // Assert
           await act.Should().ThrowAsync<UnauthorizedAccessException>()

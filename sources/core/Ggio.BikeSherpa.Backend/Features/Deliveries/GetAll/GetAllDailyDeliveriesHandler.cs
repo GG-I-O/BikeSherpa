@@ -15,7 +15,7 @@ public record GetAllDailyStepsQuery(
      DateTimeOffset Date
 ) : IQuery<Result<List<DeliveryCrud>>>;
 
-public class GetAllDailyStepsHandler(
+public class GetAllDailyDeliveriesHandler(
      IReadRepository<Courier> courierRepository,
      IReadRepository<Delivery> deliveryRepository
      ): IQueryHandler<GetAllDailyStepsQuery, Result<List<DeliveryCrud>>>
@@ -25,7 +25,7 @@ public class GetAllDailyStepsHandler(
      {
           var courier = await courierRepository.FirstOrDefaultAsync(new CourierByEmailSpecification(request.UserEmail), cancellationToken);
           if (courier is null)
-               return Result.Unauthorized();
+               return Result.NotFound();
           
           var deliveries = (await deliveryRepository
                .ListAsync(new DeliveryStepByCourierAndDate(courier.Id, request.Date), cancellationToken))

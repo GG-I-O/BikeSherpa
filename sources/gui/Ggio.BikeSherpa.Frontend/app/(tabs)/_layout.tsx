@@ -5,7 +5,6 @@ import {IAuthService} from "@/spi/AuthSPI";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {useEffect, useState} from "react";
-import dispatcherScope from "@/infra/auth/dispatcherScope";
 
 export default function TabLayout() {
     const theme = useTheme();
@@ -14,9 +13,9 @@ export default function TabLayout() {
 
     const authService = IOCContainer.get<IAuthService>(ServicesIdentifiers.AuthService);
     useEffect(() => {
-        authService.verifyScope(dispatcherScope)
+        authService.isDispatcher()
             .then((result) => setUserIsDispatcher(result))
-            .catch((error) => console.error("Error verifying scope:", error));
+            .catch((error) => console.error("Error verifying roles : ", error));
     }, [authService, setUserIsDispatcher]);
     
     if (userIsDispatcher === null)

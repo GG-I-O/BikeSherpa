@@ -13,7 +13,7 @@ using Moq;
 
 namespace BackendTests.Features.Deliveries.GetAll;
 
-public class GetAllDailyStepsHandlerTests
+public class GetAllDailyDeliveriesHandlerTests
 {
      private readonly Mock<IReadRepository<Courier>> _mockCourierRepository = new();
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
@@ -22,7 +22,7 @@ public class GetAllDailyStepsHandlerTests
      private readonly Courier _mockCourier;
      private readonly Delivery _mockDelivery;
 
-     public GetAllDailyStepsHandlerTests()
+     public GetAllDailyDeliveriesHandlerTests()
      {
           _mockCourier = _fixture.Create<Courier>();
 
@@ -97,7 +97,7 @@ public class GetAllDailyStepsHandlerTests
 
           // Assert
           result.Should().NotBeNull();
-          result.Status.Should().Be(ResultStatus.Unauthorized);
+          result.Status.Should().Be(ResultStatus.NotFound);
 
           VerifyCourierRepositoryCalledOnce();
 
@@ -128,7 +128,7 @@ public class GetAllDailyStepsHandlerTests
           VerifyDeliveryRepositoryCalledOnce();
      }
 
-     private GetAllDailyStepsHandler CreateSut(Courier? courier, List<Delivery> deliveries)
+     private GetAllDailyDeliveriesHandler CreateSut(Courier? courier, List<Delivery> deliveries)
      {
           _mockCourierRepository
                .Setup(repo => repo.FirstOrDefaultAsync(
@@ -142,7 +142,7 @@ public class GetAllDailyStepsHandlerTests
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(deliveries);
 
-          return new GetAllDailyStepsHandler(
+          return new GetAllDailyDeliveriesHandler(
                _mockCourierRepository.Object,
                _mockDeliveryRepository.Object);
      }

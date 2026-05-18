@@ -13,7 +13,6 @@ export interface IUserService {
 
 export interface IAuthService {
     setCredentialMethod: (method: (params: any) => Promise<any>) => void;
-    setAPICredentialMethod: (method: (params: any) => Promise<any>) => void;
     getToken: () => Promise<string | null>;
-    verifyScope: (scope: string) => Promise<boolean>;
+    isDispatcher: () => Promise<boolean>;
 }

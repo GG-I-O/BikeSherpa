@@ -17,17 +17,17 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BackendTests.Features.Deliveries.GetAll;
 
 [Collection("Database integration tests")]
-[TestSubject(typeof(GetAllDailyStepsEndpoint))]
+[TestSubject(typeof(GetAllDailyDeliveriesEndpoint))]
 [Trait("Category", "Integration")]
-public class GetAllDailyStepsIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
+public class GetAllDailyDeliveriesIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
      private readonly Fixture _fixture = new();
 
-     private const string Scope = "read:steps";
+     private const string Scope = "read:myDeliveries";
      private const string UserEmail = "courier@example.com";
 
-     public GetAllDailyStepsIntegrationTests(IntegrationTestWebApplicationFactory factory)
+     public GetAllDailyDeliveriesIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
           _factory = factory.WithWebHostBuilder(builder =>
                {
@@ -134,7 +134,7 @@ public class GetAllDailyStepsIntegrationTests : IClassFixture<IntegrationTestWeb
           try
           {
                // Act
-               var response = await client.GetAsync($"/api/deliveries/dailySteps/{date:O}", CancellationToken.None);
+               var response = await client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", CancellationToken.None);
 
                // Assert
                response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -180,7 +180,7 @@ public class GetAllDailyStepsIntegrationTests : IClassFixture<IntegrationTestWeb
           try
           {
                // Act
-               var act = async () => await client.GetAsync($"/api/deliveries/dailySteps/{date:O}", CancellationToken.None);
+               var act = async () => await client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", CancellationToken.None);
 
                // Assert
                await act.Should().ThrowAsync<UnauthorizedAccessException>()

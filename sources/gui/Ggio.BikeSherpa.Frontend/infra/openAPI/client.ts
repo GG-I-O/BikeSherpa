@@ -481,8 +481,8 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/deliveries/dailySteps/:date",
-    alias: "GetAllDailyStepsEndpoint",
+    path: "/deliveries/dailyDeliveries/:date",
+    alias: "GetAllDailyDeliveriesEndpoint",
     tags: ["delivery"],
     requestFormat: "json",
     parameters: [
@@ -966,9 +966,9 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/public/packingSizes",
+    path: "/general/packingSizes",
     alias: "GetAllPackingSizesEndpoint",
-    tags: ["public"],
+    tags: ["general"],
     requestFormat: "json",
     response: z.array(PackingSizeDto),
     errors: [
@@ -986,9 +986,9 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/public/pricingStrategies",
+    path: "/general/pricingStrategies",
     alias: "GetAllPricingStrategiesEndpoint",
-    tags: ["public"],
+    tags: ["general"],
     requestFormat: "json",
     response: z.array(PricingStrategyDto),
     errors: [
@@ -1006,9 +1006,9 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/public/urgencies",
+    path: "/general/urgencies",
     alias: "GetAllUrgenciesEndpoint",
-    tags: ["public"],
+    tags: ["general"],
     requestFormat: "json",
     response: z.array(UrgencyDto),
     errors: [

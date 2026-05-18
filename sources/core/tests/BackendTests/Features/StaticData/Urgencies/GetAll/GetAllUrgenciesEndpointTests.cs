@@ -12,7 +12,7 @@ using Moq;
 namespace BackendTests.Features.StaticData.Urgencies.GetAll;
 
 [UsedImplicitly]
-public class GetAllUrgenciesWebApplicationFactory() : TestWebApplicationFactory("read:steps", "read:deliveries");
+public class GetAllUrgenciesWebApplicationFactory() : TestWebApplicationFactory("AuthenticatedUser","AuthenticatedUser");
 
 public class GetAllUrgenciesEndpointTests(
      GetAllUrgenciesWebApplicationFactory factory,
@@ -43,7 +43,7 @@ public class GetAllUrgenciesEndpointTests(
                .ReturnsAsync(expectedUrgencies);
 
           // Act
-          var response = await _client.GetAsync("/api/public/urgencies", _cancellationToken);
+          var response = await _client.GetAsync("/api/general/urgencies", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -73,7 +73,7 @@ public class GetAllUrgenciesEndpointTests(
                .ReturnsAsync([]);
 
           // Act
-          var response = await _client.GetAsync("/api/public/urgencies", _cancellationToken);
+          var response = await _client.GetAsync("/api/general/urgencies", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);

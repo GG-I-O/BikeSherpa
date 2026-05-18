@@ -3,7 +3,7 @@ import JsonPatchDocument from "@/models/JsonPatchDocument";
 import Delivery from "@/deliveries/models/Delivery";
 
 export interface IDeliveryCustomBackendClientFacade {
-    GetAllDailyStepsEndpoint(date: string): Promise<Delivery[]>;
+    GetAllDailyDeliveriesEndpoint(date: string): Promise<Delivery[]>;
     PatchStepEndpoint(step: Step, patch: JsonPatchDocument): Promise<void>;
     PostStepCourierEndpoint(step: Step): Promise<void>;
     DeleteStepCourierEndpoint(step: Step): Promise<void>;

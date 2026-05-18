@@ -11,7 +11,7 @@ import JsonPatchDocument from "@/models/JsonPatchDocument";
 export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddleware {
     private backendClientFacade: IBackendClient<Delivery>;
     private customClientFacade: IDeliveryCustomBackendClientFacade;
-    private getAllDailyStepsDate: string | null = null;
+    private getAllDailyDeliveriesDate: string | null = null;
     private updateStepState: { deliveryId: string, stepId: string, state: string }[] = [];
 
     constructor(
@@ -22,15 +22,15 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
         this.customClientFacade = customClientFacade;
     }
 
-    public setGetAllDateForDailySteps(date: string | null) {
-        this.getAllDailyStepsDate = date;
+    public setGetAllDateForDailyDeliveries(date: string | null) {
+        this.getAllDailyDeliveriesDate = date;
     }
 
     public async getAll(date?: string): Promise<Delivery[]> {
-        if (!this.getAllDailyStepsDate)
+        if (!this.getAllDailyDeliveriesDate)
             return await this.backendClientFacade.GetAllEndpoint(date);
         else
-            return await this.customClientFacade.GetAllDailyStepsEndpoint(this.getAllDailyStepsDate);
+            return await this.customClientFacade.GetAllDailyDeliveriesEndpoint(this.getAllDailyDeliveriesDate);
     }
 
     public addUpdateStepState(deliveryId: string, stepId: string, state: string): void {

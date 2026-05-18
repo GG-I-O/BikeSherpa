@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 
-public class GetAllDailyStepsEndpoint(
+public class GetAllDailyDeliveriesEndpoint(
      IMediator mediator,
      IDeliveryLinks deliveryLinks,
      IDeliveryStepLinks deliveryStepLinks
@@ -16,8 +16,8 @@ public class GetAllDailyStepsEndpoint(
 {
      public override void Configure()
      {
-          Get("/deliveries/dailySteps/{date}");
-          Policies("read:steps");
+          Get("/deliveries/dailyDeliveries/{date}");
+          Policies("read:myDeliveries");
           Description(x => x.WithTags("delivery"));
      }
 
@@ -65,7 +65,7 @@ public class GetAllDailyStepsEndpoint(
                return;
           }
 
-          if (result.Status == ResultStatus.Unauthorized)
+          if (result.Status == ResultStatus.NotFound)
           {
                throw new UnauthorizedAccessException("User unauthorized");
           }

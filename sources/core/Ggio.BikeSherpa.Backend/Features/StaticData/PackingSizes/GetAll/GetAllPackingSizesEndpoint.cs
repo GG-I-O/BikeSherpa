@@ -9,9 +9,9 @@ public class GetAllPackingSizesEndpoint(IMediator mediator) : EndpointWithoutReq
 {
      public override void Configure()
      {
-          Get("/public/packingSizes");
-          Policies("read:steps");
-          Description(x => x.WithTags("public"));
+          Get("/general/packingSizes");
+          Policies("AuthenticatedUser");
+          Description(x => x.WithTags("general"));
      }
 
      public override async Task HandleAsync(CancellationToken ct)

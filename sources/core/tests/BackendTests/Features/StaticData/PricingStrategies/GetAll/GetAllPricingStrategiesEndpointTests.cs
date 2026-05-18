@@ -12,7 +12,7 @@ using Moq;
 namespace BackendTests.Features.StaticData.PricingStrategies.GetAll;
 
 [UsedImplicitly]
-public class GetAllPricingStrategiesWebApplicationFactory() : TestWebApplicationFactory("read:steps", "read:deliveries");
+public class GetAllPricingStrategiesWebApplicationFactory() : TestWebApplicationFactory("AuthenticatedUser","AuthenticatedUser");
 
 public class GetAllPricingStrategiesEndpointTests(
      GetAllPricingStrategiesWebApplicationFactory factory,
@@ -43,7 +43,7 @@ public class GetAllPricingStrategiesEndpointTests(
                .ReturnsAsync(expectedPricingStrategies);
 
           // Act
-          var response = await _client.GetAsync("/api/public/pricingStrategies", _cancellationToken);
+          var response = await _client.GetAsync("/api/general/pricingStrategies", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -73,7 +73,7 @@ public class GetAllPricingStrategiesEndpointTests(
                .ReturnsAsync([]);
 
           // Act
-          var response = await _client.GetAsync("/api/public/pricingStrategies", _cancellationToken);
+          var response = await _client.GetAsync("/api/general/pricingStrategies", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);
