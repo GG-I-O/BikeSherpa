@@ -23,6 +23,7 @@ public class GetDeliveryIntegrationTests : IClassFixture<IntegrationTestWebAppli
      private readonly Fixture _fixture = new();
 
      private const string Scope = "read:deliveries";
+     private const string UserEmail = "user@example.com";
 
      public GetDeliveryIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
@@ -34,7 +35,11 @@ public class GetDeliveryIntegrationTests : IClassFixture<IntegrationTestWebAppli
                     {
                          services
                               .AddAuthentication("Test")
-                              .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options => options.Scope = Scope);
+                              .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options =>
+                              {
+                                   options.Scope = Scope;
+                                   options.Email = UserEmail;
+                              });
 
                          services.AddAuthorizationBuilder()
                               .AddPolicy(Scope, policy => policy.RequireClaim("scope", Scope));

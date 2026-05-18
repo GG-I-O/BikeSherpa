@@ -1,15 +1,15 @@
 import { Dimensions, Pressable, View } from "react-native";
 import { Button, Card, Divider, Modal, Portal, Text, useTheme } from "react-native-paper";
-import { Step } from "../models/Step";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import { useState } from "react";
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
 import { IAddressService } from "@/spi/AddressSPI";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
 
 type Props = {
-    step: Step,
-    onPress?: (step: Step) => void,
+    step: StepToDisplay,
+    onPress?: (step: StepToDisplay) => void,
     isSelected?: boolean
 }
 
@@ -36,8 +36,8 @@ export default function StepCard({ step, onPress, isSelected = false }: Props) {
                 <Card.Content>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
                         <DeliveryTypeIcon type={step.type} />
-                        <Text>{step.id}</Text>
-                        <Text>{step.estimatedDate ? step.getEstimatedTime() : step.getContractTime()}</Text>
+                        <Text>{step.deliveryCode}</Text>
+                        <Text style={{ fontWeight: "bold"}}>{step.estimatedTime}</Text>
                     </View>
                     <Divider />
                     <Pressable

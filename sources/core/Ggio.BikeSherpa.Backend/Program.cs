@@ -90,15 +90,19 @@ builder.Services.AddCors(options =>
 if (!builder.Environment.IsEnvironment("IntegrationTest"))
 {
      const string scopeName = "scope";
-     const string emailScopeName = "email_claim";
      builder.Services.AddAuthorization(options =>
      {
+          options.AddPolicy("AuthenticatedUser", policy =>
+               policy.RequireAuthenticatedUser());
+          
           options.AddPolicy("read:customers", policy => policy.RequireClaim(scopeName, "read:customers"));
           options.AddPolicy("write:customers", policy => policy.RequireClaim(scopeName, "write:customers"));
           options.AddPolicy("read:couriers", policy => policy.RequireClaim(scopeName, "read:couriers"));
           options.AddPolicy("write:couriers", policy => policy.RequireClaim(scopeName, "write:couriers"));
           options.AddPolicy("read:deliveries", policy => policy.RequireClaim(scopeName, "read:deliveries"));
           options.AddPolicy("write:deliveries", policy => policy.RequireClaim(scopeName, "write:deliveries"));
+          options.AddPolicy("read:myDeliveries", policy => policy.RequireClaim(scopeName, "read:myDeliveries"));
+          options.AddPolicy("write:myDeliveries", policy => policy.RequireClaim(scopeName, "write:myDeliveries"));
      });
 
      builder.Services.AddAuth0ApiAuthentication(options =>
@@ -130,15 +134,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                                    claimsIdentity.RemoveClaim(scopeClaims);
                                    claimsIdentity.AddClaims(scopeClaims.Value.Split(' ').Select(scope => new Claim(scopeName, scope)));
                               }
-
-                              var customEmailClaim = claimsIdentity.FindFirst(emailScopeName);
-                              if (customEmailClaim is not null)
-                              {
-                                   claimsIdentity.RemoveClaim(customEmailClaim);
-                                   claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, customEmailClaim.Value));
-                              }
                          }
-
                          await Task.CompletedTask;
                     }
                }

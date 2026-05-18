@@ -28,6 +28,7 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<IntegrationT
      private readonly Courier _courier;
 
      private const string Scope = "write:deliveries";
+     private const string UserEmail = "user@example.com";
 
      public AddDeliveryStepCourierIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
@@ -77,7 +78,11 @@ public class AddDeliveryStepCourierIntegrationTests : IClassFixture<IntegrationT
                {
                     services
                          .AddAuthentication("Test")
-                         .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options => options.Scope = Scope);
+                         .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options =>
+                         {
+                              options.Scope = Scope;
+                              options.Email = UserEmail;
+                         });
 
                     services.AddAuthorizationBuilder()
                          .AddPolicy(Scope, policy => policy.RequireClaim("scope", Scope));

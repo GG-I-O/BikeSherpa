@@ -14,23 +14,27 @@ import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier"
 import {Step} from "@/steps/models/Step";
 import unassignedCourierDisplay from "@/deliveries/data/unassignedCourierDisplay";
 import defaultCourierDropdown from "@/deliveries/data/defaultCourierDropdown";
+import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
 
 export default class DeliveryListViewModel {
     private readonly deliveryServices: IDeliveryServices;
     private readonly stepServices: IStepServices;
     private readonly courierServices: ICourierService;
     private readonly customerServices: ICustomerService;
+    private readonly dropdownOptionsService: IDropdownOptionsService;
 
     constructor(
         @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
         @inject(StepServiceIdentifier.Services) stepServices: IStepServices,
         @inject(ServicesIdentifiers.CourierServices) courierServices: ICourierService,
         @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService,
+        @inject(DeliveryServiceIdentifier.DropdownOptionsService) dropdownOptionsService: IDropdownOptionsService,
     ) {
         this.deliveryServices = deliveryServices;
         this.stepServices = stepServices;
         this.courierServices = courierServices;
         this.customerServices = customerServices;
+        this.dropdownOptionsService = dropdownOptionsService;
     }
 
     public getFilteredDeliveries = (dateFilter: Date | undefined): DeliveryToDisplay[] => {
@@ -67,7 +71,8 @@ export default class DeliveryListViewModel {
                 (id: string) => {
                     const courier = this.courierServices.getCourier$(id).get();
                     return courier?.code ?? "";
-                }
+                },
+                this.dropdownOptionsService.GetPackingLabel,
             );
         });
     }
@@ -106,7 +111,8 @@ export default class DeliveryListViewModel {
                 (id: string) => {
                     const courier = this.courierServices.getCourier$(id).get();
                     return courier?.code ?? "";
-                }
+                },
+                this.dropdownOptionsService.GetPackingLabel,
             ));
         });
 

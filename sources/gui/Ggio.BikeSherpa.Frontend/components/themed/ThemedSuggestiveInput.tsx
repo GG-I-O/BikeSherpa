@@ -44,7 +44,6 @@ export function ThemedSuggestiveInput<T, V>(
     const theme = useTheme();
 
     const [query, setQuery] = useState('');
-    const [debouncedQuery, setDebouncedQuery] = useState('');
     const [suggestions, setSuggestions] = useState<T[] | null>([]);
     const [open, setOpen] = useState(false);
 
@@ -61,30 +60,23 @@ export function ThemedSuggestiveInput<T, V>(
     }, [value, getLabelFromValue]);
 
     useDebounce(() => {
+        if (value) {
+            setSuggestions([]);
+            setOpen(false);
+            return;
+        }
+        
         if (!query || query.length < minLength) {
             setSuggestions([]);
             setOpen(false);
             return;
         }
+        
         fetchSuggestions(query).then((res) => {
             setSuggestions(res);
             setOpen(true);
         });
-    }, 400, [query]);
-
-    // Fetch suggestions
-    useEffect(() => {
-        if (!debouncedQuery || debouncedQuery.length < minLength) {
-            setSuggestions([]);
-            setOpen(false);
-            return;
-        }
-
-        fetchSuggestions(debouncedQuery).then((res) => {
-            setSuggestions(res);
-            setOpen(true);
-        });
-    }, [debouncedQuery, fetchSuggestions, minLength]);
+    }, 400, [query, value]);
 
     // Measure position
     const measure = () => {
@@ -159,7 +151,6 @@ export function ThemedSuggestiveInput<T, V>(
                                     onPress={() => {
                                         onChange(getOptionValue(item));
                                         setQuery(getOptionLabel(item));
-                                        setDebouncedQuery('');
                                         setOpen(false);
                                     }}
                                 >

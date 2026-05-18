@@ -1,18 +1,18 @@
-import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
-import { ILogger } from "@/spi/LogsSPI";
-import { INotificationService, IStorageContext } from "@/spi/StorageSPI";
-import { Observable, observable } from "@legendapp/state";
-import { ObservablePersistMMKV } from "@legendapp/state/persist-plugins/mmkv";
-import { syncedCrud } from "@legendapp/state/sync-plugins/crud";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import {ILogger} from "@/spi/LogsSPI";
+import {INotificationService, IStorageContext} from "@/spi/StorageSPI";
+import {Observable, observable, syncState} from "@legendapp/state";
+import {ObservablePersistMMKV} from "@legendapp/state/persist-plugins/mmkv";
+import {syncedCrud} from "@legendapp/state/sync-plugins/crud";
 import * as Network from 'expo-network';
-import { inject } from "inversify";
-import { ResourceNotification, ResourceOperation } from "../notification/Notification";
-import { HateoasLinks, hateoasRel, Link } from "@/models/HateoasLink";
+import {inject} from "inversify";
+import {ResourceNotification, ResourceOperation} from "../notification/Notification";
+import {HateoasLinks, hateoasRel, Link} from "@/models/HateoasLink";
 import Storable from "@/models/Storable";
 import ServerError from "@/models/ServerError";
-import { EventRegister } from 'react-native-event-listeners';
-import { Platform } from 'react-native';
-
+import {EventRegister} from 'react-native-event-listeners';
+import {Platform} from 'react-native';
+import StorageMode from "@/infra/storage/StorageMode";
 
 export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks & Storable> implements IStorageContext<T> {
     protected logger: ILogger;
@@ -21,6 +21,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
     } ? number : string, T>>;
     private initialLoad: boolean = true;
     private readonly canSync$: Observable<boolean>;
+    private readonly storageMode: StorageMode;
 
     private readonly notificationService: INotificationService;
     private readonly resourceName: string;
@@ -31,13 +32,15 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
     protected constructor(
         storeName: string,
         @inject(ServicesIdentifiers.Logger) logger: ILogger,
-        @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService
+        @inject(ServicesIdentifiers.NotificationService) notificationService: INotificationService,
+        storageMode: StorageMode = StorageMode.merge
     ) {
         this.logger = logger.extend(storeName);
-        this.store = this.initStore(storeName);
-
+        this.storageMode = storageMode;
         this.canSync$ = observable(false);
 
+        this.store = this.initStore(storeName);
+        
         this.resourceName = storeName.toLocaleLowerCase();
         this.notificationService = notificationService;
         this.onErrorEventType = `${this.resourceName}StorageError`;
@@ -112,6 +115,12 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         const link = item.links?.find((link: Link) => link.rel === rel);
         return link?.href;
     }
+    
+    public async forceRefresh(): Promise<void> {
+        this.initialLoad = true;
+        // double cast because LegendApp has a weird type for this method
+        (syncState(this.store as any) as any).sync();
+    }
 
     private initStore(storeName: string) {
         return observable(syncedCrud<T>({
@@ -142,8 +151,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 item.updatedAt = new Date().toISOString();
 
                 await this.update(item);
-                const result = await this.getItem(item.id);
-                return result;
+                return await this.getItem(item.id);
             },
             delete: async (item: T) => {
                 // Check if we have the rights to delete
@@ -158,7 +166,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             fieldUpdatedAt: 'updatedAt',
 
             // On first load, load all data, then only changes
-            changesSince: this.initialLoad ? 'all' : 'last-sync',
+            changesSince: this.initialLoad ? 'all' : (this.storageMode === StorageMode.merge ? 'last-sync' : 'all'),
 
             // Send whole data
             updatePartial: false,
@@ -180,7 +188,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             generateId: () => crypto.randomUUID(),
 
             // Merge mode on incoming changes
-            mode: 'merge',
+            mode: this.storageMode,
 
             // Wait for authentication before syncing
             waitFor: () => this.canSync$,

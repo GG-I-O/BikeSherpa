@@ -24,6 +24,7 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebA
      private readonly Fixture _fixture = new();
 
      private const string Scope = "write:deliveries";
+     private const string UserEmail = "user@example.com";
 
      public AddDeliveryStepIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
@@ -35,7 +36,11 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebA
                {
                     services
                          .AddAuthentication("Test")
-                         .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options => options.Scope = Scope);
+                         .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options =>
+                         {
+                              options.Scope = Scope;
+                              options.Email = UserEmail;
+                         });
 
                     services.AddAuthorizationBuilder()
                          .AddPolicy(Scope, policy => policy.RequireClaim("scope", Scope));

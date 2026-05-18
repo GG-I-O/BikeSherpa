@@ -11,6 +11,7 @@ import JsonPatchDocument from "@/models/JsonPatchDocument";
 export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddleware {
     private backendClientFacade: IBackendClient<Delivery>;
     private customClientFacade: IDeliveryCustomBackendClientFacade;
+    private getAllDailyDeliveriesDate: string | null = null;
     private updateStepState: { deliveryId: string, stepId: string, state: string }[] = [];
 
     constructor(
@@ -19,6 +20,17 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
     ) {
         this.backendClientFacade = backendClientFacade;
         this.customClientFacade = customClientFacade;
+    }
+
+    public setGetAllDateForDailyDeliveries(date: string | null) {
+        this.getAllDailyDeliveriesDate = date;
+    }
+
+    public async getAll(date?: string): Promise<Delivery[]> {
+        if (!this.getAllDailyDeliveriesDate)
+            return await this.backendClientFacade.GetAllEndpoint(date);
+        else
+            return await this.customClientFacade.GetAllDailyDeliveriesEndpoint(this.getAllDailyDeliveriesDate);
     }
 
     public addUpdateStepState(deliveryId: string, stepId: string, state: string): void {
@@ -30,7 +42,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
         for (let i = 0; i < this.updateStepState.length; i++) {
             if (this.updateStepState[i].deliveryId !== delivery.id)
                 continue;
-            
+
             const step = delivery.steps.find(step => step.id === this.updateStepState[i].stepId)
             if (!step)
                 throw new Error(`Step with ID ${this.updateStepState[i].stepId} not found in delivery ${delivery.id}`);
@@ -83,7 +95,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
 
         if (completeUpdate)
             await this.backendClientFacade.UpdateEndpoint(delivery);
-        
+
         this.updateStepState = this.updateStepState.filter(state => state.deliveryId !== delivery.id);
     }
 

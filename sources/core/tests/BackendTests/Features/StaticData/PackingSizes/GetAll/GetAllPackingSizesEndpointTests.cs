@@ -11,7 +11,7 @@ using Moq;
 
 namespace BackendTests.Features.StaticData.PackingSizes.GetAll;
 [UsedImplicitly]
-public class GetAllPackingSizesWebApplicationFactory() : TestWebApplicationFactory("read:deliveries", "read:deliveries");
+public class GetAllPackingSizesWebApplicationFactory() : TestWebApplicationFactory("AuthenticatedUser","AuthenticatedUser");
 
 public class GetAllPackingSizesEndpointTests(
      GetAllPackingSizesWebApplicationFactory factory,
@@ -42,7 +42,7 @@ public class GetAllPackingSizesEndpointTests(
                .ReturnsAsync(expectedUrgencies);
 
           // Act
-          var response = await _client.GetAsync("/api/public/packingSizes", _cancellationToken);
+          var response = await _client.GetAsync("/api/general/packingSizes", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -72,7 +72,7 @@ public class GetAllPackingSizesEndpointTests(
                .ReturnsAsync([]);
 
           // Act
-          var response = await _client.GetAsync("/api/public/packingSizes", _cancellationToken);
+          var response = await _client.GetAsync("/api/general/packingSizes", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);

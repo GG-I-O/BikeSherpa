@@ -12,6 +12,7 @@ export interface StepToDisplay {
     address: Address;
     courierCode: string;
     comment: string;
+    packing: string;
     deliveryDate: string;
     deliveryTime: string;
     estimatedIsoDate: string;

@@ -34,6 +34,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
      private readonly Delivery _delivery;
 
      private const string Scope = "write:deliveries";
+     private const string UserEmail = "user@example.com";
 
      private readonly JsonSerializerOptions _jsonSerializerOptions = new()
      {
@@ -104,7 +105,11 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
                {
                     services
                          .AddAuthentication("Test")
-                         .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options => options.Scope = Scope);
+                         .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options =>
+                         {
+                              options.Scope = Scope;
+                              options.Email = UserEmail;
+                         });
 
                     services.AddAuthorizationBuilder()
                          .AddPolicy(Scope, policy => policy.RequireClaim("scope", Scope));

@@ -1,13 +1,14 @@
 import AbstractStorageContext from "@/infra/storage/AbstractStorageContext";
-import { inject, injectable } from "inversify";
+import {inject, injectable} from "inversify";
 import Delivery from "../models/Delivery";
-import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
-import { INotificationService } from "@/spi/StorageSPI";
-import { DeliveryServiceIdentifier } from "../bootstrapper/DeliveryServiceIdentifier";
-import { IBackendClient } from "@/spi/BackendClientSPI";
-import { getTagByAlias } from "@/infra/openAPI/client";
-import { ILogger } from "@/spi/LogsSPI";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import {INotificationService} from "@/spi/StorageSPI";
+import {DeliveryServiceIdentifier} from "../bootstrapper/DeliveryServiceIdentifier";
+import {IBackendClient} from "@/spi/BackendClientSPI";
+import {getTagByAlias} from "@/infra/openAPI/client";
+import {ILogger} from "@/spi/LogsSPI";
 import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddleware";
+import StorageMode from "@/infra/storage/StorageMode";
 
 @injectable()
 export default class DeliveryStorageContext extends AbstractStorageContext<Delivery> {
@@ -21,13 +22,13 @@ export default class DeliveryStorageContext extends AbstractStorageContext<Deliv
         @inject(DeliveryServiceIdentifier.StorageMiddleware) storageMiddleware: IDeliveryStorageMiddleware
     ) {
         const tag = getTagByAlias("CreateDelivery") || "Delivery";
-        super(tag, logger, notificationService);
+        super(tag, logger, notificationService, StorageMode.set);
         this.backendClient = deliveryBackendClientFacade;
         this.storageMiddleware = storageMiddleware;
     }
 
     protected async getList(lastSync?: string): Promise<Delivery[]> {
-        return await this.backendClient.GetAllEndpoint(lastSync);
+        return await this.storageMiddleware.getAll(lastSync);
     }
     protected async getItem(id: string): Promise<Delivery | null> {
         return await this.backendClient.GetEndpoint(id);

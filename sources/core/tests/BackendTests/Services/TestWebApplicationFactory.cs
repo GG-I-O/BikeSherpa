@@ -8,12 +8,13 @@ using Moq;
 
 namespace BackendTests.Services;
 
-public abstract class TestWebApplicationFactory(string policyName = "", string scope = "") : WebApplicationFactory<Program>
+public abstract class TestWebApplicationFactory(string policyName = "", string scope = "", string? email = null) : WebApplicationFactory<Program>
 {
      public Mock<IMediator> MockMediator { get; } = new();
 
      private string PolicyName { get; } = policyName;
      private string Scope { get; } = scope;
+     private string? Email { get; } = email;
 
      override protected void ConfigureWebHost(IWebHostBuilder builder)
      {
@@ -32,7 +33,11 @@ public abstract class TestWebApplicationFactory(string policyName = "", string s
 
                services
                     .AddAuthentication("Test")
-                    .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options => options.Scope = Scope);
+                    .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("Test", options =>
+                    {
+                         options.Scope = Scope;
+                         options.Email = Email;
+                    });
 
                services.AddAuthorizationBuilder()
                    .AddPolicy(PolicyName, policy => policy.RequireClaim("scope", Scope));
