@@ -8,6 +8,7 @@ using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Deliveries;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Infrastructure;
+using Ggio.BikeSherpa.Backend.Model;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Middleware;
 using Ggio.BikeSherpa.Backend.Services.Notification;
@@ -158,6 +159,8 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
      });
 
      builder.Services.AddHttpLogging();
+     
+     builder.Services.AddScoped<UserContext>();
 }
 
 

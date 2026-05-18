@@ -3,6 +3,7 @@ using Ardalis.Result;
 using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
+using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
@@ -11,7 +12,8 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 public class GetAllDailyDeliveriesEndpoint(
      IMediator mediator,
      IDeliveryLinks deliveryLinks,
-     IDeliveryStepLinks deliveryStepLinks
+     IDeliveryStepLinks deliveryStepLinks,
+     UserContext userContext  
      ) : EndpointWithoutRequest<List<DeliveryDto>>
 {
      public override void Configure()
@@ -23,7 +25,7 @@ public class GetAllDailyDeliveriesEndpoint(
 
      public override async Task HandleAsync(CancellationToken ct)
      {
-          var userEmail = User.FindFirst(ClaimTypes.Email)!.Value;
+          var userEmail = userContext.Email;
           
           var date = Route<string>("date", isRequired: true);
           if (date is null || !DateTimeOffset.TryParse(date, out _))
