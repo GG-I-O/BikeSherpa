@@ -63,6 +63,9 @@ builder.Services.AddScoped<IResourceNotificationService, ResourceNotificationSer
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IHateoasService, HateoasService>();
 
+// User context
+builder.Services.AddScoped<UserContext>();
+
 // Add DDD infrastructure services
 builder.Services.AddDddInfrastructureServices();
 
@@ -159,8 +162,6 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
      });
 
      builder.Services.AddHttpLogging();
-     
-     builder.Services.AddScoped<UserContext>();
 }
 
 
