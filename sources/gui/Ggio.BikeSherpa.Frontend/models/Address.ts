@@ -6,6 +6,7 @@ export type Address = {
     fullAddress: string;
     streetInfo: string;
     complement: string | null;
+    phone: string | null;
     postcode: string;
     city: string;
     coordinates: GeoPoint;

@@ -36,7 +36,11 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
             extraCost: delivery.extraCost ?? 0,
             distance: delivery.distance ?? 0,
             reportId: delivery.reportId ?? '',
-            steps: delivery.steps,
+            steps: delivery.steps.map(step => ({
+                ...step,
+                contactName: step.stepAddress.name,
+                contactPhone: step.stepAddress.phone ?? ''
+            })),
             details: delivery.details,
             packingSize: delivery.packingSize,
             insulatedBox: delivery.insulatedBox,

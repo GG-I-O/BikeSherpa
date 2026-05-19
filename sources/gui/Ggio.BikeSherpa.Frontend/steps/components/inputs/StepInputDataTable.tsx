@@ -22,8 +22,11 @@ export default function StepInputDataTable({name, control}: Props) {
         append({
             stepType: 0,
             comment: '',
+            courierComment: '',
             notBilled: false,
-            address: {
+            contactName: '',
+            contactPhone: '',
+            stepAddress: {
                 name: '',
                 fullAddress: '',
                 streetInfo: '',

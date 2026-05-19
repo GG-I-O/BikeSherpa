@@ -15,8 +15,20 @@ const stepFormBaseSchema = zod.object({
         .string()
         .optional()
         .nullable(),
+    courierComment: zod
+        .string()
+        .optional()
+        .nullable(),
     notBilled: zod
-        .boolean()
+        .boolean(),
+    contactName: zod
+        .string()
+        .optional()
+        .nullable(),
+    contactPhone: zod
+        .string()
+        .optional()
+        .nullable()
 });
 
 type StepFormValues = zod.infer<typeof stepFormBaseSchema>;

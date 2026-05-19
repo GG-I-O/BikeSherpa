@@ -252,4 +252,31 @@ export default class StepServices implements IStepServices {
 
         observables.step$!.comment.set(comment);
     }
+
+    public updateCourierComment(stepId: string, comment: string): void {
+        const observables = this.getDeliveryFromStep(stepId);
+        if (!observables.delivery$) {
+            this.logger.error(`UpdateStepCourierComment : Parent delivery not found for step ${stepId}`);
+            return;
+        }
+        if (!observables.step$) {
+            this.logger.error(`UpdateStepCourierComment : Step ${stepId} not found in delivery ${observables.delivery$.peek().id}`);
+            return;
+        }
+
+        // Test if the user got the rights to do this action
+        const step = observables.step$.get();
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.patch)) {
+            this.logger.error(`Cannot patch ${stepId}`);
+            return
+        }
+
+        this.deliveryStorageMiddleware.addUpdateStepState(
+            observables.delivery$.peek().id,
+            observables.step$.peek().id,
+            deliveryOperationAction.patchCourierComment
+        );
+
+        observables.step$!.courierComment.set(comment);
+    }
 }
