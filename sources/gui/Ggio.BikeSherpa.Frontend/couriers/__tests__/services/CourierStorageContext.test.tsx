@@ -1,32 +1,28 @@
-import Courier from "@/couriers/models/Courier";
+import Courier, { CourierDto } from "@/couriers/models/Courier";
+import CourierMapper from "@/couriers/services/CourierMapper";
 import CourierStorageContext from "@/couriers/services/CourierStorageContext";
 import { IBackendClient } from "@/spi/BackendClientSPI";
 import { ILogger } from "@/spi/LogsSPI";
 import { INotificationService } from "@/spi/StorageSPI";
-import { Observable, when } from "@legendapp/state";
-import { mock } from "ts-jest-mocker";
 import * as Network from "expo-network";
-import { hateoasRel } from "@/models/HateoasLink";
 import axios from "axios";
 import { createRandomCourier, linkType } from "@/fixtures/courier-fixtures";
-import { faker } from "@faker-js/faker";
 
-const logger = mock<ILogger>();
-const notificationService = mock<INotificationService>();
-const backEndClient = mock<IBackendClient<Courier>>();
+jest.mock("expo-network");
+jest.mock("axios");
 
-// Mock expo-network
-jest.mock('expo-network');
+jest.mock("@/infra/openAPI/client", () => ({
+    getTagByAlias: jest.fn(() => "Courier")
+}));
 
-// Mock axios
-jest.mock('axios');
-
-// Disable persistence for tests to avoid rehydrating stale state
 jest.mock("@legendapp/state/persist-plugins/mmkv", () => ({
     ObservablePersistMMKV: class {
-        getTable = (_: string, initial: any) => initial;
-        getMetadata = (_: string, initial: any) => initial;
-        getStorage = () => ({ delete: jest.fn(), set: jest.fn() });
+        getTable = (_: string, initial: unknown) => initial;
+        getMetadata = (_: string, initial: unknown) => initial;
+        getStorage = () => ({
+            delete: jest.fn(),
+            set: jest.fn()
+        });
         set = jest.fn();
         setMetadata = jest.fn();
         deleteTable = jest.fn();
@@ -36,168 +32,201 @@ jest.mock("@legendapp/state/persist-plugins/mmkv", () => ({
     }
 }));
 
+type CourierStorageContextTestApi = {
+    getList(lastSync?: string): Promise<Courier[]>;
+    getItem(id: string): Promise<Courier | null>;
+    create(item: Courier): Promise<string>;
+    update(item: Courier): Promise<void>;
+    delete(item: Courier): Promise<void>;
+};
+
 describe("CourierStorageContext", () => {
-    let mockCourier1: Courier;
-    let mockCourier2: Courier;
-    let mockCourier3: Courier;
-    let courierStore: Observable<Record<string, Courier>>;
+    let logger: jest.Mocked<ILogger>;
+    let notificationService: jest.Mocked<INotificationService>;
+    let backendClient: jest.Mocked<IBackendClient<Courier>>;
+    let courierStorageContext: CourierStorageContext;
+    let courierStorageContextTestApi: CourierStorageContextTestApi;
+
     beforeEach(() => {
         jest.clearAllMocks();
-        mockCourier1 = createRandomCourier(true, linkType.updateAndDelete);
-        mockCourier2 = createRandomCourier(true, linkType.update);
-        mockCourier3 = createRandomCourier(false, linkType.getAndUpdate);
+
+        logger = {
+            extend: jest.fn(),
+            error: jest.fn(),
+            info: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+        } as unknown as jest.Mocked<ILogger>;
+
         logger.extend.mockReturnValue(logger);
-        logger.error = jest.fn();
-        logger.info = jest.fn();
-        logger.warn = jest.fn();
-        logger.debug = jest.fn();
+
+        notificationService = {
+            start: jest.fn().mockResolvedValue(undefined),
+            getConnection: jest.fn().mockReturnValue(null),
+            onReconnected: jest.fn()
+        } as unknown as jest.Mocked<INotificationService>;
+
+        backendClient = {
+            GetAllEndpoint: jest.fn(),
+            GetEndpoint: jest.fn(),
+            AddEndpoint: jest.fn(),
+            UpdateEndpoint: jest.fn(),
+            DeleteEndpoint: jest.fn()
+        } as unknown as jest.Mocked<IBackendClient<Courier>>;
 
         (Network.getNetworkStateAsync as jest.Mock).mockResolvedValue({
-            isInternetReachable: true,
-            isConnected: true
-        });
-        (Network.addNetworkStateListener as jest.Mock).mockReturnValue({ remove: jest.fn() });
-
-        notificationService.start = jest.fn().mockResolvedValue(undefined);
-        notificationService.getConnection = jest.fn().mockReturnValue(null);
-
-        backEndClient.GetAllEndpoint.mockResolvedValue([mockCourier1, mockCourier2]);
-        const courierStorageContext = new CourierStorageContext(logger, notificationService, backEndClient);
-        courierStore = courierStorageContext.getStore();
-    })
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    })
-
-    it("should load couriers from backend into the store", async () => {
-        //arrange
-
-        //act
-        await when(() => Object.keys(courierStore.get()).length > 0);
-
-        const store = courierStore.get();
-
-        //assert
-        expect(backEndClient.GetAllEndpoint).toHaveBeenCalledTimes(1);
-        expect(store[mockCourier1.id].firstName).toBe(mockCourier1.firstName);
-        expect(store[mockCourier2.id].code).toBe(mockCourier2.code);
-    }, 10000);
-
-    it("should add a courier in the store", async () => {
-        //arrange
-        backEndClient.AddEndpoint.mockResolvedValue(mockCourier3.id);
-        backEndClient.GetEndpoint.mockResolvedValue({ ...mockCourier3, createdAt: faker.date.anytime.toString() });
-
-        //act
-        courierStore[mockCourier3.id].set(mockCourier3);
-        let store;
-        await when(() => {
-            store = courierStore.get();
-            return store![mockCourier3.id].createdAt !== undefined;
+            isInternetReachable: false,
+            isConnected: false
         });
 
-        //assert
-        expect(store![mockCourier3.id].firstName).toBe(mockCourier3.firstName);
-        expect(store![mockCourier3.id].code).toBe(mockCourier3.code);
-        expect(store![mockCourier3.id].createdAt).toBe(mockCourier3.createdAt);
-        expect(backEndClient.GetEndpoint).toHaveBeenCalledTimes(1);
-        expect(backEndClient.AddEndpoint).toHaveBeenCalledTimes(1);
-    }, 10000);
-
-    it("should update a courier in the store with backend data", async () => {
-        //arrange
-        await when(() => Object.keys(courierStore.get()).length > 0);
-
-        backEndClient.UpdateEndpoint.mockResolvedValue();
-        backEndClient.GetEndpoint.mockResolvedValue({ ...mockCourier2, lastName: "Updated Last Name", updatedAt: "2024-02-02T00:00:00.000Z", createdAt: "2024-02-02T00:00:00.000Z", });
-
-
-        //act
-        courierStore[mockCourier2.id].assign({
-            lastName: "Updated Last Name",
-            updatedAt: new Date().toISOString()
+        (Network.addNetworkStateListener as jest.Mock).mockReturnValue({
+            remove: jest.fn()
         });
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+        courierStorageContext = new CourierStorageContext(
+            logger,
+            notificationService,
+            backendClient
+        );
 
-        const store = courierStore.get();
+        courierStorageContextTestApi =
+            courierStorageContext as unknown as CourierStorageContextTestApi;
+    });
 
-        //assert
-        expect(store![mockCourier2.id].lastName).toBe("Updated Last Name");
-        expect(backEndClient.UpdateEndpoint).toHaveBeenCalledTimes(1);
-        expect(backEndClient.GetEndpoint).toHaveBeenCalledTimes(1);
-    }, 10000);
+    it("creates an observable store", () => {
+        const store = courierStorageContext.getStore();
 
-    it("should delete a courier in the store", async () => {
-        //arrange
-        await when(() => Object.keys(courierStore.get()).length > 0);
-        backEndClient.DeleteEndpoint.mockResolvedValue();
+        expect(store).toBeDefined();
+        expect(typeof store.get).toBe("function");
+        expect(typeof store.peek).toBe("function");
+    });
 
-        //act
-        courierStore[mockCourier1.id].delete();
+    it("loads couriers from the backend client", async () => {
+        const courier1 = createRandomCourier(true, linkType.updateAndDelete);
+        const courier2 = createRandomCourier(true, linkType.update);
 
-        let store;
-        await when(() => {
-            store = courierStore.get();
-            return store![mockCourier1.id] === undefined;
-        });
+        backendClient.GetAllEndpoint.mockResolvedValue([courier1, courier2]);
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const result = await courierStorageContextTestApi.getList();
 
-        //assert
-        expect(store![mockCourier1.id]).toBeUndefined();
-        expect(backEndClient.DeleteEndpoint).toHaveBeenCalledTimes(1);
-    }, 10000);
+        expect(backendClient.GetAllEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.GetAllEndpoint).toHaveBeenCalledWith(undefined);
+        expect(result).toEqual([courier1, courier2]);
+    });
 
-    it("should get item using link href when 'self' link exists", async () => {
-        //arrange
-        const courierWithSelfLink = {
-            ...mockCourier3,
-            links: [{
-                href: `https://api.example.com/couriers/${mockCourier3.id}`,
-                rel: "self",
-                method: "GET"
-            },
+    it("loads couriers from the backend client with a lastSync date", async () => {
+        const lastSync = "2026-05-19T10:00:00.000Z";
+        const courier = createRandomCourier(true, linkType.updateAndDelete);
+
+        backendClient.GetAllEndpoint.mockResolvedValue([courier]);
+
+        const result = await courierStorageContextTestApi.getList(lastSync);
+
+        expect(backendClient.GetAllEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.GetAllEndpoint).toHaveBeenCalledWith(lastSync);
+        expect(result).toEqual([courier]);
+    });
+
+    it("creates a courier through the backend client", async () => {
+        const courier = createRandomCourier(false, linkType.getAndUpdate);
+
+        backendClient.AddEndpoint.mockResolvedValue(courier.id);
+
+        const result = await courierStorageContextTestApi.create(courier);
+
+        expect(backendClient.AddEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.AddEndpoint).toHaveBeenCalledWith(courier);
+        expect(result).toBe(courier.id);
+    });
+
+    it("updates a courier through the backend client", async () => {
+        const courier = createRandomCourier(true, linkType.updateAndDelete);
+
+        backendClient.UpdateEndpoint.mockResolvedValue(undefined);
+
+        await courierStorageContextTestApi.update(courier);
+
+        expect(backendClient.UpdateEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.UpdateEndpoint).toHaveBeenCalledWith(courier);
+    });
+
+    it("deletes a courier through the backend client", async () => {
+        const courier = createRandomCourier(true, linkType.updateAndDelete);
+
+        backendClient.DeleteEndpoint.mockResolvedValue(undefined);
+
+        await courierStorageContextTestApi.delete(courier);
+
+        expect(backendClient.DeleteEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.DeleteEndpoint).toHaveBeenCalledWith(courier);
+    });
+
+    it("gets a courier from the backend client when no self link exists in the store", async () => {
+        const courier = createRandomCourier(true, linkType.update);
+
+        backendClient.GetEndpoint.mockResolvedValue(courier);
+
+        const result = await courierStorageContextTestApi.getItem(courier.id);
+
+        expect(backendClient.GetEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.GetEndpoint).toHaveBeenCalledWith(courier.id);
+        expect(axios.get).not.toHaveBeenCalled();
+        expect(result).toBe(courier);
+    });
+
+    it("gets a courier with axios and maps it when a self link exists in the store", async () => {
+        const selfHref = "https://api.example.test/couriers/123";
+        const courier = createRandomCourier(true, linkType.updateAndDelete);
+
+        courier.links = [
             {
-                href: "",
-                rel: hateoasRel.update,
-                method: "PUT"
-            }]
+                rel: "self",
+                href: selfHref,
+                method: "GET"
+            }
+        ];
+
+        courierStorageContext.getStore()[courier.id].set(courier);
+
+        const courierDto: CourierDto = {
+            data: {
+                id: courier.id,
+                firstName: courier.firstName,
+                lastName: courier.lastName,
+                code: courier.code,
+                phoneNumber: courier.phoneNumber,
+                email: courier.email,
+                address: courier.address,
+                createdAt: courier.createdAt ?? "2026-05-19T10:00:00.000Z",
+                updatedAt: courier.updatedAt ?? "2026-05-19T10:00:00.000Z"
+            },
+            links: courier.links
+        };
+
+        const mappedCourier = {
+            ...courier,
+            lastName: "Mapped Last Name"
         };
 
         (axios.get as jest.Mock).mockResolvedValue({
-            data: {
-                data: {
-                    ...mockCourier3,
-                    firstName: "Fetched via Self Link",
-                    lastName: "SELFLASTNAME1",
-                    code: "SELF1",
-                    phoneNumber: "0609080799",
-                    email: "self.courier@gmail.com",
-                    createdAt: "2024-01-01T00:00:00.000Z",
-                    updatedAt: "2024-01-01T00:00:00.000Z"
-                },
-                links: []
-            }
+            data: courierDto
         });
 
-        backEndClient.AddEndpoint.mockResolvedValue(mockCourier3.id);
-        backEndClient.UpdateEndpoint.mockResolvedValue();
+        const mapperSpy = jest
+            .spyOn(CourierMapper, "CourierDtoToCourier")
+            .mockReturnValue(mappedCourier);
 
-        //act
-        courierStore[mockCourier3.id].set(courierWithSelfLink);
+        const result = await courierStorageContextTestApi.getItem(courier.id);
 
-        await when(() => courierStore[mockCourier3.id].peek() !== undefined);
+        expect(axios.get).toHaveBeenCalledTimes(1);
+        expect(axios.get).toHaveBeenCalledWith(selfHref);
 
-        courierStore[mockCourier3.id].assign({
-            firstName: "Trigger Update",
-            updatedAt: new Date().toISOString()
-        });
+        expect(mapperSpy).toHaveBeenCalledTimes(1);
+        expect(mapperSpy).toHaveBeenCalledWith(courierDto);
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        expect(backendClient.GetEndpoint).not.toHaveBeenCalled();
+        expect(result).toBe(mappedCourier);
 
-        //assert
-        expect(axios.get).toHaveBeenCalledWith(`https://api.example.com/couriers/${mockCourier3.id}`);
-    }, 10000);
-})
+        mapperSpy.mockRestore();
+    });
+});

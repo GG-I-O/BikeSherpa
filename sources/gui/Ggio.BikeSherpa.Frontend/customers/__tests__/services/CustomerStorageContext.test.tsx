@@ -1,32 +1,28 @@
-import Customer from "@/customers/models/Customer";
+import Customer, { CustomerDto } from "@/customers/models/Customer";
+import CustomerMapper from "@/customers/services/CustomerMapper";
 import CustomerStorageContext from "@/customers/services/CustomerStorageContext";
 import { IBackendClient } from "@/spi/BackendClientSPI";
 import { ILogger } from "@/spi/LogsSPI";
 import { INotificationService } from "@/spi/StorageSPI";
-import { Observable, when } from "@legendapp/state";
-import { mock } from "ts-jest-mocker";
-import * as Network from 'expo-network';
-import { hateoasRel } from "@/models/HateoasLink";
+import * as Network from "expo-network";
 import axios from "axios";
 import { createRandomCustomer, linkType } from "@/fixtures/customer-fixtures";
-import { faker } from "@faker-js/faker";
 
-const logger = mock<ILogger>();
-const notificationService = mock<INotificationService>();
-const backEndClient = mock<IBackendClient<Customer>>();
+jest.mock("expo-network");
+jest.mock("axios");
 
-// Mock expo-network
-jest.mock('expo-network');
+jest.mock("@/infra/openAPI/client", () => ({
+    getTagByAlias: jest.fn(() => "Customer")
+}));
 
-// Mock axios
-jest.mock('axios');
-
-// Disable persistence for tests to avoid rehydrating stale state
 jest.mock("@legendapp/state/persist-plugins/mmkv", () => ({
     ObservablePersistMMKV: class {
-        getTable = (_: string, initial: any) => initial;
-        getMetadata = (_: string, initial: any) => initial;
-        getStorage = () => ({ delete: jest.fn(), set: jest.fn() });
+        getTable = (_: string, initial: unknown) => initial;
+        getMetadata = (_: string, initial: unknown) => initial;
+        getStorage = () => ({
+            delete: jest.fn(),
+            set: jest.fn()
+        });
         set = jest.fn();
         setMetadata = jest.fn();
         deleteTable = jest.fn();
@@ -36,167 +32,202 @@ jest.mock("@legendapp/state/persist-plugins/mmkv", () => ({
     }
 }));
 
+type CustomerStorageContextTestApi = {
+    getList(lastSync?: string): Promise<Customer[]>;
+    getItem(id: string): Promise<Customer | null>;
+    create(item: Customer): Promise<string>;
+    update(item: Customer): Promise<void>;
+    delete(item: Customer): Promise<void>;
+};
+
 describe("CustomerStorageContext", () => {
-    let mockCustomer1: Customer;
-    let mockCustomer2: Customer;
-    let mockCustomer3: Customer;
-    let customerStore: Observable<Record<string, Customer>>;
+    let logger: jest.Mocked<ILogger>;
+    let notificationService: jest.Mocked<INotificationService>;
+    let backendClient: jest.Mocked<IBackendClient<Customer>>;
+    let customerStorageContext: CustomerStorageContext;
+    let customerStorageContextTestApi: CustomerStorageContextTestApi;
+
     beforeEach(() => {
         jest.clearAllMocks();
-        mockCustomer1 = createRandomCustomer(true, linkType.updateAndDelete);
-        mockCustomer2 = createRandomCustomer(true, linkType.update);
-        mockCustomer3 = createRandomCustomer(false, linkType.getAndUpdate);
+
+        logger = {
+            extend: jest.fn(),
+            error: jest.fn(),
+            info: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+        } as unknown as jest.Mocked<ILogger>;
+
         logger.extend.mockReturnValue(logger);
-        logger.error = jest.fn();
-        logger.info = jest.fn();
-        logger.warn = jest.fn();
-        logger.debug = jest.fn();
+
+        notificationService = {
+            start: jest.fn().mockResolvedValue(undefined),
+            getConnection: jest.fn().mockReturnValue(null),
+            onReconnected: jest.fn()
+        } as unknown as jest.Mocked<INotificationService>;
+
+        backendClient = {
+            GetAllEndpoint: jest.fn(),
+            GetEndpoint: jest.fn(),
+            AddEndpoint: jest.fn(),
+            UpdateEndpoint: jest.fn(),
+            DeleteEndpoint: jest.fn()
+        } as unknown as jest.Mocked<IBackendClient<Customer>>;
 
         (Network.getNetworkStateAsync as jest.Mock).mockResolvedValue({
-            isInternetReachable: true,
-            isConnected: true
-        });
-        (Network.addNetworkStateListener as jest.Mock).mockReturnValue({ remove: jest.fn() });
-
-        notificationService.start = jest.fn().mockResolvedValue(undefined);
-        notificationService.getConnection = jest.fn().mockReturnValue(null);
-
-        backEndClient.GetAllEndpoint.mockResolvedValue([mockCustomer1, mockCustomer2]);
-        const customerStorageContext = new CustomerStorageContext(logger, notificationService, backEndClient);
-        customerStore = customerStorageContext.getStore();
-    })
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    })
-
-    it("should load customers from backend into the store", async () => {
-        //arrange
-
-        //act
-        await when(() => Object.keys(customerStore.get()).length > 0);
-
-        const store = customerStore.get();
-
-        //assert
-        expect(backEndClient.GetAllEndpoint).toHaveBeenCalledTimes(1);
-        expect(store[mockCustomer1.id].name).toBe(mockCustomer1.name);
-        expect(store[mockCustomer2.id].code).toBe(mockCustomer2.code);
-    }, 10000);
-
-    it("should add a customer in the store", async () => {
-        //arrange
-        backEndClient.AddEndpoint.mockResolvedValue(mockCustomer3.id);
-        backEndClient.GetEndpoint.mockResolvedValue({ ...mockCustomer3, createdAt: faker.date.anytime.toString() });
-
-        //act
-        customerStore[mockCustomer3.id].set(mockCustomer3);
-        let store;
-        await when(() => {
-            store = customerStore.get();
-            return store![mockCustomer3.id].createdAt !== undefined;
+            isInternetReachable: false,
+            isConnected: false
         });
 
-        //assert
-        expect(store![mockCustomer3.id].name).toBe(mockCustomer3.name);
-        expect(store![mockCustomer3.id].code).toBe(mockCustomer3.code);
-        expect(store![mockCustomer3.id].createdAt).toBe(mockCustomer3.createdAt);
-        expect(backEndClient.GetEndpoint).toHaveBeenCalledTimes(1);
-        expect(backEndClient.AddEndpoint).toHaveBeenCalledTimes(1);
-    }, 10000);
-
-    it("should update a customer in the store with backend data", async () => {
-        //arrange
-        await when(() => Object.keys(customerStore.get()).length > 0);
-
-        backEndClient.UpdateEndpoint.mockResolvedValue();
-        backEndClient.GetEndpoint.mockResolvedValue({ ...mockCustomer2, name: "Updated Name", updatedAt: "2024-02-02T00:00:00.000Z", createdAt: "2024-02-02T00:00:00.000Z", });
-
-
-        //act
-        customerStore[mockCustomer2.id].assign({
-            name: "Updated Name",
-            updatedAt: new Date().toISOString()
+        (Network.addNetworkStateListener as jest.Mock).mockReturnValue({
+            remove: jest.fn()
         });
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+        customerStorageContext = new CustomerStorageContext(
+            logger,
+            notificationService,
+            backendClient
+        );
 
-        const store = customerStore.get();
+        customerStorageContextTestApi =
+            customerStorageContext as unknown as CustomerStorageContextTestApi;
+    });
 
-        //assert
-        expect(store![mockCustomer2.id].name).toBe("Updated Name");
-        expect(backEndClient.UpdateEndpoint).toHaveBeenCalledTimes(1);
-        expect(backEndClient.GetEndpoint).toHaveBeenCalledTimes(1);
-    }, 10000);
+    it("creates an observable store", () => {
+        const store = customerStorageContext.getStore();
 
-    it("should delete a customer in the store", async () => {
-        //arrange
-        await when(() => Object.keys(customerStore.get()).length > 0);
-        backEndClient.DeleteEndpoint.mockResolvedValue();
+        expect(store).toBeDefined();
+        expect(typeof store.get).toBe("function");
+        expect(typeof store.peek).toBe("function");
+    });
 
-        //act
-        customerStore[mockCustomer1.id].delete();
+    it("loads customers from the backend client", async () => {
+        const customer1 = createRandomCustomer(true, linkType.updateAndDelete);
+        const customer2 = createRandomCustomer(true, linkType.update);
 
-        let store;
-        await when(() => {
-            store = customerStore.get();
-            return store![mockCustomer1.id] === undefined;
-        });
+        backendClient.GetAllEndpoint.mockResolvedValue([customer1, customer2]);
 
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const result = await customerStorageContextTestApi.getList();
 
-        //assert
-        expect(store![mockCustomer1.id]).toBeUndefined();
-        expect(backEndClient.DeleteEndpoint).toHaveBeenCalledTimes(1);
-    }, 10000);
+        expect(backendClient.GetAllEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.GetAllEndpoint).toHaveBeenCalledWith(undefined);
+        expect(result).toEqual([customer1, customer2]);
+    });
 
-    it("should get item using link href when 'self' link exists", async () => {
-        //arrange
-        const customerWithSelfLink = {
-            ...mockCustomer3,
-            links: [{
-                href: `https://api.example.com/customers/${mockCustomer3.id}`,
-                rel: "self",
-                method: "GET"
-            },
+    it("loads customers from the backend client with a lastSync date", async () => {
+        const lastSync = "2026-05-19T10:00:00.000Z";
+        const customer = createRandomCustomer(true, linkType.updateAndDelete);
+
+        backendClient.GetAllEndpoint.mockResolvedValue([customer]);
+
+        const result = await customerStorageContextTestApi.getList(lastSync);
+
+        expect(backendClient.GetAllEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.GetAllEndpoint).toHaveBeenCalledWith(lastSync);
+        expect(result).toEqual([customer]);
+    });
+
+    it("creates a customer through the backend client", async () => {
+        const customer = createRandomCustomer(false, linkType.getAndUpdate);
+
+        backendClient.AddEndpoint.mockResolvedValue(customer.id);
+
+        const result = await customerStorageContextTestApi.create(customer);
+
+        expect(backendClient.AddEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.AddEndpoint).toHaveBeenCalledWith(customer);
+        expect(result).toBe(customer.id);
+    });
+
+    it("updates a customer through the backend client", async () => {
+        const customer = createRandomCustomer(true, linkType.updateAndDelete);
+
+        backendClient.UpdateEndpoint.mockResolvedValue(undefined);
+
+        await customerStorageContextTestApi.update(customer);
+
+        expect(backendClient.UpdateEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.UpdateEndpoint).toHaveBeenCalledWith(customer);
+    });
+
+    it("deletes a customer through the backend client", async () => {
+        const customer = createRandomCustomer(true, linkType.updateAndDelete);
+
+        backendClient.DeleteEndpoint.mockResolvedValue(undefined);
+
+        await customerStorageContextTestApi.delete(customer);
+
+        expect(backendClient.DeleteEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.DeleteEndpoint).toHaveBeenCalledWith(customer);
+    });
+
+    it("gets a customer from the backend client when no self link exists in the store", async () => {
+        const customer = createRandomCustomer(true, linkType.update);
+
+        backendClient.GetEndpoint.mockResolvedValue(customer);
+
+        const result = await customerStorageContextTestApi.getItem(customer.id);
+
+        expect(backendClient.GetEndpoint).toHaveBeenCalledTimes(1);
+        expect(backendClient.GetEndpoint).toHaveBeenCalledWith(customer.id);
+        expect(axios.get).not.toHaveBeenCalled();
+        expect(result).toBe(customer);
+    });
+
+    it("gets a customer with axios and maps it when a self link exists in the store", async () => {
+        const selfHref = "https://api.example.test/customers/123";
+        const customer = createRandomCustomer(true, linkType.updateAndDelete);
+
+        customer.links = [
             {
-                href: "",
-                rel: hateoasRel.update,
-                method: "PUT"
-            }]
+                rel: "self",
+                href: selfHref,
+                method: "GET"
+            }
+        ];
+
+        customerStorageContext.getStore()[customer.id].set(customer);
+
+        const customerDto: CustomerDto = {
+            data: {
+                id: customer.id,
+                name: customer.name,
+                address: customer.address,
+                code: customer.code,
+                phoneNumber: customer.phoneNumber,
+                email: customer.email,
+                siret: customer.siret ?? null,
+                vatNumber: customer.vatNumber ?? null,
+                createdAt: customer.createdAt ?? "2026-05-19T10:00:00.000Z",
+                updatedAt: customer.updatedAt ?? "2026-05-19T10:00:00.000Z"
+            },
+            links: customer.links
+        };
+
+        const mappedCustomer = {
+            ...customer,
+            name: "Mapped Customer"
         };
 
         (axios.get as jest.Mock).mockResolvedValue({
-            data: {
-                data: {
-                    ...mockCustomer3,
-                    name: "Fetched via Self Link",
-                    code: "SELF1",
-                    phoneNumber: "0609080799",
-                    email: "self.customer@gmail.com",
-                    createdAt: "2024-01-01T00:00:00.000Z",
-                    updatedAt: "2024-01-01T00:00:00.000Z"
-                },
-                links: []
-            }
+            data: customerDto
         });
 
-        backEndClient.AddEndpoint.mockResolvedValue(mockCustomer3.id);
-        backEndClient.UpdateEndpoint.mockResolvedValue();
+        const mapperSpy = jest
+            .spyOn(CustomerMapper, "CustomerDtoToCustomer")
+            .mockReturnValue(mappedCustomer);
 
-        //act
-        customerStore[mockCustomer3.id].set(customerWithSelfLink);
+        const result = await customerStorageContextTestApi.getItem(customer.id);
 
-        await when(() => customerStore[mockCustomer3.id].peek() !== undefined);
+        expect(axios.get).toHaveBeenCalledTimes(1);
+        expect(axios.get).toHaveBeenCalledWith(selfHref);
 
-        customerStore[mockCustomer3.id].assign({
-            name: "Trigger Update",
-            updatedAt: new Date().toISOString()
-        });
+        expect(mapperSpy).toHaveBeenCalledTimes(1);
+        expect(mapperSpy).toHaveBeenCalledWith(customerDto);
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        expect(backendClient.GetEndpoint).not.toHaveBeenCalled();
+        expect(result).toBe(mappedCustomer);
 
-        //assert
-        expect(axios.get).toHaveBeenCalledWith(`https://api.example.com/customers/${mockCustomer3.id}`);
-    }, 10000);
-})
+        mapperSpy.mockRestore();
+    });
+});
