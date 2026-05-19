@@ -9,4 +9,5 @@ export interface IStepServices {
     unassignCourier(stepId: string): void;
     
     updateComment(stepId: string, comment: string): void;
+    updateCourierComment(stepId: string, comment: string): void;
 }

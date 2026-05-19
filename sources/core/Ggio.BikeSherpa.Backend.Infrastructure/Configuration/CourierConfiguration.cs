@@ -15,6 +15,7 @@ public class CourierConfiguration : IEntityTypeConfiguration<Courier>
                address.Property(a => a.Name).HasMaxLength(200).IsRequired();
                address.Property(a => a.StreetInfo).HasMaxLength(200).IsRequired();
                address.Property(a => a.Complement).HasMaxLength(200);
+               address.Property(a => a.Phone).HasMaxLength(20);
                address.Property(a => a.Postcode).HasMaxLength(5).IsRequired();
                address.Property(a => a.City).HasMaxLength(100).IsRequired();
                address.Property(a => a.Coordinates).HasConversion(

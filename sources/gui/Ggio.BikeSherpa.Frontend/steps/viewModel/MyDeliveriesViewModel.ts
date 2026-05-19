@@ -1,31 +1,21 @@
 import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import {inject} from "inversify";
-import {ICourierService} from "@/spi/CourierSPI";
-import {ICustomerService} from "@/spi/CustomerSPI";
-import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import Delivery from "@/deliveries/models/Delivery";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
-import DeliveryMapper from "@/deliveries/services/DeliveryMapper";
-import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
+import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
 
 export default class MyDeliveriesViewModel {
     private readonly deliveryServices: IDeliveryServices;
-    private readonly courierServices: ICourierService;
-    private readonly customerServices: ICustomerService;
-    private readonly dropdownOptionsService: IDropdownOptionsService;
+    private readonly deliveryMapper: IDeliveryMapper;
 
     constructor(
         @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
-        @inject(ServicesIdentifiers.CourierServices) courierServices: ICourierService,
-        @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService,
-        @inject(DeliveryServiceIdentifier.DropdownOptionsService) dropdownOptionsService: IDropdownOptionsService
+        @inject(DeliveryServiceIdentifier.Mapper) deliveryMapper: IDeliveryMapper
     ) {
         this.deliveryServices = deliveryServices;
-        this.courierServices = courierServices;
-        this.customerServices = customerServices;
-        this.dropdownOptionsService = dropdownOptionsService;
+        this.deliveryMapper = deliveryMapper;
     }
     
     public loadMyDeliveries = (date: Date): void => {
@@ -37,18 +27,7 @@ export default class MyDeliveriesViewModel {
         const deliveries: Delivery[] = Object.values(this.deliveryServices.getDeliveryList$().get());
 
         const deliveriesToDisplay: DeliveryToDisplay[] = deliveries.map((delivery) => {
-            return DeliveryMapper.DeliveryToDeliveryToDisplay(
-                delivery,
-                (id: string) => {
-                    const customer = this.customerServices.getCustomer$(id).get();
-                    return customer?.name ?? "";
-                },
-                (id: string) => {
-                    const courier = this.courierServices.getCourier$(id).get();
-                    return courier?.code ?? "";
-                },
-                this.dropdownOptionsService.GetPackingLabel,
-            );
+            return this.deliveryMapper.DeliveryToDeliveryToDisplay(delivery);
         });
         
         return deliveriesToDisplay.flatMap(delivery => delivery.steps).sort((stepA, stepB) => {

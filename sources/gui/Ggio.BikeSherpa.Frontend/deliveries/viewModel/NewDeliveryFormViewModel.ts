@@ -24,10 +24,16 @@ export default class NewDeliveryFormViewModel extends AbstractFormViewModel {
                     stepZone: {name: '', cities: []},
                     courierId: null,
                     comment: step.comment ?? null,
+                    courierComment: step.courierComment ?? null,
                     distance: 0,
                     attachmentFilePaths: [],
                     realDeliveryDate: null,
-                    estimatedDeliveryDate: delivery.startDate
+                    estimatedDeliveryDate: delivery.startDate,
+                    stepAddress: {
+                      ...step.stepAddress,
+                      name: step.contactName ?? '',
+                      phone: step.contactPhone ?? null
+                    }
                 }
             })
         };

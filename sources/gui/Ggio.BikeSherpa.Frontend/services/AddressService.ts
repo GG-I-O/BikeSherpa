@@ -50,6 +50,7 @@ export default class AddressService implements IAddressService {
             return data.features.map((feature: any) => {
                 const address: Address = {
                     name: "",
+                    phone: "",
                     fullAddress: feature.properties.label,
                     streetInfo: feature.properties.name,
                     complement: null,

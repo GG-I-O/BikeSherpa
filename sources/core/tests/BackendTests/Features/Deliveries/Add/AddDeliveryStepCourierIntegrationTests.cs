@@ -22,7 +22,7 @@ namespace BackendTests.Features.Deliveries.Add;
 public class AddDeliveryStepCourierIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
-     private readonly Fixture _fixture = new();
+     private readonly Fixture _fixture = TestFixtureFactory.Create();
 
      private readonly Delivery _delivery;
      private readonly Courier _courier;

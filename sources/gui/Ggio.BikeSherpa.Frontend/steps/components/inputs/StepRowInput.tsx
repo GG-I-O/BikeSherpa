@@ -1,6 +1,6 @@
 import {DataTable, IconButton} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import {Control} from "react-hook-form";
+import {Control, useWatch} from "react-hook-form";
 import StepTypeInput from "@/steps/components/inputs/StepTypeInput";
 import React from "react";
 import ThemedInput from "@/components/themed/ThemedInput";
@@ -18,6 +18,9 @@ type Props = {
 }
 
 export default function StepRowInput({control, name, index, deleteRow, moveRow, listLength}: Props) {
+    const currentName = useWatch({ control, name: `${name}.${index}.stepAddress.name` }) ?? "";
+    const currentPhone = useWatch({ control, name: `${name}.${index}.stepAddress.phone` }) ?? "";
+    
     return (
         <DataTable.Row style={{padding: 0}}>
             <DataTable.Cell style={[datatableStyle.column, datatableStyle.width130]}>
@@ -52,12 +55,28 @@ export default function StepRowInput({control, name, index, deleteRow, moveRow, 
                 />
             </DataTable.Cell>
             <DataTable.Cell style={[datatableStyle.column]}>
+                <View style={{flexDirection: 'column', width: '100%', gap: 4}}>
                 <ThemedAddressInput
                     control={control}
                     name={`${name}.${index}.stepAddress`}
                     label=""
                     placeholder="Adresse..."
                 />
+                <ThemedInput
+                    testID="StepAddressName"
+                    control={control}
+                    name={`${name}.${index}.contactName`}
+                    label=""
+                    placeholder="Nom..."
+                />
+                <ThemedInput
+                    testID="StepAddressPhone"
+                    control={control}
+                    name={`${name}.${index}.contactPhone`}
+                    label=""
+                    placeholder="Téléphone..."
+                />
+                </View>
             </DataTable.Cell>
             <DataTable.Cell style={[datatableStyle.column, datatableStyle.width90]}>
                 <ThemedCheckboxInput
@@ -77,6 +96,5 @@ export default function StepRowInput({control, name, index, deleteRow, moveRow, 
                 />
             </DataTable.Cell>
         </DataTable.Row>
-    )
-        ;
+    );
 }

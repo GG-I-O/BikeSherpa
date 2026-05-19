@@ -29,7 +29,7 @@ namespace BackendTests.Features.Deliveries.Patch;
 public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
-     private readonly Fixture _fixture = new();
+     private readonly Fixture _fixture = TestFixtureFactory.Create();
      private readonly Mock<IItinerarySpi> _mockItineraryService = new();
      private readonly Delivery _delivery;
 
@@ -415,6 +415,62 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
                await ResetDatabaseAsync(dbContext);
           }
      }
+     
+     [Fact]
+     public async Task ShouldPatchDeliveryStepCourierCommentWithCamelCasePath()
+     {
+          // Arrange
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+
+          var client = _factory.CreateClient();
+
+          var firstStep = _delivery.Steps[0];
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.SaveChangesAsync(CancellationToken.None);
+
+          const string newCourierComment = "Damaged goods";
+
+          var patchDocument = new JsonPatchDocument<object>();
+          patchDocument.Operations.Add(new Operation<object>
+          {
+               op = "replace",
+               path = "/courierComment",
+               value = newCourierComment
+          });
+
+          var json = JsonSerializer.Serialize(patchDocument, _jsonSerializerOptions);
+          using var content = new StringContent(json, Encoding.UTF8, "application/json-patch+json");
+
+          try
+          {
+               // Act
+               var response = await client.PatchAsync(
+                    $"/api/delivery/{_delivery.Id}/step/{firstStep.Id}",
+                    content,
+                    CancellationToken.None);
+
+               // Assert
+               response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+               dbContext.ChangeTracker.Clear();
+
+               var dbDelivery = await dbContext.Deliveries
+                    .Include(d => d.Steps)
+                    .FirstOrDefaultAsync(d => d.Id == _delivery.Id, CancellationToken.None);
+
+               dbDelivery.Should().NotBeNull();
+
+               var dbStep = dbDelivery.Steps.Single(s => s.Id == firstStep.Id);
+               dbStep.CourierComment.Should().Be(newCourierComment);
+          }
+          finally
+          {
+               // Clean
+               await ResetDatabaseAsync(dbContext);
+          }
+     }
 
      [Fact]
      public async Task ShouldReturnNotFoundWhenDeliveryDoesNotExist()
@@ -545,7 +601,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
 
           var client = _factory.CreateClient();
 
-          await dbContext!.Deliveries.AddAsync(_delivery, CancellationToken.None);
+          await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
 
           var patchDocument = new JsonPatchDocument<object>();

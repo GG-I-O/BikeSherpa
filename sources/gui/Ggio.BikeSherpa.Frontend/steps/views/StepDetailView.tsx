@@ -1,11 +1,13 @@
 import AppStyle from "@/constants/AppStyle";
 import {useLocalSearchParams} from "expo-router";
 import {Linking, View} from "react-native";
-import {Button, Divider, Text, useTheme} from "react-native-paper";
+import {Button, Divider, Text, TextInput, useTheme} from "react-native-paper";
 import useStepDetailViewModel from "@/steps/viewModel/useStepDetailViewModel";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import {Icon} from "react-native-paper/src";
 import {StepType} from "@/steps/models/StepType";
+import unassignedPhoneNumber from "@/steps/constants/unassignedPhoneNumber";
+import React from "react";
 
 export default function StepDetailView() {
     const theme = useTheme();
@@ -76,23 +78,32 @@ export default function StepDetailView() {
                 gap: 32
             }}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <DeliveryTypeIcon type={viewModel.step.type}/>
-                    <View>
-                        <Text style={AppStyle.textStyle.h3}>{viewModel.step.address.name}</Text>
-                        <Text>{viewModel.step.address.streetInfo}</Text>
-                        <Text>{`${viewModel.step.address.postcode} ${viewModel.step.address.city}`}</Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+                        <DeliveryTypeIcon type={viewModel.step.type}/>
+                        <View>
+                            <Text style={AppStyle.textStyle.h3}>{viewModel.step.address.name}</Text>
+                            <Text>{viewModel.step.address.streetInfo}</Text>
+                            {viewModel.step.address.complement && <Text>{viewModel.step.address.complement}</Text>}
+                            <Text>{`${viewModel.step.address.postcode} ${viewModel.step.address.city}`}</Text>
+                        </View>
                     </View>
                     <Button
                         mode="outlined"
-                        onPress={() => Linking.openURL(`tel:${"06 45 45 45 45"}`)}
+                        onPress={() => Linking.openURL(`tel:${viewModel.step!.address.phone}`)}
+                        disabled={!viewModel.step.address.phone}
                     >
                         <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
-                        <Icon source="phone" size={24} color={theme.colors.onBackground}/>
-                        <Text>06 45 45 45 45</Text>
+                            <Icon source="phone" size={24} color={theme.colors.onBackground}/>
+                            <Text>{viewModel.step!.address.phone ?? unassignedPhoneNumber}</Text>
                         </View>
                     </Button>
                 </View>
-                <View style={{flexDirection: "row", marginInline: 32, justifyContent: "space-between", alignItems: "center"}}>
+                <View style={{
+                    flexDirection: "row",
+                    marginInline: 32,
+                    justifyContent: "space-between",
+                    alignItems: "center"
+                }}>
                     <Text>Horaire contractuel</Text>
                     {viewModel.step.type === StepType.PickUp ? (
                         <Text style={AppStyle.textStyle.h3}>A partir de : {viewModel.step.deliveryTime}</Text>
@@ -111,6 +122,17 @@ export default function StepDetailView() {
                     <Divider/>
                     <Text style={AppStyle.textStyle.h3}>{viewModel.step.packing}</Text>
                 </View>
+
+                <View style={{alignItems: "center", width: "100%"}}>
+                    <Text style={{textAlign: 'center'}}>Commentaire livreur</Text>
+                    <Divider/>
+                    <TextInput
+                        value={viewModel.courierComment}
+                        onChangeText={viewModel.setCourierComment}
+                        mode="outlined"
+                    />
+                </View>
+                
             </View>
         </View>
     );

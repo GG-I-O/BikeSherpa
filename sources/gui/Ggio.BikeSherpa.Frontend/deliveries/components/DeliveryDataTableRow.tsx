@@ -42,7 +42,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     {delivery.steps.length}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.totalPrice}
+                    {delivery.totalPrice}€
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
                     {delivery.startDate}

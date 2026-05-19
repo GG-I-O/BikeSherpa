@@ -17,6 +17,7 @@ const Address = z.object({
   postcode: z.string(),
   city: z.string(),
   coordinates: GeoPoint,
+  phone: z.string().nullable(),
 });
 const City = z.object({ name: z.string() });
 const DeliveryZone = z.object({ name: z.string(), cities: z.array(City) });
@@ -29,6 +30,7 @@ const DeliveryStepCrud = z.object({
   distance: z.number(),
   courierId: z.string().nullable(),
   comment: z.string().nullable(),
+  courierComment: z.string().nullable(),
   attachmentFilePaths: z.array(z.string()).nullable(),
   notBilled: z.boolean(),
   estimatedDeliveryDate: z.string().datetime({ offset: true }),
@@ -106,6 +108,7 @@ const AddressCrud = z.object({
   postcode: z.string(),
   city: z.string(),
   coordinates: GeoPoint,
+  phone: z.string().nullable(),
 });
 const CustomerCrud = z.object({
   name: z.string(),

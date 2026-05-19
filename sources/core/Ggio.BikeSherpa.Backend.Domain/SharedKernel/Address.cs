@@ -20,4 +20,6 @@ public class Address
      public required string City { get; set; }
      [UsedImplicitly]
      public required GeoPoint Coordinates { get; set; }
+     
+     public string? Phone { get; init; }
 }

@@ -26,7 +26,11 @@ export default class DeliveryEditFormViewModel extends AbstractFormViewModel {
                         ... oldStep,
                         estimatedDeliveryDate: stepDate.toISOString(),
                         stepType: step.stepType,
-                        stepAddress: step.stepAddress,
+                        stepAddress: {
+                            ...step.stepAddress,
+                            name: step.contactName ?? '',
+                            phone: step.contactPhone ?? null
+                        },
                         comment: step.comment ?? null
                     }
                 }
@@ -39,10 +43,16 @@ export default class DeliveryEditFormViewModel extends AbstractFormViewModel {
                     stepZone: {name: '', cities: []},
                     courierId: null,
                     comment: step.comment ?? null,
+                    courierComment: step.courierComment ?? null,
                     distance: 0,
                     attachmentFilePaths: [],
                     realDeliveryDate: null,
-                    estimatedDeliveryDate: delivery.startDate
+                    estimatedDeliveryDate: delivery.startDate,
+                    stepAddress: {
+                        ...step.stepAddress,
+                        name: step.contactName ?? '',
+                        phone: step.contactPhone ?? null
+                    }
                 }
             })
         };

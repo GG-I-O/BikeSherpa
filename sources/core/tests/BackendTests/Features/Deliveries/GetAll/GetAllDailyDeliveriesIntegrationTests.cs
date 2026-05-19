@@ -22,7 +22,7 @@ namespace BackendTests.Features.Deliveries.GetAll;
 public class GetAllDailyDeliveriesIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
-     private readonly Fixture _fixture = new();
+     private readonly Fixture _fixture = TestFixtureFactory.Create();
 
      private const string Scope = "read:myDeliveries";
      private const string UserEmail = "courier@example.com";

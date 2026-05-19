@@ -14,17 +14,19 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
      public List<Link> GenerateLinks(Guid deliveryId, Guid stepId)
      {
           // Get Links depending on permissions
-          var scopes = httpContextAccessor.GetResourceScopes("read:deliveries", "write:deliveries");
+          var deliveryScopes = httpContextAccessor.GetResourceScopes("read:deliveries", "write:deliveries");
+          var stepScopes = httpContextAccessor.GetResourceScopes("read:myDeliveries", "write:myDeliveries");
+          
+          if (deliveryScopes is null && stepScopes is null) return [];
 
-          if (scopes is null) return [];
-
-          var (_, canWrite) = scopes.Value;
+          var (_, canWriteDelivery) = deliveryScopes ?? (false, false);
+          var (_, canWriteStep) = stepScopes ?? (false, false);
           
           var links = new List<Link>();
           
           // PATCH /delivery/{deliveryId}/step/{stepId}
           var routeValues = new { deliveryId, stepId };
-          if (canWrite)
+          if (canWriteDelivery || canWriteStep)
                links.Add(new Link {
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<PatchDeliveryStepEndpoint>(), routeValues),
                     Rel = "patch",
@@ -35,7 +37,7 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
           
           // POST /delivery{deliveryId}/step/{stepId}/courier/{ID}
           var postCourierRouteValues = new { deliveryId, stepId, courierId = Guid.Empty};
-          if (canWrite)
+          if (canWriteDelivery)
                links.Add(new Link {
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<AddDeliveryStepCourierEndpoint>(), postCourierRouteValues),
                     Rel = "postCourier",
@@ -43,7 +45,7 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                });
           
           // Delete /delivery{deliveryId}/step/{stepId}/courier
-          if (canWrite)
+          if (canWriteDelivery)
                links.Add(new Link {
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<DeleteDeliveryStepCourierEndpoint>(), routeValues),
                     Rel = "deleteCourier",
@@ -51,7 +53,7 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                });
 
           // PUT /delivery/{deliveryId}/step/{stepId}/changeOrder
-          if (canWrite)
+          if (canWriteDelivery)
                links.Add(new Link {
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<UpdateDeliveryStepOrderEndpoint>(), routeValues),
                     Rel = "putOrder",
@@ -59,7 +61,7 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                });
           
           // PUT /delivery/{deliveryId}/step/{stepId}/changeTime
-          if (canWrite)
+          if (canWriteDelivery)
                links.Add(new Link {
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<UpdateDeliveryStepTimeEndpoint>(), routeValues),
                     Rel = "putTime",

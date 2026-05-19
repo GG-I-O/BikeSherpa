@@ -1,3 +1,4 @@
 export const StepServiceIdentifier = {
-    Services: Symbol.for("StepServices")
+    Services: Symbol.for("StepServices"),
+    Mapper: Symbol.for("StepMapper")
 }

@@ -18,6 +18,7 @@ export default class DropdownOptionsService implements IDropdownOptionsService {
         this.options["pricingStrategies"] = [];
         this.options["packingsSizes"] = [];
         this.options["urgencies"] = [];
+        this.GetOptions().then();
     }
     
     public async GetOptions(): Promise<Record<string, DropdownOptions[]>> {
