@@ -25,7 +25,7 @@ namespace BackendTests.Features.Deliveries.Update;
 public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
-     private readonly Fixture _fixture = new();
+     private readonly Fixture _fixture = TestFixtureFactory.Create();
      private readonly Mock<IItinerarySpi> _mockItineraryService = new();
      private readonly Delivery _delivery;
 

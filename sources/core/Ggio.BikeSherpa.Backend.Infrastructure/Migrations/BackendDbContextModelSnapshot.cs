@@ -474,6 +474,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                                 .HasMaxLength(200)
                                 .HasColumnType("character varying(200)");
 
+                            b1.Property<string>("Phone")
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)");
+
                             b1.Property<string>("Postcode")
                                 .IsRequired()
                                 .HasMaxLength(5)
@@ -520,6 +524,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                                 .IsRequired()
                                 .HasMaxLength(200)
                                 .HasColumnType("character varying(200)");
+
+                            b1.Property<string>("Phone")
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)");
 
                             b1.Property<string>("Postcode")
                                 .IsRequired()
@@ -572,6 +580,9 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.Property<bool>("Completed")
                                 .HasColumnType("boolean");
+
+                            b1.Property<string>("CourierComment")
+                                .HasColumnType("text");
 
                             b1.Property<Guid?>("CourierId")
                                 .HasColumnType("uuid");
@@ -646,6 +657,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                                         .IsRequired()
                                         .HasMaxLength(200)
                                         .HasColumnType("character varying(200)");
+
+                                    b2.Property<string>("Phone")
+                                        .HasMaxLength(20)
+                                        .HasColumnType("character varying(20)");
 
                                     b2.Property<string>("Postcode")
                                         .IsRequired()

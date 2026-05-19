@@ -21,7 +21,7 @@ namespace BackendTests.Features.Deliveries.Delete;
 public class DeleteDeliveryStepCourierIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
-     private readonly Fixture _fixture = new();
+     private readonly Fixture _fixture = TestFixtureFactory.Create();
 
      private readonly Delivery _delivery;
      private readonly Guid _courierId = Guid.NewGuid();
