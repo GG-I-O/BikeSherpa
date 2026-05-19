@@ -14,7 +14,13 @@ public class PatchDeliveryStepEndpoint(IMediator mediator) : Endpoint<PatchDeliv
      public override void Configure()
      {
           Patch("/delivery/{deliveryId:guid}/step/{stepId:guid}");
-          Policies("write:deliveries");
+          Policy(policy =>
+          {
+               policy.RequireAuthenticatedUser();
+               policy.RequireAssertion(context =>
+                    context.User.HasClaim("scope", "write:deliveries") ||
+                    context.User.HasClaim("scope", "write:myDeliveries"));
+          });
           Description(x => x.WithTags("delivery"));
           Description(x => x.Accepts<PatchDeliveryRequest>("application/json-patch+json"));
      }

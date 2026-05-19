@@ -27,9 +27,15 @@ export default function useStepDetailViewModel(stepId: string) {
 
     }, [deliveryStore$, stepId]);
 
-    const [courierComment, setCourierComment] = useState(step ? step.comment : '');
+    const [courierComment, setCourierComment] = useState<string>('');
+    useEffect(() => {
+        if (step) {
+            setCourierComment(step.courierComment);
+        }
+    }, [step])
+    
     useDebounce(() => {
-        if (step && courierComment !== step.comment) {
+        if (step && courierComment !== step.courierComment) {
             viewModel.updateCourierComment(step.id, courierComment);
         }
     }, 1000, [courierComment]);

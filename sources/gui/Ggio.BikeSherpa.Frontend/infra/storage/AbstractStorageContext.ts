@@ -139,24 +139,14 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 item.createdAt = new Date().toISOString();
                 item.updatedAt = new Date().toISOString();
 
-                const result = await this.create(item);
-                return await this.getItem(result);
+                await this.create(item);
             },
             update: async (item: T) => {
-                // Check if we have the rights to update
-                if (!item.links?.some((link: Link) => link.rel === hateoasRel.update)) {
-                    return;
-                }
-
                 item.updatedAt = new Date().toISOString();
 
                 await this.update(item);
-                return await this.getItem(item.id);
             },
             delete: async (item: T) => {
-                // Check if we have the rights to delete
-                if (!item.links?.some((link: Link) => link.rel === hateoasRel.delete)) return;
-
                 await this.delete(item);
             },
 
