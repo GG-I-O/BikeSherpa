@@ -28,6 +28,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      public double Distance { get; set; }
      public Guid? CourierId { get; set; }
      public string? Comment { get; set; }
+     public string? CourierComment { get; set; }
      public string[]? AttachmentFilePaths { get; set; }
      public bool NotBilled { get; set; }
      public DateTimeOffset EstimatedDeliveryDate { get; set; }
