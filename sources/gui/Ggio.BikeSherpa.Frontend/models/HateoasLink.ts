@@ -22,5 +22,8 @@ export const hateoasRel = {
     },
     stepTime: {
         put: "putTime"
+    },
+    stepCompletion: {
+        put: "putComplete"
     }
 }

@@ -10,7 +10,7 @@ public class UpdateDeliveryStepCompletionEndpoint(IMediator mediator) : Endpoint
      public override void Configure()
      {
           Put("/delivery/{deliveryId:guid}/step/{stepId:guid}/complete");
-          Policies("write:deliveries");
+          Policies("write:myDeliveries");
           Description(x => x.WithTags("delivery"));
      }
 

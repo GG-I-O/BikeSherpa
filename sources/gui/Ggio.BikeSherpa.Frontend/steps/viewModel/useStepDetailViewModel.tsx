@@ -43,6 +43,8 @@ export default function useStepDetailViewModel(stepId: string) {
     return {
         step,
         courierComment,
-        setCourierComment
+        setCourierComment,
+        completeStep: () => viewModel.stepComplete(stepId, true),
+        cancelStep: () => viewModel.stepComplete(stepId, false)
     }
 }

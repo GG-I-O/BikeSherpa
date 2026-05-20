@@ -6,7 +6,8 @@ const deliveryOperationAction = {
     postCourier: "postCourier",
     deleteCourier: "deleteCourier",
     putOrder: "putOrder",
-    putTime: "putTime"
+    putTime: "putTime",
+    putComplete: "putComplete"
 }
 
 export default deliveryOperationAction;

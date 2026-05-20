@@ -10,4 +10,6 @@ export interface IStepServices {
     
     updateComment(stepId: string, comment: string): void;
     updateCourierComment(stepId: string, comment: string): void;
+    
+    completeStep(stepId: string, complete: boolean): void;
 }

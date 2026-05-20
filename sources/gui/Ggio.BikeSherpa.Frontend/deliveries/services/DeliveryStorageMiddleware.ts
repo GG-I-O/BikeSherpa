@@ -97,6 +97,9 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                 case deliveryOperationAction.putTime:
                     await this.customClientFacade.PutStepTimeEndpoint(step);
                     break;
+                case deliveryOperationAction.putComplete:
+                    await this.customClientFacade.PutStepCompletionEndpoint(step);
+                    break;
                 default:
                     throw new Error(`Unsupported update action: ${this.updateStepState[i].state}`);
             }

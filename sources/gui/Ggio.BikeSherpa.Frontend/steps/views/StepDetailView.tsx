@@ -51,11 +51,13 @@ export default function StepDetailView() {
                 </View>
                 <View style={{gap: 8}}>
                     <Button
+                        buttonColor={viewModel.step.completed ? theme.colors.errorContainer : theme.colors.background}
                         mode="outlined"
                         onPress={() => {
+                            viewModel.step?.completed ? viewModel.cancelStep() : viewModel.completeStep()
                         }}
                     >
-                        <Text>Valider</Text>
+                        <Text>{viewModel.step.completed ? "Annuler" : "Valider"}</Text>
                     </Button>
                 </View>
             </View>
