@@ -1,13 +1,10 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 
 public class PricingStrategyService(
-     IEnumerable<IPricingStrategy> strategies,
-     IUrgencyRepository urgencies,
-     IPackingSizeRepository packingSizes
+     IEnumerable<IPricingStrategy> strategies
 ) : IPricingStrategyService
 {
      public double CalculateDeliveryPriceWithoutVat(Delivery delivery)
@@ -17,19 +14,12 @@ public class PricingStrategyService(
           {
                return (double)delivery.TotalPrice!;
           }
-
-          var packingSize = packingSizes.GetByName(delivery.PackingSize);
-          if (packingSize is null)
-          {
-               throw new Exception("Taille de colis invalide");
-          }
-
-          var urgencyPriceCoefficient = delivery.Urgency.PriceCoefficient;
+          
           var pickupCount = delivery.Steps.Count(s => s.StepType == StepType.Pickup);
-          var dropoffsInCore = delivery.Steps.Count(s => s.StepZone.Name == "Centre");
-          var dropoffsInBorder = delivery.Steps.Count(s => s.StepZone.Name == "Limitrophe");
-          var dropoffsInPeriphery = delivery.Steps.Count(s => s.StepZone.Name == "Périphérie");
-          var dropoffsOutside = delivery.Steps.Count(s => s.StepZone.Name == "Extérieur");
+          var dropOffsInCore = delivery.Steps.Count(s => s.StepZone.Name == StepZone.InCore && s.StepType == StepType.Dropoff);
+          var dropOffsInBorder = delivery.Steps.Count(s => s.StepZone.Name == StepZone.InBorder && s.StepType == StepType.Dropoff);
+          var dropOffsInPeriphery = delivery.Steps.Count(s => s.StepZone.Name == StepZone.InPeriphery && s.StepType == StepType.Dropoff);
+          var dropOffsOutside = delivery.Steps.Count(s => s.StepZone.Name == StepZone.Outside && s.StepType == StepType.Dropoff);
 
           var totalDistance = delivery.Distance ?? 0;
           
@@ -40,17 +30,17 @@ public class PricingStrategyService(
                delivery.StartDate,
                delivery.ContractDate,
                pickupCount,
-               dropoffsInCore,
-               dropoffsInBorder,
-               dropoffsInPeriphery,
-               dropoffsOutside,
-               packingSize,
-               urgencyPriceCoefficient,
-               totalDistance
+               dropOffsInCore,
+               dropOffsInBorder,
+               dropOffsInPeriphery,
+               dropOffsOutside,
+               delivery.PackingSize,
+               delivery.Urgency,
+               totalDistance,
+               delivery.Discount ?? 0,
+               delivery.ExtraCost ?? 0
           );
           
-          price -= delivery.Discount ?? 0;
-          price += delivery.ExtraCost ?? 0;
           return price;
      }
 }

@@ -11,28 +11,78 @@ public class SimpleDeliveryStrategy : IPricingStrategy
 
      public PricingStrategy ImplementedStrategy => PricingStrategy.SimpleDeliveryStrategy;
 
+     public double SameDayExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate)
+     {
+          return PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate);
+     }
+
+     public double DelayCost(DateTimeOffset startDate, DateTimeOffset contractDate)
+     {
+          return PricingRules.CalculateDelayCost(startDate, contractDate);
+     }
+
+     public double PickupCost(int pickupNumber)
+     {
+          return 0;
+     }
+
+     public double DropOffInCoreCost(int dropOffStepsInCore)
+     {
+          return dropOffStepsInCore * StepPriceInCore;
+     }
+
+     public double DropOffInBorderCost(int dropOffStepsInBorder)
+     {
+          return dropOffStepsInBorder * StepPriceInBorder;
+     }
+
+     public double DropOffInPeripheryCost(int dropOffStepsInPeriphery)
+     {
+          return dropOffStepsInPeriphery * StepPriceInPeriphery;
+     }
+
+     public double DropOffOutsideCost(int dropOffStepsOutside)
+     {
+          return dropOffStepsOutside * StepPriceOutside;
+     }
+
+     public double TotalDistanceCost(double totalDistance, Urgency urgency)
+     {
+          return urgency.PriceCoefficient * totalDistance;
+     }
+
      public double CalculateDeliveryPriceWithoutVat(
           DateTimeOffset startDate,
           DateTimeOffset contractDate,
           int pickupNumber,
-          int dropoffStepsInCore,
-          int dropoffStepsInBorder,
-          int dropoffStepsInPeriphery,
-          int dropoffStepsOutside,
+          int dropOffStepsInCore,
+          int dropOffStepsInBorder,
+          int dropOffStepsInPeriphery,
+          int dropOffStepsOutside,
           PackingSize packingSize,
-          double urgencyPriceCoefficient,
-          double totalDistance)
+          Urgency urgency,
+          double totalDistance,
+          double discount,
+          double extraCost)
      {
+          var sameDayCost = SameDayExtraCost(startDate, contractDate);
+          var delayCost = DelayCost(startDate, contractDate);
+          var inCoreCost = DropOffInCoreCost(dropOffStepsInCore);
+          var inBorderCost = DropOffInBorderCost(dropOffStepsInBorder);
+          var inPeripheryCost = DropOffInPeripheryCost(dropOffStepsInPeriphery);
+          var outsideCost = DropOffOutsideCost(dropOffStepsOutside);
+          var distanceCost = TotalDistanceCost(totalDistance, urgency);
 
           return Math.Round(
-               (PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate) +
-                  PricingRules.CalculateDelayCost(startDate, contractDate) +
-                  dropoffStepsInCore * StepPriceInCore +
-                  dropoffStepsInBorder * StepPriceInBorder +
-                  dropoffStepsInPeriphery * StepPriceInPeriphery +
-                  dropoffStepsOutside * StepPriceOutside +
-                  packingSize.Price +
-                  urgencyPriceCoefficient * totalDistance)
+               sameDayCost +
+               delayCost +
+               inCoreCost +
+               inBorderCost +
+               inPeripheryCost +
+               outsideCost +
+               packingSize.Price +
+               distanceCost +
+               extraCost - discount
                , 2);
      }
 }

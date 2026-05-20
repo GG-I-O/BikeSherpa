@@ -10,12 +10,23 @@ public interface IPricingStrategy
           DateTimeOffset startDate,
           DateTimeOffset contractDate,
           int pickupNumber,
-          int dropoffStepsInCore,
-          int dropoffStepsInBorder,
-          int dropoffStepsInPeriphery,
-          int dropoffStepsOutside,
+          int dropOffStepsInCore,
+          int dropOffStepsInBorder,
+          int dropOffStepsInPeriphery,
+          int dropOffStepsOutside,
           PackingSize packingSize,
-          double urgencyPriceCoefficient,
-          double totalDistance
+          Urgency urgency,
+          double totalDistance,
+          double discount,
+          double extraCost
      );
+
+     double SameDayExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate);
+     double DelayCost(DateTimeOffset startDate, DateTimeOffset contractDate);
+     double PickupCost(int pickupNumber);
+     double DropOffInCoreCost(int dropOffStepsInCore);
+     double DropOffInBorderCost(int dropOffStepsInBorder);
+     double DropOffInPeripheryCost(int dropOffStepsInPeriphery);
+     double DropOffOutsideCost(int dropOffStepsOutside);
+     double TotalDistanceCost(double totalDistance, Urgency urgency);
 }
