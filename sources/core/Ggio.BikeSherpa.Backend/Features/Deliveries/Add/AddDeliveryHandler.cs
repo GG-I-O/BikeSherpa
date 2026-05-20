@@ -45,6 +45,7 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 public class AddDeliveryHandler(
      IDeliveryFactory factory,
      IUrgencyRepository urgencyRepository,
+     IPackingSizeRepository packingSizeRepository,
      IValidator<AddDeliveryCommand> validator,
      IApplicationTransaction transaction
      ) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
@@ -56,6 +57,10 @@ public class AddDeliveryHandler(
           var urgency = urgencyRepository.GetByName(command.Urgency);
           if (urgency is null)
                return Result.Invalid();
+          
+          var packingSize = packingSizeRepository.GetByName(command.PackingSize);
+          if (packingSize is null)
+               return Result.Invalid();
 
           var delivery = await factory.CreateDeliveryAsync(
                command.PricingStrategy,
@@ -66,7 +71,7 @@ public class AddDeliveryHandler(
                command.ExtraCost,
                command.Distance,
                command.Details,
-               command.PackingSize,
+               packingSize,
                command.InsulatedBox,
                command.ContractDate,
                command.StartDate

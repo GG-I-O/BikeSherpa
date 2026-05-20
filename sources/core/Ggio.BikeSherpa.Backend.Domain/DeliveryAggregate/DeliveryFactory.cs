@@ -19,7 +19,7 @@ public interface IDeliveryFactory
           double? extraCost,
           double? distance,
           string[] details,
-          string packingSize,
+          PackingSize packingSize,
           bool insulatedBox,
           DateTimeOffset contractDate,
           DateTimeOffset startDate
@@ -42,7 +42,7 @@ public class DeliveryFactory(
           double? extraCost,
           double? distance,
           string[] details,
-          string packingSize,
+          PackingSize packingSize,
           bool insulatedBox,
           DateTimeOffset contractDate,
           DateTimeOffset startDate
