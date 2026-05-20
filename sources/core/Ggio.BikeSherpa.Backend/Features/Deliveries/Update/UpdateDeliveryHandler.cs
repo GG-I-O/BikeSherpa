@@ -71,6 +71,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
 public class UpdateDeliveryHandler(
      IReadRepository<Delivery> repository,
      IUrgencyRepository urgencyRepository,
+     IPackingSizeRepository packingSizeRepository,
      IValidator<UpdateDeliveryCommand> validator,
      IApplicationTransaction transaction,
      IDeliveryZoneRepository deliveryZones,
@@ -88,6 +89,10 @@ public class UpdateDeliveryHandler(
           var urgency = urgencyRepository.GetByName(command.Urgency);
           if (urgency is null)
                return Result.Invalid();
+          
+          var packingSize = packingSizeRepository.GetByName(command.PackingSize);
+          if (packingSize is null)
+               return Result.Invalid();
 
           entity.PricingStrategy = command.PricingStrategy;
           entity.Status = command.Status;
@@ -100,7 +105,7 @@ public class UpdateDeliveryHandler(
           entity.Distance = command.Distance;
           entity.ReportId = command.ReportId;
           entity.Details = command.Details;
-          entity.PackingSize = command.PackingSize;
+          entity.PackingSize = packingSize;
           entity.InsulatedBox = command.InsulatedBox;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
