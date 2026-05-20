@@ -33,8 +33,6 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                     Method = "PATCH" 
                });
           
-          // PUT /delivery/{deliveryId}/step/{stepId}/complete
-          
           // POST /delivery{deliveryId}/step/{stepId}/courier/{ID}
           var postCourierRouteValues = new { deliveryId, stepId, courierId = Guid.Empty};
           if (canWriteDelivery)
@@ -66,6 +64,15 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<UpdateDeliveryStepTimeEndpoint>(), routeValues),
                     Rel = "putTime",
                     Method = "PUT" 
+               });
+          
+          // PUT /delivery/{deliveryId}/step/{stepId}/complete
+          if (canWriteStep)
+               links.Add(new Link
+               {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<UpdateDeliveryStepCompletionEndpoint>(), routeValues),
+                    Rel = "putComplete",
+                    Method = "PUT"
                });
           
           return links;

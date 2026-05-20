@@ -42,7 +42,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         return deliveries || [];
     }
 
-    public async GetEndpoint(id: string): Promise<Delivery | null> {
+    public async GetEndpoint(id: string): Promise<Delivery | null> {        
         const response = await this.apiClient.GetDeliveryEndpoint({
             params: {deliveryId: id}
         });
@@ -237,5 +237,21 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
                 date: step.estimatedDeliveryDate
             }
         );
+    }
+    
+    public async PutStepCompletionEndpoint(step: Step): Promise<void> {
+        if (!step.links)
+            throw new Error(`Step links empty`);
+
+        const link = step.links.find(link => link.rel === hateoasRel.stepCompletion.put);
+        if (!link)
+            throw new Error(`Step link for '${hateoasRel.stepCompletion.put}' not found`);
+            
+        await axios.put(
+            link.href,
+            {
+                completed: step.completed
+            }
+        )
     }
 }

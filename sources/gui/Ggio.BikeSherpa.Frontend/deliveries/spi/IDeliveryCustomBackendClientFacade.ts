@@ -9,4 +9,5 @@ export interface IDeliveryCustomBackendClientFacade {
     DeleteStepCourierEndpoint(step: Step): Promise<void>;
     PutStepOrderEndpoint(step: Step, increment: number): Promise<void>;
     PutStepTimeEndpoint(step: Step): Promise<void>;
+    PutStepCompletionEndpoint(step: Step): Promise<void>;
 }

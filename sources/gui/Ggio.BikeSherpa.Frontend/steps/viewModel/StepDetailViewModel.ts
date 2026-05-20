@@ -47,4 +47,8 @@ export default class StepDetailViewModel {
     public updateCourierComment = (stepId: string, comment: string)=> {
         this.stepServices.updateCourierComment(stepId, comment);
     }
+    
+    public stepComplete = (stepId: string, complete: boolean) => {
+        this.stepServices.completeStep(stepId, complete);
+    }
 }
