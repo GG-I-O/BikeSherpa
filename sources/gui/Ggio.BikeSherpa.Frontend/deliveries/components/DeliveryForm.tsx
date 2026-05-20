@@ -84,10 +84,11 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 control={control}
                 name="totalPrice"
                 error={errors.totalPrice as FieldError | undefined}
-                label="Prix total"
+                label="Prix total (en €)"
                 placeholder="10"
                 disabled={props.pricingStrategies.length === 0 || field.value !== parseInt(props.pricingStrategies[0].value)}
                 required
+                isNumeric
             />
             <ThemedInput
                 testID="deliveryFormDiscountInput"
@@ -96,6 +97,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 error={errors.discount as FieldError | undefined}
                 label="Remise (en €)"
                 placeholder="0"
+                isNumeric
             />
             <ThemedInput
                 testID="deliveryFormDiscountInput"
@@ -104,14 +106,16 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 error={errors.discount as FieldError | undefined}
                 label="Surcout (en €)"
                 placeholder="0"
+                isNumeric
             />
             <ThemedInput
                 testID="deliveryFormDetailsInput"
                 control={control}
                 name="distance"
                 error={errors.details as FieldError | undefined}
-                label="Distance"
+                label="Distance (en Km)"
                 placeholder="Message lambda"
+                isNumeric
             />
             <ThemedInput
                 testID="deliveryFormDetailsInput"

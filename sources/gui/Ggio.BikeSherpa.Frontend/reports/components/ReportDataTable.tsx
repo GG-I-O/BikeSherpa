@@ -2,11 +2,10 @@ import { ScrollView } from "react-native";
 import { DataTable, useTheme } from "react-native-paper";
 import ReportDataTableRow from "./ReportDataTableRow";
 import datatableStyle from "@/style/datatableStyle";
-import Report from "../models/Report";
+import {Report} from "@/reports/models/Report";
 
 type Props = {
-    reports: Report[],
-    onPress?: (report: Report) => void,
+    reports: Report[]
 }
 
 export default function ReportDataTable(props: Props) {
@@ -15,16 +14,14 @@ export default function ReportDataTable(props: Props) {
     return <ScrollView>
         <DataTable style={{ backgroundColor: theme.colors.background }}>
             <DataTable.Header>
-                <DataTable.Title style={[style.column]}>Client</DataTable.Title>
-                <DataTable.Title style={[style.column]}>Numéro de rapport</DataTable.Title>
-                <DataTable.Title style={[style.column]}>Date</DataTable.Title>
-                <DataTable.Title style={[style.column]}>Courses</DataTable.Title>
+                <DataTable.Title style={[style.column]}>Description</DataTable.Title>
+                <DataTable.Title style={[style.column, style.width80]}>Prix</DataTable.Title>
+                <DataTable.Title style={[style.column, style.width80]}>Quantité</DataTable.Title>
             </DataTable.Header>
 
             {props.reports.map((report, index) => (
                 <ReportDataTableRow
                     report={report}
-                    onPress={props.onPress}
                     key={index}
                 />
             ))}

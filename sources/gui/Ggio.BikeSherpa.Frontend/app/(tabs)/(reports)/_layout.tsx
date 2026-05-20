@@ -11,14 +11,6 @@ export default function ReportLayout() {
                     title: 'Mes rapports'
                 }}
             />
-            <Stack.Screen
-                name="[reportId]"
-                options={{
-                    headerShown: true,
-                    title: 'Détails'
-                }}
-            />
         </Stack>
-
     )
 }

@@ -1,13 +1,13 @@
 import { DataTable, useTheme } from "react-native-paper";
-import Report from "../models/Report";
 import datatableStyle from "@/style/datatableStyle";
+import {Report} from "@/reports/models/Report";
+import AppStyle from "@/constants/AppStyle";
 
 type Props = {
     report: Report,
-    onPress?: (report: Report) => void,
 }
 
-export default function ReportDataTableRow({ report, onPress }: Props) {
+export default function ReportDataTableRow({ report }: Props) {
     const theme = useTheme();
 
     const style = datatableStyle;
@@ -15,24 +15,47 @@ export default function ReportDataTableRow({ report, onPress }: Props) {
     return (
         <>
             <DataTable.Row
-                key={report.id}
+                key={report.deliveryCode}
                 testID="ReportDataTableRow"
-                onPress={() => {
-                    if (onPress) return onPress(report);
-                }}
                 style={{ backgroundColor: theme.colors.background }}
             >
-                <DataTable.Cell style={[style.column]}>
-                    {report.customer}
+                <DataTable.Cell style={[style.column]} textStyle={AppStyle.textStyle.h3}>
+                    {`${report.deliveryCode} - ${report.deliveryDate} - ${report.deliveryTime}`}
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column]}>
-                    {report.reportNumber}
+            </DataTable.Row>
+            {report.details.map((detail, index) => (
+                <DataTable.Row
+                    key={`${report.deliveryCode}-${index}`}
+                    testID="ReportDataTableDetailRow"
+                    style={[
+                        style.smallHeight,
+                        { backgroundColor: theme.colors.background, marginLeft: 32 }
+                    ]}
+                >
+                    <DataTable.Cell style={[style.column]}>
+                        {detail.description}
+                    </DataTable.Cell>
+                    <DataTable.Cell style={[style.column, style.width80]} textStyle={{width: '100%'}}>
+                        {detail.price} €
+                    </DataTable.Cell>
+                    <DataTable.Cell style={[style.column, style.width80]} textStyle={{width: '100%', textAlign: 'center'}}>
+                        {detail.quantity}
+                    </DataTable.Cell>
+                </DataTable.Row>
+            ))}
+            <DataTable.Row
+                key={`${report.deliveryCode}-total`}
+                testID="ReportDataTableRowTotal"
+                style={{ backgroundColor: theme.colors.background }}
+            >
+                <DataTable.Cell style={[style.column]} textStyle={AppStyle.textStyle.h3}>
+                    Total :
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column]}>
-                    {report.reportDate.toLocaleDateString()}
+                <DataTable.Cell style={[style.column, style.width80]} textStyle={AppStyle.textStyle.h3}>
+                    {report.deliveryPrice} €
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column,]}>
-                    {report.deliveries.length}
+                <DataTable.Cell style={[style.column, style.width80]}>
+                    {""}
                 </DataTable.Cell>
             </DataTable.Row>
         </>

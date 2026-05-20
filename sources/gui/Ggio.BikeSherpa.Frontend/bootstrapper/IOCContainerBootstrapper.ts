@@ -25,6 +25,7 @@ import CourierServices from "@/couriers/services/CourierServices";
 import { ICourierService } from "@/spi/CourierSPI";
 import DeliveryBootstrapper from "@/deliveries/bootstrapper/DeliveryBootstrapper";
 import StepBootstrapper from "@/steps/bootstrapper/StepBootstrapper";
+import ReportBootstrapper from "@/reports/bootstrapper/ReportBootstrapper";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -56,6 +57,8 @@ export default class IOCContainerBootstrapper {
         DeliveryBootstrapper.init(IOCContainer);
         
         StepBootstrapper.init(IOCContainer);
+        
+        ReportBootstrapper.init(IOCContainer);
     }
 
     private static bindUserService() {

@@ -8,6 +8,17 @@ const PricingStrategyDto = z.object({
   value: PricingStrategy,
 });
 const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
+const ReportDetail = z.object({
+  description: z.string(),
+  price: z.number(),
+  quantity: z.number().int(),
+});
+const Report = z.object({
+  deliveryCode: z.string(),
+  deliveryDate: z.string().datetime({ offset: true }),
+  deliveryPrice: z.number(),
+  details: z.array(ReportDetail),
+});
 const StepType = z.union([z.literal(0), z.literal(1)]);
 const GeoPoint = z.object({ longitude: z.number(), latitude: z.number() });
 const Address = z.object({
@@ -57,6 +68,7 @@ const DeliveryStatus = z.union([
 const DeliveryCrud = z.object({
   steps: z.array(DeliveryStepDto),
   urgency: z.string(),
+  packingSize: z.string(),
   limitDate: z.string().datetime({ offset: true }).nullable(),
   pricingStrategy: PricingStrategy,
   status: DeliveryStatus,
@@ -68,7 +80,6 @@ const DeliveryCrud = z.object({
   distance: z.number().nullable(),
   reportId: z.string().nullable(),
   details: z.array(z.string()),
-  packingSize: z.string(),
   insulatedBox: z.boolean(),
   startDate: z.string().datetime({ offset: true }),
   contractDate: z.string().datetime({ offset: true }),
@@ -147,6 +158,8 @@ export const schemas = {
   PricingStrategy,
   PricingStrategyDto,
   PackingSizeDto,
+  ReportDetail,
+  Report,
   StepType,
   GeoPoint,
   Address,
@@ -1014,6 +1027,43 @@ const endpoints = makeApi([
     tags: ["general"],
     requestFormat: "json",
     response: z.array(UrgencyDto),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/reports/:customerId/:startDate/:endDate",
+    alias: "GetAllReportsEndpoint",
+    tags: ["report"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "customerId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "startDate",
+        type: "Path",
+        schema: z.string().datetime({ offset: true }),
+      },
+      {
+        name: "endDate",
+        type: "Path",
+        schema: z.string().datetime({ offset: true }),
+      },
+    ],
+    response: z.array(Report),
     errors: [
       {
         status: 401,
