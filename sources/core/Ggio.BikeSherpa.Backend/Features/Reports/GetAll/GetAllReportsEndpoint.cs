@@ -12,7 +12,7 @@ public class GetAllReportsEndpoint(
      public override void Configure()
      {
           Get("/reports");
-          Policies("read:deliveries");
+          Policies("read:reports");
           Description(x => x.WithTags("report"));
      }
 
