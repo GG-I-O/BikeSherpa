@@ -17,7 +17,7 @@ export default class ReportServices implements IReportServices {
     
     public async getReports(customerId: string, startDate: string, endDate: string): Promise<Report[]> {
         const reports = await this.apiClient.GetAllReportsEndpoint({
-            params: {
+            queries: {
                 customerId: customerId,
                 startDate: startDate,
                 endDate: endDate

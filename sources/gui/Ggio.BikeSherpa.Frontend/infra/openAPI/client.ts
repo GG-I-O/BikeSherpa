@@ -1042,24 +1042,24 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/reports/:customerId/:startDate/:endDate",
+    path: "/reports",
     alias: "GetAllReportsEndpoint",
     tags: ["report"],
     requestFormat: "json",
     parameters: [
       {
         name: "customerId",
-        type: "Path",
+        type: "Query",
         schema: z.string(),
       },
       {
         name: "startDate",
-        type: "Path",
+        type: "Query",
         schema: z.string().datetime({ offset: true }),
       },
       {
         name: "endDate",
-        type: "Path",
+        type: "Query",
         schema: z.string().datetime({ offset: true }),
       },
     ],

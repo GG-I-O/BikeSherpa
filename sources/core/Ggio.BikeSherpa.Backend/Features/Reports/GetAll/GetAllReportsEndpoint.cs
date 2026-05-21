@@ -7,21 +7,21 @@ namespace Ggio.BikeSherpa.Backend.Features.Reports.GetAll;
 
 public class GetAllReportsEndpoint(
      IMediator mediator
-     ) : EndpointWithoutRequest<List<Report>>
+     ) : Endpoint<GetAllReportsRequest, List<Report>>
 {
      public override void Configure()
      {
-          Get("/reports/{customerId:guid}/{startDate:datetime}/{endDate:datetime}");
+          Get("/reports");
           Policies("read:deliveries");
           Description(x => x.WithTags("report"));
      }
 
-     public override async Task HandleAsync(CancellationToken ct)
+     public override async Task HandleAsync(GetAllReportsRequest req, CancellationToken ct)
      {
           var query = new GetAllReportsQuery(
-               Route<Guid>("customerId"),
-               Route<DateTime>("startDate"),
-               Route<DateTime>("endDate")
+               req.CustomerId,
+               req.StartDate,
+               req.EndDate
           );
 
           var reports = await mediator.Send(query, ct);
