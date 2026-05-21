@@ -59,7 +59,9 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
 
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.PackingSize).NotEmpty().Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
+          RuleFor(x => x.PackingSize)
+               .NotEmpty()
+               .Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
                .WithMessage("Taille de colis saisie invalide.");
 
           RuleFor(x => x.PackingSize).NotEmpty();
@@ -88,11 +90,11 @@ public class UpdateDeliveryHandler(
 
           var urgency = urgencyRepository.GetByName(command.Urgency);
           if (urgency is null)
-               return Result.Invalid();
+               return Result.Invalid([new ValidationError("Urgency", "Valeur d'urgence saisie invalide.")]);
           
           var packingSize = packingSizeRepository.GetByName(command.PackingSize);
           if (packingSize is null)
-               return Result.Invalid();
+               return Result.Invalid([new ValidationError("PackingSize", "Taille de colis saisie invalide.")]);
 
           entity.PricingStrategy = command.PricingStrategy;
           entity.Status = command.Status;
