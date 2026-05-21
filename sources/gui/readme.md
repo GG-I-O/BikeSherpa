@@ -69,7 +69,17 @@ npx expo prebuild --clean
 npx expo run:android
 ```
 
-## Release
+# Realses
+
+## Release Web
+
+```sh
+npx expo export --platform web
+```
+
+Prepara env file. As exmple see .env.blank
+
+## Release Andoid
 
 Follow the steps or run the command:
 
@@ -335,7 +345,8 @@ npm run openAPI:file
 
 Unit testing
 
-Warning: @testing-library/react-native needs react-test-renderer, and react-test-renderer needs to be at the EXACT same version as react
+Warning: @testing-library/react-native needs react-test-renderer, and react-test-renderer needs to be at the EXACT same
+version as react
 
 ```sh
 npx expo install jest-expo jest @types/jest --dev
