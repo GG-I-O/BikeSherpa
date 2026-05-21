@@ -34,6 +34,7 @@ public class GetReportQueryValidator : AbstractValidator<GetReportQuery>
 
 public class GetReportHandler(
      IReadRepository<Delivery> repository,
+     IReadRepository<Customer> customerRepository,
      IValidator<GetReportQuery> validator,
      IReportService service
 ) : IQueryHandler<GetReportQuery, Report>
@@ -41,6 +42,8 @@ public class GetReportHandler(
      public async ValueTask<Report> Handle(GetReportQuery query, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(query, cancellationToken);
+          
+          var customer = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(query.CustomerId), cancellationToken);
 
           var deliveries = await repository
                .ListAsync(
@@ -53,7 +56,7 @@ public class GetReportHandler(
                );
 
           return service.GenerateReport(
-               query.CustomerId,
+               customer!.Name,
                query.From,
                query.To,
                deliveries

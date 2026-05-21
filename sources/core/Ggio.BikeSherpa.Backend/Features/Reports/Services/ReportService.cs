@@ -9,11 +9,11 @@ public class ReportService(
      IEnumerable<IPricingStrategy> strategies
 ) : IReportService
 {
-     public Report GenerateReport(Guid customerId, DateTimeOffset startDate, DateTimeOffset endDate, List<Delivery> deliveries)
+     public Report GenerateReport(string customerName, DateTimeOffset startDate, DateTimeOffset endDate, List<Delivery> deliveries)
      {
           var report = new Report
           {
-               CustomerId = customerId,
+               CustomerName = customerName,
                StartDate = startDate,
                EndDate = endDate,
                TotalPrice = 0,
@@ -146,7 +146,7 @@ public class ReportService(
                     });
 
                report.Deliveries.Add(deliveryReport);
-               report.TotalPrice += delivery.TotalPrice ?? 0;
+               report.TotalPrice += deliveryReport.DeliveryPrice;
           }
 
           return report;

@@ -2,7 +2,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Reports.Model;
 
 public record Report
 {
-     public required Guid CustomerId { get; set; }
+     public required string CustomerName { get; set; }
      public required DateTimeOffset StartDate { get; set; }
      public required DateTimeOffset EndDate { get; set; }
      public required double TotalPrice { get; set; }
