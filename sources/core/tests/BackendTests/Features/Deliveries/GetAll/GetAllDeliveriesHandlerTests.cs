@@ -2,7 +2,6 @@
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 using Ggio.DddCore;
 using Moq;
@@ -27,10 +26,10 @@ public class GetAllDeliveriesHandlerTests
                .Create();
 
           _mockDeliveryA.Code = "AAA";
-          _mockDeliveryA.PackingSize = "Xxl";
+          _mockDeliveryA.PackingSize = new PackingSize("Xxl", 1, "Label Xxl", 0, 0);
 
           _mockDeliveryB.Code = "BBB";
-          _mockDeliveryB.PackingSize = "Xl";
+          _mockDeliveryB.PackingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
      }
 
      [Fact]

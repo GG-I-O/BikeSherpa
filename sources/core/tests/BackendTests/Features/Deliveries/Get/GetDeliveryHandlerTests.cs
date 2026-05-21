@@ -33,7 +33,7 @@ public class GetDeliveryHandlerTests
           _mockDelivery.Id = guid;
           _mockDelivery.Code = "AAA";
           _mockDelivery.PricingStrategy = PricingStrategy.CustomStrategy;
-          _mockDelivery.PackingSize = "Xl";
+          _mockDelivery.PackingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
           var sut = CreateSut(_mockDelivery);
           var query = new GetDeliveryQuery(guid);
 

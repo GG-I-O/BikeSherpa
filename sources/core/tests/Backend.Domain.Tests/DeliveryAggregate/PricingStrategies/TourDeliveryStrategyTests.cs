@@ -7,7 +7,8 @@ namespace Backend.Domain.Tests.DeliveryAggregate.PricingStrategies;
 
 public class TourDeliveryStrategyTests
 {
-    private readonly static PackingSize DefaultPackingSize = new("Standard", 2, "Standard", 10, 50, 0, 0);
+    private readonly static PackingSize DefaultPackingSize = new("Standard", 2, "Standard", 0, 0);
+    private readonly static Urgency DefaultUrgency = new ("urgency", 1, "urgency", 1, null, null);
     private readonly static DateTimeOffset BaseDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
     private static TourDeliveryStrategy MakeSut() => new();
 
@@ -33,7 +34,7 @@ public class TourDeliveryStrategyTests
         var startDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, pickupNumber, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, pickupNumber, 0, 0, 0, 0, DefaultPackingSize, DefaultUrgency,0 , 0, 0);
 
         // Assert
         result.Should().Be(2 + expectedPickupCost);
@@ -48,7 +49,7 @@ public class TourDeliveryStrategyTests
         var startDate = BaseDate.AddHours(5);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, DefaultUrgency, 0, 0, 0);
 
         // Assert
         result.Should().Be(2);
@@ -63,7 +64,7 @@ public class TourDeliveryStrategyTests
         var startDate = new DateTimeOffset(2026, 1, 16, 10, 0, 0, TimeSpan.Zero);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize,DefaultUrgency, 0, 0, 0);
 
         // Assert
         result.Should().Be(2);
@@ -78,7 +79,7 @@ public class TourDeliveryStrategyTests
         var startDate = BaseDate.AddHours(25);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, DefaultUrgency, 0, 0, 0);
 
         // Assert
         result.Should().Be(-2);
@@ -93,7 +94,7 @@ public class TourDeliveryStrategyTests
         var startDate = BaseDate.AddHours(1);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, DefaultUrgency, 0, 0, 0);
 
         // Assert
         result.Should().Be(2 + 3);
@@ -108,7 +109,7 @@ public class TourDeliveryStrategyTests
         var startDate = BaseDate.AddHours(2);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, DefaultUrgency, 0,0, 0);
 
         // Assert
         result.Should().Be(2 + 3);
@@ -123,7 +124,7 @@ public class TourDeliveryStrategyTests
         var startDate = BaseDate.AddHours(6);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, DefaultUrgency, 0, 0, 0);
 
         // Assert
         result.Should().Be(2);
@@ -143,7 +144,7 @@ public class TourDeliveryStrategyTests
         var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, core, border, periphery, outside, DefaultPackingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, core, border, periphery, outside, DefaultPackingSize, DefaultUrgency, 0, 0, 0);
 
         // Assert
         result.Should().Be(2 + expectedZoneCost);
@@ -159,7 +160,7 @@ public class TourDeliveryStrategyTests
         var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, packingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, packingSize, DefaultUrgency, 0, 0, 0);
 
         // Assert
         result.Should().Be(2 + 7.0);
@@ -172,10 +173,11 @@ public class TourDeliveryStrategyTests
         var sut = MakeSut();
         var contractDate = new DateTimeOffset(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
         var startDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
-
+        var urgency = DefaultUrgency with { PriceCoefficient = 10 };
+        
         // Act
-        var resultWithoutUrgency = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 0, 0);
-        var resultWithUrgency = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, 10.0, 100.0);
+        var resultWithoutUrgency = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, DefaultUrgency, 0, 0, 0);
+        var resultWithUrgency = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultPackingSize, urgency, 100, 0, 0);
 
         // Assert
         resultWithUrgency.Should().Be(resultWithoutUrgency);
@@ -191,7 +193,7 @@ public class TourDeliveryStrategyTests
         var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
         // Act
-        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 2, 1, 2, 1, 1, packingSize, 0, 0);
+        var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 2, 1, 2, 1, 1, packingSize, DefaultUrgency, 0, 0, 0);
 
         // Assert
         result.Should().Be(14 * 2 + 2 + 4 + 1 * 5 + 2 * 8 + 1 * 0 + 1 * 0, "Coût PEC * nb PEC +\nCoût PEC le jour même +\ncoût du colisage +\nnb dépôts dans la zone centrale x coût de la zone +\nnb dépôts en bordure x coût de la zone +\nnb dépôts périphérie x coût de la zone +\nnb dépôts en extérieur x coût de la zone");

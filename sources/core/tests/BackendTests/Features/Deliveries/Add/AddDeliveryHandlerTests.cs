@@ -48,6 +48,9 @@ public class AddDeliveryHandlerTests
           _mockPackingSizeRepository
                .Setup(x => x.GetAll())
                .Returns(packingSizes);
+          _mockPackingSizeRepository
+               .Setup(x => x.GetByName(It.IsAny<string>()))
+               .Returns(packingSizes[0]);
 
           _mockCommand = _fixture.Build<AddDeliveryCommand>()
           .With(c => c.Urgency, urgencies[0].Name)
@@ -64,7 +67,7 @@ public class AddDeliveryHandlerTests
                     It.IsAny<double>(),
                     It.IsAny<double>(),
                     It.IsAny<string[]>(),
-                    It.IsAny<string>(),
+                    It.IsAny<PackingSize>(),
                     It.IsAny<bool>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>()
@@ -75,7 +78,7 @@ public class AddDeliveryHandlerTests
      private AddDeliveryHandler CreateSut()
      {
           var validator = new AddDeliveryCommandValidator(_mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
-          return new AddDeliveryHandler(_mockFactory.Object, _mockUrgencyRepository.Object, validator, _mockTransaction.Object);
+          return new AddDeliveryHandler(_mockFactory.Object, _mockUrgencyRepository.Object, _mockPackingSizeRepository.Object, validator, _mockTransaction.Object);
      }
 
      private void SetupRepositoryTestingIfCodeExists(bool doesCodeExist)
@@ -99,7 +102,7 @@ public class AddDeliveryHandlerTests
                     It.IsAny<double>(),
                     It.IsAny<double>(),
                     It.IsAny<string[]>(),
-                    It.IsAny<string>(),
+                    It.IsAny<PackingSize>(),
                     It.IsAny<bool>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>()),
@@ -151,7 +154,7 @@ public class AddDeliveryHandlerTests
                     It.IsAny<double>(),
                     It.IsAny<double>(),
                     It.IsAny<string[]>(),
-                    It.IsAny<string>(),
+                    It.IsAny<PackingSize>(),
                     It.IsAny<bool>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>()),

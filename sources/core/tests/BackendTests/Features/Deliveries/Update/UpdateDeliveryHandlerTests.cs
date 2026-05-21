@@ -22,6 +22,7 @@ public class UpdateDeliveryHandlerTests
 {
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
      private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
+     private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
      private readonly Mock<IValidator<UpdateDeliveryCommand>> _mockValidator = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
@@ -32,7 +33,8 @@ public class UpdateDeliveryHandlerTests
      private readonly DeliveryZone _deliveryZone;
      private readonly Delivery _delivery;
      private readonly UpdateDeliveryCommand _command;
-     private readonly static Urgency Urgency = new Urgency("urgency", 1, "urgency", 1, null, null);
+     private readonly static Urgency Urgency = new ("urgency", 1, "urgency", 1, null, null);
+     private readonly static PackingSize PackingSize = new ("Standard", 2, "Standard", 0, 0);
 
      public UpdateDeliveryHandlerTests()
      {
@@ -45,7 +47,11 @@ public class UpdateDeliveryHandlerTests
           _mockUrgencyRepository
                .Setup(x => x.GetByName(It.IsAny<string>()))
                .Returns(Urgency);
-
+          
+          _mockPackingSizeRepository
+               .Setup(x => x.GetByName(It.IsAny<string>()))
+               .Returns(PackingSize);
+               
           _mockPricingStrategyService
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
                .Returns(123.45);
@@ -117,6 +123,7 @@ public class UpdateDeliveryHandlerTests
           return new UpdateDeliveryHandler(
                _mockDeliveryRepository.Object,
                _mockUrgencyRepository.Object,
+               _mockPackingSizeRepository.Object,
                _mockValidator.Object,
                _mockTransaction.Object,
                _mockDeliveryZoneRepository.Object,
@@ -179,7 +186,7 @@ public class UpdateDeliveryHandlerTests
           _delivery.Discount.Should().Be(_command.Discount);
           _delivery.ReportId.Should().Be(_command.ReportId);
           _delivery.Details.Should().BeEquivalentTo(_command.Details);
-          _delivery.PackingSize.Should().Be(_command.PackingSize);
+          _delivery.PackingSize.Should().Be(PackingSize);
           _delivery.InsulatedBox.Should().Be(_command.InsulatedBox);
           _delivery.ContractDate.Should().Be(_command.ContractDate);
           _delivery.StartDate.Should().Be(_command.StartDate);
