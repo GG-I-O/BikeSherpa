@@ -3,11 +3,11 @@ using Ggio.BikeSherpa.Backend.Features.Reports.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
-namespace Ggio.BikeSherpa.Backend.Features.Reports.GetAll;
+namespace Ggio.BikeSherpa.Backend.Features.Reports.Get;
 
-public class GetAllReportsEndpoint(
+public class GetReportEndpoint(
      IMediator mediator
-     ) : Endpoint<GetAllReportsRequest, List<Report>>
+     ) : Endpoint<GetReportRequest, Report>
 {
      public override void Configure()
      {
@@ -16,9 +16,9 @@ public class GetAllReportsEndpoint(
           Description(x => x.WithTags("report"));
      }
 
-     public override async Task HandleAsync(GetAllReportsRequest req, CancellationToken ct)
+     public override async Task HandleAsync(GetReportRequest req, CancellationToken ct)
      {
-          var query = new GetAllReportsQuery(
+          var query = new GetReportQuery(
                req.CustomerId,
                req.StartDate,
                req.EndDate

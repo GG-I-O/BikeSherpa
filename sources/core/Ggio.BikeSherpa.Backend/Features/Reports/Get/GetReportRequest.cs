@@ -1,10 +1,10 @@
 using FastEndpoints;
 using JetBrains.Annotations;
 
-namespace Ggio.BikeSherpa.Backend.Features.Reports.GetAll;
+namespace Ggio.BikeSherpa.Backend.Features.Reports.Get;
 
 [UsedImplicitly]
-public record GetAllReportsRequest
+public record GetReportRequest
 {
      [QueryParam]
      public Guid CustomerId { get; set; }
