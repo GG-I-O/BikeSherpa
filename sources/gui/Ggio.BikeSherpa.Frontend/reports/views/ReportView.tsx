@@ -1,14 +1,14 @@
 import {ScrollView, View} from "react-native";
 import {Button, Text, useTheme} from "react-native-paper";
 import {DatePickerModal} from "react-native-paper-dates";
-import useReportListViewModel from "@/reports/viewModels/useReportListViewModel";
 import DateToolbox from "@/services/DateToolbox";
 import React, {useState} from "react";
 import {Dropdown} from "react-native-paper-dropdown";
 import ReportDetail from "@/reports/components/ReportDetail";
+import useReportViewModel from "@/reports/viewModels/useReportViewModel";
 
 export default function ReportView() {
-    const viewModel = useReportListViewModel();
+    const viewModel = useReportViewModel();
     const theme = useTheme();
 
     const [openDatePicker, setOpenDatePicker] = useState<boolean>(false);

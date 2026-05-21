@@ -2,10 +2,8 @@ import {inject} from "inversify";
 import {ReportServiceIdentifier} from "@/reports/bootstrapper/ReportServiceIdentifier";
 import {IReportServices} from "@/reports/spi/IReportServices";
 import {Report} from "@/reports/models/Report";
-import {ICustomerService} from "@/spi/CustomerSPI";
-import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
-export default class ReportListViewModel {
+export default class ReportViewModel {
     private readonly reportServices: IReportServices;
 
     constructor(
