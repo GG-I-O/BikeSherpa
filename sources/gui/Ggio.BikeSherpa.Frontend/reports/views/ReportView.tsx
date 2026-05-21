@@ -60,13 +60,7 @@ export default function ReportView() {
             </View>
         ) : (
             <ReportDetail
-                reports={viewModel.reports}
-                startDate={viewModel.startDateFilter.toISOString()}
-                endDate={viewModel.endDateFilter.toISOString()}
-                customerName={viewModel.reports.length > 0 ? (viewModel.reports[0].customer ?? '') : ''}
-                totalPrice={viewModel.reports.reduce((accumulator, report) => {
-                    return accumulator + report.deliveryPrice
-                },0)}
+                report={viewModel.report}
             />
         )}
     </>

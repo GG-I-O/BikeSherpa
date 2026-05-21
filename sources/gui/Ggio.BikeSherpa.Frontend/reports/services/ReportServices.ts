@@ -15,23 +15,27 @@ export default class ReportServices implements IReportServices {
         });
     }
     
-    public async getReports(customerId: string, startDate: string, endDate: string): Promise<Report[]> {
-        const reports = await this.apiClient.GetAllReportsEndpoint({
+    public async getReport(customerId: string, startDate: string, endDate: string): Promise<Report> {
+        const data = await this.apiClient.GetReportEndpoint({
             queries: {
                 customerId: customerId,
                 startDate: startDate,
                 endDate: endDate
             }
         });
-        
-        return reports.map(report => {
-            return {
-                deliveryCode: report.deliveryCode,
-                deliveryDate: DateToolbox.getFormattedDateFromISO(new Date(report.deliveryDate).toISOString()),
-                deliveryTime: DateToolbox.getFormattedTimeFromISO(new Date(report.deliveryDate).toISOString()),
-                deliveryPrice: report.deliveryPrice,
-                details: report.details
-            };
-        })
+
+        return {
+            customerName: data.customerName,
+            startDate: DateToolbox.getFormattedDateFromISO(new Date(data.startDate).toISOString()),
+            endDate: DateToolbox.getFormattedDateFromISO(new Date(data.endDate).toISOString()),
+            totalPrice: data.totalPrice,
+            deliveries: data.deliveries.map(delivery => ({
+                deliveryCode: delivery.deliveryCode,
+                deliveryDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.deliveryDate).toISOString()),
+                deliveryTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.deliveryDate).toISOString()),
+                deliveryPrice: delivery.deliveryPrice,
+                details: delivery.details
+            }))
+        };
     }
 }

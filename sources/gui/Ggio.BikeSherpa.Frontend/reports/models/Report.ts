@@ -1,10 +1,9 @@
-import {ReportDetail} from "@/reports/models/ReportDetail";
+import {DeliveryReport} from "@/reports/models/DeliveryReport";
 
 export type Report = {
-    customer?: string | undefined;
-    deliveryCode: string;
-    deliveryDate: string;
-    deliveryTime: string;
-    deliveryPrice: number;
-    details: ReportDetail[];
+    customerName: string;
+    startDate: string;
+    endDate: string;
+    totalPrice: number;
+    deliveries: DeliveryReport[];
 }

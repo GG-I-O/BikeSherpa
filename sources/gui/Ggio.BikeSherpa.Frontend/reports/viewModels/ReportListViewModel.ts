@@ -7,26 +7,16 @@ import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers"
 
 export default class ReportListViewModel {
     private readonly reportServices: IReportServices;
-    private readonly customerServices: ICustomerService;
 
     constructor(
-        @inject(ReportServiceIdentifier.Services) reportServices: IReportServices,
-        @inject(ServicesIdentifiers.CustomerServices) customerServices: ICustomerService
+        @inject(ReportServiceIdentifier.Services) reportServices: IReportServices
     ) {
         this.reportServices = reportServices;
-        this.customerServices = customerServices;
     }
 
-    public getReports = async (startDateFilter: Date, endDateFilter: Date, customerFilter?: string): Promise<Report[]> => {
-        if (!this.reportServices || !this.customerServices || !customerFilter) return [];
-        
-        const customerId = this.customerServices.getCustomerIdByCode(customerFilter);
-        if (!customerId) return [];
-        const customer = this.customerServices.getCustomer$(customerId).get();
+    public getReport = async (startDateFilter: Date, endDateFilter: Date, customerFilter?: string): Promise<Report | null> => {
+        if (!this.reportServices || !customerFilter) return null;
 
-        const reports = await this.reportServices.getReports(customerId, startDateFilter.toISOString(), endDateFilter.toISOString());
-        if (reports.length > 0)
-            reports[0].customer = customer.name;
-        return reports;
+        return await this.reportServices.getReport(customerFilter, startDateFilter.toISOString(), endDateFilter.toISOString());
     }
 }

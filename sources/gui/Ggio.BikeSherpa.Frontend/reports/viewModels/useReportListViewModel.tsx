@@ -13,11 +13,11 @@ import {Report} from "@/reports/models/Report";
 export default function useReportListViewModel() {
     const reportServices = IOCContainer.get<IReportServices>(ReportServiceIdentifier.Services);
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
-    const viewModel = new ReportListViewModel(reportServices, customerServices);
+    const viewModel = new ReportListViewModel(reportServices);
     
     const customerStore$ = customerServices.getCustomerList$();
     
-    const [reports, setReports] = useState<Report[]>([]);
+    const [report, setReport] = useState<Report | null>(null);
     const [startDateFilter, setStartDateFilter] = useState<Date>(DateToolbox.getFirstDayOfTheMonth(new Date()));
     const [endDateFilter, setEndDateFilter] = useState<Date>(DateToolbox.getLastDayOfTheMonth(new Date()));
     const [customerFilter, setCustomerFilter] = useState<string | undefined>();
@@ -26,21 +26,21 @@ export default function useReportListViewModel() {
     
     useEffect(() => {
         return observe(() => {
-          viewModel.getReports(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
-              .then(reports => setReports(reports));
+          viewModel.getReport(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
+              .then(report => setReport(report));
           
             let customerList: { label: string, value: string }[] = [];
             customerList.push(...defaultDropdownOption);
             Object.values(customerStore$.peek()).forEach(customer =>
-                customerList.push({label: customer.code + " - " + customer.name, value: customer.code})
+                customerList.push({label: customer.code + " - " + customer.name, value: customer.id})
             );
             setCustomersOptions(customerList);
         });
-    }, [customerStore$, setReports, setCustomersOptions, startDateFilter, endDateFilter, customerFilter])
+    }, [customerStore$, setReport, setCustomersOptions, startDateFilter, endDateFilter, customerFilter])
     
     return {
-        reports,
-        setReports,
+        report,
+        setReport,
         startDateFilter,
         setStartDateFilter,
         endDateFilter,

@@ -2,9 +2,10 @@ import { DataTable, useTheme } from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
 import {Report} from "@/reports/models/Report";
 import AppStyle from "@/constants/AppStyle";
+import {DeliveryReport} from "@/reports/models/DeliveryReport";
 
 type Props = {
-    report: Report,
+    report: DeliveryReport,
 }
 
 export default function ReportDataTableRow({ report }: Props) {

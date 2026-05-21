@@ -8,16 +8,23 @@ const PricingStrategyDto = z.object({
   value: PricingStrategy,
 });
 const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
-const ReportDetail = z.object({
+const DeliveryReportDetail = z.object({
   description: z.string(),
   price: z.number(),
   quantity: z.number().int(),
 });
-const Report = z.object({
+const DeliveryReport = z.object({
   deliveryCode: z.string(),
   deliveryDate: z.string().datetime({ offset: true }),
   deliveryPrice: z.number(),
-  details: z.array(ReportDetail),
+  details: z.array(DeliveryReportDetail),
+});
+const Report = z.object({
+  customerName: z.string(),
+  startDate: z.string().datetime({ offset: true }),
+  endDate: z.string().datetime({ offset: true }),
+  totalPrice: z.number(),
+  deliveries: z.array(DeliveryReport),
 });
 const StepType = z.union([z.literal(0), z.literal(1)]);
 const GeoPoint = z.object({ longitude: z.number(), latitude: z.number() });
@@ -158,7 +165,8 @@ export const schemas = {
   PricingStrategy,
   PricingStrategyDto,
   PackingSizeDto,
-  ReportDetail,
+  DeliveryReportDetail,
+  DeliveryReport,
   Report,
   StepType,
   GeoPoint,
@@ -1043,7 +1051,7 @@ const endpoints = makeApi([
   {
     method: "get",
     path: "/reports",
-    alias: "GetAllReportsEndpoint",
+    alias: "GetReportEndpoint",
     tags: ["report"],
     requestFormat: "json",
     parameters: [
@@ -1063,7 +1071,7 @@ const endpoints = makeApi([
         schema: z.string().datetime({ offset: true }),
       },
     ],
-    response: z.array(Report),
+    response: Report,
     errors: [
       {
         status: 401,
