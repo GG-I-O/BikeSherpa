@@ -16,6 +16,7 @@ interface CustomTextInputProps {
     testID?: string;
     disabled?: boolean;
     isAnArray?: boolean;
+    isNumeric?: boolean;
 }
 
 const ThemedInput: React.FC<CustomTextInputProps> = (
@@ -30,7 +31,8 @@ const ThemedInput: React.FC<CustomTextInputProps> = (
         required = false,
         testID,
         disabled,
-        isAnArray
+        isAnArray,
+        isNumeric
     }) => {
     const theme = useTheme();
 
@@ -38,6 +40,22 @@ const ThemedInput: React.FC<CustomTextInputProps> = (
         control,
         name,
     });
+    
+    const onChange = (value: string) => {
+        if (isNumeric) {
+            const cleaned = value.replace(/[^0-9.]/g, '');
+            if (cleaned === '' || cleaned === '.') {
+                field.onChange(0);
+            } else {
+                const parsed = parseFloat(cleaned);
+                field.onChange(isNaN(parsed) ? 0 : parsed);
+            }
+        }
+        else if (isAnArray)
+            field.onChange([value]);
+        else 
+            field.onChange(value);
+    }
 
     return (
         <View style={formStyle.intputContainer}>
@@ -47,7 +65,7 @@ const ThemedInput: React.FC<CustomTextInputProps> = (
             </Text>
             <TextInput
                 value={ isAnArray ? field.value[0] : field.value}
-                onChangeText={(value) => isAnArray ? field.onChange([value]) : field.onChange(value)}
+                onChangeText={(value) => onChange(value)}
                 placeholder={placeholder}
                 placeholderTextColor={placeholderTextColor || '#3636367e'}
                 secureTextEntry={secureTextEntry}
@@ -62,6 +80,7 @@ const ThemedInput: React.FC<CustomTextInputProps> = (
                 contentStyle={{color: theme.colors.onBackground}}
                 testID={testID}
                 disabled={disabled}
+                keyboardType={isNumeric ? "numeric" : "default"}
             />
             {error && (<Text style={{color: theme.colors.error}}>{error.message}</Text>)}
         </View>

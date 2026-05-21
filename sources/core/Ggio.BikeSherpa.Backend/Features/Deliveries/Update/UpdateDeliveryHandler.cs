@@ -1,6 +1,4 @@
 ﻿using Ardalis.Result;
-using Facet.Extensions;
-using Facet.Mapping;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
@@ -59,7 +57,9 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
 
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.PackingSize).NotEmpty().Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
+          RuleFor(x => x.PackingSize)
+               .NotEmpty()
+               .Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
                .WithMessage("Taille de colis saisie invalide.");
 
           RuleFor(x => x.PackingSize).NotEmpty();
@@ -71,6 +71,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
 public class UpdateDeliveryHandler(
      IReadRepository<Delivery> repository,
      IUrgencyRepository urgencyRepository,
+     IPackingSizeRepository packingSizeRepository,
      IValidator<UpdateDeliveryCommand> validator,
      IApplicationTransaction transaction,
      IDeliveryZoneRepository deliveryZones,
@@ -85,9 +86,8 @@ public class UpdateDeliveryHandler(
           if (entity is null)
                return Result.NotFound();
 
-          var urgency = urgencyRepository.GetByName(command.Urgency);
-          if (urgency is null)
-               return Result.Invalid();
+          var urgency = urgencyRepository.GetByName(command.Urgency)!;
+          var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
 
           entity.PricingStrategy = command.PricingStrategy;
           entity.Status = command.Status;
@@ -100,7 +100,7 @@ public class UpdateDeliveryHandler(
           entity.Distance = command.Distance;
           entity.ReportId = command.ReportId;
           entity.Details = command.Details;
-          entity.PackingSize = command.PackingSize;
+          entity.PackingSize = packingSize;
           entity.InsulatedBox = command.InsulatedBox;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;

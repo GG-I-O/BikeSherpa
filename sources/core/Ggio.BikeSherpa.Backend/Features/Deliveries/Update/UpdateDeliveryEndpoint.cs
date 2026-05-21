@@ -17,8 +17,6 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
 
      public override async Task HandleAsync(DeliveryCrud req, CancellationToken ct)
      {
-          
-          
           var command = new UpdateDeliveryCommand(
                Route<Guid>("deliveryId"),
                req.PricingStrategy,

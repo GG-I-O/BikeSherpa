@@ -231,9 +231,9 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.Property<bool>("InsulatedBox")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("PackingSize")
+                    b.Property<string>("PackingSizeName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("PricingStrategy")
                         .HasColumnType("integer");
@@ -259,6 +259,8 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PackingSizeName");
 
                     b.HasIndex("UrgencyName");
 
@@ -304,12 +306,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("MaxPackageLength")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("MaxWeight")
-                        .HasColumnType("integer");
-
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
@@ -328,8 +324,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         {
                             Name = "S",
                             Label = "S = jusqu'à 3kg / 45cm",
-                            MaxPackageLength = 45,
-                            MaxWeight = 3,
                             Order = 1,
                             Price = 3.0,
                             TourPrice = 0.0
@@ -338,8 +332,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         {
                             Name = "M",
                             Label = "M = jusqu'à 10kg / 100cm",
-                            MaxPackageLength = 85,
-                            MaxWeight = 10,
                             Order = 2,
                             Price = 5.0,
                             TourPrice = 2.0
@@ -348,8 +340,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         {
                             Name = "L",
                             Label = "L = jusqu'à 20kg / 120cm",
-                            MaxPackageLength = 105,
-                            MaxWeight = 20,
                             Order = 3,
                             Price = 7.0,
                             TourPrice = 4.0
@@ -358,8 +348,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         {
                             Name = "XL",
                             Label = "XL = jusqu'à 30kg / 120cm",
-                            MaxPackageLength = 115,
-                            MaxWeight = 30,
                             Order = 4,
                             Price = 9.0,
                             TourPrice = 6.0
@@ -368,8 +356,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         {
                             Name = "XXL",
                             Label = "XXL = jusqu'à 40kg (sur devis)",
-                            MaxPackageLength = 500,
-                            MaxWeight = 40,
                             Order = 5,
                             Price = 11.0,
                             TourPrice = 8.0
@@ -378,8 +364,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         {
                             Name = "XXXL",
                             Label = "XXXL = jusqu'à 50kg (sur devis)",
-                            MaxPackageLength = 500,
-                            MaxWeight = 50,
                             Order = 6,
                             Price = 13.0,
                             TourPrice = 10.0
@@ -388,8 +372,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         {
                             Name = "XXXXL",
                             Label = "XXXXL = jusqu'à 60kg (sur devis)",
-                            MaxPackageLength = 500,
-                            MaxWeight = 60,
                             Order = 7,
                             Price = 15.0,
                             TourPrice = 12.0
@@ -561,6 +543,12 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery", b =>
                 {
+                    b.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PackingSize", "PackingSize")
+                        .WithMany()
+                        .HasForeignKey("PackingSizeName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Urgency", "Urgency")
                         .WithMany()
                         .HasForeignKey("UrgencyName")
@@ -687,6 +675,8 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.Navigation("StepZone");
                         });
+
+                    b.Navigation("PackingSize");
 
                     b.Navigation("Steps");
 

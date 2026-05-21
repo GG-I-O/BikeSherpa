@@ -14,14 +14,20 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           builder.Property(d => d.Status).HasConversion<int>().IsRequired();
           builder.Property(d => d.Code).IsRequired();
           builder.Property(d => d.CustomerId).IsRequired();
+          
           builder.HasOne(d => d.Urgency).WithMany()
                .HasForeignKey("UrgencyName")
                .IsRequired();
           builder.Navigation(d => d.Urgency).AutoInclude();
+          
+          builder.HasOne(d => d.PackingSize).WithMany()
+               .HasForeignKey("PackingSizeName")
+               .IsRequired();
+          builder.Navigation(d => d.PackingSize).AutoInclude();
+          
           builder.Property(d => d.TotalPrice).IsRequired();
           builder.Property(d => d.ReportId).IsRequired();
           builder.Property(d => d.Details).IsRequired();
-          builder.Property(d => d.PackingSize).IsRequired();
           builder.Property(d => d.ContractDate).IsRequired();
           builder.Property(d => d.StartDate).IsRequired();
           builder.OwnsMany(d => d.Steps, steps =>

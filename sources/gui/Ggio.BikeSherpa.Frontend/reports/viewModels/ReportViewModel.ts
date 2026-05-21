@@ -1,29 +1,20 @@
-import Report from "../models/Report";
+import {inject} from "inversify";
+import {ReportServiceIdentifier} from "@/reports/bootstrapper/ReportServiceIdentifier";
+import {IReportServices} from "@/reports/spi/IReportServices";
+import {Report} from "@/reports/models/Report";
 
-class ReportViewModel {
-    private static instance: ReportViewModel;
-    private readonly reports: Report[];
+export default class ReportViewModel {
+    private readonly reportServices: IReportServices;
 
-    public static getInstance(): ReportViewModel {
-        if (!ReportViewModel.instance)
-            ReportViewModel.instance = new ReportViewModel();
-        return ReportViewModel.instance;
+    constructor(
+        @inject(ReportServiceIdentifier.Services) reportServices: IReportServices
+    ) {
+        this.reportServices = reportServices;
     }
 
-    private constructor() {
-        this.reports = [];
+    public getReport = async (startDateFilter: Date, endDateFilter: Date, customerFilter?: string): Promise<Report | null> => {
+        if (!this.reportServices || !customerFilter) return null;
+
+        return await this.reportServices.getReport(customerFilter, startDateFilter.toISOString(), endDateFilter.toISOString());
     }
-
-    public getReportList(): Report[] {
-        return this.reports;
-    }
-
-    public getReport(reportId: string): Report | undefined {
-        return this.reports.find((report) => report.id === reportId);
-    }
-
-}
-
-export default function useReportViewModel() {
-    return ReportViewModel.getInstance();
 }

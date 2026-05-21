@@ -16,7 +16,8 @@ public class DeliveryFactoryTests
 {
      private readonly static Guid CustomerId = Guid.NewGuid();
      private readonly static string CustomerCode = "T01";
-     private readonly static Urgency Urgency = new Urgency("urgency", 1, "urgency", 1, null, null);
+     private readonly static Urgency Urgency = new ("urgency", 1, "urgency", 1, null, null);
+     private readonly static PackingSize PackingSize = new ("packing", 1, "label", 3, 10);
      private readonly static DateTimeOffset ContractDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
      private readonly Mock<IReadRepository<Customer>> _customerRepositoryMock = new();
@@ -62,13 +63,13 @@ public class DeliveryFactoryTests
      }
 
      private Task<Delivery> CreateDefault(
-          Urgency? urgency = null,
           PricingStrategy strategy = PricingStrategy.SimpleDeliveryStrategy,
           Guid? customerId = null,
+          Urgency? urgency = null,
           double? totalPrice = null,
           double? discount = null,
           string[]? details = null,
-          string packingSize = "Standard",
+          PackingSize? packingSize = null,
           bool insulatedBox = false,
           DateTimeOffset? contractDate = null,
           DateTimeOffset? startDate = null) =>
@@ -80,7 +81,8 @@ public class DeliveryFactoryTests
                discount,
                extraCost: 0,
                distance: 0,
-               details ?? [], packingSize,
+               details ?? [],
+               packingSize ?? PackingSize,
                insulatedBox,
                contractDate ?? ContractDate,
                startDate ?? StartDate
@@ -94,12 +96,10 @@ public class DeliveryFactoryTests
 
           // Act
           var delivery = await CreateDefault(
-               Urgency,
                PricingStrategy.TourDeliveryStrategy,
                CustomerId,
                discount: 5.0,
                details: details,
-               packingSize: "Large",
                insulatedBox: true,
                contractDate: ContractDate,
                startDate: StartDate);
@@ -112,7 +112,7 @@ public class DeliveryFactoryTests
           delivery.TotalPrice.Should().Be(55);
           delivery.Discount.Should().Be(5.0);
           delivery.Details.Should().BeEquivalentTo(details);
-          delivery.PackingSize.Should().Be("Large");
+          delivery.PackingSize.Should().Be(PackingSize);
           delivery.InsulatedBox.Should().BeTrue();
           delivery.ContractDate.Should().Be(ContractDate);
           delivery.StartDate.Should().Be(StartDate);

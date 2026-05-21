@@ -15,6 +15,7 @@ public class DeliveryCrudMapper : IFacetMapConfiguration<Delivery, DeliveryCrud>
                })
                .ToList();
           target.Urgency = source.Urgency.Name;
+          target.PackingSize = source.PackingSize.Name;
           target.LimitDate = source.GetLimitDate();
      }
 }

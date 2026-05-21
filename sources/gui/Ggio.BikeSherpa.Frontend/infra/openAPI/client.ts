@@ -8,6 +8,24 @@ const PricingStrategyDto = z.object({
   value: PricingStrategy,
 });
 const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
+const DeliveryReportDetail = z.object({
+  description: z.string(),
+  price: z.number(),
+  quantity: z.number().int(),
+});
+const DeliveryReport = z.object({
+  deliveryCode: z.string(),
+  deliveryDate: z.string().datetime({ offset: true }),
+  deliveryPrice: z.number(),
+  details: z.array(DeliveryReportDetail),
+});
+const Report = z.object({
+  customerName: z.string(),
+  startDate: z.string().datetime({ offset: true }),
+  endDate: z.string().datetime({ offset: true }),
+  totalPrice: z.number(),
+  deliveries: z.array(DeliveryReport),
+});
 const StepType = z.union([z.literal(0), z.literal(1)]);
 const GeoPoint = z.object({ longitude: z.number(), latitude: z.number() });
 const Address = z.object({
@@ -57,6 +75,7 @@ const DeliveryStatus = z.union([
 const DeliveryCrud = z.object({
   steps: z.array(DeliveryStepDto),
   urgency: z.string(),
+  packingSize: z.string(),
   limitDate: z.string().datetime({ offset: true }).nullable(),
   pricingStrategy: PricingStrategy,
   status: DeliveryStatus,
@@ -68,7 +87,6 @@ const DeliveryCrud = z.object({
   distance: z.number().nullable(),
   reportId: z.string().nullable(),
   details: z.array(z.string()),
-  packingSize: z.string(),
   insulatedBox: z.boolean(),
   startDate: z.string().datetime({ offset: true }),
   contractDate: z.string().datetime({ offset: true }),
@@ -147,6 +165,9 @@ export const schemas = {
   PricingStrategy,
   PricingStrategyDto,
   PackingSizeDto,
+  DeliveryReportDetail,
+  DeliveryReport,
+  Report,
   StepType,
   GeoPoint,
   Address,
@@ -1014,6 +1035,43 @@ const endpoints = makeApi([
     tags: ["general"],
     requestFormat: "json",
     response: z.array(UrgencyDto),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/reports",
+    alias: "GetReportEndpoint",
+    tags: ["report"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "customerId",
+        type: "Query",
+        schema: z.string(),
+      },
+      {
+        name: "startDate",
+        type: "Query",
+        schema: z.string().datetime({ offset: true }),
+      },
+      {
+        name: "endDate",
+        type: "Query",
+        schema: z.string().datetime({ offset: true }),
+      },
+    ],
+    response: Report,
     errors: [
       {
         status: 401,

@@ -1,5 +1,5 @@
-import ReportListView from "@/reports/views/ReportListView";
+import ReportView from "@/reports/views/ReportView";
 
-export default function ReportList() {
-    return <ReportListView />
+export default function ReportIndex() {
+    return <ReportView />
 }

@@ -7,6 +7,7 @@ using Ggio.BikeSherpa.Backend.Features.Couriers;
 using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Deliveries;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
+using Ggio.BikeSherpa.Backend.Features.Reports;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Middleware;
@@ -52,6 +53,7 @@ builder.Services.AddBackendInfrastructure(builder.Configuration);
 builder.Services.ConfigureDeliveryFeature();
 builder.Services.ConfigureCustomerFeature();
 builder.Services.ConfigureCourierFeature();
+builder.Services.ConfigureReportFeature();
 builder.Services.AddBackendDomain();
 
 // Notification
@@ -103,6 +105,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
           options.AddPolicy("write:deliveries", policy => policy.RequireClaim(scopeName, "write:deliveries"));
           options.AddPolicy("read:myDeliveries", policy => policy.RequireClaim(scopeName, "read:myDeliveries"));
           options.AddPolicy("write:myDeliveries", policy => policy.RequireClaim(scopeName, "write:myDeliveries"));
+          options.AddPolicy("read:reports", policy => policy.RequireClaim(scopeName, "read:reports"));
      });
 
      builder.Services.AddAuth0ApiAuthentication(options =>

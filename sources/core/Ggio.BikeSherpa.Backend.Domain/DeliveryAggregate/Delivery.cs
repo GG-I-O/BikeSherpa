@@ -23,7 +23,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public string? ReportId { get; set; }
      public required List<DeliveryStep> Steps { get; set; } = [];
      public string[] Details { get; set; } = [];
-     public required string PackingSize { get; set; }
+     public required PackingSize PackingSize { get; set; }
      public required bool InsulatedBox { get; set; }
      public required DateTimeOffset StartDate { get; set; }
      public required DateTimeOffset ContractDate { get; set; }

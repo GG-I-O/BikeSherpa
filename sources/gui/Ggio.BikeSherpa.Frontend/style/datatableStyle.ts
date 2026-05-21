@@ -56,6 +56,11 @@ const datatableStyle = StyleSheet.create({
     },
     minWidth150: {
         minWidth: 150
+    },
+    smallHeight: {
+        minHeight: 30,
+        height: 30,
+        maxHeight: 30
     }
 });
 
