@@ -9,10 +9,10 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
      nameof(Delivery.Urgency),
      nameof(Delivery.PackingSize)
 ], Configuration = typeof(DeliveryCrudMapper))]
-public partial record DeliveryCrud
+public partial record DeliveryCrud(string Urgency, string PackingSize, DateTimeOffset? LimitDate)
 {
      public List<DeliveryStepDto> Steps { get; set; } = [];
-     public required string Urgency { get; set; }
-     public required string PackingSize { get; set; }
-     public DateTimeOffset? LimitDate { get; set; }
+     public string Urgency { get; set; } = Urgency;
+     public string PackingSize { get; set; } = PackingSize;
+     public DateTimeOffset? LimitDate { get; set; }= LimitDate;
 }
