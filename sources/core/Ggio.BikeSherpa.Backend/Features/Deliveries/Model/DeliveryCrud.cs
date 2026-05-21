@@ -12,7 +12,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 public partial record DeliveryCrud
 {
      public List<DeliveryStepDto> Steps { get; set; } = [];
-     public string Urgency { get; set; }
-     public string PackingSize { get; set; }
+     public required string Urgency { get; set; }
+     public required string PackingSize { get; set; }
      public DateTimeOffset? LimitDate { get; set; }
 }

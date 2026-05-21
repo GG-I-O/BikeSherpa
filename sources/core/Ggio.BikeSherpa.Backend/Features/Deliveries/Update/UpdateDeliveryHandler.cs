@@ -1,6 +1,4 @@
 ﻿using Ardalis.Result;
-using Facet.Extensions;
-using Facet.Mapping;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
@@ -88,13 +86,8 @@ public class UpdateDeliveryHandler(
           if (entity is null)
                return Result.NotFound();
 
-          var urgency = urgencyRepository.GetByName(command.Urgency);
-          if (urgency is null)
-               return Result.Invalid([new ValidationError("Urgency", "Valeur d'urgence saisie invalide.")]);
-          
-          var packingSize = packingSizeRepository.GetByName(command.PackingSize);
-          if (packingSize is null)
-               return Result.Invalid([new ValidationError("PackingSize", "Taille de colis saisie invalide.")]);
+          var urgency = urgencyRepository.GetByName(command.Urgency)!;
+          var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
 
           entity.PricingStrategy = command.PricingStrategy;
           entity.Status = command.Status;

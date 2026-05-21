@@ -54,13 +54,8 @@ public class AddDeliveryHandler(
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           
-          var urgency = urgencyRepository.GetByName(command.Urgency);
-          if (urgency is null)
-               return Result.Invalid();
-          
-          var packingSize = packingSizeRepository.GetByName(command.PackingSize);
-          if (packingSize is null)
-               return Result.Invalid();
+          var urgency = urgencyRepository.GetByName(command.Urgency)!;
+          var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
 
           var delivery = await factory.CreateDeliveryAsync(
                command.PricingStrategy,
