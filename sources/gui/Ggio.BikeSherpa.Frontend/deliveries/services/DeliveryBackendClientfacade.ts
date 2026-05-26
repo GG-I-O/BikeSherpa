@@ -12,6 +12,7 @@ import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCust
 import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import UploadableFile from "@/models/UploadableFile";
+import AttachmentFileService from "@/deliveries/services/AttachmentFileService";
 
 @injectable()
 export default class DeliveryBackendClientFacade implements IBackendClient<Delivery>, IDeliveryCustomBackendClientFacade {
@@ -265,15 +266,16 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             throw new Error(`Step link for '${hateoasRel.stepAttachment.post}' not found`);
         
         const formData = new FormData();
-        formData.append('file', {
-           uri: file.uri,
-           type: file.type,
-           name: file.name
-        } as unknown as Blob);
+        await AttachmentFileService.appendFileToFormData(formData, 'file', file);
         
         await axios.post(
             link.href,
-            formData
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
         )
     }
 }

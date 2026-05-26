@@ -17,11 +17,15 @@ export default function Document(props: Props) {
             type: "*/*",
             copyToCacheDirectory: true
         }).then(result => {
-            if (!result.canceled) {                
+            if (!result.canceled) {
+                const asset = result.assets[0];
+                const extension = asset.name?.includes(".")
+                    ? asset.name.substring(asset.name.lastIndexOf("."))
+                    : "";
                 props.onDocument({
                     uri: result.assets[0].uri,
                     type: result.assets[0].mimeType ?? "application/octet-stream",
-                    name: `document_${props.deliveryCode}_${Date.now()}`,
+                    name: `document_${props.deliveryCode}_${Date.now()}${extension}`,
                 });
             }
         })

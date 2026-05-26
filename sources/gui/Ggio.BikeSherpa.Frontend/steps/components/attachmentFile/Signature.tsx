@@ -32,15 +32,16 @@ export default function Signature(props: Props) {
         }
         const mimeType = match[1];
         const base64 = match[2];
+        const name = `signature_${props.deliveryCode}_${Date.now()}.png`;
 
-        const signatureFile = new File(Paths.cache, `signature_${props.deliveryCode}_${Date.now()}.png`);
+        const signatureFile = new File(Paths.cache, name);
         signatureFile.create({overwrite: true, intermediates: true});
         signatureFile.write(base64, {encoding: 'base64'});
 
         props.onSignature({
             uri: signatureFile.uri,
             type: mimeType,
-            name: `signature_${signatureName}_${props.deliveryCode}_${Date.now()}`,
+            name
         });
 
         setIsLoading(false);

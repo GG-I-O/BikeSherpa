@@ -18,11 +18,11 @@ export default function Photo(props: Props) {
             quality: 0.8,
             base64: true,
         }).then(result => {
-            if (!result.canceled) {                
+            if (!result.canceled) {
                 props.onPhoto({
                     uri: result.assets[0].uri,
                     type: 'image/png',
-                    name: `photo_${props.deliveryCode}_${Date.now()}`,
+                    name: `photo_${props.deliveryCode}_${Date.now()}.png`,
                 });
             }
         })
