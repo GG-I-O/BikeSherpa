@@ -3,6 +3,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
 using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
+using Ggio.BikeSherpa.Backend.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +47,8 @@ public static class Bootstrap
                services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
                services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
                services.AddScoped<IUrgencyRepository, UrgencyRepository>();
+               
+               services.AddScoped<IDeliveryStepAttachmentSaveService, DeliveryStepAttachmentSaveService>();
           }
      }
 }
