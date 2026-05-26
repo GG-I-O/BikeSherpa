@@ -34,9 +34,7 @@ public class AddDeliveryStepAttachmentHandler(
         
         var url = await attachmentSaveService.StoreFileAsync(stream, command.File.FileName, command.File.ContentType, cancellationToken);
 
-        step.AttachmentFilePaths = (step.AttachmentFilePaths ?? [])
-            .Append(url)
-            .ToArray();
+        step.AddAttachment(url);
         
         await transaction.CommitAsync(cancellationToken);
         return Result.Success();
