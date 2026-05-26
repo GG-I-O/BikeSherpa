@@ -6,7 +6,7 @@ import TimePickerInput from "@/components/general/TimePickerInput";
 import {Icon} from "react-native-paper/src";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import useStepDataTableRowViewModel from "@/steps/viewModel/useStepDataTableRowViewModel";
-import {View} from "react-native";
+import {Linking, View} from "react-native";
 
 type Props = {
     step: StepToDisplay,
@@ -27,7 +27,7 @@ export default function StepDataTableRow(
     const theme = useTheme();
     const style = datatableStyle;
 
-    
+
     const [isTimePickerOpen, setIsTimePickerOpen] = useState(false); // Disable onRowPress if we're picking time
 
     const viewModel = useStepDataTableRowViewModel(step);
@@ -72,6 +72,16 @@ export default function StepDataTableRow(
                     onChangeText={viewModel.setComment}
                     mode="outlined"
                 />
+            </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.minWidth150]}>
+                {step.attachmentFilePaths.map((filePath, index) =>
+                    <Text
+                        key={`${step.id}-${index}`}
+                        onPress={() => Linking.openURL(filePath)}
+                    >
+                        {filePath}
+                    </Text>
+                )}
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>{step.courierCode}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>
