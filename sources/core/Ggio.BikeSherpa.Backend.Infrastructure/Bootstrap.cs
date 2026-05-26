@@ -3,11 +3,11 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
 using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
-using Ggio.BikeSherpa.Backend.Infrastructure.Services;
+using Ggio.BikeSherpa.Backend.Infrastructure.Storage;
+using Ggio.DddCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Ggio.DddCore.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -39,16 +39,15 @@ public static class Bootstrap
                };
 
                services.AddRefitClient<IItineraryApi>(settings)
-                    .ConfigureHttpClient(c =>
-                    {
-                         c.BaseAddress = new Uri(configuration["ItineraryService:BaseUrl"]!);
-                    });
+                    .ConfigureHttpClient(c => { c.BaseAddress = new Uri(configuration["ItineraryService:BaseUrl"]!); });
+
                services.AddScoped<IItinerarySpi, ItineraryService>();
                services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
                services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
                services.AddScoped<IUrgencyRepository, UrgencyRepository>();
-               
-               services.AddScoped<IDeliveryStepAttachmentSaveService, DeliveryStepAttachmentSaveService>();
+
+               services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
+               services.AddSingleton<IDeliveryStepAttachmentSaveService, StorageService>();
           }
      }
 }

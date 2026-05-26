@@ -1,4 +1,4 @@
-namespace Ggio.BikeSherpa.Backend.Infrastructure.Services;
+namespace Ggio.BikeSherpa.Backend.Infrastructure.Storage;
 
 public interface IDeliveryStepAttachmentSaveService
 {
