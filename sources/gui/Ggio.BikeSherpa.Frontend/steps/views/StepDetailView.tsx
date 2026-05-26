@@ -130,6 +130,19 @@ export default function StepDetailView() {
                     />
                 </View>
 
+                <View style={{width: "100%"}}>
+                    <Text style={{textAlign: 'center'}}>Pièces jointes</Text>
+                    <Divider style={{width: '50%', margin: 'auto'}} />
+                    {viewModel.step.attachmentFilePaths.map((filePath, index) =>
+                        <Text
+                            key={`${viewModel.step!.id}-${index}`}
+                            style={{textAlign: 'center', marginTop: 16}}
+                            onPress={() => Linking.openURL(filePath)}
+                        >
+                            {filePath}
+                        </Text>
+                    )}
+                </View>
             </View>
         </View>
     );
