@@ -1,5 +1,6 @@
 using Ardalis.Result;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.DddCore;
 using Mediator;
@@ -15,6 +16,7 @@ public record AddDeliveryStepAttachmentCommand(
 
 public class AddDeliveryStepAttachmentHandler(
     IReadRepository<Delivery> deliveryRepository,
+    IDeliveryStepAttachmentSaveService attachmentSaveService,
     IApplicationTransaction transaction
     ): ICommandHandler<AddDeliveryStepAttachmentCommand, Result>
 {
@@ -30,10 +32,10 @@ public class AddDeliveryStepAttachmentHandler(
         
         await using var stream = command.File.OpenReadStream();
         
-        // TODO: Save file to storage service and get name
+        var url = await attachmentSaveService.StoreFileAsync(stream, command.File.FileName, command.File.ContentType, cancellationToken);
 
         step.AttachmentFilePaths = (step.AttachmentFilePaths ?? [])
-            .Append(command.File.Name) // Temporary, to change with file URL once stored
+            .Append(url)
             .ToArray();
         
         await transaction.CommitAsync(cancellationToken);
