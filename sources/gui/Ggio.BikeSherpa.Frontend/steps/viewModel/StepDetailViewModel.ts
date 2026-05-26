@@ -7,6 +7,7 @@ import {Step} from "@/steps/models/Step";
 import IStepMapper from "@/steps/spi/IStepMapper";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
 import {IStepServices} from "@/steps/spi/IStepServices";
+import UploadableFile from "@/models/UploadableFile";
 
 export default class StepDetailViewModel {
     private readonly deliveryServices: IDeliveryServices;
@@ -43,12 +44,16 @@ export default class StepDetailViewModel {
 
         return this.stepMapper.StepToStepToDisplay(delivery, step);
     }
-    
-    public updateCourierComment = (stepId: string, comment: string)=> {
+
+    public updateCourierComment = (stepId: string, comment: string) => {
         this.stepServices.updateCourierComment(stepId, comment);
     }
-    
+
     public stepComplete = (stepId: string, complete: boolean) => {
         this.stepServices.completeStep(stepId, complete);
+    }
+
+    public addAttachment = (stepId: string, file: UploadableFile) => {
+        this.stepServices.addAttachment(stepId, file);
     }
 }

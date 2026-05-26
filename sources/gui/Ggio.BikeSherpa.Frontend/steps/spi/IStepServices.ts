@@ -1,3 +1,5 @@
+import UploadableFile from "@/models/UploadableFile";
+
 export interface IStepServices {
     updateTime(stepId: string, hours: number, minutes: number): void;
     updateTimeForADay(stepId: string, hours: number, minutes: number): void;
@@ -12,4 +14,6 @@ export interface IStepServices {
     updateCourierComment(stepId: string, comment: string): void;
     
     completeStep(stepId: string, complete: boolean): void;
+    
+    addAttachment(stepId: string, file: UploadableFile): void;
 }

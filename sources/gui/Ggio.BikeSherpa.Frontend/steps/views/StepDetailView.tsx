@@ -8,6 +8,9 @@ import {Icon} from "react-native-paper/src";
 import {StepType} from "@/steps/models/StepType";
 import unassignedPhoneNumber from "@/steps/constants/unassignedPhoneNumber";
 import React from "react";
+import Signature from "@/steps/components/attachmentFile/Signature";
+import Photo from "@/steps/components/attachmentFile/Photo";
+import Document from "@/steps/components/attachmentFile/Document";
 
 export default function StepDetailView() {
     const theme = useTheme();
@@ -27,27 +30,18 @@ export default function StepDetailView() {
         <View style={{backgroundColor: theme.colors.background, padding: 8, height: '100%'}}>
             <View style={{flexDirection: 'column', justifyContent: 'flex-start', gap: 8}}>
                 <View style={{gap: 8, flexDirection: 'row'}}>
-                    <Button
-                        mode="outlined"
-                        onPress={() => {
-                        }}
-                    >
-                        <Icon source="draw-pen" size={24} color={theme.colors.onBackground}/>
-                    </Button>
-                    <Button
-                        mode="outlined"
-                        onPress={() => {
-                        }}
-                    >
-                        <Icon source="camera" size={24} color={theme.colors.onBackground}/>
-                    </Button>
-                    <Button
-                        mode="outlined"
-                        onPress={() => {
-                        }}
-                    >
-                        <Icon source="file" size={24} color={theme.colors.onBackground}/>
-                    </Button>
+                    <Signature
+                        deliveryCode={viewModel.step.deliveryCode}
+                        onSignature={(file) => viewModel.addAttachment(file)}
+                    />
+                    <Photo
+                        deliveryCode={viewModel.step.deliveryCode}
+                        onPhoto={(file) => viewModel.addAttachment(file)}
+                    />
+                    <Document
+                        deliveryCode={viewModel.step.deliveryCode}
+                        onDocument={(file) => viewModel.addAttachment(file)}
+                    />
                 </View>
                 <View style={{gap: 8}}>
                     <Button
@@ -134,7 +128,7 @@ export default function StepDetailView() {
                         mode="outlined"
                     />
                 </View>
-                
+
             </View>
         </View>
     );

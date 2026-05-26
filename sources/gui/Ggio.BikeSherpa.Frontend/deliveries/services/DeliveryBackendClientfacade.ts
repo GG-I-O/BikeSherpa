@@ -11,6 +11,7 @@ import JsonPatchDocument from "@/models/JsonPatchDocument";
 import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCustomBackendClientFacade";
 import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
+import UploadableFile from "@/models/UploadableFile";
 
 @injectable()
 export default class DeliveryBackendClientFacade implements IBackendClient<Delivery>, IDeliveryCustomBackendClientFacade {
@@ -252,6 +253,27 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             {
                 completed: step.completed
             }
+        )
+    }
+    
+    public async PostAttachmentEndpoint(step: Step, file: UploadableFile): Promise<void> {
+        if (!step.links)
+            throw new Error(`Step links empty`);
+
+        const link = step.links.find(link => link.rel === hateoasRel.stepAttachment.post);
+        if (!link)
+            throw new Error(`Step link for '${hateoasRel.stepAttachment.post}' not found`);
+        
+        const formData = new FormData();
+        formData.append('file', {
+           uri: file.uri,
+           type: file.type,
+           name: file.name
+        } as unknown as Blob);
+        
+        await axios.post(
+            link.href,
+            formData
         )
     }
 }

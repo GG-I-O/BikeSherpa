@@ -9,6 +9,7 @@ import IStepMapper from "@/steps/spi/IStepMapper";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
 import {IStepServices} from "@/steps/spi/IStepServices";
 import {useDebounce} from "@/hooks/useDebounce";
+import UploadableFile from "@/models/UploadableFile";
 
 export default function useStepDetailViewModel(stepId: string) {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -45,6 +46,7 @@ export default function useStepDetailViewModel(stepId: string) {
         courierComment,
         setCourierComment,
         completeStep: () => viewModel.stepComplete(stepId, true),
-        cancelStep: () => viewModel.stepComplete(stepId, false)
+        cancelStep: () => viewModel.stepComplete(stepId, false),
+        addAttachment: (file: UploadableFile) => viewModel.addAttachment(stepId, file)
     }
 }
