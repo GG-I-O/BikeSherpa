@@ -33,7 +33,7 @@ public class AddDeliveryStepAttachmentHandler(
         // TODO: Save file to storage service and get name
 
         step.AttachmentFilePaths = (step.AttachmentFilePaths ?? [])
-            .Append(command.File.Name)
+            .Append(command.File.Name) // Temporary, to change with file URL once stored
             .ToArray();
         
         await transaction.CommitAsync(cancellationToken);
