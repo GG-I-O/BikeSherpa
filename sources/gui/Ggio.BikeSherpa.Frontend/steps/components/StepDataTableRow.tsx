@@ -7,6 +7,7 @@ import {Icon} from "react-native-paper/src";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import useStepDataTableRowViewModel from "@/steps/viewModel/useStepDataTableRowViewModel";
 import {Linking, View} from "react-native";
+import AppStyle from "@/constants/AppStyle";
 
 type Props = {
     step: StepToDisplay,
@@ -63,8 +64,12 @@ export default function StepDataTableRow(
                 <DeliveryTypeIcon type={step.type}/>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
-                <Text numberOfLines={3}>{step.address.streetInfo}</Text>
-                <Text numberOfLines={3}>{`${step.address.postcode} ${step.address.city}`}</Text>
+                <View>
+                    <Text style={AppStyle.textStyle.h3}>{step.address.name}</Text>
+                    <Text>{step.address.streetInfo}</Text>
+                    {step.address.complement && <Text>{step.address.complement}</Text>}
+                    <Text>{`${step.address.postcode} ${step.address.city}`}</Text>
+                </View>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <TextInput

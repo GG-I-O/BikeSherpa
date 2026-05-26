@@ -74,7 +74,7 @@ export default function StepDetailView() {
                 gap: 32
             }}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center', marginInline: 16, gap: 32}}>
                         <DeliveryTypeIcon type={viewModel.step.type}/>
                         <View>
                             <Text style={AppStyle.textStyle.h3}>{viewModel.step.address.name}</Text>
@@ -90,10 +90,11 @@ export default function StepDetailView() {
                     >
                         <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
                             <Icon source="phone" size={24} color={theme.colors.onBackground}/>
-                            <Text>{viewModel.step!.address.phone ?? unassignedPhoneNumber}</Text>
+                            <Text>{viewModel.step!.address.phone != "" ? viewModel.step!.address.phone : unassignedPhoneNumber}</Text>
                         </View>
                     </Button>
                 </View>
+                <Divider/>
                 <View style={{
                     flexDirection: "row",
                     marginInline: 32,
@@ -107,22 +108,22 @@ export default function StepDetailView() {
                         <Text style={AppStyle.textStyle.h3}>Avant : {viewModel.step.deliveryLimitDate}</Text>
                     )}
                 </View>
-                <View style={{alignItems: "center", width: "100%"}}>
+                <View style={{width: "100%"}}>
                     <Text style={{textAlign: 'center'}}>Infos de livraison</Text>
-                    <Divider/>
-                    <Text style={AppStyle.textStyle.h2}>{viewModel.step.comment}</Text>
+                    <Divider style={{width: '50%', margin: 'auto'}} />
+                    <Text style={[AppStyle.textStyle.h3, {textAlign: 'center'}]}>{viewModel.step.comment}</Text>
                 </View>
 
-                <View style={{alignItems: "center", width: "100%"}}>
+                <View style={{width: "100%"}}>
                     <Text style={{textAlign: 'center'}}>Colisage</Text>
-                    <Divider/>
-                    <Text style={AppStyle.textStyle.h3}>{viewModel.step.packing}</Text>
+                    <Divider style={{width: '50%', margin: 'auto'}} />
+                    <Text style={[AppStyle.textStyle.h3, {textAlign: 'center'}]}>{viewModel.step.packing}</Text>
                 </View>
 
-                <View style={{alignItems: "center", width: "100%"}}>
+                <View style={{width: "100%"}}>
                     <Text style={{textAlign: 'center'}}>Commentaire livreur</Text>
-                    <Divider/>
                     <TextInput
+                        style={{width: '80%', margin: 'auto'}}
                         value={viewModel.courierComment}
                         onChangeText={viewModel.setCourierComment}
                         mode="outlined"
