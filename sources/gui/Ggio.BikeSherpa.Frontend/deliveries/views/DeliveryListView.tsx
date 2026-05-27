@@ -1,6 +1,6 @@
 import {navigate} from "expo-router/build/global-state/routing";
 import React, {useState} from "react";
-import {ScrollView} from "react-native";
+import {ScrollView, View} from "react-native";
 import {Button, SegmentedButtons, Text, useTheme} from 'react-native-paper';
 import {Dropdown, MultiSelectDropdown} from 'react-native-paper-dropdown';
 import DeliveryDataTable from "../components/DeliveryDataTable";
@@ -19,7 +19,7 @@ export function DeliveryListView() {
     const [isAssigning, setIsAssigning] = useState<boolean>(false);
     const [courierToAssign, setCourierToAssign] = useState<string>('');
     const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
-    
+
     const viewModel = useDeliveryListViewModel();
     const {
         selectedSteps,
@@ -38,25 +38,26 @@ export function DeliveryListView() {
                     flexDirection: 'row', flexGrow: 0, flexShrink: 0,
                     backgroundColor: theme.colors.background
                 }}
-                contentContainerStyle={{
-                    alignItems: "center", gap: 8
-                }}
             >
                 {!isAssigning ? (
-                    <>
+                    <View style={{flexDirection: 'row', gap: 8, alignItems: "center", flexShrink: 1}}>
                         <SegmentedButtons
-                            style={{height: "auto", flex: 1, alignItems: "center"}}
                             value={viewModel.dateFilter}
                             onValueChange={viewModel.setDateFilter}
-                            buttons={dateFilterDropdown}
+                            buttons={dateFilterDropdown.map(b => ({
+                                ...b,
+                                style: {width: 100}
+                            }))}
                         />
-                        <DatePickerInput
-                            locale={"fr"}
-                            inputMode={"start"}
-                            onChange={(date: Date | undefined): void => viewModel.setDatePicker(date)}
-                            value={viewModel.datePicker}
-                            disabled={viewModel.dateFilter !== dateFilterEnum.Date}
-                        />
+                        <View style={{width: 'auto', overflow: 'hidden'}}>
+                            <DatePickerInput
+                                locale={"fr"}
+                                inputMode={"start"}
+                                onChange={(date: Date | undefined): void => viewModel.setDatePicker(date)}
+                                value={viewModel.datePicker}
+                                disabled={viewModel.dateFilter !== dateFilterEnum.Date}
+                            />
+                        </View>
                         <MultiSelectDropdown
                             key={`courier-filter-${viewModel.courierFilter || 'empty'}`}
                             label="Assignées à"
@@ -79,7 +80,7 @@ export function DeliveryListView() {
                         >
                             <Text>Assigner des courses</Text>
                         </Button>
-                    </>
+                    </View>
                 ) : (
                     <>
                         <Dropdown
@@ -99,7 +100,7 @@ export function DeliveryListView() {
                             onPress={() => {
                                 if (courierToAssign)
                                     viewModel.assignCourier(selectedSteps, courierToAssign);
-                                else 
+                                else
                                     viewModel.unassignCourier(selectedSteps);
                                 clearSelection();
                                 setIsAssigning(false);
