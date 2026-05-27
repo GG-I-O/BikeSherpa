@@ -20,5 +20,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5433/ggio_tests_db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="bs-test@dbbikesherpa.postgres.database.azure.com" uuid="e272ae50-1786-458d-b99e-a6babb6b8a8a">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://dbbikesherpa.postgres.database.azure.com:5432/bs-test</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

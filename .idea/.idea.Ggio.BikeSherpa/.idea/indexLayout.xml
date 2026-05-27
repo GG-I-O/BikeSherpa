@@ -5,6 +5,7 @@
       <Path>sources/gui</Path>
     </attachedFolders>
     <explicitIncludes>
+      <Path>deploy</Path>
       <Path>sources/gui</Path>
     </explicitIncludes>
     <explicitExcludes />
