@@ -12,6 +12,7 @@ using Moq;
 namespace Backend.Infrastructure.Tests.Storage;
 
 [TestSubject(typeof(StorageService))]
+[Trait("Category", "Integration")]
 public class StorageServiceTest
 {
      private static StorageService MakeSut(
