@@ -64,7 +64,7 @@ export const createLokiTransport = (
             };
 
             // Post logs to loki
-            const response = await fetch(`${lokiOptions.host}/api/v1/push`, {
+            const response = await fetch(`${lokiOptions.host}/loki/api/v1/push`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -99,7 +99,7 @@ export const createLokiTransport = (
         const { rawMsg, level, extension } = props;
 
         // Convert timestamp to nanoseconds (Loki format)
-        const timestamp = Date.now() * 1000 * 1000;
+        const timestamp = Date.now().toString() + "000000";
 
         // Format the log message
         let logMessage;
@@ -139,7 +139,7 @@ export const createLokiTransport = (
             // Send immediately if batching is disabled
             sendBatchToLoki([
                 {
-                    timestamp: timestamp.toString(),
+                    timestamp: timestamp,
                     line: logMessage,
                     level: level.text,
                 },
