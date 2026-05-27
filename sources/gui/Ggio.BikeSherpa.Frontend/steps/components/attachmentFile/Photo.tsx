@@ -12,7 +12,7 @@ type Props = {
 export default function Photo(props: Props) {
     const theme = useTheme();
     
-    const photoQuality = parseFloat(process.env.EXPO_PUBLIC_AUTH_DEV_CLIENT_ANDROID ?? '0.8');
+    const photoQuality = parseFloat(process.env.EXPO_PUBLIC_PHOTO_QUALITY ?? '0.8');
 
     const takePhoto = () => {
         ImagePicker.launchCameraAsync({
