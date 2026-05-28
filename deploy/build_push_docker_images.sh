@@ -67,6 +67,10 @@ fi
 
 echo "Git Version detected: $GIT_VERSION"
 
+# Sanitize GIT_VERSION for Docker tag (replace + with -)
+DOCKER_TAG_VERSION="${GIT_VERSION//+/-}"
+echo "Docker tag version: $DOCKER_TAG_VERSION"
+
 # 5. add a check to ensure that a .env file exists before launching build process
 FRONTEND_DIR="sources/gui/Ggio.BikeSherpa.Frontend"
 ENV_FILE="$FRONTEND_DIR/.env"
@@ -78,7 +82,7 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 1
 fi
 
-# 5. build docker image of Backend project tagged with BikeSherpa/Backend:latest and with current git version
+# 6. build docker image of Backend project tagged with BikeSherpa/Backend:latest and with current git version
 # We need to build from the root because the Dockerfile copies from sources/core/...
 echo "Building Docker image..."
 ACR_NAME="bikeherpa"
@@ -86,29 +90,29 @@ IMAGE_NAME="bikesherpa/backend"
 ACR_IMAGE_PREFIX="$ACR_NAME.azurecr.io"
 
 docker build -t "$IMAGE_NAME:latest" \
-             -t "$IMAGE_NAME:$GIT_VERSION" \
+             -t "$IMAGE_NAME:$DOCKER_TAG_VERSION" \
              -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:latest" \
-             -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$GIT_VERSION" \
+             -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$DOCKER_TAG_VERSION" \
              -f sources/core/Ggio.BikeSherpa.Backend/Dockerfile .
              
 echo "Pushing Docker image of backend to ACR..."
 docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:latest"
-docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$GIT_VERSION"
+docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$DOCKER_TAG_VERSION"
              
 IMAGE_NAME="bikesherpa/front-web"
 
 docker build -t "$IMAGE_NAME:latest" \
-            -t "$IMAGE_NAME:$GIT_VERSION" \
+            -t "$IMAGE_NAME:$DOCKER_TAG_VERSION" \
             -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:latest" \
-            -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$GIT_VERSION" \
+            -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$DOCKER_TAG_VERSION" \
             -f "$FRONTEND_DIR/Dockerfile" "$FRONTEND_DIR"
 
-# 6. push docker image to ACR
+# 7. push docker image to ACR
 echo "Pushing Docker image of frontend to ACR..."
 docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:latest"
-docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$GIT_VERSION"
+docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$DOCKER_TAG_VERSION"
 
-# 7. push current version tag to origin (unless --current-branch is used)
+# 8. push current version tag to origin (unless --current-branch is used)
 if [ "$USE_CURRENT_BRANCH" = false ]; then
   echo "Pushing tag $VERSION to origin..."
   git push origin "$VERSION"
