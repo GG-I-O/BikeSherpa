@@ -31,7 +31,7 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService
 
           var containerClient = _blobServiceClient.GetBlobContainerClient(_options.ContainerName);
           var extension = Path.GetExtension(fileName);
-          var blobName = $"{Guid.NewGuid().ToString()}.{extension}";
+          var blobName = $"{Guid.NewGuid().ToString()}{extension}";
           var blobClient = containerClient.GetBlobClient(blobName);
 
           var uploadOptions = new BlobUploadOptions

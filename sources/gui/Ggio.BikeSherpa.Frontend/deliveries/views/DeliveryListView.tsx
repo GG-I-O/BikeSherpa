@@ -38,9 +38,10 @@ export function DeliveryListView() {
                     flexDirection: 'row', flexGrow: 0, flexShrink: 0,
                     backgroundColor: theme.colors.background
                 }}
+                contentContainerStyle={{flexDirection: 'row', gap: 8, alignItems: "center", flexShrink: 1}}
             >
                 {!isAssigning ? (
-                    <View style={{flexDirection: 'row', gap: 8, alignItems: "center", flexShrink: 1}}>
+                    <>
                         <SegmentedButtons
                             value={viewModel.dateFilter}
                             onValueChange={viewModel.setDateFilter}
@@ -80,7 +81,7 @@ export function DeliveryListView() {
                         >
                             <Text>Assigner des courses</Text>
                         </Button>
-                    </View>
+                    </>
                 ) : (
                     <>
                         <Dropdown

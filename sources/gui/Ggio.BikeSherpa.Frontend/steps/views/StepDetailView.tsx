@@ -1,6 +1,6 @@
 import AppStyle from "@/constants/AppStyle";
 import {useLocalSearchParams} from "expo-router";
-import {Linking, View} from "react-native";
+import {Linking, ScrollView, View} from "react-native";
 import {Button, Divider, Text, TextInput, useTheme} from "react-native-paper";
 import useStepDetailViewModel from "@/steps/viewModel/useStepDetailViewModel";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
@@ -27,7 +27,7 @@ export default function StepDetailView() {
         )
 
     return (
-        <View style={{backgroundColor: theme.colors.background, padding: 8, height: '100%'}}>
+        <ScrollView style={{backgroundColor: theme.colors.background, padding: 8, height: '100%'}}>
             <View style={{flexDirection: 'column', justifyContent: 'flex-start', gap: 8}}>
                 <View style={{gap: 8, flexDirection: 'row'}}>
                     <Signature
@@ -144,6 +144,6 @@ export default function StepDetailView() {
                     )}
                 </View>
             </View>
-        </View>
+        </ScrollView>
     );
 }

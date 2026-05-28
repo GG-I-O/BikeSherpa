@@ -111,8 +111,8 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                     for (let i = 0; i < this.attachmentUploadQueue.length; i++) {
                         if (this.attachmentUploadQueue[i].stepId === step.id)
                             await this.customClientFacade.PostAttachmentEndpoint(step, this.attachmentUploadQueue[i].file);
-
                     }
+                    this.attachmentUploadQueue = this.attachmentUploadQueue.filter(file => file.stepId !== step.id);
                     break;
                 default:
                     throw new Error(`Unsupported update action: ${this.updateStepState[i].state}`);

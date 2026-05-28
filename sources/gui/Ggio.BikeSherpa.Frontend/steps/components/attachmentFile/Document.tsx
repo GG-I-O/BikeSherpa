@@ -15,7 +15,7 @@ export default function Document(props: Props) {
     const selectFile = () => {
         DocumentPicker.getDocumentAsync({
             type: "*/*",
-            copyToCacheDirectory: true
+            copyToCacheDirectory: false
         }).then(result => {
             if (!result.canceled) {
                 const asset = result.assets[0];
