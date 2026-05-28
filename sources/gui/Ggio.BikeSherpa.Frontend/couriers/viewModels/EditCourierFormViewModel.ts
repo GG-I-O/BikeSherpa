@@ -16,6 +16,7 @@ export default class EditCourierFormViewModel {
 
     onSubmit = (courier: Courier) => {
         courier.address.name = `${courier.firstName} ${courier.lastName}`;
+        courier.address.phone = courier.phoneNumber;
         this.courierServices.updateCourier(courier);
     };
 

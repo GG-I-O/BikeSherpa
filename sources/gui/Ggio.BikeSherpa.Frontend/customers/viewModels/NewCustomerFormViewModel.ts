@@ -18,6 +18,7 @@ export default class NewCustomerFormViewModel {
 
     public onSubmit = (customer: InputCustomer): void => {
         customer.address.name = customer.name;
+        customer.address.phone = customer.phoneNumber;
         this.customerServices.createCustomer(customer);
         if (this.resetCallback) {
             this.resetCallback(); // Clear form after submission
