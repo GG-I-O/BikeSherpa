@@ -22,7 +22,7 @@ export default class StepMapper implements IStepMapper {
         this.dropdownOptionsService = dropdownOptionsService;
     }
     
-    public StepToStepToDisplay(delivery: Delivery, step: Step){
+    public StepToStepToDisplay = (delivery: Delivery, step: Step)=> {
         return {
             id: step.id,
             deliveryId: delivery.id,
