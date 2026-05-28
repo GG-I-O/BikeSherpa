@@ -6,17 +6,19 @@ import { Button } from "react-native-paper";
 export default function Login() {
     const { authorize, error, isLoading } = useAuth0();
     const audience = process.env.EXPO_PUBLIC_AUTH_AUDIENCE;
+    const scope = process.env.EXPO_PUBLIC_AUTH_DEV_SCOPE;
 
     const onLogin = useCallback(async () => {
         try {
             if (audience)
                 await authorize({
-                    audience: audience
+                    audience,
+                    scope
                 });
         } catch (e) {
             console.error(e);
         }
-    }, [authorize, audience]);
+    }, [authorize, audience, scope]);
 
     if (isLoading) {
         return (
