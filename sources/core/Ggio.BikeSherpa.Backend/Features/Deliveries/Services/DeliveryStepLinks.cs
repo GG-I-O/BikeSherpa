@@ -75,6 +75,15 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                     Method = "PUT"
                });
           
+          // POST /delivery{deliveryId}/step/{stepId}/attachment
+          if (canWriteStep)
+               links.Add(new Link
+               {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<AddDeliveryStepAttachmentEndpoint>(), routeValues),
+                    Rel = "postAttachment",
+                    Method = "POST"
+               });
+          
           return links;
      }
 }

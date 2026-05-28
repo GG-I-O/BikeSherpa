@@ -62,15 +62,17 @@ export default function DeliveryDetailView({canEdit = false}: Props) {
                 ) : (
                     <></>
                 )}
-                <Text style={[AppStyle.textStyle.h2, {marginBottom: 8}]}>Course :</Text>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                    <Text style={[AppStyle.textStyle.h2, {marginBottom: 8}]}>Course :</Text>
                     <Text style={AppStyle.textStyle.h3}>{delivery.code}</Text>
                     <Text style={AppStyle.textStyle.h3}>{delivery.customerName}</Text>
                 </View>
                 <Text style={AppStyle.textStyle.h3}>{delivery.startDate}</Text>
+                <Text style={AppStyle.textStyle.h3}>{delivery.startTime}</Text>
+                <Divider/>
                 <Text style={AppStyle.textStyle.h3}>{delivery.urgency}</Text>
+                <Text style={AppStyle.textStyle.h3}>{delivery.limitTime}</Text>
             </View>
-            <Text style={[AppStyle.textStyle.h2, {marginBottom: 8}]}>Étapes :</Text>
             {
                 <StepDataTable
                     steps={delivery.steps ?? []}

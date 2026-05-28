@@ -6,13 +6,16 @@ import deliveryOperationAction from "@/steps/constants/deliveryOperationAction";
 import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCustomBackendClientFacade";
 import {IBackendClient} from "@/spi/BackendClientSPI";
 import JsonPatchDocument from "@/models/JsonPatchDocument";
+import UploadableFile from "@/models/UploadableFile";
 
 @injectable()
 export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddleware {
     private backendClientFacade: IBackendClient<Delivery>;
     private customClientFacade: IDeliveryCustomBackendClientFacade;
+
     private getAllDailyDeliveriesDate: string | null = null;
     private updateStepState: { deliveryId: string, stepId: string, state: string }[] = [];
+    private attachmentUploadQueue: { stepId: string, file: UploadableFile }[] = [];
 
     constructor(
         @inject(DeliveryServiceIdentifier.BackendClientFacade) backendClientFacade: IBackendClient<Delivery>,
@@ -35,6 +38,10 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
 
     public addUpdateStepState(deliveryId: string, stepId: string, state: string): void {
         this.updateStepState.push({deliveryId, stepId, state});
+    }
+
+    public addAttachmentToUploadQueue(stepId: string, file: UploadableFile) {
+        this.attachmentUploadQueue.push({stepId, file});
     }
 
     public async update(delivery: Delivery): Promise<void> {
@@ -99,6 +106,13 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                     break;
                 case deliveryOperationAction.putComplete:
                     await this.customClientFacade.PutStepCompletionEndpoint(step);
+                    break;
+                case deliveryOperationAction.postAttachment:
+                    for (let i = 0; i < this.attachmentUploadQueue.length; i++) {
+                        if (this.attachmentUploadQueue[i].stepId === step.id)
+                            await this.customClientFacade.PostAttachmentEndpoint(step, this.attachmentUploadQueue[i].file);
+                    }
+                    this.attachmentUploadQueue = this.attachmentUploadQueue.filter(file => file.stepId !== step.id);
                     break;
                 default:
                     throw new Error(`Unsupported update action: ${this.updateStepState[i].state}`);

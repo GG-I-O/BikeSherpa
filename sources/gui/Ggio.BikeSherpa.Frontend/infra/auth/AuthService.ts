@@ -2,7 +2,6 @@ import { IAuthService } from "@/spi/AuthSPI";
 import { injectable } from "inversify";
 import { Credentials } from "react-native-auth0/lib/typescript/src/core/models";
 import DispatcherRole from "@/infra/auth/dispatcherRole";
-import { Buffer } from 'buffer';
 
 @injectable()
 export default class AuthService implements IAuthService {

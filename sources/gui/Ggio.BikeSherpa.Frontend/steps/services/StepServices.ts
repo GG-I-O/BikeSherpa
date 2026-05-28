@@ -10,6 +10,7 @@ import deliveryOperationAction from "@/steps/constants/deliveryOperationAction";
 import {Step} from "@/steps/models/Step";
 import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddleware";
 import {hateoasRel} from "@/models/HateoasLink";
+import UploadableFile from "@/models/UploadableFile";
 
 @injectable()
 export default class StepServices implements IStepServices {
@@ -305,5 +306,37 @@ export default class StepServices implements IStepServices {
         );
 
         observables.step$!.completed.set(complete);
+    }
+
+    public addAttachment(stepId: string, file: UploadableFile): void {
+        const observables = this.getDeliveryFromStep(stepId);
+        if (!observables.delivery$) {
+            this.logger.error(`AddAttachment : Parent delivery not found for step ${stepId}`);
+            return;
+        }
+        if (!observables.step$) {
+            this.logger.error(`AddAttachment: Step ${stepId} not found in delivery ${observables.delivery$.peek().id}`);
+            return;
+        }
+
+        // Test if the user got the rights to do this action
+        const step = observables.step$.get();
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.stepAttachment.post)) {
+            this.logger.error(`Cannot post attachment for step ${stepId}`);
+            return
+        }
+        
+        this.deliveryStorageMiddleware.addAttachmentToUploadQueue(
+            stepId,
+            file
+        );
+
+        this.deliveryStorageMiddleware.addUpdateStepState(
+            observables.delivery$.peek().id,
+            observables.step$.peek().id,
+            deliveryOperationAction.postAttachment
+        );
+
+        observables.step$!.attachmentFilePaths.set([...step.attachmentFilePaths ?? [], file.uri]);
     }
 }

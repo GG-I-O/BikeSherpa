@@ -21,4 +21,5 @@ export interface StepToDisplay {
     estimatedTime: string;
     distance: number;
     notBilled: boolean;
+    attachmentFilePaths: string[];
 }

@@ -5,18 +5,37 @@ import {IAuthService} from "@/spi/AuthSPI";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {useEffect, useState} from "react";
+import {useAuth0} from "react-native-auth0";
 
 export default function TabLayout() {
     const theme = useTheme();
 
     const [userIsDispatcher, setUserIsDispatcher] = useState<boolean | null>(null);
+    const [authError, setAuthError] = useState(false);
 
     const authService = IOCContainer.get<IAuthService>(ServicesIdentifiers.AuthService);
+    const {clearSession} = useAuth0();
+    
     useEffect(() => {
         authService.isDispatcher()
             .then((result) => setUserIsDispatcher(result))
-            .catch((error) => console.error("Error verifying roles : ", error));
+            .catch((error) => {
+                console.error("Error verifying roles : ", error);
+                setAuthError(true);
+            })
     }, [authService, setUserIsDispatcher]);
+
+    useEffect(() => {
+        if (!authError) return;
+        const logout = async () => {
+            try {
+                await clearSession();
+            } catch (e) {
+                console.error("Logout failed:", e);
+            }
+        };
+        logout().then();
+    }, [authError, clearSession]);
     
     if (userIsDispatcher === null)
         return <></>;

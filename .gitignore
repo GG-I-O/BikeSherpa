@@ -10,7 +10,6 @@
 *.userosscache
 *.sln.docstates
 *.env
-*launchSettings.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -417,3 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Rider config
+.idea

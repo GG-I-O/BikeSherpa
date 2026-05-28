@@ -64,4 +64,10 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           EstimatedDeliveryDate = estimatedDeliveryDate;
           RegisterDomainEvent(new DeliveryStepTimeChangeEvent(ParentDelivery.Id));
      }
+     
+     public void AddAttachment(string filePath)
+     {
+          AttachmentFilePaths ??= [];
+          AttachmentFilePaths = AttachmentFilePaths.Append(filePath).ToArray();
+     }
 }

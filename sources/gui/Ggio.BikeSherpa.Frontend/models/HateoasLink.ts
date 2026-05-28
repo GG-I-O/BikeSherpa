@@ -25,5 +25,8 @@ export const hateoasRel = {
     },
     stepCompletion: {
         put: "putComplete"
+    },
+    stepAttachment: {
+        post: "postAttachment"
     }
 }

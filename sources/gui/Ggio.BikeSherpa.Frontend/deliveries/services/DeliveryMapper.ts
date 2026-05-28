@@ -21,7 +21,7 @@ export default class DeliveryMapper implements IDeliveryMapper {
         this.stepMapper = stepMapper;
     }
     
-    public DeliveryDtoToDelivery(deliveryDto: DeliveryDto): Delivery {
+    public DeliveryDtoToDelivery = (deliveryDto: DeliveryDto): Delivery => {
         const deliveryCrud = deliveryDto.data;
         return {
             ...deliveryCrud,
@@ -40,7 +40,7 @@ export default class DeliveryMapper implements IDeliveryMapper {
         };
     }
 
-    public DeliveryToDeliveryToDisplay(delivery: Delivery): DeliveryToDisplay {
+    public DeliveryToDeliveryToDisplay = (delivery: Delivery): DeliveryToDisplay => {
         return {
             id: delivery.id,
             code: delivery.code,
