@@ -73,8 +73,8 @@ export default function StepDetailView() {
                 width: '100%',
                 gap: 32
             }}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <View style={{flexDirection: 'row', alignItems: 'center', marginInline: 16, gap: 32}}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center', marginInline: 8, gap: 32}}>
                         <DeliveryTypeIcon type={viewModel.step.type}/>
                         <View>
                             <Text style={AppStyle.textStyle.h3}>{viewModel.step.address.name}</Text>
@@ -97,9 +97,10 @@ export default function StepDetailView() {
                 <Divider/>
                 <View style={{
                     flexDirection: "row",
-                    marginInline: 32,
+                    marginInline: 8,
                     justifyContent: "space-between",
-                    alignItems: "center"
+                    alignItems: "center",
+                    flexWrap: 'wrap',
                 }}>
                     <Text>Horaire contractuel</Text>
                     {viewModel.step.type === StepType.PickUp ? (
@@ -130,7 +131,7 @@ export default function StepDetailView() {
                     />
                 </View>
 
-                <View style={{width: "100%"}}>
+                <View style={{width: "100%", marginBottom: 64}}>
                     <Text style={{textAlign: 'center'}}>Pièces jointes</Text>
                     <Divider style={{width: '50%', margin: 'auto'}} />
                     {viewModel.step.attachmentFilePaths.map((filePath, index) =>
