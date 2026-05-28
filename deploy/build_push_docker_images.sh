@@ -9,10 +9,32 @@ failure() {
 }
 trap 'failure ${LINENO} "$BASH_COMMAND"' ERR
 
-# 1. check out main branch and pull rebase
-echo "Checking out main branch and pulling/rebasing..."
-git checkout main
-git pull --rebase origin main
+# Parse command line arguments
+USE_CURRENT_BRANCH=false
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --current-branch)
+      USE_CURRENT_BRANCH=true
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Usage: $0 [--current-branch]"
+      exit 1
+      ;;
+  esac
+done
+
+# 1. check out main branch and pull rebase (unless --current-branch is used)
+if [ "$USE_CURRENT_BRANCH" = true ]; then
+  CURRENT_BRANCH=$(git branch --show-current)
+  echo "Using current branch: $CURRENT_BRANCH"
+else
+  echo "Checking out main branch and pulling/rebasing..."
+  git checkout main
+  git pull --rebase origin main
+fi
 
 # 2. ask user current version
 echo "Please enter the version to build (e.g., 1.0.0):"
@@ -23,9 +45,13 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-# 3. add tag to current branch with current version value
-echo "Tagging current branch with version $VERSION..."
-git tag -a "$VERSION" -m "Release version $VERSION"
+# 3. add tag to current branch with current version value (unless --current-branch is used)
+if [ "$USE_CURRENT_BRANCH" = false ]; then
+  echo "Tagging current branch with version $VERSION..."
+  git tag -a "$VERSION" -m "Release version $VERSION"
+else
+  echo "Skipping tag creation (using current branch mode)..."
+fi
 
 # 4. call dotnet gitversion and set current version as variable
 echo "Running dotnet-gitversion..."
@@ -82,8 +108,12 @@ echo "Pushing Docker image of frontend to ACR..."
 docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:latest"
 docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$GIT_VERSION"
 
-# 7. push current version tag to origin
-echo "Pushing tag $VERSION to origin..."
-git push origin "$VERSION"
+# 7. push current version tag to origin (unless --current-branch is used)
+if [ "$USE_CURRENT_BRANCH" = false ]; then
+  echo "Pushing tag $VERSION to origin..."
+  git push origin "$VERSION"
+else
+  echo "Skipping tag push (using current branch mode)..."
+fi
 
 echo "Build and push completed successfully!"
