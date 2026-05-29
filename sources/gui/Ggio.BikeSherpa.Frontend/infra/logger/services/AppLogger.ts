@@ -21,6 +21,7 @@ export default class AppLogger implements ILogger {
             host: config.host,
             labels: {
                 app: config.app,
+                env: config.env,
                 platform: config.platform,
                 user: () => {
                     const user = this.userService.getUserLogInfo();
