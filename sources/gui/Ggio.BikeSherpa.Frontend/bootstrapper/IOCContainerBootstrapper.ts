@@ -79,7 +79,8 @@ export default class IOCContainerBootstrapper {
             .bind<ILoggerConfig>(ServicesIdentifiers.LoggerConfig)
             .toConstantValue({
                 host: LOKI_HOST,
-                app: 'bike-sherpa',
+                app: 'bikesherpa-front',
+                env: __DEV__ ? 'dev' : 'prod',
                 platform: `${Platform.OS} - ${Platform.Version}`,
             });
 
