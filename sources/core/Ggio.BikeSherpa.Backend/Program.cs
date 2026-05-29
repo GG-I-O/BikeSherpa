@@ -23,7 +23,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NJsonSchema.Generation;
 using Serilog;
-using Serilog.Sinks.Grafana.Loki;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -96,7 +95,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
      {
           options.AddPolicy("AuthenticatedUser", policy =>
                policy.RequireAuthenticatedUser());
-          
+
           options.AddPolicy("read:customers", policy => policy.RequireClaim(scopeName, "read:customers"));
           options.AddPolicy("write:customers", policy => policy.RequireClaim(scopeName, "write:customers"));
           options.AddPolicy("read:couriers", policy => policy.RequireClaim(scopeName, "read:couriers"));
@@ -138,6 +137,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                                    claimsIdentity.AddClaims(scopeClaims.Value.Split(' ').Select(scope => new Claim(scopeName, scope)));
                               }
                          }
+
                          await Task.CompletedTask;
                     }
                }
@@ -148,9 +148,13 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
      builder.Host.UseSerilog((context, configuration) =>
      {
           configuration.ReadFrom.Configuration(context.Configuration);
-          configuration.WriteTo.GrafanaLoki(builder.Configuration["GrafanaLoki"]!);
-     });
+          configuration.Enrich.FromLogContext();
+          configuration.Enrich.WithProperty("env", context.HostingEnvironment.EnvironmentName);
+          configuration.Enrich.WithProperty("app", context.HostingEnvironment.ApplicationName);
+          configuration.Enrich.WithProperty("service_name", context.HostingEnvironment.ApplicationName);
+          configuration.Enrich.WithProperty("machine", Environment.MachineName);
 
+     });
      builder.Services.AddHttpLogging();
 }
 
