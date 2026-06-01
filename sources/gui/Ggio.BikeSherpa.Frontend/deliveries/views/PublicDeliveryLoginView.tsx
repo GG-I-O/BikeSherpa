@@ -3,15 +3,10 @@ import ThemedInput from "@/components/themed/ThemedInput";
 import {Button, Divider, Text} from "react-native-paper";
 import formStyle from "@/style/formStyle";
 import React from "react";
-import usePublicDeliveryLoginFormViewModel from "@/deliveries/viewModel/usePublicDeliveryLoginFormViewModel";
-import PublicDeliveryCustomer from "@/deliveries/models/PublicDeliveryCustomer";
+import usePublicDeliveryLoginViewModel from "@/deliveries/viewModel/usePublicDeliveryLoginViewModel";
 
-type Props = {
-    login: (customer?: PublicDeliveryCustomer) => void
-}
-
-export default function PublicDeliveryLoginForm(props: Props) {
-    const viewModel = usePublicDeliveryLoginFormViewModel(props.login);
+export default function PublicDeliveryLoginView() {
+    const viewModel = usePublicDeliveryLoginViewModel();
 
     return (
         <View style={{justifyContent: 'center', gap: 16, height: '100%', width: '75%', maxWidth: 500, margin: 'auto'}}>
@@ -42,7 +37,7 @@ export default function PublicDeliveryLoginForm(props: Props) {
             <Divider style={{width: '80%'}} />
             <Button
                 mode="outlined"
-                onPress={() => props.login()}
+                onPress={() => viewModel.proceedAsAnonymous()}
                 style={[formStyle.button, {width: '80%'}]}
             >
                 <Text>Je n'ai pas d'identifiant</Text>

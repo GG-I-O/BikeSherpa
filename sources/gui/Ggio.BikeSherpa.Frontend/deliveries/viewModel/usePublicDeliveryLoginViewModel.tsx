@@ -6,19 +6,24 @@ import PublicDeliveryCustomer from "@/deliveries/models/PublicDeliveryCustomer";
 import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
-import PublicDeliveryLoginFormViewModel from "@/deliveries/viewModel/PublicDeliveryLoginFormViewModel";
+import PublicDeliveryLoginViewModel from "@/deliveries/viewModel/PublicDeliveryLoginViewModel";
+import {useRouter} from "expo-router";
+import {publicDeliveryStore$} from "@/deliveries/store/publicDeliveryStore";
 
-export default function usePublicDeliveryLoginFormViewModel(
-    login: (customer?: PublicDeliveryCustomer) => void
-) {
+export default function usePublicDeliveryLoginViewModel() {
     const publicDeliveryService = IOCContainer.get<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices);
-    const viewModel = new PublicDeliveryLoginFormViewModel(publicDeliveryService);
+    const viewModel = new PublicDeliveryLoginViewModel(publicDeliveryService);
+    
+    const router = useRouter();
 
     const [publicCustomer, setPublicCustomer] = useState<PublicDeliveryCustomer | null>(null);
 
     useEffect(() => {
-        if (publicCustomer && publicCustomer.email && publicCustomer.code)
-            login(publicCustomer);
+        if (publicCustomer && publicCustomer.email && publicCustomer.code) {
+            publicDeliveryStore$.customer.set(publicCustomer);
+            publicDeliveryStore$.isAnonymous.set(false);
+            router.push("/newDelivery/form");
+        }
     }, [publicCustomer])
 
     const {
@@ -65,6 +70,11 @@ export default function usePublicDeliveryLoginFormViewModel(
                 console.error(errors);
             }
         ),
-        errors
+        errors,
+        proceedAsAnonymous: () => {
+            publicDeliveryStore$.customer.set(null);
+            publicDeliveryStore$.isAnonymous.set(true);
+            router.push("/newDelivery/form");
+        }
     }
 }
