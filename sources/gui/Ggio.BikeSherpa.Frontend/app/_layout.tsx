@@ -32,6 +32,7 @@ function AppStack() {
             </Stack.Protected>
             <Stack.Protected guard={!loggedIn}>
                 <Stack.Screen name="login" options={{headerShown: false}}/>
+                <Stack.Screen name="newDelivery" options={{headerShown: true, title: 'Nouvelle course'}}/>
             </Stack.Protected>
         </Stack>
     );

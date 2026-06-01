@@ -14,14 +14,17 @@ import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCust
 import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
 import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
 import DeliveryMapper from "@/deliveries/services/DeliveryMapper";
+import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
+import PublicDeliveryService from "@/deliveries/services/PublicDeliveryService";
 
 export default class DeliveryBootstrapper {
     public static init(IOCContainer: Container) {
         // Storage
         IOCContainer.bind<IStorageContext<Delivery>>(DeliveryServiceIdentifier.Storage).to(DeliveryStorageContext).inSingletonScope();
 
-        // Service
+        // Services
         IOCContainer.bind<IDeliveryServices>(DeliveryServiceIdentifier.Services).to(DeliveryServices).inSingletonScope();
+        IOCContainer.bind<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices).to(PublicDeliveryService).inSingletonScope();
         
         // Mapper
         IOCContainer.bind<IDeliveryMapper>(DeliveryServiceIdentifier.Mapper).to(DeliveryMapper).inSingletonScope();
