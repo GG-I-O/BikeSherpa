@@ -2,7 +2,7 @@ import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import {inject} from "inversify";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 
-export default class PublicDeliveryLoginFormViewModel { 
+export default class PublicDeliveryLoginViewModel { 
     private readonly publicDeliveryService: IPublicDeliveryService;
     
     public constructor(
