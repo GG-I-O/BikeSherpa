@@ -1,19 +1,19 @@
 import React from 'react';
-import {Control, FieldError, useController} from 'react-hook-form';
+import {Control, FieldError, FieldValues, Path, useController} from 'react-hook-form';
 import {Checkbox, Text, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
 import {View} from 'react-native';
 
-interface CustomCheckboxInputProps {
+interface CustomCheckboxInputProps<T extends FieldValues = FieldValues> {
     name: string;
-    control: Control<any>;
+    control: Control<T>;
     label: string;
     error?: FieldError | undefined;
     required?: boolean;
     testID?: string;
 }
 
-const ThemedCheckboxInput: React.FC<CustomCheckboxInputProps> = (
+const ThemedCheckboxInput = <T extends FieldValues = FieldValues>(
     {
         name,
         control,
@@ -21,12 +21,13 @@ const ThemedCheckboxInput: React.FC<CustomCheckboxInputProps> = (
         error,
         required = false,
         testID
-    }) => {
+    }: CustomCheckboxInputProps<T>
+) => {
     const theme = useTheme();
 
     const {field} = useController({
         control,
-        name,
+        name: name as Path<T>,
     });
 
     return (

@@ -1,13 +1,13 @@
 import React from 'react';
-import {Control, FieldError, useController} from 'react-hook-form';
+import {Control, FieldError, FieldValues, Path, useController} from 'react-hook-form';
 import {Text, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
 import {View} from 'react-native';
 import TimePickerInput from "@/components/general/TimePickerInput";
 
-interface CustomTimeInputProps {
+interface CustomTimeInputProps<T extends FieldValues = FieldValues> {
     name: string;
-    control: Control<any>;
+    control: Control<T>;
     label: string;
     error?: FieldError | undefined;
     required?: boolean;
@@ -15,19 +15,20 @@ interface CustomTimeInputProps {
     disabled?: boolean;
 }
 
-const ThemedTimeInput: React.FC<CustomTimeInputProps> = (
+const ThemedTimeInput = <T extends FieldValues = FieldValues>(
     {
         name,
         control,
         label,
         error,
         required = false
-    }) => {
+    }: CustomTimeInputProps<T>
+) => {
     const theme = useTheme();
 
     const {field} = useController({
         control,
-        name,
+        name: name as Path<T>,
     });
 
     const fieldDate = field.value ? new Date(field.value) : new Date();

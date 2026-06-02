@@ -2,6 +2,8 @@ import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import {injectable} from "inversify";
 import {createApiClient} from "@/infra/openAPI/client";
 import axios from "axios";
+import Delivery from "@/deliveries/models/Delivery";
+import Customer from "@/customers/models/Customer";
 
 @injectable()
 export default class PublicDeliveryService implements IPublicDeliveryService {
@@ -20,5 +22,9 @@ export default class PublicDeliveryService implements IPublicDeliveryService {
             name: "test",
             deliveryType: 0
         }
+    }
+    
+    public createDelivery = async (delivery: Delivery, customer: Customer): Promise<void> => {
+        // const result = await this.apiClient.createPublicDelivery({params: {delivery: delivery, customer: customer} });
     }
 }

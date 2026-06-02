@@ -1,13 +1,13 @@
 import React from 'react';
-import {Control, FieldError, useController} from 'react-hook-form';
+import {Control, FieldError, FieldValues, Path, useController} from 'react-hook-form';
 import {Text, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
 import {View} from 'react-native';
 import {Dropdown} from 'react-native-paper-dropdown';
 
-interface CustomDropdownInputProps {
+interface CustomDropdownInputProps<T extends FieldValues = FieldValues> {
     name: string;
-    control: Control<any>;
+    control: Control<T>;
     label: string;
     options: { label: string, value: string }[]
     error?: FieldError | undefined;
@@ -16,7 +16,7 @@ interface CustomDropdownInputProps {
     isNumber?: boolean;
 }
 
-const ThemedDropdownInput: React.FC<CustomDropdownInputProps> = (
+const ThemedDropdownInput = <T extends FieldValues = FieldValues>(
     {
         name,
         control,
@@ -26,12 +26,13 @@ const ThemedDropdownInput: React.FC<CustomDropdownInputProps> = (
         required = false,
         testID,
         isNumber
-    }) => {
+    }: CustomDropdownInputProps<T>
+) => {
     const theme = useTheme();
 
     const {field} = useController({
         control,
-        name,
+        name: name as Path<T>,
     });
 
     return (
@@ -41,7 +42,7 @@ const ThemedDropdownInput: React.FC<CustomDropdownInputProps> = (
                 <Text style={{color: theme.colors.error}}> *</Text>}
             </Text>
             <Dropdown
-                value={ isNumber ? field.value.toString() : field.value}
+                value={isNumber ? field.value.toString() : field.value}
                 onSelect={(value) => isNumber ? field.onChange(parseInt(value ?? "0")) : field.onChange(value)}
                 mode='outlined'
                 error={error !== undefined}
