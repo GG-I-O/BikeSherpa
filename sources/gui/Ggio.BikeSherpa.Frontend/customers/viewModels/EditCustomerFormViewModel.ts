@@ -16,6 +16,7 @@ export default class EditCustomerFormViewModel {
 
     onSubmit = (customer: Customer) => {
         customer.address.name = customer.name;
+        customer.address.phone = customer.phoneNumber;
         this.customerServices.updateCustomer(customer);
     };
 

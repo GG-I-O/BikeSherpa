@@ -9,6 +9,7 @@ export interface ILogger {
 export interface ILoggerConfig {
     host: string;
     app: string;
+    env: string;
     platform: string;
 }
 

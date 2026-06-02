@@ -18,6 +18,7 @@ export default class NewCourierFormViewModel {
 
     public onSubmit = (courier: InputCourier): void => {
         courier.address.name = `${courier.firstName} ${courier.lastName}`;
+        courier.address.phone = courier.phoneNumber;
         this.courierServices.createCourier(courier);
         if (this.resetCallback) {
             this.resetCallback(); // Clear form after submission
