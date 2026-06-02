@@ -1,12 +1,12 @@
 import React from 'react';
-import {Control, FieldError, useController} from 'react-hook-form';
+import {Control, FieldError, FieldValues, Path, useController} from 'react-hook-form';
 import {Text, TextInput, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
 import {View} from 'react-native';
 
-interface CustomTextInputProps {
+interface CustomTextInputProps<T extends FieldValues = FieldValues> {
     name: string;
-    control: Control<any>;
+    control: Control<T>;
     label: string;
     placeholder: string;
     error?: FieldError | undefined;
@@ -19,7 +19,7 @@ interface CustomTextInputProps {
     isNumeric?: boolean;
 }
 
-const ThemedInput: React.FC<CustomTextInputProps> = (
+const ThemedInput = <T extends FieldValues = FieldValues>(
     {
         name,
         control,
@@ -33,14 +33,14 @@ const ThemedInput: React.FC<CustomTextInputProps> = (
         disabled,
         isAnArray,
         isNumeric
-    }) => {
+    }: CustomTextInputProps<T>) => {
     const theme = useTheme();
 
     const {field} = useController({
         control,
-        name,
+        name: name as Path<T>
     });
-    
+
     const onChange = (value: string) => {
         if (isNumeric) {
             const cleaned = value.replace(/[^0-9.]/g, '');
@@ -50,10 +50,9 @@ const ThemedInput: React.FC<CustomTextInputProps> = (
                 const parsed = parseFloat(cleaned);
                 field.onChange(isNaN(parsed) ? 0 : parsed);
             }
-        }
-        else if (isAnArray)
+        } else if (isAnArray)
             field.onChange([value]);
-        else 
+        else
             field.onChange(value);
     }
 
@@ -64,7 +63,7 @@ const ThemedInput: React.FC<CustomTextInputProps> = (
                 <Text style={{color: theme.colors.error}}> *</Text>}
             </Text>
             <TextInput
-                value={ isAnArray ? field.value[0] : field.value}
+                value={isAnArray ? field.value[0] : field.value}
                 onChangeText={(value) => onChange(value)}
                 placeholder={placeholder}
                 placeholderTextColor={placeholderTextColor || '#3636367e'}

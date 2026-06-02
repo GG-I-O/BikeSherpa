@@ -1,21 +1,21 @@
 import React from 'react';
-import {Control, FieldError} from 'react-hook-form';
+import {Control, FieldError, FieldValues} from 'react-hook-form';
 import {IOCContainer} from '@/bootstrapper/constants/IOCContainer';
 import {IAddressService} from '@/spi/AddressSPI';
 import {ServicesIdentifiers} from '@/bootstrapper/constants/ServicesIdentifiers';
 import {ThemedRHFSuggestiveInput} from "@/components/themed/ThemedRHFSuggestiveInput";
 import {Address} from "@/models/Address";
 
-interface ThemedAddressInputProps {
+interface ThemedAddressInputProps<T extends FieldValues = FieldValues> {
     name: string;
-    control: Control<any>;
+    control: Control<T>;
     label?: string;
     placeholder?: string;
     error?: FieldError | undefined
     required?: boolean;
 }
 
-const ThemedAddressInput: React.FC<ThemedAddressInputProps> = (
+const ThemedAddressInput = <T extends FieldValues = FieldValues>(
     {
         name,
         control,
@@ -23,12 +23,12 @@ const ThemedAddressInput: React.FC<ThemedAddressInputProps> = (
         placeholder,
         error,
         required = false
-    }
+    }: ThemedAddressInputProps<T>
 ) => {
     const addressService = IOCContainer.get<IAddressService>(ServicesIdentifiers.AddressService);
 
     return (
-        <ThemedRHFSuggestiveInput<Address, Address>
+        <ThemedRHFSuggestiveInput<T, Address, Address>
             name={name}
             control={control}
             label={label}
