@@ -1,11 +1,11 @@
 import { observable } from "@legendapp/state";
 import PublicDeliveryCustomer from "@/deliveries/models/PublicDeliveryCustomer";
-import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
+import Delivery from "@/deliveries/models/Delivery";
 
 type PublicDeliveryState = {
     customer: PublicDeliveryCustomer | null;
     isAnonymous: boolean;
-    delivery: DeliveryToDisplay | null;
+    delivery: Delivery | null;
 };
 
 export const publicDeliveryStore$ = observable<PublicDeliveryState>({

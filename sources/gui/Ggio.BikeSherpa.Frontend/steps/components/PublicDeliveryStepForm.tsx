@@ -64,11 +64,11 @@ export default function PublicDeliveryStepForm(props: Props) {
             {fields.slice(2).map((step, index) => (
                 <View key={index} style={{flexDirection: "row", alignItems: "center"}}>
                     <ThemedAddressInput
-                        name={`steps.${index}.stepAddress`}
+                        name={`steps.${index+2}.stepAddress`}
                         control={props.control}
                         label=""
                     />
-                    <IconButton style={{ margin: 0 }} icon="trash-can-outline" onPress={() => remove(index)} />
+                    <IconButton style={{ margin: 0 }} icon="trash-can-outline" onPress={() => remove(index+2)} />
                 </View>
             ))}
             <Text style={AppStyle.textStyle.h3}>{`Kilométrage estimatif : ${props.totalDistance} km`}</Text>

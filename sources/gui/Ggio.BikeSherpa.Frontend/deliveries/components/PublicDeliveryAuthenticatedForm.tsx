@@ -11,6 +11,8 @@ import {ScrollView, View} from "react-native";
 import AppStyle from "@/constants/AppStyle";
 import formStyle from "@/style/formStyle";
 import PublicDeliveryCustomerType from "@/deliveries/components/PublicDeliveryCustomerType";
+import LoadingModal from "@/components/general/LoadingModal";
+import PublicDeliveryErrorModal from "@/deliveries/components/PublicDeliveryErrorModal";
 
 type Props = {
     customer: PublicDeliveryCustomer
@@ -27,6 +29,11 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
 
     return (
         <ScrollView contentContainerStyle={{paddingInline: 16, paddingTop: 16, gap: 16, marginBottom: 64}}>
+            <LoadingModal visible={viewModel.isLoading} />
+            <PublicDeliveryErrorModal 
+                visible={viewModel.showErrorModal} 
+                setVisible={viewModel.setShowErrorModal}
+                onDismiss={viewModel.goToLogin} />
             <View style={{flexDirection: "row", gap: 16, alignItems: "center"}}>
                 <Text style={AppStyle.textStyle.h2}>Type de livraison</Text>
                 <SegmentedButtons
