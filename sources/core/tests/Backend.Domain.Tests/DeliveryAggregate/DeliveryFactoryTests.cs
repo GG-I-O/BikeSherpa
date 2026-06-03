@@ -80,12 +80,11 @@ public class DeliveryFactoryTests
                totalPrice,
                discount,
                extraCost: 0,
-               distance: 0,
-               details ?? [],
-               packingSize ?? PackingSize,
-               insulatedBox,
-               contractDate ?? ContractDate,
-               startDate ?? StartDate
+               details: details ?? [],
+               packingSize: packingSize ?? PackingSize,
+               insulatedBox: insulatedBox,
+               contractDate: contractDate ?? ContractDate,
+               startDate: startDate ?? StartDate
           );
 
      [Fact]

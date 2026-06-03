@@ -10,20 +10,17 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
 public interface IDeliveryFactory
 {
-     Task<Delivery> CreateDeliveryAsync(
-          PricingStrategy pricingStrategy,
+     Task<Delivery> CreateDeliveryAsync(PricingStrategy pricingStrategy,
           Guid customerId,
           Urgency urgency,
           double? totalPrice,
           double? discount,
           double? extraCost,
-          double? distance,
           string[] details,
           PackingSize packingSize,
           bool insulatedBox,
           DateTimeOffset contractDate,
-          DateTimeOffset startDate
-     );
+          DateTimeOffset startDate);
 }
 
 public class DeliveryFactory(
@@ -40,7 +37,6 @@ public class DeliveryFactory(
           double? totalPrice,
           double? discount,
           double? extraCost,
-          double? distance,
           string[] details,
           PackingSize packingSize,
           bool insulatedBox,
@@ -58,7 +54,6 @@ public class DeliveryFactory(
                TotalPrice = totalPrice,
                Discount = discount,
                ExtraCost = extraCost,
-               Distance = distance,
                Details = details,
                Steps = [],
                PackingSize = packingSize,
