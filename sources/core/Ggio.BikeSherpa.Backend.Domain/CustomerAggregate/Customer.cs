@@ -3,6 +3,8 @@ using Ggio.DddCore;
 
 namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 
+public enum DeliveryType { Simple, Tour }
+
 public class Customer : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 {
      public required string Name { get; set; }
@@ -14,4 +16,6 @@ public class Customer : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required Address Address { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
+     
+     public DeliveryType? DefaultDeliveryType { get; set; }
 }

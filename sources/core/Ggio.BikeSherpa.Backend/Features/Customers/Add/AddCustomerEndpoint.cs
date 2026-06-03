@@ -25,7 +25,8 @@ public class AddCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud, Ad
                req.VatNumber,
                req.Email,
                req.PhoneNumber,
-               req.Address
+               req.Address,
+               req.DefaultDeliveryType
           );
 
           var result = await mediator.Send(command, ct);
