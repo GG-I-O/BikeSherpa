@@ -116,7 +116,7 @@ public class DeliveryFactoryTests
           delivery.ContractDate.Should().Be(ContractDate);
           delivery.StartDate.Should().Be(StartDate);
           delivery.Status.Should().Be(DeliveryStatus.Pending);
-          delivery.ReportId.Should().NotBeNull();
+          delivery.CustomerReference.Should().NotBeNull();
           delivery.TotalPrice.Should().Be(55);
      }
 

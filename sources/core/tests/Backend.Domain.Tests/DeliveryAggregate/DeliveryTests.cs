@@ -63,7 +63,7 @@ public class DeliveryTests
         delivery.GenerateReportId(customer);
 
         // Assert
-        delivery.ReportId.Should().StartWith($"{customer.Code}-");
+        delivery.CustomerReference.Should().StartWith($"{customer.Code}-");
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class DeliveryTests
 
         // Assert
         // ReportId format = CUSTOMERCODE-yyyyMMddHHmmss (14-character timestamp)
-        var timestamp = delivery.ReportId![("TEST".Length + 1)..];
+        var timestamp = delivery.CustomerReference![("TEST".Length + 1)..];
         timestamp.Should().HaveLength(14);
     }
 
@@ -94,9 +94,9 @@ public class DeliveryTests
 
         // Act
         delivery.GenerateReportId(customers[0]);
-        var id1 = delivery.ReportId;
+        var id1 = delivery.CustomerReference;
         delivery.GenerateReportId(customers[1]);
-        var id2 = delivery.ReportId;
+        var id2 = delivery.CustomerReference;
 
         // Assert
         id1.Should().StartWith("TEST1-");

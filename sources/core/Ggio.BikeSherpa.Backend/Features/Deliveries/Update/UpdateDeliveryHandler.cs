@@ -96,7 +96,7 @@ public class UpdateDeliveryHandler(
           entity.TotalPrice = command.TotalPrice;
           entity.Discount = command.Discount;
           entity.ExtraCost = command.ExtraCost;
-          entity.ReportId = command.ReportId;
+          entity.CustomerReference = command.ReportId;
           entity.Details = command.Details;
           entity.PackingSize = packingSize;
           entity.InsulatedBox = command.InsulatedBox;

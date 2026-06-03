@@ -184,7 +184,7 @@ public class UpdateDeliveryHandlerTests
           _delivery.Urgency.Should().Be(Urgency);
           _delivery.TotalPrice.Should().Be(123.45);
           _delivery.Discount.Should().Be(_command.Discount);
-          _delivery.ReportId.Should().Be(_command.ReportId);
+          _delivery.CustomerReference.Should().Be(_command.ReportId);
           _delivery.Details.Should().BeEquivalentTo(_command.Details);
           _delivery.PackingSize.Should().Be(PackingSize);
           _delivery.InsulatedBox.Should().Be(_command.InsulatedBox);
