@@ -43,7 +43,6 @@ public class ReportServiceTests
           double? totalPrice = null,
           double? discount = null,
           double? extraCost = null,
-          double? distance = null,
           List<DeliveryStep>? steps = null,
           PackingSize? packingSize = null,
           Urgency? urgency = null)
@@ -61,8 +60,7 @@ public class ReportServiceTests
                Steps = steps ?? [],
                TotalPrice = totalPrice,
                Discount = discount,
-               ExtraCost = extraCost,
-               Distance = distance
+               ExtraCost = extraCost
           };
      }
 
@@ -252,17 +250,18 @@ public class ReportServiceTests
      public void GenerateReport_WhenDeliveryDistanceIsProvided_UsesDeliveryDistanceForDistanceCost()
      {
           // Arrange
-          const double deliveryDistance = 24.5;
 
-          var delivery = MakeDelivery(distance: deliveryDistance);
+          var delivery = MakeDelivery();
           delivery.Steps =
           [
                MakeStep(delivery, StepType.Pickup, CoreZone, distance: 10),
                MakeStep(delivery, StepType.Dropoff, CoreZone, distance: 15)
           ];
+          
+          var totalDistance = delivery.Steps.Sum(s => s.Distance);
 
           _pricingStrategyMock
-               .Setup(s => s.TotalDistanceCost(deliveryDistance, delivery.Urgency))
+               .Setup(s => s.TotalDistanceCost(totalDistance, delivery.Urgency))
                .Returns(12.345);
 
           // Act
@@ -270,7 +269,7 @@ public class ReportServiceTests
 
           // Assert
           _pricingStrategyMock.Verify(
-               s => s.TotalDistanceCost(deliveryDistance, delivery.Urgency),
+               s => s.TotalDistanceCost(totalDistance, delivery.Urgency),
                Times.Once);
 
           report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
@@ -288,7 +287,7 @@ public class ReportServiceTests
           const double billableDistance = 12.5;
           const double ignoredDistance = 8.5;
 
-          var delivery = MakeDelivery(distance: 0);
+          var delivery = MakeDelivery();
           delivery.Steps =
           [
                MakeStep(delivery, StepType.Pickup, CoreZone, distance: billableDistance),

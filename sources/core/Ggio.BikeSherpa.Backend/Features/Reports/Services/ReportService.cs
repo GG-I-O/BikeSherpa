@@ -100,9 +100,8 @@ public class ReportService(
                          Quantity = dropOffsOutside
                     });
 
-               var distance = delivery.Distance ?? 0;
-               if (distance == 0)
-                    distance = delivery.Steps.Where(s => !s.NotBilled).Sum(s => s.Distance);
+
+               var distance = delivery.Steps.Where(s => !s.NotBilled).Sum(s => s.Distance);
 
                var distanceCost = strategy?.TotalDistanceCost(distance, delivery.Urgency) ?? 0;
                if (distanceCost > 0)
