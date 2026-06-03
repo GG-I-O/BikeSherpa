@@ -10,8 +10,8 @@ public class GetAllPricingStrategiesEndpoint(IMediator mediator): EndpointWithou
      public override void Configure()
      {
           Get("/general/pricingStrategies");
-          Policies("AuthenticatedUser");
           Description(x => x.WithTags("general"));
+          AllowAnonymous();
      }
 
      public override async Task HandleAsync(CancellationToken ct)
