@@ -2,6 +2,7 @@
 
 public enum DeliveryStatus
 {
+     New,
      Pending,
      Started,
      Completed,
@@ -10,6 +11,7 @@ public enum DeliveryStatus
 
 public enum DeliveryStatusTrigger
 {
+     Validate,
      Start,
      Complete,
      Cancel

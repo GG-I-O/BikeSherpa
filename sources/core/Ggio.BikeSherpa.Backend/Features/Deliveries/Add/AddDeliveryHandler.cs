@@ -19,7 +19,8 @@ public record AddDeliveryCommand(
      string PackingSize,
      bool InsulatedBox,
      DateTimeOffset ContractDate,
-     DateTimeOffset StartDate
+     DateTimeOffset StartDate,
+     bool NeedEstimate
      ) : ICommand<Result<Guid>>;
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
@@ -56,18 +57,20 @@ public class AddDeliveryHandler(
           var urgency = urgencyRepository.GetByName(command.Urgency)!;
           var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
 
-          var delivery = await factory.CreateDeliveryAsync(
-               command.PricingStrategy,
-               command.CustomerId,
-               urgency,
-               command.TotalPrice,
-               command.Discount,
-               command.ExtraCost,
-               command.Details,
-               packingSize,
-               command.InsulatedBox,
-               command.ContractDate,
-               command.StartDate
+          var delivery = await factory.CreateDeliveryAsync(new DeliveryFactoryParameters(
+                    command.PricingStrategy,
+                    command.CustomerId,
+                    urgency,
+                    command.TotalPrice,
+                    command.Discount,
+                    command.ExtraCost,
+                    command.Details,
+                    packingSize,
+                    command.InsulatedBox,
+                    command.ContractDate,
+                    command.StartDate,
+                    command.NeedEstimate
+                    )
                );
 
           await transaction.CommitAsync(cancellationToken);

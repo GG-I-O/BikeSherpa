@@ -4,7 +4,6 @@ using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
@@ -58,18 +57,7 @@ public class AddDeliveryHandlerTests
           .Create();
 
           _mockFactory
-               .Setup(x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategy>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<Urgency>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<string[]>(),
-                    It.IsAny<PackingSize>(),
-                    It.IsAny<bool>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>()
+               .Setup(x => x.CreateDeliveryAsync(It.IsAny<DeliveryFactoryParameters>()
                     ))
                .ReturnsAsync(_mockDelivery);
      }
@@ -92,18 +80,7 @@ public class AddDeliveryHandlerTests
      private void VerifyFactoryCalledOnce()
      {
           _mockFactory.Verify(
-               x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategy>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<Urgency>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<string[]>(),
-                    It.IsAny<PackingSize>(),
-                    It.IsAny<bool>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>()),
+               x => x.CreateDeliveryAsync(It.IsAny<DeliveryFactoryParameters>()),
                Times.Once);
      }
 
@@ -143,18 +120,7 @@ public class AddDeliveryHandlerTests
           result.IsSuccess.Should().BeTrue();
           result.Value.Should().Be(_mockDelivery.Id);
           _mockFactory.Verify(
-               x => x.CreateDeliveryAsync(
-                    It.IsAny<PricingStrategy>(),
-                    It.IsAny<Guid>(),
-                    It.IsAny<Urgency>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<string[]>(),
-                    It.IsAny<PackingSize>(),
-                    It.IsAny<bool>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>()),
+               x => x.CreateDeliveryAsync(It.IsAny<DeliveryFactoryParameters>()),
                Times.Once);
      }
 
@@ -162,7 +128,7 @@ public class AddDeliveryHandlerTests
      public async Task Handle_ShouldRespectCancellationToken()
      {
           // Arrange
-          var cancellationTokenSource = new CancellationTokenSource();
+          using var cancellationTokenSource = new CancellationTokenSource();
           await cancellationTokenSource.CancelAsync();
           SetupRepositoryTestingIfCodeExists(false);
           var sut = CreateSut();

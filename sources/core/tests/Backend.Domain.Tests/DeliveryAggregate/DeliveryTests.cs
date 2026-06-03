@@ -189,6 +189,7 @@ public class DeliveryTests
         var delivery = MakeSut();
         var step = CreateDropoffStep();
         delivery.Steps.Add(step);
+        delivery.Validate();
 
         // Act
         delivery.UpdateStepCompletion(step.Id, true);
@@ -205,7 +206,8 @@ public class DeliveryTests
         var delivery = MakeSut();
         var step = CreateDropoffStep(completed: true);
         delivery.Steps.Add(step);
-
+        delivery.Validate();
+        
         // Act
         delivery.UpdateStepCompletion(step.Id, false);
 
@@ -220,12 +222,28 @@ public class DeliveryTests
         var delivery = MakeSut();
         var pickup = CreatePickupStep();
         delivery.Steps.Add(pickup);
+        delivery.Validate();
 
         // Act
         delivery.UpdateStepCompletion(pickup.Id, true);
 
         // Assert
         delivery.Status.Should().Be(DeliveryStatus.Started);
+    }
+    
+    [Fact]
+    public void UpdateStepCompletion_WhenDeliveryHasStatusNew_ShouldThrowException()
+    {
+        // Arrange
+        var delivery = MakeSut();
+        var pickup = CreatePickupStep();
+        delivery.Steps.Add(pickup);
+
+        // Act
+        var act = () => delivery.UpdateStepCompletion(pickup.Id, true);
+
+        // Assert
+        act.Should().Throw<InvalidOperationException>();
     }
 
     [Fact]
@@ -675,6 +693,33 @@ public class DeliveryTests
         step2.EstimatedDeliveryDate.Should().Be(startTime.AddMinutes(20));
         step3.EstimatedDeliveryDate.Should().Be(startTime.AddMinutes(30));
         step4.EstimatedDeliveryDate.Should().Be(startTime.AddMinutes(40));
+    }
+
+    [Fact]
+    public void ValidateDelivery_WhenHasStatusNew_ThenShouldForwardToPEndingStatus()
+    {
+        // Arrange
+        var delivery = MakeSut();
+        
+        //Act
+        delivery.Validate();
+        
+        //Assert
+        delivery.Status.Should().Be(DeliveryStatus.Pending);
+    }
+    
+    [Fact]
+    public void ValidateDelivery_WhenHasStatusPending_ThenShouldThrowException()
+    {
+        // Arrange
+        var delivery = MakeSut();
+        delivery.Status = DeliveryStatus.Pending;
+        
+        //Act
+        var test = () => delivery.Validate();
+        
+        //Assert
+       test.Should().Throw<InvalidOperationException>();
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
