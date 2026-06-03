@@ -19,7 +19,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public double? TotalPrice { get; set; }
      public double? Discount { get; set; }
      public double? ExtraCost { get; set; }
-     public string? ReportId { get; set; }
+     public string? CustomerReference { get; set; }
      public required List<DeliveryStep> Steps { get; set; } = [];
      public string[] Details { get; set; } = [];
      public required PackingSize PackingSize { get; set; }
@@ -38,7 +38,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public void GenerateReportId(Customer customer)
      {
-          ReportId = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
+          CustomerReference = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
      }
 
      public void GenerateCode(Customer customer, int increment)
@@ -71,7 +71,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                case DeliveryStatus.Cancelled:
                     throw new InvalidOperationException("Course annulée.");
                default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new InvalidOperationException($"Statut inconnu {Status}");
           }
      }
 

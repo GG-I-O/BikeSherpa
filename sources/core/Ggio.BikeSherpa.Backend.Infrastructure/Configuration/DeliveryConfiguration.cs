@@ -26,7 +26,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           builder.Navigation(d => d.PackingSize).AutoInclude();
           
           builder.Property(d => d.TotalPrice).IsRequired();
-          builder.Property(d => d.ReportId).IsRequired();
+          builder.Property(d => d.CustomerReference).IsRequired();
           builder.Property(d => d.Details).IsRequired();
           builder.Property(d => d.ContractDate).IsRequired();
           builder.Property(d => d.StartDate).IsRequired();
