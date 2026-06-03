@@ -83,7 +83,13 @@ export default class PublicDeliveryFormViewModel {
 
         const result = await this.publicDeliveryService.createDelivery(deliveryObject, customerObject);
         if (result) {
-            publicDeliveryStore$.delivery.set(deliveryObject)
+            publicDeliveryStore$.delivery.set(deliveryObject);
+            publicDeliveryStore$.customer.set({
+                code: '',
+                name: customerObject.name,
+                email: customerObject.email,
+                deliveryType: deliveryObject.pricingStrategy
+            });
         }
         return result;
     }
