@@ -9,6 +9,8 @@ import {ScrollView} from "react-native";
 import formStyle from "@/style/formStyle";
 import React from "react";
 import PublicDeliveryCustomerType from "@/deliveries/components/PublicDeliveryCustomerType";
+import LoadingModal from "@/components/general/LoadingModal";
+import PublicDeliveryErrorModal from "@/deliveries/components/PublicDeliveryErrorModal";
 
 export default function PublicDeliveryAnonymousForm() {
 
@@ -16,6 +18,11 @@ export default function PublicDeliveryAnonymousForm() {
 
     return (
         <ScrollView contentContainerStyle={{paddingInline: 16, paddingTop: 16, gap: 16, marginBottom: 64}}>
+            <LoadingModal visible={viewModel.isLoading} />
+            <PublicDeliveryErrorModal
+                visible={viewModel.showErrorModal}
+                setVisible={viewModel.setShowErrorModal}
+                onDismiss={viewModel.goToLogin} />
             <PublicDeliveryStepForm
                 control={viewModel.control}
                 totalDistance={0}

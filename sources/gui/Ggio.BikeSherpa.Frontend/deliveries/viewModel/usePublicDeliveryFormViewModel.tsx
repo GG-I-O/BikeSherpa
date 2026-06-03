@@ -1,4 +1,4 @@
-import {useForm} from "react-hook-form";
+import {useForm, useWatch} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {
     publicDeliveryFormBaseSchema,
@@ -10,21 +10,25 @@ import PublicDeliveryFormViewModel from "@/deliveries/viewModel/PublicDeliveryFo
 import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
+import {navigate} from "expo-router/build/global-state/routing";
 
 export default function usePublicDeliveryFormViewModel(customer?: PublicDeliveryCustomer) {
     const publicDeliveryService = IOCContainer.get<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices);
-    const viewModel = new PublicDeliveryFormViewModel(publicDeliveryService, customer);
+    const viewModel = new PublicDeliveryFormViewModel(publicDeliveryService);
 
     const {urgencies, pricingStrategies, packingSizes} = useDeliveryDropdown();
 
     const [customerType, setCustomerType] = useState<PublicDeliveryCustomerTypeEnum>(PublicDeliveryCustomerTypeEnum.Sender);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
 
     const {
         control,
         handleSubmit,
         formState: {errors},
+        setValue
     } = useForm<PublicDeliveryFormValues>({
         defaultValues: {
             pricingStrategy: customer?.deliveryType ?? 1,
@@ -35,7 +39,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 email: customer?.email ?? '',
                 phoneNumber: customer ? null : '',
                 address: {
-                    name: '',
+                    name: customer?.name ?? '',
                     streetInfo: '',
                     complement: '',
                     postcode: '',
@@ -85,11 +89,35 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         resolver: zodResolver(publicDeliveryFormBaseSchema)
     });
 
+    const stepAddresses = useWatch({ control, name: "steps" });
+
+    useEffect(() => {
+        if (customerType === PublicDeliveryCustomerTypeEnum.Sender) {
+            const senderAddress = stepAddresses?.[0]?.stepAddress;
+            if (senderAddress) {
+                setValue("customer.address", senderAddress);
+            }
+        } else if (customerType === PublicDeliveryCustomerTypeEnum.Receiver) {
+            const receiverAddress = stepAddresses?.[1]?.stepAddress;
+            if (receiverAddress) {
+                setValue("customer.address", receiverAddress);
+            }
+        }
+    }, [customerType, stepAddresses, setValue]);
+
     return {
         control,
         handleSubmit: handleSubmit(
             (data) => {
-                viewModel.onSubmit(data, customerType);
+                setIsLoading(true);
+                viewModel.onSubmit(data, customerType)
+                    .then((isOk: boolean) => {
+                        if (isOk)
+                            navigate("/newDelivery/summary");
+                        else 
+                            setShowErrorModal(true);
+                    })
+                    .finally(() => setIsLoading(false));
             },
             (errors) => {
                 console.error("Invalid delivery for creation");
@@ -101,6 +129,10 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         deliveryTypes: pricingStrategies.slice(1),
         packingSizes,
         customerType,
-        setCustomerType
+        setCustomerType,
+        isLoading,
+        showErrorModal,
+        setShowErrorModal,
+        goToLogin: () => navigate("/newDelivery")
     };
 }

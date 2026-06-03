@@ -1,4 +1,3 @@
-import PublicDeliveryCustomer from "@/deliveries/models/PublicDeliveryCustomer";
 import Delivery from "@/deliveries/models/Delivery";
 import * as Crypto from "expo-crypto";
 import {PublicDeliveryFormValues} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
@@ -7,20 +6,18 @@ import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServi
 import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import Customer from "@/customers/models/Customer";
 import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
+import {publicDeliveryStore$} from "@/deliveries/store/publicDeliveryStore";
 
 export default class PublicDeliveryFormViewModel {
     private readonly publicDeliveryService: IPublicDeliveryService;
-    private readonly customer?: PublicDeliveryCustomer;
     
     public constructor(
         @inject(DeliveryServiceIdentifier.PublicServices) publicDeliveryService: IPublicDeliveryService,
-        customer?: PublicDeliveryCustomer
     ) {
         this.publicDeliveryService = publicDeliveryService;
-        this.customer = customer;
     }
 
-    public onSubmit = (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): void => {
+    public onSubmit = async (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): Promise<boolean> => {
         if (customerType === PublicDeliveryCustomerTypeEnum.Sender) {
             delivery.customer.address = delivery.steps[0].stepAddress;
             delivery.steps[0].contactName = delivery.customer.name;
@@ -84,6 +81,10 @@ export default class PublicDeliveryFormViewModel {
             vatNumber: null
         }
 
-        this.publicDeliveryService.createDelivery(deliveryObject, customerObject).then();
+        const result = await this.publicDeliveryService.createDelivery(deliveryObject, customerObject);
+        if (result) {
+            publicDeliveryStore$.delivery.set(deliveryObject)
+        }
+        return result;
     }
 }

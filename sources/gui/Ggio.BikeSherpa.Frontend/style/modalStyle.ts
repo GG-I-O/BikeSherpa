@@ -11,7 +11,6 @@ const modalStyle = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        opacity: 0.5,
     },
     title: {
         margin: 16
