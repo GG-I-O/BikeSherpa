@@ -22,7 +22,7 @@ export default function PublicDeliveryLayout() {
                 name="summary"
                 options={{
                     headerShown: true,
-                    title: 'Récapitulatif'
+                    title: 'Résumé de votre commande'
                 }}
             />
         </Stack>
