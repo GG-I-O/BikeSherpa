@@ -20,6 +20,7 @@ public class DeliveryFactoryTests
      private readonly static PackingSize PackingSize = new ("packing", 1, "label", 3, 10);
      private readonly static DateTimeOffset ContractDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+     private readonly static bool NeedEstimate = true;
      private readonly Mock<IReadRepository<Customer>> _customerRepositoryMock = new();
      private readonly Mock<IReadRepository<Delivery>> _deliveryRepositoryMock = new();
      private readonly Fixture _fixture = new();
@@ -72,19 +73,22 @@ public class DeliveryFactoryTests
           PackingSize? packingSize = null,
           bool insulatedBox = false,
           DateTimeOffset? contractDate = null,
-          DateTimeOffset? startDate = null) =>
-          _sut.CreateDeliveryAsync(
-               strategy,
-               customerId ?? CustomerId,
-               urgency ?? Urgency,
-               totalPrice,
-               discount,
-               extraCost: 0,
-               details: details ?? [],
-               packingSize: packingSize ?? PackingSize,
-               insulatedBox: insulatedBox,
-               contractDate: contractDate ?? ContractDate,
-               startDate: startDate ?? StartDate
+          DateTimeOffset? startDate = null,
+          bool? needEstimate = null) =>
+          _sut.CreateDeliveryAsync(new DeliveryFactoryParameters(
+                    strategy,
+                    customerId ?? CustomerId,
+                    urgency ?? Urgency,
+                    totalPrice,
+                    discount,
+                    0,
+                    details ?? [],
+                    packingSize ?? PackingSize,
+                    insulatedBox,
+                    contractDate ?? ContractDate,
+                    startDate ?? StartDate,
+                    NeedEstimate: needEstimate ?? NeedEstimate
+                    )
           );
 
      [Fact]
@@ -115,9 +119,10 @@ public class DeliveryFactoryTests
           delivery.InsulatedBox.Should().BeTrue();
           delivery.ContractDate.Should().Be(ContractDate);
           delivery.StartDate.Should().Be(StartDate);
-          delivery.Status.Should().Be(DeliveryStatus.Pending);
+          delivery.Status.Should().Be(DeliveryStatus.New);
           delivery.CustomerReference.Should().NotBeNull();
           delivery.TotalPrice.Should().Be(55);
+          delivery.NeedEstimate.Should().Be(NeedEstimate);
      }
 
      [Fact]

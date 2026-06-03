@@ -29,7 +29,8 @@ public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, Ad
                req.PackingSize,
                req.InsulatedBox,
                req.ContractDate,
-               req.StartDate
+               req.StartDate,
+               req.NeedEstimate
           );
 
           var result = await mediator.Send(command, ct);

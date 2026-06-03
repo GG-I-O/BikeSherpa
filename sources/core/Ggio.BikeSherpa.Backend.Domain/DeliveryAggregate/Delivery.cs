@@ -12,7 +12,7 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 {
      public required PricingStrategy PricingStrategy { get; set; }
-     public DeliveryStatus Status { get; set; } = DeliveryStatus.Pending;
+     public DeliveryStatus Status { get; set; } = DeliveryStatus.New;
      public required string Code { get; set; }
      public required Guid CustomerId { get; set; }
      public required Urgency Urgency { get; set; }
@@ -28,6 +28,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required DateTimeOffset ContractDate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
+     
+     public bool NeedEstimate { get; set; }
 
      private readonly DeliveryStatusMachine _statusMachine;
 
@@ -73,6 +75,12 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                default:
                     throw new InvalidOperationException($"Statut inconnu {Status}");
           }
+     }
+
+     public void Validate()
+     {
+          _statusMachine.Fire(DeliveryStatusTrigger.Validate);
+          RegisterDomainEvent(new DeliveryValidatedEvent(Id));
      }
 
      private void Start()
@@ -168,6 +176,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public void UpdateStepCompletion(Guid stepId, bool completed)
      {
+          CheckDeliveryHasBeenValidated();
+          
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.Completed = completed;
           if (completed)
@@ -322,5 +332,13 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                return StartDate + Urgency.AddTimeLimit.Value;
           }
           return null;
+     }
+
+     private void CheckDeliveryHasBeenValidated()
+     {
+          if (Status == DeliveryStatus.New)
+          {
+               throw new InvalidOperationException("La course doit avoir été validée avant de pouvoir être modifiée");
+          }
      }
 }
