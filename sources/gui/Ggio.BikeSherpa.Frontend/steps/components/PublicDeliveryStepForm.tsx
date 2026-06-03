@@ -1,9 +1,10 @@
 import {Button, IconButton, Text} from "react-native-paper";
-import {useEffect} from "react";
+import {useCallback, useEffect} from "react";
 import {Control, useFieldArray} from "react-hook-form";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";
 import {PublicDeliveryFormValues} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
+import AppStyle from "@/constants/AppStyle";
 
 type Props = {
     control: Control<PublicDeliveryFormValues>,
@@ -18,7 +19,7 @@ export default function PublicDeliveryStepForm(props: Props) {
         control: props.control
     });
 
-    const addStep = (stepType: number = 1) => {
+    const addStep = useCallback((stepType: number = 1) => {
         append({
             stepType: stepType,
             comment: '',
@@ -33,21 +34,14 @@ export default function PublicDeliveryStepForm(props: Props) {
                 complement: '',
                 postcode: '',
                 city: '',
-                coordinates: {
-                    longitude: 0,
-                    latitude: 0
-                }
+                coordinates: { longitude: 0, latitude: 0 }
             }
         });
-    }
-    
-    useEffect(() => {
-        addStep(0);
-        addStep(1);
-    },[addStep, append]);
+    }, [append]);
     
     return (
-        <View>
+        <View style={{gap: 16}}>
+            <Text style={AppStyle.textStyle.h2}>Adresses de livraison</Text>
             <ThemedAddressInput
                 name={`steps.0.stepAddress`}
                 control={props.control}
@@ -68,17 +62,16 @@ export default function PublicDeliveryStepForm(props: Props) {
                 </Button>
             }
             {fields.slice(2).map((step, index) => (
-                <View key={index} style={{flexDirection: "row"}}>
+                <View key={index} style={{flexDirection: "row", alignItems: "center"}}>
                     <ThemedAddressInput
                         name={`steps.${index}.stepAddress`}
                         control={props.control}
                         label=""
-                        required
                     />
                     <IconButton style={{ margin: 0 }} icon="trash-can-outline" onPress={() => remove(index)} />
                 </View>
             ))}
-            <Text>{`Kilométrage estimatif : ${props.totalDistance} km`}</Text>
+            <Text style={AppStyle.textStyle.h3}>{`Kilométrage estimatif : ${props.totalDistance} km`}</Text>
         </View>
     );
 }

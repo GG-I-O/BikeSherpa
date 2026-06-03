@@ -9,6 +9,8 @@ import {Dropdown} from "react-native-paper-dropdown";
 import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
 import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 import {PublicDeliveryFormValues} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
+import AppStyle from "@/constants/AppStyle";
+import DateToolbox from "@/services/DateToolbox";
 
 type Props = {
     control: Control<PublicDeliveryFormValues>;
@@ -21,7 +23,8 @@ export default function PublicDeliveryDetailsForm(props: Props) {
 
     // Il faudrait sûrement un endpoint pour les heures qui limitent les choix
     const now = new Date();
-    const tomorrow = new Date(now.setDate(now.getDate() + 1))
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
 
     // Time
     const {field} = useController({
@@ -30,9 +33,11 @@ export default function PublicDeliveryDetailsForm(props: Props) {
     });
 
     const fieldDate = field.value ? new Date(field.value) : new Date();
+    const isFieldToday = DateToolbox.getFormattedDateFromISO(now.toISOString()) === DateToolbox.getFormattedDateFromISO(fieldDate.toISOString());
 
     let hoursOptions: DropdownOptions[] = [];
-    for (let i = now.getHours() + 1; i < 17; i++) {
+    const startHours = isFieldToday ? now.getHours() + 1 : 8;
+    for (let i = startHours; i < 17; i++) {
         hoursOptions.push({label: i.toString(), value: i.toString()});
     }
 
@@ -40,22 +45,25 @@ export default function PublicDeliveryDetailsForm(props: Props) {
     for (let i = 0; i < 60; i += 15) {
         minutesOptions.push({label: i.toString(), value: i.toString()});
     }
-    
+
     // Urgencies - Il faudra avoir ces horaires quelque part
-    const urgencies = props.urgencies.filter((urgency, index) => {
-       if (index === 2) return true;
-       
-       if (index === 1) {
-           return now.getHours() <= 14;
-       }
-       if (index === 0) {
-           return now.getHours() <= 12;
-       }
-    });
+    let urgencies = props.urgencies;
+    if (isFieldToday) {
+        urgencies = urgencies.filter((urgency, index) => {
+            if (index === 2) return true;
+
+            if (index === 1) {
+                return now.getHours() <= 14;
+            }
+            if (index === 0) {
+                return now.getHours() <= 12;
+            }
+        });
+    }
 
     return (
-        <View>
-            <View style={[formStyle.intputContainer, {flexDirection: 'row'}]}>
+        <View style={{gap: 16}}>
+            <View style={[formStyle.intputContainer, {flexDirection: 'row', alignItems: 'flex-end'}]}>
                 <ThemedDateInput
                     style={{marginRight: 16}}
                     testID="deliveryFormStartDateInput"
@@ -64,7 +72,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                     error={props.errors.startDate as FieldError | undefined}
                     label="Date de livraison - Heure de mise à disposition par l'expéditeur"
                     validRange={{
-                        startDate: now.getHours() < 15 ? now : tomorrow,
+                        startDate: now.getHours() < 15 ? yesterday : now,
                         endDate: undefined,
                         disabledDates: undefined
                     }}
@@ -82,7 +90,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                     mode='outlined'
                     options={hoursOptions}
                 />
-                <Text>:</Text>
+                <Text style={AppStyle.textStyle.h3}> h </Text>
                 <Dropdown
                     value={fieldDate.getMinutes().toString()}
                     onSelect={(minutes) => {
@@ -94,6 +102,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                     mode='outlined'
                     options={minutesOptions}
                 />
+                <Text style={AppStyle.textStyle.h3}> min </Text>
             </View>
             <ThemedDropdownInput
                 testID="deliveryFormUrgencyInput"

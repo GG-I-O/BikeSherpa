@@ -1,42 +1,61 @@
-import {Text} from "react-native-paper";
+import {Button, Divider, Text} from "react-native-paper";
 import PublicDeliveryStepForm from "@/steps/components/PublicDeliveryStepForm";
 import PublicDeliveryDetailsForm from "@/deliveries/components/PublicDeliveryDetailsForm";
 import PublicDeliveryStepDetailsForm from "@/steps/components/PublicDeliveryStepDetailsForm";
 import PublicDeliveryPrice from "@/deliveries/components/PublicDeliveryPrice";
 import PublicDeliveryCustomerForm from "@/deliveries/components/PublicDeliveryCustomerForm";
 import usePublicDeliveryFormViewModel from "@/deliveries/viewModel/usePublicDeliveryFormViewModel";
+import {ScrollView} from "react-native";
+import formStyle from "@/style/formStyle";
+import React from "react";
+import PublicDeliveryCustomerType from "@/deliveries/components/PublicDeliveryCustomerType";
 
 export default function PublicDeliveryAnonymousForm() {
 
     const viewModel = usePublicDeliveryFormViewModel();
 
     return (
-        <>
+        <ScrollView contentContainerStyle={{paddingInline: 16, paddingTop: 16, gap: 16, marginBottom: 64}}>
             <PublicDeliveryStepForm
                 control={viewModel.control}
                 totalDistance={0}
             />
+            <Divider />
             <PublicDeliveryDetailsForm
                 control={viewModel.control}
                 errors={viewModel.errors}
                 urgencies={viewModel.urgencies}
                 packingSizes={viewModel.packingSizes}
             />
+            <Divider />
             <PublicDeliveryPrice
                 price={0}
                 priceWithTaxes={0}
             />
+            <Divider />
+            <PublicDeliveryCustomerType 
+                customerType={viewModel.customerType}
+                setCustomerType={viewModel.setCustomerType} />
+            <Divider />
             <PublicDeliveryCustomerForm
                 control={viewModel.control}
                 errors={viewModel.errors}
                 customerType={viewModel.customerType}
             />
+            <Divider />
             <PublicDeliveryStepDetailsForm
                 control={viewModel.control}
                 errors={viewModel.errors}
                 customerType={viewModel.customerType}
-                setCustomerType={viewModel.setCustomerType}
             />
-        </>
+            <Button
+                testID="formButton"
+                mode="outlined"
+                onPress={() => viewModel.handleSubmit()}
+                style={formStyle.button}
+            >
+                <Text testID="buttonName">Valider</Text>
+            </Button>
+        </ScrollView>
     );
 }

@@ -15,7 +15,7 @@ export default class AuthService implements IAuthService {
 
     public async getToken(): Promise<string | null> {
         if (!this.getCredentials || !this.audience)
-            throw new Error("AuthService not initialized");
+            return null;
         try {
             const credentials = await this.getCredentials(this.scope, undefined, {audience: this.audience});
             return credentials.accessToken;

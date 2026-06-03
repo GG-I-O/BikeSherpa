@@ -8,6 +8,7 @@ import {
     PublicDeliveryCustomerTypeEnum
 } from "@/deliveries/data/PublicDeliveryCustomerType";
 import {PublicDeliveryFormValues} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
+import AppStyle from "@/constants/AppStyle";
 
 type Props = {
     control: Control<PublicDeliveryFormValues>;
@@ -18,12 +19,12 @@ type Props = {
 export default function PublicDeliveryCustomerForm(props: Props) {
 
     return (
-        <View>
-            <Text>Informations du client / facturation</Text>
+        <View style={{gap: 16}}>
+            <Text style={AppStyle.textStyle.h2}>Informations du client / facturation</Text>
             <ThemedInput
                 testID="customerFormNameInput"
                 control={props.control}
-                name="name"
+                name="customer.name"
                 error={(props.errors.customer as any)?.name as FieldError | undefined}
                 label="Nom"
                 placeholder="Ma Petite Société"
@@ -32,7 +33,7 @@ export default function PublicDeliveryCustomerForm(props: Props) {
             <ThemedInput
                 testID="customerFormEmailInput"
                 control={props.control}
-                name="email"
+                name="customer.email"
                 error={(props.errors.customer as any)?.email as FieldError | undefined}
                 label="E-mail"
                 placeholder="votre-nom@societe.fr"
@@ -41,7 +42,7 @@ export default function PublicDeliveryCustomerForm(props: Props) {
             <ThemedInput
                 testID="customerFormPhoneInput"
                 control={props.control}
-                name="phoneNumber"
+                name="customer.phoneNumber"
                 error={(props.errors.customer as any)?.phoneNumber as FieldError | undefined}
                 label="Téléphone"
                 placeholder="06 10 11 12 13"

@@ -20,11 +20,14 @@ export default class PublicDeliveryService implements IPublicDeliveryService {
         
         return {
             name: "test",
-            deliveryType: 0
+            deliveryType: 1
         }
     }
     
     public createDelivery = async (delivery: Delivery, customer: Customer): Promise<void> => {
+        console.debug("createDelivery")
+        console.debug(delivery)
+        console.debug(customer)
         // const result = await this.apiClient.createPublicDelivery({params: {delivery: delivery, customer: customer} });
     }
 }
