@@ -10,8 +10,8 @@ public class GetAllUrgenciesEndpoint(IMediator mediator) : EndpointWithoutReques
      public override void Configure()
      {
           Get("/general/urgencies");
-          Policies("AuthenticatedUser");
           Description(x => x.WithTags("general"));
+          AllowAnonymous();
      }
 
      public override async Task HandleAsync(CancellationToken ct)
