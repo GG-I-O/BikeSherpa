@@ -4,32 +4,35 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 
+public record CustomerFactoryParameters(
+     string Name,
+     string Code,
+     string? Siret,
+     string? VatNumber,
+     string Email,
+     string PhoneNumber,
+     Address Address,
+     DeliveryType? DefaultDeliveryType);
+
 public interface ICustomerFactory
 {
-     Task<Customer> CreateCustomerAsync(
-          string name,
-          string code,
-          string? siret,
-          string? vatNumber,
-          string email,
-          string phoneNumber,
-          Address address
-     );
+     Task<Customer> CreateCustomerAsync(CustomerFactoryParameters parameters);
 }
 
 public class CustomerFactory(IMediator mediator) : FactoryBase(mediator), ICustomerFactory
 {
-     public async Task<Customer> CreateCustomerAsync(string name, string code, string? siret, string? vatNumber, string email, string phoneNumber, Address address)
+     public async Task<Customer> CreateCustomerAsync(CustomerFactoryParameters parameters)
      {
           var customer = new Customer
           {
-               Name = name,
-               Code = code,
-               Siret = siret,
-               VatNumber = vatNumber,
-               Email = email,
-               PhoneNumber = phoneNumber,
-               Address = address
+               Name = parameters.Name,
+               Code = parameters.Code,
+               Siret = parameters.Siret,
+               VatNumber = parameters.VatNumber,
+               Email = parameters.Email,
+               PhoneNumber = parameters.PhoneNumber,
+               Address = parameters.Address,
+               DefaultDeliveryType = parameters.DefaultDeliveryType
           };
 
           await NotifyNewAggregateRootAdded(customer);

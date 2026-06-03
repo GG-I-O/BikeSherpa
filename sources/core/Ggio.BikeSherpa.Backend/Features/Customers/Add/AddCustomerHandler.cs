@@ -17,7 +17,8 @@ public record AddCustomerCommand(
      string? VatNumber,
      string Email,
      string PhoneNumber,
-     AddressCrud Address
+     AddressCrud Address,
+     DeliveryType? DefaultDeliveryType
 ) : ICommand<Result<Guid>>;
 
 public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
@@ -52,6 +53,7 @@ public class AddCustomerCommandValidator : AbstractValidator<AddCustomerCommand>
           RuleFor(x => x.Email).NotEmpty();
           RuleFor(x => x.PhoneNumber).NotEmpty();
           RuleFor(x => x.Address).NotEmpty();
+          RuleFor(x => x.DefaultDeliveryType).IsInEnum();
      }
 }
 
@@ -64,14 +66,16 @@ public class AddCustomerHandler(
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
 
-          var customer = await factory.CreateCustomerAsync(
-               command.Name,
-               command.Code,
-               command.Siret,
-               command.VatNumber,
-               command.Email,
-               command.PhoneNumber,
-               command.Address.ToSource<AddressCrud, Address>()
+          var customer = await factory.CreateCustomerAsync(new CustomerFactoryParameters(
+                    command.Name,
+                    command.Code,
+                    command.Siret,
+                    command.VatNumber,
+                    command.Email,
+                    command.PhoneNumber,
+                    command.Address.ToSource<AddressCrud, Address>(),
+                    command.DefaultDeliveryType
+                    )
           );
 
           await transaction.CommitAsync(cancellationToken);
