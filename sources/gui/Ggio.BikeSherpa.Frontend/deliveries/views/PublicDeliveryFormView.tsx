@@ -10,7 +10,7 @@ export default function PublicDeliveryFormView() {
     if (customer && !isAnonymous)
         return (
             <>
-                <Stack.Screen options={{title: `${customer.name} - Nouvelle course`}}/>
+                <Stack.Screen options={{title: `${customer.name} - Nouvelle livraison`}}/>
                 <PublicDeliveryAuthenticatedForm customer={customer}/>
             </>
         );

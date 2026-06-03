@@ -18,8 +18,8 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
     const viewModel = new PublicDeliveryFormViewModel(publicDeliveryService, customer);
 
     const {urgencies, pricingStrategies, packingSizes} = useDeliveryDropdown();
-    
-    const [customerType, setCustomerType] = useState<PublicDeliveryCustomerTypeEnum>(PublicDeliveryCustomerTypeEnum.None);
+
+    const [customerType, setCustomerType] = useState<PublicDeliveryCustomerTypeEnum>(PublicDeliveryCustomerTypeEnum.Sender);
 
     const {
         control,
@@ -33,7 +33,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             customer: {
                 name: customer?.name ?? '',
                 email: customer?.email ?? '',
-                phoneNumber: customer ? null : '06',
+                phoneNumber: customer ? null : '',
                 address: {
                     name: '',
                     streetInfo: '',
@@ -42,7 +42,42 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                     city: '',
                 }
             },
-            steps: [],
+            steps: [
+                {
+                    stepType: 0,
+                    comment: '',
+                    courierComment: '',
+                    notBilled: false,
+                    contactName: '',
+                    contactPhone: '',
+                    stepAddress: {
+                        name: '',
+                        fullAddress: '',
+                        streetInfo: '',
+                        complement: '',
+                        postcode: '',
+                        city: '',
+                        coordinates: {longitude: 0, latitude: 0}
+                    }
+                },
+                {
+                    stepType: 1,
+                    comment: '',
+                    courierComment: '',
+                    notBilled: false,
+                    contactName: '',
+                    contactPhone: '',
+                    stepAddress: {
+                        name: '',
+                        fullAddress: '',
+                        streetInfo: '',
+                        complement: '',
+                        postcode: '',
+                        city: '',
+                        coordinates: {longitude: 0, latitude: 0}
+                    }
+                },
+            ],
             packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
             insulatedBox: false,
             startDate: new Date().toISOString(),
@@ -54,7 +89,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         control,
         handleSubmit: handleSubmit(
             (data) => {
-                viewModel.onSubmit(data);
+                viewModel.onSubmit(data, customerType);
             },
             (errors) => {
                 console.error("Invalid delivery for creation");

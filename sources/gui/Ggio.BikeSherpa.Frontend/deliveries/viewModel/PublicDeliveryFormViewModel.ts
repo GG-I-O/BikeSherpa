@@ -1,4 +1,3 @@
-import {deliveryFormBaseSchema, DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 import PublicDeliveryCustomer from "@/deliveries/models/PublicDeliveryCustomer";
 import Delivery from "@/deliveries/models/Delivery";
 import * as Crypto from "expo-crypto";
@@ -7,6 +6,7 @@ import {inject} from "inversify";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import Customer from "@/customers/models/Customer";
+import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
 
 export default class PublicDeliveryFormViewModel {
     private readonly publicDeliveryService: IPublicDeliveryService;
@@ -20,7 +20,18 @@ export default class PublicDeliveryFormViewModel {
         this.customer = customer;
     }
 
-    public onSubmit = (delivery: PublicDeliveryFormValues): void => {
+    public onSubmit = (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): void => {
+        if (customerType === PublicDeliveryCustomerTypeEnum.Sender) {
+            delivery.customer.address = delivery.steps[0].stepAddress;
+            delivery.steps[0].contactName = delivery.customer.name;
+            delivery.steps[0].contactPhone = delivery.customer.phoneNumber;
+        }
+        if (customerType === PublicDeliveryCustomerTypeEnum.Receiver) {
+            delivery.customer.address = delivery.steps[1].stepAddress;
+            delivery.steps[1].contactName = delivery.customer.name;
+            delivery.steps[1].contactPhone = delivery.customer.phoneNumber;
+        }
+        
         // Mapping
         const deliveryObject: Delivery = {
             ...delivery,
