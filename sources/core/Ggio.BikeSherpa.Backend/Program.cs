@@ -165,7 +165,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-if (!app.Environment.IsEnvironment("IntegrationTest"))
+if (!app.Environment.IsEnvironment("IntegrationTest") && !app.Environment.IsProduction())
 {
      app.UseFastEndpoints(config => { config.Endpoints.ShortNames = true; })
           .UseSwaggerGen();
