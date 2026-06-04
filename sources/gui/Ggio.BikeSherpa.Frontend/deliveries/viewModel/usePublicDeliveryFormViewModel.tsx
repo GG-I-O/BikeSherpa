@@ -10,9 +10,12 @@ import PublicDeliveryFormViewModel from "@/deliveries/viewModel/PublicDeliveryFo
 import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
 import {navigate} from "expo-router/build/global-state/routing";
+import {publicDeliveryStore$} from "@/deliveries/store/publicDeliveryStore";
+import {useDebounce} from "@/hooks/useDebounce";
+import {useSelector} from "@legendapp/state/react";
 
 export default function usePublicDeliveryFormViewModel(customer?: PublicDeliveryCustomer) {
     const publicDeliveryService = IOCContainer.get<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices);
@@ -28,7 +31,8 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         control,
         handleSubmit,
         formState: {errors},
-        setValue
+        setValue,
+        getValues
     } = useForm<PublicDeliveryFormValues>({
         defaultValues: {
             pricingStrategy: customer?.deliveryType ?? 1,
@@ -105,6 +109,33 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         }
     }, [customerType, stepAddresses, setValue]);
 
+    const triggerFields = useWatch({
+        control,
+        name: ["steps", "pricingStrategy", "packingSize", "urgency", "startDate"]
+    });
+
+    const cancelledRef = useRef(false);
+
+    useDebounce(() => {
+        cancelledRef.current = false;
+
+        const [steps] = triggerFields;
+        if (!steps?.[0]?.stepAddress?.city || !steps?.[1]?.stepAddress?.city) return;
+
+        viewModel.getEstimatedValue(getValues(), customerType)
+            .then((result) => {
+                if (!cancelledRef.current) {
+                    publicDeliveryStore$.estimatedValue.set(result);
+                }
+            });
+
+        return () => { cancelledRef.current = true; };
+    }, 400, [triggerFields, customerType]);
+
+    const estimatedDistance = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.distance ?? 0);
+    const estimatedPrice = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.priceWithoutTaxes ?? 0);
+    const estimatedPriceWithTaxes = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.priceWithTaxes ?? 0);
+
     return {
         control,
         handleSubmit: handleSubmit(
@@ -133,6 +164,9 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         isLoading,
         showErrorModal,
         setShowErrorModal,
-        goToLogin: () => navigate("/newDelivery")
+        goToLogin: () => navigate("/newDelivery"),
+        estimatedDistance: estimatedDistance,
+        estimatedPrice: estimatedPrice,
+        estimatedPriceWithTaxes: estimatedPriceWithTaxes
     };
 }

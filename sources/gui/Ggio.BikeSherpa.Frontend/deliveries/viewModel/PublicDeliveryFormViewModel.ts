@@ -7,6 +7,7 @@ import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import Customer from "@/customers/models/Customer";
 import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
 import {publicDeliveryStore$} from "@/deliveries/store/publicDeliveryStore";
+import PublicDeliveryEstimatedValue from "@/deliveries/models/PublicDeliveryEstimatedValue";
 
 export default class PublicDeliveryFormViewModel {
     private readonly publicDeliveryService: IPublicDeliveryService;
@@ -18,6 +19,29 @@ export default class PublicDeliveryFormViewModel {
     }
 
     public onSubmit = async (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): Promise<boolean> => {
+        const {deliveryObject, customerObject} = this.mapFormValuesToObject(delivery, customerType);
+        
+        const result = await this.publicDeliveryService.createDelivery(deliveryObject, customerObject);
+        if (result) {
+            publicDeliveryStore$.delivery.set(deliveryObject);
+            publicDeliveryStore$.customer.set({
+                code: '',
+                name: customerObject.name,
+                email: customerObject.email,
+                deliveryType: deliveryObject.pricingStrategy
+            });
+        }
+        return result;
+    }
+    
+    public getEstimatedValue = async (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): Promise<PublicDeliveryEstimatedValue> => {
+        const {deliveryObject} = this.mapFormValuesToObject(delivery, customerType);
+        const estimatedValue =  await this.publicDeliveryService.getEstimatedValue(deliveryObject);
+        console.log(estimatedValue);
+        return estimatedValue;
+    }
+    
+    private mapFormValuesToObject = (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): {deliveryObject: Delivery, customerObject: Customer} => {
         if (customerType === PublicDeliveryCustomerTypeEnum.Sender) {
             delivery.customer.address = delivery.steps[0].stepAddress;
             delivery.steps[0].contactName = delivery.customer.name;
@@ -29,7 +53,6 @@ export default class PublicDeliveryFormViewModel {
             delivery.steps[1].contactPhone = delivery.customer.phoneNumber;
         }
         
-        // Mapping
         const deliveryObject: Delivery = {
             ...delivery,
             code: "",
@@ -65,7 +88,7 @@ export default class PublicDeliveryFormViewModel {
                 }
             })
         };
-        
+
         const customerObject: Customer = {
             id: Crypto.randomUUID(),
             code: "XXX",
@@ -80,17 +103,7 @@ export default class PublicDeliveryFormViewModel {
             siret: null,
             vatNumber: null
         }
-
-        const result = await this.publicDeliveryService.createDelivery(deliveryObject, customerObject);
-        if (result) {
-            publicDeliveryStore$.delivery.set(deliveryObject);
-            publicDeliveryStore$.customer.set({
-                code: '',
-                name: customerObject.name,
-                email: customerObject.email,
-                deliveryType: deliveryObject.pricingStrategy
-            });
-        }
-        return result;
+        
+        return {deliveryObject, customerObject};
     }
 }
