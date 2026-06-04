@@ -36,9 +36,7 @@ export default class PublicDeliveryFormViewModel {
     
     public getEstimatedValue = async (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): Promise<PublicDeliveryEstimatedValue> => {
         const {deliveryObject} = this.mapFormValuesToObject(delivery, customerType);
-        const estimatedValue =  await this.publicDeliveryService.getEstimatedValue(deliveryObject);
-        console.log(estimatedValue);
-        return estimatedValue;
+        return await this.publicDeliveryService.getEstimatedValue(deliveryObject);
     }
     
     private mapFormValuesToObject = (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): {deliveryObject: Delivery, customerObject: Customer} => {
