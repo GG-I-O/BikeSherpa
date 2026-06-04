@@ -14,6 +14,6 @@ public class ParameterRepository(BackendDbContext dbContext) : IParameterReposit
 
      public async ValueTask<double> GetVatRateAsync()
      {
-          return Convert.ToDouble(await dbContext.Parameters.FindAsync(VatRateKey));
+          return Convert.ToDouble((await dbContext.Parameters.FindAsync(VatRateKey))!.Value);
      }
 }
