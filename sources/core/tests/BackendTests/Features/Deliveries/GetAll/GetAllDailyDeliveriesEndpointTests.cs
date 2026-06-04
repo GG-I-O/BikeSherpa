@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text.Json;
-using Ardalis.Result;
 using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
