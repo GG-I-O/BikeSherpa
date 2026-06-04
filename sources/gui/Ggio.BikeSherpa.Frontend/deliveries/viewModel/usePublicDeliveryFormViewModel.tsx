@@ -93,7 +93,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         resolver: zodResolver(publicDeliveryFormBaseSchema)
     });
 
-    const stepAddresses = useWatch({ control, name: "steps" });
+    const stepAddresses = useWatch({control, name: "steps"});
 
     useEffect(() => {
         if (customerType === PublicDeliveryCustomerTypeEnum.Sender) {
@@ -117,11 +117,12 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
     const cancelledRef = useRef(false);
 
     useDebounce(() => {
-        setIsLoading(true);
         cancelledRef.current = false;
 
         const [steps] = triggerFields;
         if (!steps?.[0]?.stepAddress?.city || !steps?.[1]?.stepAddress?.city) return;
+        
+        setIsLoading(true);
 
         viewModel.getEstimatedValue(getValues(), customerType)
             .then((result) => {
@@ -131,7 +132,9 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             })
             .finally(() => setIsLoading(false));
 
-        return () => { cancelledRef.current = true; };
+        return () => {
+            cancelledRef.current = true;
+        };
     }, 400, [triggerFields, customerType]);
 
     const estimatedDistance = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.distance ?? 0);
@@ -147,7 +150,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                     .then((isOk: boolean) => {
                         if (isOk)
                             navigate("/newDelivery/summary");
-                        else 
+                        else
                             setShowErrorModal(true);
                     })
                     .finally(() => setIsLoading(false));
@@ -159,7 +162,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         ),
         errors,
         urgencies,
-        deliveryTypes: pricingStrategies.slice(1),
+        deliveryTypes: pricingStrategies.slice(0, 2),
         packingSizes,
         customerType,
         setCustomerType,

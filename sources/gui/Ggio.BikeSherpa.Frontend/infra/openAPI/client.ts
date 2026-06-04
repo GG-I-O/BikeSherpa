@@ -71,6 +71,7 @@ const DeliveryStatus = z.union([
   z.literal(1),
   z.literal(2),
   z.literal(3),
+  z.literal(4),
 ]);
 const DeliveryCrud = z.object({
   steps: z.array(DeliveryStepDto),
@@ -84,14 +85,14 @@ const DeliveryCrud = z.object({
   totalPrice: z.number().nullable(),
   discount: z.number().nullable(),
   extraCost: z.number().nullable(),
-  distance: z.number().nullable(),
-  reportId: z.string().nullable(),
+  customerReference: z.string().nullable(),
   details: z.array(z.string()),
   insulatedBox: z.boolean(),
   startDate: z.string().datetime({ offset: true }),
   contractDate: z.string().datetime({ offset: true }),
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
+  needEstimate: z.boolean(),
   id: z.string(),
 });
 const DeliveryDto = z.object({
@@ -119,6 +120,40 @@ const JsonPatchDocumentOfDeliveryStep = z.object({
   operations: z.array(OperationOfDeliveryStep),
 });
 const AddResultOfGuid = z.object({ id: z.string() });
+const AttachmentRequest = z.object({ file: z.instanceof(File) });
+const ResultStatus = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+  z.literal(4),
+  z.literal(5),
+  z.literal(6),
+  z.literal(7),
+  z.literal(8),
+  z.literal(9),
+  z.literal(10),
+]);
+const ValidationSeverity = z.union([z.literal(0), z.literal(1), z.literal(2)]);
+const ValidationError = z.object({
+  identifier: z.string(),
+  errorMessage: z.string(),
+  errorCode: z.string(),
+  severity: ValidationSeverity,
+});
+const ResultOfResult = z.lazy(() =>
+  z.object({
+    value: Result,
+    status: ResultStatus,
+    isSuccess: z.boolean(),
+    successMessage: z.string(),
+    correlationId: z.string(),
+    location: z.string(),
+    errors: z.array(z.string()),
+    validationErrors: z.array(ValidationError),
+  })
+);
+const Result = z.lazy(() => ResultOfResult.and(z.object({})));
 const AddressCrud = z.object({
   name: z.string(),
   streetInfo: z.string(),
@@ -128,6 +163,7 @@ const AddressCrud = z.object({
   coordinates: GeoPoint,
   phone: z.string().nullable(),
 });
+const DeliveryType = z.union([z.literal(0), z.literal(1)]);
 const CustomerCrud = z.object({
   name: z.string(),
   code: z.string(),
@@ -138,12 +174,18 @@ const CustomerCrud = z.object({
   address: AddressCrud,
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
+  defaultDeliveryType: DeliveryType.nullable(),
   id: z.string(),
 });
 const CustomerDto = z.object({
   data: CustomerCrud,
   links: z.array(Link).nullable(),
 });
+const CheckCustomerResponse = z.object({
+  defaultDeliveryType: DeliveryType.nullable(),
+  customerName: z.string(),
+});
+const ProblemDetails = z.record(z.unknown().nullable());
 const CourierCrud = z.object({
   firstName: z.string(),
   lastName: z.string(),
@@ -188,9 +230,18 @@ export const schemas = {
   OperationOfDeliveryStep,
   JsonPatchDocumentOfDeliveryStep,
   AddResultOfGuid,
+  AttachmentRequest,
+  ResultStatus,
+  ValidationSeverity,
+  ValidationError,
+  ResultOfResult,
+  Result,
   AddressCrud,
+  DeliveryType,
   CustomerCrud,
   CustomerDto,
+  CheckCustomerResponse,
+  ProblemDetails,
   CourierCrud,
   CourierDto,
 };
@@ -469,6 +520,55 @@ const endpoints = makeApi([
         description: `Unauthorized`,
         schema: z.void(),
       },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "post",
+    path: "/customers/check",
+    alias: "CheckCustomerEndpoint",
+    tags: ["customer"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "code",
+        type: "Query",
+        schema: z.string(),
+      },
+      {
+        name: "email",
+        type: "Query",
+        schema: z.string(),
+      },
+    ],
+    response: CheckCustomerResponse,
+    errors: [
+      {
+        status: 404,
+        description: `Not Found`,
+        schema: z.record(z.unknown().nullable()),
+      },
+    ],
+  },
+  {
+    method: "post",
+    path: "/deliveries/:deliveryId/validate",
+    alias: "ValidateDeliveryEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
       {
         status: 403,
         description: `Forbidden`,
@@ -772,6 +872,43 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "post",
+    path: "/delivery/:deliveryId/step/:stepId/attachment",
+    alias: "AddDeliveryStepAttachmentEndpoint",
+    tags: ["delivery"],
+    requestFormat: "form-data",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ file: z.instanceof(File) }),
+      },
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "stepId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: Result,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "put",
     path: "/delivery/:deliveryId/step/:stepId/changeOrder",
     alias: "UpdateDeliveryStepOrderEndpoint",
@@ -995,18 +1132,6 @@ const endpoints = makeApi([
     tags: ["general"],
     requestFormat: "json",
     response: z.array(PackingSizeDto),
-    errors: [
-      {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
   },
   {
     method: "get",
@@ -1015,18 +1140,6 @@ const endpoints = makeApi([
     tags: ["general"],
     requestFormat: "json",
     response: z.array(PricingStrategyDto),
-    errors: [
-      {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
   },
   {
     method: "get",
@@ -1035,18 +1148,6 @@ const endpoints = makeApi([
     tags: ["general"],
     requestFormat: "json",
     response: z.array(UrgencyDto),
-    errors: [
-      {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
   },
   {
     method: "get",
