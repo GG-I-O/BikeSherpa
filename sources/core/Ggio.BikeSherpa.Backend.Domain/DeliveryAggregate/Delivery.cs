@@ -334,6 +334,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           return null;
      }
 
+     public double GetTotalDistance()
+     {
+          return Steps.Sum(s => s.Distance);
+     }
+
      private void CheckDeliveryHasBeenValidated()
      {
           if (Status == DeliveryStatus.New)

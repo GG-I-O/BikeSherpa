@@ -1,5 +1,6 @@
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.PriceCalculation;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,7 @@ public static class Bootstrap
                services.AddScoped<IValidator<UpdateDeliveryStepOrderCommand>, UpdateDeliveryStepOrderCommandValidator>();
                services.AddScoped<IValidator<UpdateDeliveryStepTimeCommand>, UpdateDeliveryStepTimeCommandValidator>();
                services.AddTransient<IValidator<ValidateDeliveryCommand>, ValidateDeliveryCommandValidator>();
+               services.AddTransient<IValidator<CalculateDeliveryPriceQuery>, CalculateDeliveryPriceQueryValidator>();
                return services;
           }
      }
