@@ -7,6 +7,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Ggio.DddCore;
 using Mediator;
 
@@ -39,11 +40,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
           RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
           RuleFor(x => x.Status).IsInEnum();
           RuleFor(x => x.CustomerId).NotNull();
-          RuleFor(x => x.Urgency)
-               .NotEmpty()
-               .Must(urgency => urgencies.GetAll().Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
-               .WithMessage("Valeur d'urgence saisie invalide.");
-
+          RuleFor(x => x.Urgency).SetValidator(new UrgencyValidator(urgencies));
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.Discount).NotEmpty();
           RuleForEach(x => x.Steps)
@@ -54,13 +51,8 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                     step.RuleFor(s => s.EstimatedDeliveryDate).NotEmpty();
                });
 
-          RuleFor(x => x.PackingSize).NotEmpty();
+          RuleFor(x => x.PackingSize).SetValidator(new PackingSizeValidator(packingSizes));
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.PackingSize)
-               .NotEmpty()
-               .Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
-               .WithMessage("Taille de colis saisie invalide.");
-
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
