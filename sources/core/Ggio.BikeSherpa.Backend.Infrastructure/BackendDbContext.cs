@@ -1,6 +1,7 @@
 using Ggio.BikeSherpa.Backend.Domain.CourierAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
+using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,9 @@ public class BackendDbContext(DbContextOptions<BackendDbContext> options) : DbCo
      public virtual DbSet<DeliveryZone> DeliveryZones { get; set; }
      [UsedImplicitly]
      public virtual DbSet<Urgency> Urgencies { get; set; }
+     
+     [UsedImplicitly]
+     public virtual DbSet<Parameter> Parameters { get; set; }
 
      override protected void OnModelCreating(ModelBuilder modelBuilder)
      {

@@ -1,10 +1,10 @@
 using AutoFixture;
 using AwesomeAssertions;
-using Facet.Extensions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.PriceCalculation;
 using Moq;
@@ -14,6 +14,7 @@ namespace BackendTests.Features.Deliveries.PriceCalculation;
 public class CalculateDeliveryPriceHandlerTest
 {
      private readonly Fixture _fixture = new();
+
      [Fact]
      public async Task Handle_ShouldReturnCorrectResult_WhenValidQueryIsProvided()
      {
@@ -58,9 +59,9 @@ public class CalculateDeliveryPriceHandlerTest
           var result = await sut.Handle(query, CancellationToken.None);
 
           // Assert
-         result.Price.Should().Be(expectedPriceWithoutVat);
-         result.PriceWithVat.Should().Be(expectedPriceWithoutVat * 1.2);
-         result.TotalDistance.Should().Be(8.5);
+          result.Price.Should().Be(expectedPriceWithoutVat);
+          result.PriceWithVat.Should().Be(expectedPriceWithoutVat * 1.2);
+          result.TotalDistance.Should().Be(8.5);
 
           pricingStrategyServiceMock.Verify(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Once);
      }
@@ -84,7 +85,7 @@ public class CalculateDeliveryPriceHandlerTest
                               .With(s => s.StepType, StepType.Pickup)
                               .With(s => s.Distance, 0.0)
                               .Create()
-                        
+
                     }
                ],
                Urgency = urgency.Name,
@@ -135,7 +136,7 @@ public class CalculateDeliveryPriceHandlerTest
                     },
 
                     new()
-                    {    
+                    {
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Dropoff)
                               .With(s => s.Distance, 4.3)
@@ -166,12 +167,14 @@ public class CalculateDeliveryPriceHandlerTest
           pricingStrategyServiceMock = new Mock<IPricingStrategyService>();
           var urgencyMock = new Mock<IUrgencyRepository>();
           var packingSizeMock = new Mock<IPackingSizeRepository>();
+          var vatServiceMock = new Mock<IVatService>();
           urgencyMock.Setup(x => x.GetByName(urgency.Name)).Returns(urgency);
           packingSizeMock.Setup(x => x.GetByName(packingSize.Name)).Returns(packingSize);
-          
+          vatServiceMock.Setup(x => x.GetPriceWithVatAsync(It.IsAny<double>())).ReturnsAsync((double price) => price * 1.2);
           return new CalculateDeliveryPriceHandler(pricingStrategyServiceMock.Object,
                urgencyMock.Object,
                packingSizeMock.Object,
-               new CalculateDeliveryPriceQueryValidator(urgencyMock.Object, packingSizeMock.Object));
+               new CalculateDeliveryPriceQueryValidator(urgencyMock.Object, packingSizeMock.Object),
+               vatServiceMock.Object);
      }
 }

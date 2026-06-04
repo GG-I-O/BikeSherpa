@@ -1,5 +1,6 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.Spi;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
 using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
@@ -45,6 +46,7 @@ public static class Bootstrap
                services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
                services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
                services.AddScoped<IUrgencyRepository, UrgencyRepository>();
+               services.AddScoped<IParameterRepository, ParameterRepository>();
 
                services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
                services.AddSingleton<IDeliveryStepAttachmentSaveService, StorageService>();
