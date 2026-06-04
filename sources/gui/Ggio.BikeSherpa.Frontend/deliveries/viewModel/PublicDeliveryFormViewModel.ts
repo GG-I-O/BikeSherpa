@@ -54,7 +54,7 @@ export default class PublicDeliveryFormViewModel {
         const deliveryObject: Delivery = {
             ...delivery,
             code: "",
-            contractDate: "",
+            contractDate: new Date().toISOString(),
             customerId: "",
             details: [],
             discount: 0,

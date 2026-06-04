@@ -22,7 +22,7 @@ export default function LoadingModal(props: LoadingModalProps) {
                 animationType="slide"
                 transparent={true}
                 visible={modalVisible}>
-                <View style={[modalStyle.safeArea, {backgroundColor: theme.colors.onBackground}]}>
+                <View style={[modalStyle.safeArea, {backgroundColor: 'rgba(0, 0, 0, 0.75)'}]}>
                     <ActivityIndicator animating color={theme.colors.background} size="large"/>
                 </View>
             </Modal>

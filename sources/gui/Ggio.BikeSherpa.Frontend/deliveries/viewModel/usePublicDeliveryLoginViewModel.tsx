@@ -9,6 +9,7 @@ import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServi
 import PublicDeliveryLoginViewModel from "@/deliveries/viewModel/PublicDeliveryLoginViewModel";
 import {useRouter} from "expo-router";
 import {publicDeliveryStore$} from "@/deliveries/store/publicDeliveryStore";
+import {navigate} from "expo-router/build/global-state/routing";
 
 export default function usePublicDeliveryLoginViewModel() {
     const publicDeliveryService = IOCContainer.get<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices);
@@ -17,12 +18,14 @@ export default function usePublicDeliveryLoginViewModel() {
     const router = useRouter();
 
     const [publicCustomer, setPublicCustomer] = useState<PublicDeliveryCustomer | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (publicCustomer && publicCustomer.email && publicCustomer.code) {
+            setIsLoading(false);
             publicDeliveryStore$.customer.set(publicCustomer);
             publicDeliveryStore$.isAnonymous.set(false);
-            router.push("/newDelivery/form");
+            navigate("/newDelivery/form");
         }
     }, [publicCustomer])
 
@@ -44,6 +47,7 @@ export default function usePublicDeliveryLoginViewModel() {
         control,
         handleSubmit: handleSubmit(
             (data) => {
+                setIsLoading(true);
                 viewModel.login(data.email, data.code)
                     .then(customer => {
                             if (!customer) {
@@ -64,6 +68,7 @@ export default function usePublicDeliveryLoginViewModel() {
                             }
                         }
                     )
+                    .finally(() => setIsLoading(false))
             },
             (errors) => {
                 console.error("Invalid delivery for creation");
@@ -75,6 +80,7 @@ export default function usePublicDeliveryLoginViewModel() {
             publicDeliveryStore$.customer.set(null);
             publicDeliveryStore$.isAnonymous.set(true);
             router.push("/newDelivery/form");
-        }
+        },
+        isLoading
     }
 }

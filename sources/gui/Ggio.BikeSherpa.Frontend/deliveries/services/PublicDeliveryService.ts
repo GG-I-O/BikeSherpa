@@ -16,25 +16,34 @@ export default class PublicDeliveryService implements IPublicDeliveryService {
     }
 
     public loginPublicDeliveryCustomer = async (email: string, code: string) => {
-        // const result = await this.apiClient.loginPublicDeliveryCustomer({params: {email: email, code: code} });
-        
-        return {
-            name: "test",
-            deliveryType: 1
+        try {
+            const result = await this.apiClient.CheckCustomerEndpoint(undefined, {
+                queries: {
+                    email,
+                    code
+                }
+            });
+
+            return {
+                name: result.customerName,
+                deliveryType: result.defaultDeliveryType ?? 0
+            }
+        } catch (error) {
+            return null;
         }
     }
-    
+
     public getEstimatedValue = async (delivery: Delivery) => {
         // const result = await this.apiClient.getEstimatedValue({params: {delivery: delivery} });
         // return result.data;
-        
+
         return {
             distance: 2,
             priceWithoutTaxes: 10,
             priceWithTaxes: 12
         }
     }
-    
+
     public createDelivery = async (delivery: Delivery, customer: Customer): Promise<boolean> => {
         console.debug("createDelivery")
         console.debug(delivery)
