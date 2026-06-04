@@ -1,5 +1,5 @@
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;

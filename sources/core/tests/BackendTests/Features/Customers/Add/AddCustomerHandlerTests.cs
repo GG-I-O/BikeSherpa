@@ -2,7 +2,7 @@
 using AutoFixture;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.DddCore;
 using Moq;

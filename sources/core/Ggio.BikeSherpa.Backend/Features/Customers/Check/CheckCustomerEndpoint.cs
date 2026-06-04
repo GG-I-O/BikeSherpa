@@ -1,7 +1,7 @@
 using FastEndpoints;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 using Ggio.DddCore;
 using Microsoft.AspNetCore.Http;
 

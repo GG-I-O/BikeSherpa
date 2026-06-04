@@ -1,6 +1,6 @@
 ﻿using Ardalis.Specification;
 
-namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+namespace Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 
 public class CustomerByVatNumberSpecification : SingleResultSpecification<Customer>
 {
