@@ -5,6 +5,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Mediator;
@@ -22,8 +23,8 @@ public class CalculateDeliveryPriceQueryValidator : AbstractValidator<CalculateD
           RuleFor(x => x.Delivery).NotNull();
           RuleFor(x=>x.Delivery.Urgency).SetValidator(new UrgencyValidator(urgencyRepository));
           RuleFor(x => x.Delivery.PackingSize).SetValidator(new PackingSizeValidator(packingSizeRepository));
-          RuleFor(x => x.Delivery.PricingStrategy).NotEmpty()
-               .Must(val => val == PricingStrategy.SimpleDeliveryStrategy || val == PricingStrategy.TourDeliveryStrategy)
+          RuleFor(x => x.Delivery.PricingStrategy)
+               .Must(val => val is PricingStrategy.SimpleDeliveryStrategy or PricingStrategy.TourDeliveryStrategy)
                .WithMessage("Le type de tarification pour le calcul doit être 'Course' ou 'Tournée'");
           RuleFor(x => x.Delivery.Steps).NotEmpty()
                .Must(steps => steps.Any())
@@ -34,10 +35,9 @@ public class CalculateDeliveryPriceHandler(
      IPricingStrategyService pricingStrategyService,
      IUrgencyRepository urgencyRepository,
      IPackingSizeRepository packingSizeRepository,
-     IValidator<CalculateDeliveryPriceQuery> validator) : IQueryHandler<CalculateDeliveryPriceQuery, CalculateDeliveryPriceResult>
+     IValidator<CalculateDeliveryPriceQuery> validator,
+     IVatService vatService) : IQueryHandler<CalculateDeliveryPriceQuery, CalculateDeliveryPriceResult>
 {
-     const double VatCoefficient = 1.2;
-
      public async ValueTask<CalculateDeliveryPriceResult> Handle(CalculateDeliveryPriceQuery query, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(query, cancellationToken);
@@ -58,7 +58,7 @@ public class CalculateDeliveryPriceHandler(
           };
 
           var price = pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
-          var priceWithVat = price * VatCoefficient;
+          var priceWithVat = await vatService.GetPriceWithVatAsync(price);
           var totalDistance = delivery.GetTotalDistance();
 
           return new CalculateDeliveryPriceResult(price, priceWithVat, totalDistance);
