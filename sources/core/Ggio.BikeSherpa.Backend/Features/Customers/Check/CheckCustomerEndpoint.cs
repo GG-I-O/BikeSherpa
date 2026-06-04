@@ -38,7 +38,12 @@ public class CheckCustomerEndpoint(IReadRepository<Customer> repository , IValid
      {
           AllowAnonymous();
           Post("/customers/check");
-          Description(x => x.WithTags("customer").WithDescription("Check if a customer exists"));
+          Description(x => x.WithTags("customer")
+               .WithDescription("Check if a customer exists")
+               .Produces<CheckCustomerResponse>()
+               .ProducesProblem(404, "application/json")
+          );
+          
      }
 
      public override async Task HandleAsync(CheckCustomerQuery req, CancellationToken ct)
