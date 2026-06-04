@@ -26,4 +26,8 @@
         <PackageReference Include="Refit.Newtonsoft.Json" Version="10.0.1"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Mail\" />
+    </ItemGroup>
+
 </Project>

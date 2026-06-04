@@ -1,6 +1,6 @@
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Features.Reports.Model;
