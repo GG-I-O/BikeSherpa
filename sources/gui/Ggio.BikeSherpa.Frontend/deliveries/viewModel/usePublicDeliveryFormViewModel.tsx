@@ -117,6 +117,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
     const cancelledRef = useRef(false);
 
     useDebounce(() => {
+        setIsLoading(true);
         cancelledRef.current = false;
 
         const [steps] = triggerFields;
@@ -127,7 +128,8 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 if (!cancelledRef.current) {
                     publicDeliveryStore$.estimatedValue.set(result);
                 }
-            });
+            })
+            .finally(() => setIsLoading(false));
 
         return () => { cancelledRef.current = true; };
     }, 400, [triggerFields, customerType]);
