@@ -3,9 +3,15 @@ import {View} from "react-native";
 import {Divider, Text} from "react-native-paper";
 
 export default function PublicDeliverySummaryView() {
+    
     const delivery = publicDeliveryStore$.delivery.get();
     const customer = publicDeliveryStore$.customer.get();
     const estimatedValue = publicDeliveryStore$.estimatedValue.get();
+    
+    console.log("Summary")
+    console.log(delivery)
+    console.log(customer)
+    console.log(estimatedValue)
     
     if (!delivery || !customer || !estimatedValue)
         return (

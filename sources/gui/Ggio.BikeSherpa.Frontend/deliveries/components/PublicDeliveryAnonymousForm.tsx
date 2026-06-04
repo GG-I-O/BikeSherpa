@@ -25,7 +25,7 @@ export default function PublicDeliveryAnonymousForm() {
                 onDismiss={viewModel.goToLogin} />
             <PublicDeliveryStepForm
                 control={viewModel.control}
-                totalDistance={0}
+                totalDistance={viewModel.estimatedDistance}
             />
             <Divider />
             <PublicDeliveryDetailsForm
@@ -36,8 +36,8 @@ export default function PublicDeliveryAnonymousForm() {
             />
             <Divider />
             <PublicDeliveryPrice
-                price={0}
-                priceWithTaxes={0}
+                price={viewModel.estimatedPrice}
+                priceWithTaxes={viewModel.estimatedPriceWithTaxes}
             />
             <Divider />
             <PublicDeliveryCustomerType 

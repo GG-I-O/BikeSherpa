@@ -48,7 +48,7 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
             <Divider/>
             <PublicDeliveryStepForm
                 control={viewModel.control}
-                totalDistance={0}
+                totalDistance={viewModel.estimatedDistance}
                 canAddStep={viewModel.deliveryTypes.length > 0 && field.value.toString() === viewModel.deliveryTypes[1].value}
             />
             <Divider/>
@@ -60,8 +60,8 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
             />
             <Divider/>
             <PublicDeliveryPrice
-                price={0}
-                priceWithTaxes={0}
+                price={viewModel.estimatedPrice}
+                priceWithTaxes={viewModel.estimatedPriceWithTaxes}
             />
             <Divider/>
             <PublicDeliveryCustomerType
