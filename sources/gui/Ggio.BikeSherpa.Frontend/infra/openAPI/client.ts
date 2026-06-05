@@ -98,9 +98,9 @@ const DeliveryCrud = z.object({
   insulatedBox: z.boolean(),
   startDate: z.string().datetime({ offset: true }),
   contractDate: z.string().datetime({ offset: true }),
+  needEstimate: z.boolean(),
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
-  needEstimate: z.boolean(),
   id: z.string(),
 });
 const DeliveryDto = z.object({
@@ -161,39 +161,6 @@ const AddDeliveryByCustomerRequest = z.object({
 });
 const AddResultOfGuid = z.object({ id: z.string() });
 const AttachmentRequest = z.object({ file: z.instanceof(File) });
-const ResultStatus = z.union([
-  z.literal(0),
-  z.literal(1),
-  z.literal(2),
-  z.literal(3),
-  z.literal(4),
-  z.literal(5),
-  z.literal(6),
-  z.literal(7),
-  z.literal(8),
-  z.literal(9),
-  z.literal(10),
-]);
-const ValidationSeverity = z.union([z.literal(0), z.literal(1), z.literal(2)]);
-const ValidationError = z.object({
-  identifier: z.string(),
-  errorMessage: z.string(),
-  errorCode: z.string(),
-  severity: ValidationSeverity,
-});
-const ResultOfResult = z.lazy(() =>
-  z.object({
-    value: Result,
-    status: ResultStatus,
-    isSuccess: z.boolean(),
-    successMessage: z.string(),
-    correlationId: z.string(),
-    location: z.string(),
-    errors: z.array(z.string()),
-    validationErrors: z.array(ValidationError),
-  })
-);
-const Result = z.lazy(() => ResultOfResult.and(z.object({})));
 const CustomerDto = z.object({
   data: CustomerCrud,
   links: z.array(Link).nullable(),
@@ -254,11 +221,6 @@ export const schemas = {
   AddDeliveryByCustomerRequest,
   AddResultOfGuid,
   AttachmentRequest,
-  ResultStatus,
-  ValidationSeverity,
-  ValidationError,
-  ResultOfResult,
-  Result,
   CustomerDto,
   CheckCustomerResponse,
   ProblemDetails,
@@ -944,7 +906,7 @@ const endpoints = makeApi([
         schema: z.string(),
       },
     ],
-    response: Result,
+    response: z.void(),
     errors: [
       {
         status: 401,
@@ -954,6 +916,11 @@ const endpoints = makeApi([
       {
         status: 403,
         description: `Forbidden`,
+        schema: z.void(),
+      },
+      {
+        status: 404,
+        description: `Not Found`,
         schema: z.void(),
       },
     ],

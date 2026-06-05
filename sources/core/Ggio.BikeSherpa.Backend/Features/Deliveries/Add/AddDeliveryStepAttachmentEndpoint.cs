@@ -2,7 +2,6 @@ using Ardalis.Result;
 using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Extensions;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
-using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
@@ -17,7 +16,11 @@ public class AddDeliveryStepAttachmentEndpoint(
           Post("/delivery/{deliveryId:guid}/step/{stepId:guid}/attachment");
           Policies("write:myDeliveries");
           AllowFileUploads();
-          Description(x => x.WithTags("delivery"));
+          Description(x => 
+               x.WithTags("delivery")
+                    .Produces(StatusCodes.Status200OK)
+                    .Produces(StatusCodes.Status404NotFound)
+               );
      }
 
      public override async Task HandleAsync(AttachmentRequest req, CancellationToken ct)
@@ -29,7 +32,6 @@ public class AddDeliveryStepAttachmentEndpoint(
           );
 
           var result = await mediator.Send(command, ct);
-          
           await Send.ToEndpointResult(result, ct);
      }
 }
