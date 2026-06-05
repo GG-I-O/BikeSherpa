@@ -5,7 +5,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 using JetBrains.Annotations;
@@ -19,7 +19,7 @@ public record AddDeliveryStepCommand(
      Address StepAddress,
      string? Comment,
      bool NotBilled
-     ) : ICommand<Result<Guid>>;
+) : ICommand<Result<Guid>>;
 
 [UsedImplicitly]
 public class AddDeliveryStepCommandValidator : AbstractValidator<AddDeliveryStepCommand>
@@ -39,7 +39,7 @@ public class AddDeliveryStepHandler(
      IDeliveryZoneRepository deliveryZones,
      IPricingStrategyService pricingStrategyService,
      IItinerarySpi itineraryService
-     ) : ICommandHandler<AddDeliveryStepCommand, Result<Guid>>
+) : ICommandHandler<AddDeliveryStepCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryStepCommand command, CancellationToken cancellationToken)
      {

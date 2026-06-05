@@ -1,7 +1,7 @@
 using Ardalis.Result;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.DddCore;
 using Mediator;
 
@@ -11,20 +11,22 @@ public record PatchDeliveryStepOrderCommand(
      Guid DeliveryId,
      Guid StepId,
      int Order
-     ) : ICommand<Result>;
+) : ICommand<Result>;
 
 public class PatchDeliveryStepOrderHandler(
      IReadRepository<Delivery> deliveryRepository,
      IApplicationTransaction transaction,
      IItinerarySpi itineraryService
-): ICommandHandler<PatchDeliveryStepOrderCommand, Result>
+) : ICommandHandler<PatchDeliveryStepOrderCommand, Result>
 {
      public async ValueTask<Result> Handle(PatchDeliveryStepOrderCommand command, CancellationToken cancellationToken)
      {
           var delivery = await deliveryRepository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.DeliveryId), cancellationToken);
           if (delivery is null)
+          {
                return Result.NotFound();
-          
+          }
+
           await delivery.ReorderStepsAsync(
                command.StepId,
                command.Order,

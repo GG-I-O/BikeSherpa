@@ -4,7 +4,7 @@ using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 using Moq;
@@ -13,11 +13,10 @@ namespace Backend.Domain.Tests.DeliveryAggregate.Services.Step;
 
 public class DeliveryChangeTimeServiceTests
 {
+     private readonly Guid _courierId = Guid.NewGuid();
+     private readonly Fixture _fixture = new();
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
      private readonly Mock<IItinerarySpi> _mockItineraryService = new();
-     private readonly Fixture _fixture = new();
-
-     private readonly Guid _courierId = Guid.NewGuid();
 
      public DeliveryChangeTimeServiceTests()
      {
@@ -29,13 +28,10 @@ public class DeliveryChangeTimeServiceTests
                .ReturnsAsync(new ItineraryResult(12.3, 45));
      }
 
-     private DeliveryChangeTimeService CreateSut()
-     {
-          return new DeliveryChangeTimeService(
-               _mockDeliveryRepository.Object,
-               _mockItineraryService.Object
-          );
-     }
+     private DeliveryChangeTimeService CreateSut() => new(
+          _mockDeliveryRepository.Object,
+          _mockItineraryService.Object
+     );
 
      private DeliveryStep CreateStep(int order, DateTimeOffset estimatedDeliveryDate, Guid? courierId = null)
      {
@@ -60,7 +56,7 @@ public class DeliveryChangeTimeServiceTests
 
      private Delivery CreateDelivery(params DeliveryStep[] steps)
      {
-          
+
           var delivery = _fixture
                .Build<Delivery>()
                .With(d => d.Steps, [])
@@ -74,6 +70,7 @@ public class DeliveryChangeTimeServiceTests
           {
                step.ParentDelivery = delivery;
           }
+
           delivery.Steps.AddRange(steps);
           return delivery;
      }

@@ -7,7 +7,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 using Ggio.DddCore;
 using JetBrains.Annotations;
@@ -18,15 +18,15 @@ namespace BackendTests.Features.Deliveries.Add;
 [TestSubject(typeof(AddDeliveryStepHandler))]
 public class AddDeliveryStepHandlerTest
 {
-     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
-     private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
-     private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
-     private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
-     private readonly Mock<IItinerarySpi> _mockItineraryApi = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly AddDeliveryStepCommand _mockCommand;
      private readonly Delivery _mockDelivery;
+     private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
+     private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
+     private readonly Mock<IItinerarySpi> _mockItineraryApi = new();
+     private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
+     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
 
      public AddDeliveryStepHandlerTest()
      {
@@ -34,9 +34,10 @@ public class AddDeliveryStepHandlerTest
           _mockDelivery = _fixture.Build<Delivery>()
                .With(d => d.Steps, [])
                .Create();
+
           _mockDelivery.GenerateReportId(mockCustomer);
           _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
-          
+
           _mockCommand = _fixture.Build<AddDeliveryStepCommand>().Create();
 
           _mockDeliveryRepository
@@ -58,7 +59,7 @@ public class AddDeliveryStepHandlerTest
                _mockItineraryApi.Object
           );
      }
-     
+
      [Fact]
      public async Task Handle_ShouldCreateStepAndAddItToDelivery_WhenCommandIsValid()
      {
@@ -73,7 +74,7 @@ public class AddDeliveryStepHandlerTest
           _mockDelivery.Steps[0].Id.Should().Be(result.Value);
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Once);
      }
-     
+
      [Fact]
      public async Task Handle_ShouldReturnNotFound_WhenDeliveryDoesNotExit()
      {
@@ -84,6 +85,7 @@ public class AddDeliveryStepHandlerTest
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryByIdSpecification),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(badDelivery);
+
           var sut = CreateSut();
 
           // Act

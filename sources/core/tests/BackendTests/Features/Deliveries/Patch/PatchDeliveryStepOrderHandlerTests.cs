@@ -4,8 +4,8 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Patch;
 using Ggio.DddCore;
 using Moq;
@@ -14,12 +14,11 @@ namespace BackendTests.Features.Deliveries.Patch;
 
 public class PatchDeliveryStepOrderHandlerTests
 {
-     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
+     private readonly Guid _deliveryId;
+     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
      private readonly Mock<IItinerarySpi> _mockItineraryService = new();
-     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
-
-     private readonly Guid _deliveryId;
+     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly Guid _stepId;
 
      public PatchDeliveryStepOrderHandlerTests()
@@ -53,14 +52,11 @@ public class PatchDeliveryStepOrderHandlerTests
                .ReturnsAsync(new ItineraryResult(12.3, 45));
      }
 
-     private PatchDeliveryStepOrderHandler CreateSut()
-     {
-          return new PatchDeliveryStepOrderHandler(
-               _mockDeliveryRepository.Object,
-               _mockTransaction.Object,
-               _mockItineraryService.Object
-          );
-     }
+     private PatchDeliveryStepOrderHandler CreateSut() => new(
+          _mockDeliveryRepository.Object,
+          _mockTransaction.Object,
+          _mockItineraryService.Object
+     );
 
      [Fact]
      public async Task Handle_ShouldReturnSuccess_WhenRequestIsValid()

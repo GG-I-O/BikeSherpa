@@ -5,7 +5,7 @@ using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Patch;
 using Ggio.BikeSherpa.Backend.Infrastructure;
@@ -28,19 +28,19 @@ namespace BackendTests.Features.Deliveries.Patch;
 [Trait("Category", "Integration")]
 public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
-     private readonly WebApplicationFactory<Program> _factory;
-     private readonly Fixture _fixture = TestFixtureFactory.Create();
-     private readonly Mock<IItinerarySpi> _mockItineraryService = new();
-     private readonly Delivery _delivery;
-
      private const string Scope = "write:deliveries";
      private const string UserEmail = "user@example.com";
+     private readonly Delivery _delivery;
+     private readonly WebApplicationFactory<Program> _factory;
+     private readonly Fixture _fixture = TestFixtureFactory.Create();
 
      private readonly JsonSerializerOptions _jsonSerializerOptions = new()
      {
           PropertyNameCaseInsensitive = false,
           PropertyNamingPolicy = JsonNamingPolicy.CamelCase
      };
+
+     private readonly Mock<IItinerarySpi> _mockItineraryService = new();
 
      public PatchDeliveryStepIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
@@ -415,7 +415,7 @@ public class PatchDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWe
                await ResetDatabaseAsync(dbContext);
           }
      }
-     
+
      [Fact]
      public async Task ShouldPatchDeliveryStepCourierCommentWithCamelCasePath()
      {

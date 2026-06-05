@@ -8,16 +8,36 @@ public class ParameterConfiguration : IEntityTypeConfiguration<Parameter>
 {
      public void Configure(EntityTypeBuilder<Parameter> builder)
      {
-         builder.HasKey(p => p.Key);
-         builder.ToTable("Parameters");
-         builder.Property(p => p.Key).HasMaxLength(100).IsRequired();
-         builder.Property(p => p.Value).IsRequired();
-         builder.HasData(
-              new
-              {
-                   Key = ParameterRepository.VatRateKey,
-                   Value = "20"
-              }
-         );
+          builder.HasKey(p => p.Key);
+          builder.ToTable("Parameters");
+          builder.Property(p => p.Key).HasMaxLength(100).IsRequired();
+          builder.Property(p => p.Value).IsRequired();
+          builder.HasData(
+               new
+               {
+                    Key = ParameterRepository.VatRateKey,
+                    Value = "20"
+               },
+               new
+               {
+                    Key = ParameterRepository.SimpleDeliveryMailTemplateKey,
+                    Value = "Your delivery is ready for pickup at {pickupLocation} on {pickupDate}. {deliverycode} { pickupaddress} { destinationaddress} {PickupDate} {LoadingSlot} "
+               },
+               new
+               {
+                    Key = ParameterRepository.SimpleDeliveryMailSubjectKey,
+                    Value = "Delivery Ready for Pickup"
+               },
+               new
+               {
+                    Key = ParameterRepository.TourDeliveryMailTemplateKey,
+                    Value = "Your delivery is ready for pickup at {pickupLocation} on {pickupDate}. {deliverycode} { pickupaddress} { destinationaddress} {PickupDate} {LoadingSlot} "
+               },
+               new
+               {
+                    Key = ParameterRepository.TourDeliveryMailSubjectKey,
+                    Value = "Tour delivery Ready for Pickup"
+               }
+          );
      }
 }

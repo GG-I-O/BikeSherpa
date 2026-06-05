@@ -5,7 +5,7 @@ using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 using Ggio.BikeSherpa.Backend.Infrastructure;
@@ -24,13 +24,11 @@ namespace BackendTests.Features.Deliveries.Update;
 [Trait("Category", "Integration")]
 public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
-     private readonly WebApplicationFactory<Program> _factory;
-     private readonly Fixture _fixture = TestFixtureFactory.Create();
-     private readonly Mock<IItinerarySpi> _mockItineraryService = new();
-     private readonly Delivery _delivery;
-
      private const string Scope = "write:deliveries";
      private const string UserEmail = "user@example.com";
+     private readonly Delivery _delivery;
+     private readonly WebApplicationFactory<Program> _factory;
+     private readonly Fixture _fixture = TestFixtureFactory.Create();
 
      private readonly JsonSerializerOptions _jsonSerializerOptions = new()
      {
@@ -38,10 +36,12 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<Integration
           PropertyNamingPolicy = JsonNamingPolicy.CamelCase
      };
 
+     private readonly Mock<IItinerarySpi> _mockItineraryService = new();
+
      public UpdateDeliveryStepOrderIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
           var courierId = Guid.NewGuid();
-          
+
           var firstAddress = _fixture
                .Build<Address>()
                .With(a => a.Postcode, "38000")
@@ -61,7 +61,7 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<Integration
                .With(s => s.CreatedAt, DateTime.UtcNow)
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .Create();
-          
+
           var firstStep = _fixture
                .Build<DeliveryStep>()
                .With(s => s.ParentDelivery, _delivery)
@@ -73,6 +73,7 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<Integration
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .With(s => s.StepAddress, firstAddress)
                .Create();
+
           _delivery.Steps.Add(firstStep);
 
           var secondStep = _fixture
@@ -86,6 +87,7 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<Integration
                .With(s => s.UpdatedAt, DateTime.UtcNow)
                .With(s => s.StepAddress, secondAddress)
                .Create();
+
           _delivery.Steps.Add(secondStep);
 
           _mockItineraryService
@@ -130,7 +132,7 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<Integration
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-          
+
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];
@@ -208,7 +210,7 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<Integration
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-          
+
           var client = _factory.CreateClient();
 
           await dbContext.Deliveries.AddAsync(_delivery, CancellationToken.None);
@@ -243,7 +245,7 @@ public class UpdateDeliveryStepOrderIntegrationTests : IClassFixture<Integration
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-          
+
           var client = _factory.CreateClient();
 
           var firstStep = _delivery.Steps[0];

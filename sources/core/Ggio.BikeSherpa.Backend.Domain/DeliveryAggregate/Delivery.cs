@@ -3,7 +3,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 
@@ -11,6 +11,13 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
 public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 {
+     private readonly DeliveryStatusMachine _statusMachine;
+
+     public Delivery()
+     {
+          _statusMachine = new DeliveryStatusMachine(this);
+     }
+
      public required PricingStrategy PricingStrategy { get; set; }
      public DeliveryStatus Status { get; set; } = DeliveryStatus.New;
      public required string Code { get; set; }
@@ -26,17 +33,10 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required bool InsulatedBox { get; set; }
      public required DateTimeOffset StartDate { get; set; }
      public required DateTimeOffset ContractDate { get; set; }
+
+     public bool NeedEstimate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
-     
-     public bool NeedEstimate { get; set; }
-
-     private readonly DeliveryStatusMachine _statusMachine;
-
-     public Delivery()
-     {
-          _statusMachine = new DeliveryStatusMachine(this);
-     }
 
      public void GenerateReportId(Customer customer)
      {
@@ -45,7 +45,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public void GenerateCode(Customer customer, int increment)
      {
-          
+
           Code = $"{StartDate.Year.ToString()[^1..]}{StartDate.Month.ToString().PadLeft(2, '0')}{StartDate.Day.ToString().PadLeft(2, '0')}-{customer.Code}-{increment}";
      }
 
@@ -142,7 +142,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      {
           foreach (var step in Steps.Where(s => s.StepType == StepType.Dropoff))
           {
-               if (step.Order == 1) continue;
+               if (step.Order == 1)
+               {
+                    continue;
+               }
+
                var previousStep = Steps.First(s => s.Order == step.Order - 1);
                var result = await itineraryService.GetItineraryInfoAsync(previousStep.StepAddress.Coordinates, step.StepAddress.Coordinates);
                step.Distance = result.DistanceInKm;
@@ -151,7 +155,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      private async Task<double> GetDistanceAsync(DeliveryStep step, IItinerarySpi itineraryService)
      {
-          if (step.Order == 1 || step.StepType == StepType.Pickup) return 0;
+          if (step.Order == 1 || step.StepType == StepType.Pickup)
+          {
+               return 0;
+          }
+
           var previousStep = Steps.First(s => s.Order == step.Order - 1);
           var result = await itineraryService.GetItineraryInfoAsync(previousStep.StepAddress.Coordinates, step.StepAddress.Coordinates);
           return result.DistanceInKm;
@@ -177,7 +185,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public void UpdateStepCompletion(Guid stepId, bool completed)
      {
           CheckDeliveryHasBeenValidated();
-          
+
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.Completed = completed;
           if (completed)
@@ -233,7 +241,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           IPricingStrategyService pricingStrategyService,
           IItinerarySpi itineraryService)
      {
-          var nextStep = Steps.FirstOrDefault((s => s.Order == removedStep.Order + 1));
+          var nextStep = Steps.FirstOrDefault(s => s.Order == removedStep.Order + 1);
           var timeOffset = CalculateDeliveryTimeOffset(removedStep, nextStep);
           Steps.Remove(removedStep);
           ReorderStepsOnDeletion();
@@ -242,10 +250,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
-     private static TimeSpan CalculateDeliveryTimeOffset(DeliveryStep removedStep, DeliveryStep? nextStep)
-     {
-          return nextStep is null ? TimeSpan.Zero : nextStep.EstimatedDeliveryDate - removedStep.EstimatedDeliveryDate;
-     }
+     private static TimeSpan CalculateDeliveryTimeOffset(DeliveryStep removedStep, DeliveryStep? nextStep) => nextStep is null ? TimeSpan.Zero : nextStep.EstimatedDeliveryDate - removedStep.EstimatedDeliveryDate;
 
      private void UpdateStepDeliveryTimeOnDelete(int stepOrder, TimeSpan timeOffset)
      {
@@ -268,7 +273,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                {
                     steps[index] = new DeliveryStep(
                          steps[index].StepType,
-                         order: index + 1,
+                         index + 1,
                          steps[index].StepAddress,
                          steps[index].Comment)
                     {
@@ -283,7 +288,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                {
                     existing.Update(
                          steps[index].StepType,
-                         order: index + 1,
+                         index + 1,
                          steps[index].Completed,
                          steps[index].StepAddress,
                          deliveryZones.GetByAddress(steps[index].StepAddress.City),
@@ -296,9 +301,13 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                }
 
                if (index == 0)
+               {
                     steps[index].Distance = 0;
+               }
                else
+               {
                     steps[index].EstimatedDeliveryDate = steps[index - 1].EstimatedDeliveryDate + TimeSpan.FromMinutes(15);
+               }
 
           }
 
@@ -327,10 +336,12 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                     Urgency.FixedTimeLimit.Value.Seconds,
                     StartDate.Offset);
           }
+
           if (Urgency.AddTimeLimit != null)
           {
                return StartDate + Urgency.AddTimeLimit.Value;
           }
+
           return null;
      }
 

@@ -5,7 +5,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Ggio.DddCore;
@@ -75,7 +75,9 @@ public class UpdateDeliveryHandler(
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           var entity = await repository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.Id), cancellationToken);
           if (entity is null)
+          {
                return Result.NotFound();
+          }
 
           var urgency = urgencyRepository.GetByName(command.Urgency)!;
           var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
@@ -107,9 +109,9 @@ public class UpdateDeliveryHandler(
                          Id = step.Id,
                          StepAddress = step.StepAddress,
                          StepZone = step.StepZone,
-                         ParentDelivery = entity,
+                         ParentDelivery = entity
                     };
-                    
+
                     DeliveryStepCrudMapper.Map(step, deliveryStep);
                     return deliveryStep;
                })

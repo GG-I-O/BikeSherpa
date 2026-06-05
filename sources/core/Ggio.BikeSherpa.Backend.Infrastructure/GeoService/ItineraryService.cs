@@ -1,5 +1,5 @@
 ﻿using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts;
 using Microsoft.Extensions.Logging;
 
@@ -7,22 +7,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 
 public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryService> logger) : IItinerarySpi
 {
-     private static void EnsureDifferentCoordinates(GeoPoint start, GeoPoint end)
-     {
-          if (start == end)
-          {
-               throw ItineraryServiceException.NoIdenticalCoordinates();
-          }
-     }
-
-     private static void EnsureApiReturnedResult(Itineraire? result)
-     {
-          if (result is null)
-          {
-               throw ItineraryServiceException.NoNullResult();
-          }
-     }
-
      public async Task<ItineraryResult> GetItineraryInfoAsync(
           GeoPoint startStepCoordinates,
           GeoPoint endStepCoordinates,
@@ -37,8 +21,8 @@ public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryServi
                EnsureApiReturnedResult(result);
 
                return new ItineraryResult(
-                    DistanceInKm: result.Distance,
-                    TimeInMinutes: result.Duration
+                    result.Distance,
+                    result.Duration
                );
           }
 
@@ -47,6 +31,22 @@ public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryServi
                logger.LogError(exception, "Error calling the itinerary API");
 
                throw new ItineraryServiceException("Erreur lors de l’appel à l’API d’itinéraire", exception);
+          }
+     }
+
+     private static void EnsureDifferentCoordinates(GeoPoint start, GeoPoint end)
+     {
+          if (start == end)
+          {
+               throw ItineraryServiceException.NoIdenticalCoordinates();
+          }
+     }
+
+     private static void EnsureApiReturnedResult(Itineraire? result)
+     {
+          if (result is null)
+          {
+               throw ItineraryServiceException.NoNullResult();
           }
      }
 }
