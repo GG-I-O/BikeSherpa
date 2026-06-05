@@ -109,6 +109,11 @@ const UpdateDeliveryStepOrderRequest = z.object({
 const UpdateDeliveryStepTimeRequest = z.object({
   date: z.string().datetime({ offset: true }),
 });
+const CalculateDeliveryPriceResult = z.object({
+  price: z.number(),
+  priceWithVat: z.number(),
+  totalDistance: z.number(),
+});
 const OperationBase = z.object({
   path: z.string(),
   op: z.string(),
@@ -118,6 +123,33 @@ const Operation = OperationBase.and(z.object({ value: z.unknown() }));
 const OperationOfDeliveryStep = Operation.and(z.object({}));
 const JsonPatchDocumentOfDeliveryStep = z.object({
   operations: z.array(OperationOfDeliveryStep),
+});
+const AddressCrud = z.object({
+  name: z.string(),
+  streetInfo: z.string(),
+  complement: z.string().nullable(),
+  postcode: z.string(),
+  city: z.string(),
+  coordinates: GeoPoint,
+  phone: z.string().nullable(),
+});
+const DeliveryType = z.union([z.literal(0), z.literal(1)]);
+const CustomerCrud = z.object({
+  name: z.string(),
+  code: z.string(),
+  siret: z.string().nullable(),
+  vatNumber: z.string().nullable(),
+  email: z.string(),
+  phoneNumber: z.string(),
+  address: AddressCrud,
+  createdAt: z.string().datetime({ offset: true }),
+  updatedAt: z.string().datetime({ offset: true }),
+  defaultDeliveryType: DeliveryType.nullable(),
+  id: z.string(),
+});
+const AddDeliveryByCustomerRequest = z.object({
+  customer: CustomerCrud,
+  delivery: DeliveryCrud,
 });
 const AddResultOfGuid = z.object({ id: z.string() });
 const AttachmentRequest = z.object({ file: z.instanceof(File) });
@@ -154,29 +186,6 @@ const ResultOfResult = z.lazy(() =>
   })
 );
 const Result = z.lazy(() => ResultOfResult.and(z.object({})));
-const AddressCrud = z.object({
-  name: z.string(),
-  streetInfo: z.string(),
-  complement: z.string().nullable(),
-  postcode: z.string(),
-  city: z.string(),
-  coordinates: GeoPoint,
-  phone: z.string().nullable(),
-});
-const DeliveryType = z.union([z.literal(0), z.literal(1)]);
-const CustomerCrud = z.object({
-  name: z.string(),
-  code: z.string(),
-  siret: z.string().nullable(),
-  vatNumber: z.string().nullable(),
-  email: z.string(),
-  phoneNumber: z.string(),
-  address: AddressCrud,
-  createdAt: z.string().datetime({ offset: true }),
-  updatedAt: z.string().datetime({ offset: true }),
-  defaultDeliveryType: DeliveryType.nullable(),
-  id: z.string(),
-});
 const CustomerDto = z.object({
   data: CustomerCrud,
   links: z.array(Link).nullable(),
@@ -225,10 +234,15 @@ export const schemas = {
   UpdateDeliveryStepCourierRequest,
   UpdateDeliveryStepOrderRequest,
   UpdateDeliveryStepTimeRequest,
+  CalculateDeliveryPriceResult,
   OperationBase,
   Operation,
   OperationOfDeliveryStep,
   JsonPatchDocumentOfDeliveryStep,
+  AddressCrud,
+  DeliveryType,
+  CustomerCrud,
+  AddDeliveryByCustomerRequest,
   AddResultOfGuid,
   AttachmentRequest,
   ResultStatus,
@@ -236,9 +250,6 @@ export const schemas = {
   ValidationError,
   ResultOfResult,
   Result,
-  AddressCrud,
-  DeliveryType,
-  CustomerCrud,
   CustomerDto,
   CheckCustomerResponse,
   ProblemDetails,
@@ -604,6 +615,21 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "post",
+    path: "/deliveries/by_customer",
+    alias: "AddDeliveryByCustomerEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: AddDeliveryByCustomerRequest,
+      },
+    ],
+    response: z.void(),
+  },
+  {
     method: "get",
     path: "/deliveries/dailyDeliveries/:date",
     alias: "GetAllDailyDeliveriesEndpoint",
@@ -629,6 +655,21 @@ const endpoints = makeApi([
         schema: z.void(),
       },
     ],
+  },
+  {
+    method: "post",
+    path: "/deliveries/price",
+    alias: "CalculateDeliveryPriceEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: DeliveryCrud,
+      },
+    ],
+    response: CalculateDeliveryPriceResult,
   },
   {
     method: "post",

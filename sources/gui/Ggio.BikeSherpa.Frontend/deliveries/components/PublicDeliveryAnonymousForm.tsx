@@ -36,6 +36,7 @@ export default function PublicDeliveryAnonymousForm() {
             />
             <Divider />
             <PublicDeliveryPrice
+                control={viewModel.control}
                 price={viewModel.estimatedPrice}
                 priceWithTaxes={viewModel.estimatedPriceWithTaxes}
             />

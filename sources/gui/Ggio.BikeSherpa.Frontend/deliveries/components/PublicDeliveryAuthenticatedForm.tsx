@@ -60,6 +60,7 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
             />
             <Divider/>
             <PublicDeliveryPrice
+                control={viewModel.control}
                 price={viewModel.estimatedPrice}
                 priceWithTaxes={viewModel.estimatedPriceWithTaxes}
             />

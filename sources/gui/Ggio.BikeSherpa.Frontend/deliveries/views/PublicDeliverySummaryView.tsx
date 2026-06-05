@@ -33,9 +33,9 @@ export default function PublicDeliverySummaryView() {
             <Text>Date de la livraison: {DateToolbox.getFormattedDateFromISO(delivery.startDate)}</Text>
             <Text>Heure de ramasse: {DateToolbox.getFormattedTimeFromISO(delivery.startDate)}</Text>
             <Divider />
-            <Text>Distance total: {estimatedValue.distance} km</Text>
-            <Text>Prix HT: {estimatedValue.priceWithoutTaxes} km</Text>
-            <Text style={AppStyle.textStyle.h3}>Prix TTC: {estimatedValue.priceWithTaxes} €</Text>
+            <Text>Distance total: {estimatedValue.totalDistance} km</Text>
+            <Text>Prix HT: {estimatedValue.price} km</Text>
+            <Text style={AppStyle.textStyle.h3}>Prix TTC: {estimatedValue.totalDistance} €</Text>
         </View>
     );
 }
