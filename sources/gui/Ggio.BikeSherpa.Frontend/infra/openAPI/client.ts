@@ -1,11 +1,19 @@
 import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
-const UrgencyDto = z.object({ label: z.string(), value: z.string() });
+const UrgencyDto = z.object({
+  label: z.string(),
+  value: z.string(),
+  lastHourToOrder: z.number().int(),
+});
 const PricingStrategy = z.union([z.literal(0), z.literal(1), z.literal(2)]);
 const PricingStrategyDto = z.object({
   label: z.string(),
   value: PricingStrategy,
+});
+const WorkHourDto = z.object({
+  startDate: z.string().datetime({ offset: true }),
+  endDate: z.string().datetime({ offset: true }),
 });
 const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
 const DeliveryReportDetail = z.object({
@@ -215,6 +223,7 @@ export const schemas = {
   UrgencyDto,
   PricingStrategy,
   PricingStrategyDto,
+  WorkHourDto,
   PackingSizeDto,
   DeliveryReportDetail,
   DeliveryReport,
@@ -1173,6 +1182,30 @@ const endpoints = makeApi([
     tags: ["general"],
     requestFormat: "json",
     response: z.array(PackingSizeDto),
+  },
+  {
+    method: "get",
+    path: "/general/parameters/lastHourToOrder",
+    alias: "GetParameterLastHourToOrderEndpoint",
+    tags: ["general"],
+    requestFormat: "json",
+    response: z.number().int(),
+  },
+  {
+    method: "get",
+    path: "/general/parameters/vatRate",
+    alias: "GetParameterVatRateEndpoint",
+    tags: ["general"],
+    requestFormat: "json",
+    response: z.number(),
+  },
+  {
+    method: "get",
+    path: "/general/parameters/workHours",
+    alias: "GetParameterWorkHoursEndpoint",
+    tags: ["general"],
+    requestFormat: "json",
+    response: WorkHourDto,
   },
   {
     method: "get",

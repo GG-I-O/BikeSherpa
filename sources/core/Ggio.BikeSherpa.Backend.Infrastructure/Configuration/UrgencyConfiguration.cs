@@ -16,6 +16,7 @@ public class UrgencyConfiguration : IEntityTypeConfiguration<Urgency>
           builder.Property(u => u.PriceCoefficient).IsRequired();
           builder.Property(u => u.AddTimeLimit).IsRequired(false);
           builder.Property(u => u.FixedTimeLimit).IsRequired(false);
+          builder.Property(u => u.LastHourToOrder).IsRequired();
           builder.HasData(
                new
                {
@@ -23,7 +24,8 @@ public class UrgencyConfiguration : IEntityTypeConfiguration<Urgency>
                     Order = 1,
                     Label = "Avant 17h le jour-même (Eco)",
                     PriceCoefficient = 0.75,
-                    FixedTimeLimit = new TimeSpan(17, 0, 0)
+                    FixedTimeLimit = new TimeSpan(17, 0, 0),
+                    LastHourToOrder = 12
                },
                new
                {
@@ -31,7 +33,8 @@ public class UrgencyConfiguration : IEntityTypeConfiguration<Urgency>
                     Order = 2,
                     Label = "2h30 (Standard)",
                     PriceCoefficient = 1.25,
-                    AddTimeLimit = new TimeSpan(2, 30, 0)
+                    AddTimeLimit = new TimeSpan(2, 30, 0),
+                    LastHourToOrder = 15
                },
                new
                {
@@ -39,7 +42,8 @@ public class UrgencyConfiguration : IEntityTypeConfiguration<Urgency>
                     Order = 3,
                     Label = "1h (Urgent)",
                     PriceCoefficient = 2.0,
-                    AddTimeLimit = new TimeSpan(1, 0, 0)
+                    AddTimeLimit = new TimeSpan(1, 0, 0),
+                    LastHourToOrder = 20
                }
           );
      }

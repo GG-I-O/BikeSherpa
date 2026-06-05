@@ -1,6 +1,6 @@
-import {ActivityIndicator, Button, Text, useTheme} from "react-native-paper";
+import {ActivityIndicator, useTheme} from "react-native-paper";
 import {useEffect, useState} from "react";
-import {SafeAreaProvider, SafeAreaView} from "react-native-safe-area-context";
+import {SafeAreaView} from "react-native-safe-area-context";
 import modalStyle from "@/style/modalStyle";
 import {Modal, View} from "react-native";
 

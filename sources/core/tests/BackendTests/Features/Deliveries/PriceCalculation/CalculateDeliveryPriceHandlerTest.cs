@@ -20,7 +20,7 @@ public class CalculateDeliveryPriceHandlerTest
      {
           // Arrange
           var packingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
-          var urgency = new Urgency("High", 1, "Label High", 0, null, null);
+          var urgency = new Urgency("High", 1, "Label High", 0, null, null, 12);
           var sut = MakeSut(out var pricingStrategyServiceMock, packingSize, urgency);
 
           var deliveryCrud = new DeliveryCrud
@@ -71,7 +71,7 @@ public class CalculateDeliveryPriceHandlerTest
      {
           // Arrange
           var packingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
-          var urgency = new Urgency("High", 1, "Label High", 0, null, null);
+          var urgency = new Urgency("High", 1, "Label High", 0, null, null, 16);
           var sut = MakeSut(out var pricingStrategyServiceMock, packingSize, urgency);
 
           var deliveryCrud = new DeliveryCrud
@@ -112,7 +112,7 @@ public class CalculateDeliveryPriceHandlerTest
      {
           // Arrange
           var packingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
-          var urgency = new Urgency("High", 1, "Label High", 0, null, null);
+          var urgency = new Urgency("High", 1, "Label High", 0, null, null, 16);
           var sut = MakeSut(out var pricingStrategyServiceMock, packingSize, urgency);
 
           var deliveryCrud = new DeliveryCrud

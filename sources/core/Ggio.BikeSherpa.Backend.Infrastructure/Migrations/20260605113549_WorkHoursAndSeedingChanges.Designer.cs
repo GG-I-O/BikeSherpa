@@ -3,6 +3,7 @@ using System;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(BackendDbContext))]
-    partial class BackendDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260605113549_WorkHoursAndSeedingChanges")]
+    partial class WorkHoursAndSeedingChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -397,6 +400,9 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("LastHourToOrder")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
@@ -413,6 +419,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "Eco",
                             FixedTimeLimit = new TimeSpan(0, 17, 0, 0, 0),
                             Label = "Avant 17h le jour-même (Eco)",
+                            LastHourToOrder = 12,
                             Order = 1,
                             PriceCoefficient = 0.75
                         },
@@ -421,6 +428,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "Standard",
                             AddTimeLimit = new TimeSpan(0, 2, 30, 0, 0),
                             Label = "2h30 (Standard)",
+                            LastHourToOrder = 15,
                             Order = 2,
                             PriceCoefficient = 1.25
                         },
@@ -429,6 +437,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "Urgent",
                             AddTimeLimit = new TimeSpan(0, 1, 0, 0, 0),
                             Label = "1h (Urgent)",
+                            LastHourToOrder = 20,
                             Order = 3,
                             PriceCoefficient = 2.0
                         });
@@ -468,26 +477,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         {
                             Key = "WORK_END_DATE",
                             Value = "0001-01-01T19:00:00"
-                        },
-                        new
-                        {
-                            Key = "SIMPLE_DELIVERY_MAIL_TEMPLATE",
-                            Value = "Your delivery is ready for pickup at {pickupLocation} on {pickupDate}. {deliverycode} { pickupaddress} { destinationaddress} {PickupDate} {LoadingSlot} "
-                        },
-                        new
-                        {
-                            Key = "SIMPLE_DELIVERY_MAIL_SUBJECT",
-                            Value = "Delivery Ready for Pickup"
-                        },
-                        new
-                        {
-                            Key = "TOUR_DELIVERY_MAIL_TEMPLATE",
-                            Value = "Your delivery is ready for pickup at {pickupLocation} on {pickupDate}. {deliverycode} { pickupaddress} { destinationaddress} {PickupDate} {LoadingSlot} "
-                        },
-                        new
-                        {
-                            Key = "TOUR_DELIVERY_MAIL_SUBJECT",
-                            Value = "Tour delivery Ready for Pickup"
                         });
                 });
 

@@ -17,7 +17,7 @@ public class PricingStrategyServiceTests
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private static DateTimeOffset _startDate;
      private static DateTimeOffset _contractDate;
-     private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null);
+     private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null, 12);
      private readonly static PackingSize PackingSize = new("packing", 1, "label", 3, 10);
      private readonly static DeliveryZone CoreZone = new("Centre");
      private readonly static DeliveryZone BorderZone = new("Limitrophe");

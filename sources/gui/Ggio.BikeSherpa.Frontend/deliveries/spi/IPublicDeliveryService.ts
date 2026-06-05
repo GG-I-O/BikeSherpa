@@ -7,5 +7,11 @@ export default interface IPublicDeliveryService {
     
     getEstimatedValue: (delivery: Delivery) => Promise<PublicDeliveryEstimatedValue>;
     
-    createDelivery: (delivery: Delivery, customer: Customer) => Promise<boolean>
+    getVatRate: () => Promise<number>;
+    
+    getLastHourToOrder: () => Promise<number>;
+    getUrgenciesLastHourToOrder: () => Promise<{value: string, label: string, lastHourToOrder: number}[]>;
+    getWorkHours: () => Promise<{startDate: string, endDate: string}>;
+    
+    createDelivery: (delivery: Delivery, customer: Customer) => Promise<boolean>;
 }

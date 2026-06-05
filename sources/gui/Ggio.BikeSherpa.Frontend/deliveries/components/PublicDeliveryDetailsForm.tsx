@@ -4,62 +4,49 @@ import ThemedDateInput from "@/components/themed/ThemedDateInput";
 import {Control, FieldError, FieldErrors, useController} from "react-hook-form";
 import {DropdownOptions} from "@/models/DropdownOptions";
 import formStyle from "@/style/formStyle";
-import React from "react";
+import React, {useMemo} from "react";
 import {Dropdown} from "react-native-paper-dropdown";
 import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
 import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 import {PublicDeliveryFormValues} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
 import AppStyle from "@/constants/AppStyle";
-import DateToolbox from "@/services/DateToolbox";
+import usePublicDeliveryDetailsFormViewModel from "@/deliveries/viewModel/usePublicDeliveryDetailsFormViewModel";
 
 type Props = {
     control: Control<PublicDeliveryFormValues>;
     errors: FieldErrors;
-    urgencies: DropdownOptions[];
     packingSizes: DropdownOptions[];
+    setUrgency: (urgency: string) => void;
+    setStartDate: (startDate: string) => void;   
 }
 
 export default function PublicDeliveryDetailsForm(props: Props) {
-
-    // Il faudrait sûrement un endpoint pour les heures qui limitent les choix
-    const now = new Date();
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
-
-    // Time
-    const {field} = useController({
+    
+    const startDate = useController({
         control: props.control,
         name: "startDate",
-    });
+    }).field;
+    const fieldDate = new Date(startDate.value);
+    
+    const urgency = useController({
+        control: props.control,
+        name: "urgency",
+    }).field;
+    
+    const viewModel = usePublicDeliveryDetailsFormViewModel(
+        fieldDate,
+        props.setStartDate,
+        urgency.value,
+        props.setUrgency
+    );
 
-    const fieldDate = field.value ? new Date(field.value) : new Date();
-    const isFieldToday = DateToolbox.getFormattedDateFromISO(now.toISOString()) === DateToolbox.getFormattedDateFromISO(fieldDate.toISOString());
-
-    let hoursOptions: DropdownOptions[] = [];
-    const startHours = isFieldToday ? now.getHours() + 1 : 8;
-    for (let i = startHours; i < 17; i++) {
-        hoursOptions.push({label: i.toString(), value: i.toString()});
-    }
-
-    let minutesOptions: DropdownOptions[] = [];
-    for (let i = 0; i < 60; i += 15) {
-        minutesOptions.push({label: i.toString(), value: i.toString()});
-    }
-
-    // Urgencies - Il faudra avoir ces horaires quelque part
-    let urgencies = props.urgencies;
-    if (isFieldToday) {
-        urgencies = urgencies.filter((urgency, index) => {
-            if (index === 2) return true;
-
-            if (index === 1) {
-                return now.getHours() <= 14;
-            }
-            if (index === 0) {
-                return now.getHours() <= 12;
-            }
-        });
-    }
+    // Stable data
+    const now = useMemo(() => new Date(), []);
+    const yesterday = useMemo(() => {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        return d;
+    }, []);
 
     return (
         <View style={{gap: 16}}>
@@ -72,7 +59,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                     error={props.errors.startDate as FieldError | undefined}
                     label="Date de livraison - Heure de mise à disposition par l'expéditeur"
                     validRange={{
-                        startDate: now.getHours() < 15 ? yesterday : now,
+                        startDate: now.getHours() < viewModel.lastHourToOrder ? yesterday : now,
                         endDate: undefined,
                         disabledDates: undefined
                     }}
@@ -82,25 +69,25 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                     value={fieldDate.getHours().toString()}
                     onSelect={(hours) => {
                         if (!hours) return;
-                        let newDate: Date = new Date(field.value);
+                        let newDate: Date = new Date(startDate.value);
                         newDate.setHours(parseInt(hours));
-                        field.onChange(newDate.toISOString());
+                        startDate.onChange(newDate.toISOString());
 
                     }}
                     mode='outlined'
-                    options={hoursOptions}
+                    options={viewModel.hoursOptions}
                 />
                 <Text style={AppStyle.textStyle.h3}> h </Text>
                 <Dropdown
                     value={fieldDate.getMinutes().toString()}
                     onSelect={(minutes) => {
                         if (!minutes) return;
-                        let newDate: Date = new Date(field.value);
+                        let newDate: Date = new Date(startDate.value);
                         newDate.setMinutes(parseInt(minutes));
-                        field.onChange(newDate.toISOString());
+                        startDate.onChange(newDate.toISOString());
                     }}
                     mode='outlined'
-                    options={minutesOptions}
+                    options={viewModel.minutesOptions}
                 />
                 <Text style={AppStyle.textStyle.h3}> min </Text>
             </View>
@@ -110,7 +97,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                 name="urgency"
                 error={props.errors.urgency as FieldError | undefined}
                 label="Urgence"
-                options={urgencies}
+                options={viewModel.urgencies}
                 required
             />
             <ThemedDropdownInput

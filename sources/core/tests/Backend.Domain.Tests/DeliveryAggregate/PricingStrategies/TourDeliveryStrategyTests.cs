@@ -8,7 +8,7 @@ namespace Backend.Domain.Tests.DeliveryAggregate.PricingStrategies;
 public class TourDeliveryStrategyTests
 {
     private readonly static PackingSize DefaultPackingSize = new("Standard", 2, "Standard", 0, 0);
-    private readonly static Urgency DefaultUrgency = new ("urgency", 1, "urgency", 1, null, null);
+    private readonly static Urgency DefaultUrgency = new ("urgency", 1, "urgency", 1, null, null, 12);
     private readonly static DateTimeOffset BaseDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
     private static TourDeliveryStrategy MakeSut() => new();
 
