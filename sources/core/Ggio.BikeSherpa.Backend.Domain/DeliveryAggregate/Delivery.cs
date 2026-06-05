@@ -138,7 +138,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     private async Task RecalculateStepDistancesAsync(IItinerarySpi itineraryService)
+     public async Task RecalculateStepDistancesAsync(IItinerarySpi itineraryService)
      {
           foreach (var step in Steps.Where(s => s.StepType == StepType.Dropoff))
           {
