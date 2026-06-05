@@ -2,12 +2,13 @@ using Ardalis.Result;
 using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
+using Ggio.BikeSherpa.Backend.Extensions;
 using Ggio.BikeSherpa.Backend.Features.Customers.Add;
-using Ggio.BikeSherpa.Backend.Features.Customers.Check;
 using Ggio.BikeSherpa.Backend.Features.Customers.Delete;
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Mails;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Model;
 using Ggio.DddCore;
@@ -40,7 +41,19 @@ public class AddDeliveryByCustomerEndpoint(
           var customerId = await ManageCreationOrGetCustomer(req, ct);
 
           var resultCreateDelivery = await CreateDeliveryAsync(req, ct, customerId);
-          
+          if (!resultCreateDelivery.IsSuccess)
+          {
+               await Send.ErrorsAsync(500, ct);
+               return;
+          }
+
+          var mailResult = await mediator.Send(new SendDeliveryCreationMailToCustomerCommand(resultCreateDelivery.Value), ct);
+          if (!mailResult.IsSuccess)
+          {
+               await Send.ToEndpointResult(mailResult, ct);
+               return;
+          }
+
           await Send.CreatedAtAsync<GetDeliveryEndpoint>(resultCreateDelivery.Value, new AddResult<Guid>(resultCreateDelivery.Value), cancellation: ct);
      }
 
@@ -64,21 +77,21 @@ public class AddDeliveryByCustomerEndpoint(
                     req.Delivery.NeedEstimate
                );
 
-              return await mediator.Send(createDeliveryCommand, ct);
+               return await mediator.Send(createDeliveryCommand, ct);
 
           }
           catch (Exception e)
           {
                await mediator.Send(new DeleteCustomerCommand(customerId), ct);
                logger.LogError(e, "Error adding delivery by customer");
-               throw;
+               return Result.Error(e.Message);
           }
      }
 
      private async Task<Guid> ManageCreationOrGetCustomer(AddDeliveryByCustomerRequest req, CancellationToken ct)
      {
 
-          Guid? customerId = null;
+          Guid? customerId;
           var checkCustomerResult = await customerRepository.SingleOrDefaultAsync(new CustomerByCodeAndEmailSpecification(req.Customer.Code, req.Customer.Email), ct);
 
           if (checkCustomerResult is null)
