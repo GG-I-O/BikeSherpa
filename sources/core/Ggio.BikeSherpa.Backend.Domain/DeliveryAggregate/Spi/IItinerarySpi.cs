@@ -1,4 +1,4 @@
-﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 
 public record ItineraryResult(double DistanceInKm, double TimeInMinutes);
 

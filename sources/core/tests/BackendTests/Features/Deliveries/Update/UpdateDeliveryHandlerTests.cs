@@ -10,7 +10,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 using Ggio.DddCore;
@@ -20,21 +20,21 @@ namespace BackendTests.Features.Deliveries.Update;
 
 public class UpdateDeliveryHandlerTests
 {
-     private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
-     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
-     private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
-     private readonly Mock<IValidator<UpdateDeliveryCommand>> _mockValidator = new();
-     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
-     private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
-     private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
-     private readonly Mock<IItinerarySpi> _mockItineraryService = new();
-     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
+     private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null);
+     private readonly static PackingSize PackingSize = new("Standard", 2, "Standard", 0, 0);
+     private readonly UpdateDeliveryCommand _command;
+     private readonly Delivery _delivery;
 
      private readonly DeliveryZone _deliveryZone;
-     private readonly Delivery _delivery;
-     private readonly UpdateDeliveryCommand _command;
-     private readonly static Urgency Urgency = new ("urgency", 1, "urgency", 1, null, null);
-     private readonly static PackingSize PackingSize = new ("Standard", 2, "Standard", 0, 0);
+     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
+     private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
+     private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
+     private readonly Mock<IItinerarySpi> _mockItineraryService = new();
+     private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
+     private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
+     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
+     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
+     private readonly Mock<IValidator<UpdateDeliveryCommand>> _mockValidator = new();
 
      public UpdateDeliveryHandlerTests()
      {
@@ -43,15 +43,15 @@ public class UpdateDeliveryHandlerTests
           _mockDeliveryZoneRepository
                .Setup(x => x.GetByAddress(It.IsAny<string>()))
                .Returns(_deliveryZone);
-          
+
           _mockUrgencyRepository
                .Setup(x => x.GetByName(It.IsAny<string>()))
                .Returns(Urgency);
-          
+
           _mockPackingSizeRepository
                .Setup(x => x.GetByName(It.IsAny<string>()))
                .Returns(PackingSize);
-               
+
           _mockPricingStrategyService
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
                .Returns(123.45);
@@ -68,7 +68,7 @@ public class UpdateDeliveryHandlerTests
                     It.IsAny<UpdateDeliveryCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ValidationResult());
-          
+
           _delivery = _fixture.Build<Delivery>()
                .With(d => d.Steps, [])
                .Create();
@@ -80,6 +80,7 @@ public class UpdateDeliveryHandlerTests
                .With(s => s.StepZone, _deliveryZone)
                .With(s => s.EstimatedDeliveryDate, DateTimeOffset.UtcNow.AddHours(1))
                .Create();
+
           _delivery.Steps.Add(firstStep);
 
           var secondStep = _fixture.Build<DeliveryStep>()
@@ -89,6 +90,7 @@ public class UpdateDeliveryHandlerTests
                .With(s => s.StepZone, _deliveryZone)
                .With(s => s.EstimatedDeliveryDate, DateTimeOffset.UtcNow.AddHours(2))
                .Create();
+
           _delivery.Steps.Add(secondStep);
 
           var commandSteps = _delivery.Steps
@@ -118,18 +120,15 @@ public class UpdateDeliveryHandlerTests
                .ReturnsAsync(_delivery);
      }
 
-     private UpdateDeliveryHandler CreateSut()
-     {
-          return new UpdateDeliveryHandler(
-               _mockDeliveryRepository.Object,
-               _mockUrgencyRepository.Object,
-               _mockPackingSizeRepository.Object,
-               _mockValidator.Object,
-               _mockTransaction.Object,
-               _mockDeliveryZoneRepository.Object,
-               _mockPricingStrategyService.Object,
-               _mockItineraryService.Object);
-     }
+     private UpdateDeliveryHandler CreateSut() => new(
+          _mockDeliveryRepository.Object,
+          _mockUrgencyRepository.Object,
+          _mockPackingSizeRepository.Object,
+          _mockValidator.Object,
+          _mockTransaction.Object,
+          _mockDeliveryZoneRepository.Object,
+          _mockPricingStrategyService.Object,
+          _mockItineraryService.Object);
 
      [Fact]
      public async Task Handle_ShouldReturnSuccess_WhenCommandIsValid()
