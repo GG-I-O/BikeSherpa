@@ -49,6 +49,8 @@ public static class Bootstrap
                services.AddScoped<IUrgencyRepository, UrgencyRepository>();
                services.AddScoped<IParameterRepository, ParameterRepository>();
                services.AddScoped<IMailService, MailService>();
+               services.Configure<PostmarkOptions>(configuration.GetSection(PostmarkOptions.SectionName));
+               services.AddScoped<IMailSender, MailSender>();
 
                services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
                services.AddSingleton<IDeliveryStepAttachmentSaveService, StorageService>();
