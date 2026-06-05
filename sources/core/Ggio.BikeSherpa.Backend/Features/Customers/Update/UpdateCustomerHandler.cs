@@ -37,6 +37,7 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
                     context.AddFailure("Code client déjà utilisé");
                }
           });
+
           RuleFor(x => x.Siret).NotEmpty().CustomAsync(async (siret, context, cancellationToken) =>
           {
                var command = context.InstanceToValidate;
@@ -46,6 +47,7 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
                     context.AddFailure("Siret déjà utilisé pour un autre client");
                }
           }).When(x => x.Siret != null);
+
           RuleFor(x => x.VatNumber).NotEmpty().CustomAsync(async (vatNumber, context, cancellationToken) =>
           {
                var command = context.InstanceToValidate;
@@ -55,6 +57,7 @@ public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCo
                     context.AddFailure("Numéro de TVA déjà utilisé pour un autre client");
                }
           }).When(x => x.VatNumber != null);
+
           RuleFor(x => x.Email).NotEmpty();
           RuleFor(x => x.PhoneNumber).NotEmpty();
           RuleFor(x => x.Address).NotEmpty();
@@ -72,10 +75,12 @@ public class UpdateCustomerHandler(
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           var entity = await repository.FirstOrDefaultAsync(new CustomerByIdSpecification(command.Id), cancellationToken);
           if (entity is null)
+          {
                return Result.NotFound();
+          }
 
           entity.Name = command.Name;
-          entity.Code = command.Code;
+          entity.SetCode(command.Code);
           entity.Siret = command.Siret;
           entity.VatNumber = command.VatNumber;
           entity.Email = command.Email;
