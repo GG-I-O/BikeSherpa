@@ -4,7 +4,6 @@ import {createApiClient, schemas} from "@/infra/openAPI/client";
 import axios from "axios";
 import Delivery from "@/deliveries/models/Delivery";
 import Customer from "@/customers/models/Customer";
-import {Step} from "@/steps/models/Step";
 import {ILogger} from "@/spi/LogsSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
@@ -37,6 +36,7 @@ export default class PublicDeliveryService implements IPublicDeliveryService {
                 deliveryType: result.defaultDeliveryType ?? 0
             }
         } catch (error) {
+            this.logger.error("Login public delivery customer error:", error);
             return null;
         }
     }
@@ -77,6 +77,19 @@ export default class PublicDeliveryService implements IPublicDeliveryService {
         }
         
         return await this.apiClient.CalculateDeliveryPriceEndpoint(parsedDelivery.data);
+    }
+
+    public getVatRate = async (): Promise<number> => {
+        return await this.apiClient.GetParameterVatRateEndpoint();
+    }
+    public getLastHourToOrder = async (): Promise<number> => {
+        return await this.apiClient.GetParameterLastHourToOrderEndpoint();
+    }
+    public getUrgenciesLastHourToOrder = async (): Promise<{ value: string, label: string, lastHourToOrder: number }[]> => {
+        return await this.apiClient.GetAllUrgenciesEndpoint();
+    }
+    public getWorkHours = async (): Promise<{startDate: string, endDate: string}> => {
+        return await this.apiClient.GetParameterWorkHoursEndpoint();
     }
 
     public createDelivery = async (delivery: Delivery, customer: Customer): Promise<boolean> => {

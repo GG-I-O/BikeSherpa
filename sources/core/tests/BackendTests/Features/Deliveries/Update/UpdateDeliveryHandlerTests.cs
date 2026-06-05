@@ -20,7 +20,7 @@ namespace BackendTests.Features.Deliveries.Update;
 
 public class UpdateDeliveryHandlerTests
 {
-     private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null);
+     private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null, 12);
      private readonly static PackingSize PackingSize = new("Standard", 2, "Standard", 0, 0);
      private readonly UpdateDeliveryCommand _command;
      private readonly Delivery _delivery;

@@ -21,7 +21,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
     const publicDeliveryService = IOCContainer.get<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices);
     const viewModel = new PublicDeliveryFormViewModel(publicDeliveryService);
 
-    const {urgencies, pricingStrategies, packingSizes} = useDeliveryDropdown();
+    const {pricingStrategies, urgencies, packingSizes} = useDeliveryDropdown();
 
     const [customerType, setCustomerType] = useState<PublicDeliveryCustomerTypeEnum>(PublicDeliveryCustomerTypeEnum.Sender);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -162,7 +162,6 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             }
         ),
         errors,
-        urgencies,
         deliveryTypes: pricingStrategies.slice(0, 2),
         packingSizes,
         customerType,
@@ -173,6 +172,8 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         goToLogin: () => navigate("/newDelivery"),
         estimatedDistance: estimatedDistance,
         estimatedPrice: estimatedPrice,
-        estimatedPriceWithTaxes: estimatedPriceWithTaxes
+        estimatedPriceWithTaxes: estimatedPriceWithTaxes,
+        setUrgency: (urgency: string) => setValue("urgency", urgency),
+        setStartDate: (startDate: string) => setValue("startDate", startDate)
     };
 }

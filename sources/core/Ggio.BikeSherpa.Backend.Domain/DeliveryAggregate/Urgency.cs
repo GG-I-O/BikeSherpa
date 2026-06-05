@@ -6,5 +6,6 @@ public record Urgency(
      string Label,
      double PriceCoefficient,
      TimeSpan? AddTimeLimit,
-     TimeSpan? FixedTimeLimit
+     TimeSpan? FixedTimeLimit,
+     int LastHourToOrder
 );

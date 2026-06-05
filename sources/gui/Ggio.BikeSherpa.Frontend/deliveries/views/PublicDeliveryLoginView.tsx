@@ -51,7 +51,7 @@ export default function PublicDeliveryLoginView() {
                     onPress={() => viewModel.proceedAsAnonymous()}
                     style={[formStyle.button, {width: '80%'}]}
                 >
-                    <Text>Je n'ai pas d'identifiant</Text>
+                    <Text>{"Je n'ai pas d'identifiant"}</Text>
                 </Button>
             </View>
         </>

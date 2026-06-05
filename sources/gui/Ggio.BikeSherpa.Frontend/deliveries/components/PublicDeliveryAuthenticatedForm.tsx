@@ -55,8 +55,9 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
             <PublicDeliveryDetailsForm
                 control={viewModel.control}
                 errors={viewModel.errors}
-                urgencies={viewModel.urgencies}
                 packingSizes={viewModel.packingSizes}
+                setUrgency={viewModel.setUrgency}
+                setStartDate={viewModel.setStartDate}
             />
             <Divider/>
             <PublicDeliveryPrice

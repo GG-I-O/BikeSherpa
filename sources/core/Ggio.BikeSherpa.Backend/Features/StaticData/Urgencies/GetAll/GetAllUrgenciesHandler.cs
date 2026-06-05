@@ -16,7 +16,8 @@ public class GetAllUrgenciesHandler(IUrgencyRepository repository) : IQueryHandl
                urgencies.Select(urgency => new UrgencyDto
                     {
                          Label = urgency.Label,
-                         Value = urgency.Name
+                         Value = urgency.Name,
+                         LastHourToOrder = urgency.LastHourToOrder
                     }
                ).ToList()
           );

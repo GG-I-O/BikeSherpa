@@ -11,5 +11,5 @@ export function useDebounce(callback: () => void, delay: number, deps: unknown[]
         return () => {
             if (timerRef.current) clearTimeout(timerRef.current);
         };
-    }, deps);
+    }, [...deps, callback, delay]);
 }

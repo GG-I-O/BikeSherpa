@@ -1,5 +1,5 @@
 import {Button, IconButton, Text} from "react-native-paper";
-import {useCallback, useEffect} from "react";
+import {useCallback} from "react";
 import {Control, useFieldArray} from "react-hook-form";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";

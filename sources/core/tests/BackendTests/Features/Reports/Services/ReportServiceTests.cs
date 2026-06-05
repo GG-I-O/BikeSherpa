@@ -15,7 +15,7 @@ public class ReportServiceTests
      private readonly Fixture _fixture = new();
      private readonly Mock<IPricingStrategy> _pricingStrategyMock = new();
 
-     private readonly static Urgency Urgency = new("Standard", 1, "Standard", 1, null, null);
+     private readonly static Urgency Urgency = new("Standard", 1, "Standard", 1, null, null, 12);
      private readonly static PackingSize PackingSize = new("Small", 1, "Small", 3, 10);
      private readonly static DeliveryZone CoreZone = new(StepZone.InCore);
      private readonly static DeliveryZone BorderZone = new(StepZone.InBorder);

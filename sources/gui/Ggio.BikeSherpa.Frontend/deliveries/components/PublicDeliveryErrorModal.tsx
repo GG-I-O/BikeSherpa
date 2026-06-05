@@ -14,7 +14,7 @@ export default function PublicDeliveryErrorModal(props: Props) {
         <GenericModal
             visible={props.visible}>
             <Text>Une erreur est survenue lors de la création de la livraison</Text>
-            <Text>Pour plus d'informations, veuillez contacter le 06 49 66 21 16</Text>
+            <Text>{"Pour plus d'informations, veuillez contacter le 06 49 66 21 16"}</Text>
             <Button mode="outlined" onPress={() => {
                 props.setVisible(false);
                 props.onDismiss();
