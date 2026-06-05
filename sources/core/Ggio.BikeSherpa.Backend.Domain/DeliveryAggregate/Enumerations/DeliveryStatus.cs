@@ -11,6 +11,7 @@ public enum DeliveryStatus
 
 public enum DeliveryStatusTrigger
 {
+     Renew,
      Validate,
      Start,
      Complete,

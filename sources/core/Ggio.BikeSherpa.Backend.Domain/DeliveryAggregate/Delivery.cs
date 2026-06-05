@@ -337,12 +337,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                     StartDate.Offset);
           }
 
-          if (Urgency.AddTimeLimit != null)
-          {
-               return StartDate + Urgency.AddTimeLimit.Value;
-          }
+          return StartDate + Urgency.AddTimeLimit;
 
-          return null;
      }
 
      public double GetTotalDistance()
@@ -356,5 +352,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           {
                throw new InvalidOperationException("La course doit avoir été validée avant de pouvoir être modifiée");
           }
+     }
+
+     public void Renew()
+     {
+          _statusMachine.Fire(DeliveryStatusTrigger.Renew);
+          RegisterDomainEvent(new DeliveryRenewedEvent(Id));
      }
 }

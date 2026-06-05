@@ -17,6 +17,7 @@ public class DeliveryStatusMachine
 
           _statusMachine.Configure(DeliveryStatus.Pending)
                .PermitIf(DeliveryStatusTrigger.Start, DeliveryStatus.Started, () => delivery.Steps.Any(s => s is { StepType: StepType.Pickup, Completed: true }), "Aucune étape de collecte n’est terminée.")
+               .PermitIf(DeliveryStatusTrigger.Renew, DeliveryStatus.New, () => delivery.Steps.All(s => !s.Completed), "Aucune étape ne doit être terminée pour pouvoir repasser à l'état à valider.")
                .Permit(DeliveryStatusTrigger.Cancel, DeliveryStatus.Cancelled);
 
           _statusMachine.Configure(DeliveryStatus.Started)

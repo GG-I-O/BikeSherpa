@@ -4,6 +4,7 @@ using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
@@ -255,7 +256,7 @@ public class DeliveryTests
           // Arrange
           var delivery = MakeSut();
           var pickup = CreatePickupStep(true);
-          var dropoff = CreateDropoffStep(false);
+          var dropoff = CreateDropoffStep();
           delivery.Steps.AddRange([pickup, dropoff]);
           delivery.Status = DeliveryStatus.Started;
 
@@ -725,6 +726,224 @@ public class DeliveryTests
           //Assert
           test.Should().Throw<InvalidOperationException>();
      }
+
+
+     [Fact]
+     public void Renew_WhenStatusIsCancelled_ShouldChangeStatusToPending()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          delivery.Status = DeliveryStatus.Pending;
+
+          // Act
+          delivery.Renew();
+
+          // Assert
+          delivery.Status.Should().Be(DeliveryStatus.New);
+     }
+
+     [Fact]
+     public void Renew_WhenStatusIsCancelled_ShouldRegisterDeliveryRenewedEvent()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          delivery.Status = DeliveryStatus.Pending;
+
+          // Act
+          delivery.Renew();
+
+          // Assert
+          delivery.DomainEvents.Should().ContainSingle(e => e is DeliveryRenewedEvent);
+     }
+
+     [Fact]
+     public void Renew_WhenStatusIsNotCancelled_ShouldThrowInvalidOperationException()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          delivery.Status = DeliveryStatus.Cancelled;
+
+          // Act
+          var act = () => delivery.Renew();
+
+          // Assert
+          act.Should().Throw<InvalidOperationException>();
+     }
+
+     [Fact]
+     public void Cancel_WhenStatusIsNew_ShouldChangeStatusToCancelled()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          delivery.Status = DeliveryStatus.New;
+
+          // Act
+          delivery.Cancel();
+
+          // Assert
+          delivery.Status.Should().Be(DeliveryStatus.Cancelled);
+     }
+
+     [Fact]
+     public void Cancel_ShouldRegisterDeliveryCancelledEvent()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          delivery.Status = DeliveryStatus.Pending;
+
+          // Act
+          delivery.Cancel();
+
+          // Assert
+          delivery.DomainEvents.Should().ContainSingle(e => e is DeliveryCancelledEvent);
+     }
+
+     [Fact]
+     public void Validate_ShouldRegisterDeliveryValidatedEvent()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          delivery.Status = DeliveryStatus.New;
+
+          // Act
+          delivery.Validate();
+
+          // Assert
+          delivery.DomainEvents.Should().ContainSingle(e => e is DeliveryValidatedEvent);
+     }
+
+     [Fact]
+     public void UpdateStepCompletion_WhenPickupStepCompleted_ShouldRegisterDeliveryStartedEvent()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          var pickup = CreatePickupStep();
+          delivery.Steps.Add(pickup);
+          delivery.Validate();
+
+          // Act
+          delivery.UpdateStepCompletion(pickup.Id, true);
+
+          // Assert
+          delivery.DomainEvents.Should().ContainSingle(e => e is DeliveryStartedEvent);
+     }
+
+     [Fact]
+     public void UpdateStepCompletion_WhenAllStepsCompleted_ShouldRegisterDeliveryCompletedEvent()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          var pickup = CreatePickupStep(true);
+          var dropoff = CreateDropoffStep();
+          delivery.Steps.AddRange([pickup, dropoff]);
+          delivery.Status = DeliveryStatus.Started;
+
+
+          // Act
+          delivery.UpdateStepCompletion(dropoff.Id, true);
+
+          // Assert
+          delivery.DomainEvents.Should().ContainSingle(e => e is DeliveryCompletedEvent);
+     }
+
+     [Fact]
+     public void GetLimitDate_WhenUrgencyHasFixedTimeLimit_ShouldReturnFixedTimeLimitBasedOnStartDate()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          var urgency = _fixture.Build<Urgency>()
+               .With(u => u.FixedTimeLimit, new TimeSpan(14, 30, 0))
+               .Create();
+
+          delivery.Urgency = urgency;
+          delivery.StartDate = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero);
+
+          // Act
+          var limitDate = delivery.GetLimitDate();
+
+          // Assert
+          limitDate.Should().NotBeNull();
+          limitDate!.Value.Year.Should().Be(2024);
+          limitDate.Value.Month.Should().Be(6);
+          limitDate.Value.Day.Should().Be(15);
+          limitDate.Value.Hour.Should().Be(14);
+          limitDate.Value.Minute.Should().Be(30);
+     }
+
+     [Fact]
+     public void GetLimitDate_WhenUrgencyHasAddTimeLimit_ShouldReturnStartDatePlusAddTimeLimit()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          var urgency = _fixture.Build<Urgency>()
+               .With(u => u.FixedTimeLimit, (TimeSpan?)null)
+               .With(u => u.AddTimeLimit, TimeSpan.FromHours(2))
+               .Create();
+
+          delivery.Urgency = urgency;
+          delivery.StartDate = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero);
+
+          // Act
+          var limitDate = delivery.GetLimitDate();
+
+          // Assert
+          limitDate.Should().NotBeNull();
+          limitDate!.Value.Should().Be(new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero));
+     }
+
+     [Fact]
+     public void GetTotalDistance_ShouldReturnSumOfAllStepDistances()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          var step1 = CreatePickupStep();
+          var step2 = CreateDropoffStep();
+          var step3 = CreateDropoffStep();
+          step1.Distance = 0;
+          step2.Distance = 5.5;
+          step3.Distance = 3.2;
+          delivery.Steps.AddRange([step1, step2, step3]);
+
+          // Act
+          var totalDistance = delivery.GetTotalDistance();
+
+          // Assert
+          totalDistance.Should().Be(8.7);
+     }
+
+     [Fact]
+     public void GenerateCode_ShouldGenerateCodeWithCorrectFormat()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          var customer = _fixture.Create<Customer>();
+          customer.Code = "CUST";
+          delivery.StartDate = new DateTimeOffset(2024, 6, 15, 10, 0, 0, TimeSpan.Zero);
+
+          // Act
+          delivery.GenerateCode(customer, 5);
+
+          // Assert
+          delivery.Code.Should().Be("40615-CUST-5");
+     }
+
+     [Fact]
+     public void GenerateCode_WhenIncrementIsLessThan10_ShouldNotPadIncrement()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          var customer = _fixture.Create<Customer>();
+          customer.Code = "TEST";
+          delivery.StartDate = new DateTimeOffset(2025, 1, 5, 10, 0, 0, TimeSpan.Zero);
+
+          // Act
+          delivery.GenerateCode(customer, 3);
+
+          // Assert
+          delivery.Code.Should().Be("50105-TEST-3");
+     }
+
+     // ── Helpers ───────────────────────────────────────────────────────────────
 
      // ── Helpers ───────────────────────────────────────────────────────────────
 
