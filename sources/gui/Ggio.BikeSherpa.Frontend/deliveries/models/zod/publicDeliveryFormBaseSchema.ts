@@ -16,6 +16,8 @@ const publicDeliveryFormBaseSchema = zod
             .number()
             .gte(0, "Le prix ne peut pas être négatif")
             .nullable(),
+        needEstimate: zod
+            .boolean(),
         customer: zod
             .object({
                 name: zod

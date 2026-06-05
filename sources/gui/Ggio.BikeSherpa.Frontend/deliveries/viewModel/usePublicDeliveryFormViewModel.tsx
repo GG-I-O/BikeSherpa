@@ -89,6 +89,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
             insulatedBox: false,
             startDate: new Date().toISOString(),
+            needEstimate: false,
         },
         resolver: zodResolver(publicDeliveryFormBaseSchema)
     });
@@ -137,9 +138,9 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         };
     }, 400, [triggerFields, customerType]);
 
-    const estimatedDistance = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.distance ?? 0);
-    const estimatedPrice = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.priceWithoutTaxes ?? 0);
-    const estimatedPriceWithTaxes = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.priceWithTaxes ?? 0);
+    const estimatedDistance = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.totalDistance ?? 0);
+    const estimatedPrice = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.price ?? 0);
+    const estimatedPriceWithTaxes = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.priceWithVat ?? 0);
 
     return {
         control,

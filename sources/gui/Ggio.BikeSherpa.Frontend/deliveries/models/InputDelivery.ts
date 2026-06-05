@@ -9,8 +9,6 @@ export default class InputDelivery {
     public totalPrice: number | null;
     public discount: number | null;
     public extraCost: number | null;
-    public distance: number | null;
-    public reportId: string | null;
     public steps: Step[];
     public details: string[];
     public packingSize: string;
@@ -18,6 +16,8 @@ export default class InputDelivery {
     public contractDate: string;
     public startDate: string;
     public limitDate?: string | null;
+    public needEstimate?: boolean;
+    public customerReference: string | null;
 
     public constructor(
         code: string,
@@ -28,15 +28,15 @@ export default class InputDelivery {
         totalPrice: number, 
         discount: number,
         extraCost: number,
-        distance: number,
-        reportId: string,
         steps: Step[],
         details: string[],
         packingSize: string,
         insulatedBox: boolean,
         contractDate: string,
         startDate: string,
-        limitDate: string
+        limitDate: string,
+        needEstimate: boolean,
+        customerReference: string,
     ) {
         this.code = code;
         this.status = status;
@@ -46,8 +46,6 @@ export default class InputDelivery {
         this.totalPrice = totalPrice;
         this.discount = discount;
         this.extraCost = extraCost;
-        this.distance = distance;
-        this.reportId = reportId;
         this.steps = steps;
         this.details = details;
         this.packingSize = packingSize;
@@ -55,5 +53,7 @@ export default class InputDelivery {
         this.contractDate = contractDate;
         this.startDate = startDate;
         this.limitDate = limitDate;
+        this.needEstimate = needEstimate;
+        this.customerReference = customerReference;
     }
 }

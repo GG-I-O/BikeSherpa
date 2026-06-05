@@ -1,7 +1,7 @@
-type PublicDeliveryEstimatedValue = { 
-    distance: number;
-    priceWithoutTaxes: number;
-    priceWithTaxes: number;
+type PublicDeliveryEstimatedValue = {
+    price: number;
+    priceWithVat: number;
+    totalDistance: number;
 }
 
 export default PublicDeliveryEstimatedValue;
