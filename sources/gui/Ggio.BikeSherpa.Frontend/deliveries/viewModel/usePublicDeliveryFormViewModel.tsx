@@ -50,6 +50,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             urgency: urgencies.length > 0 ? urgencies[0].value : 'Standard',
             totalPrice: 0,
             customer: {
+                code: customer?.code ?? "xxx",
                 name: customer?.name ?? '',
                 email: customer?.email ?? '',
                 phoneNumber: customer ? null : '',

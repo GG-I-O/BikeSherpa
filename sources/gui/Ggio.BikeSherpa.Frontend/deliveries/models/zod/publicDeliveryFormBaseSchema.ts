@@ -20,6 +20,10 @@ const publicDeliveryFormBaseSchema = zod
             .boolean(),
         customer: zod
             .object({
+                code: zod
+                    .string()
+                    .trim()
+                    .min(1, "Code requis"),
                 name: zod
                     .string()
                     .trim()

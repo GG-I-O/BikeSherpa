@@ -77,7 +77,7 @@ export default class PublicDeliveryFormViewModel {
 
         const customerObject: Customer = {
             id: Crypto.randomUUID(),
-            code: "XXX",
+            code: delivery.customer.code,
             name: delivery.customer.name,
             email: delivery.customer.email,
             phoneNumber: delivery.customer.phoneNumber ?? '06 00 00 00 00',
