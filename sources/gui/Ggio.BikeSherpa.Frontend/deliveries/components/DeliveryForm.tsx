@@ -179,6 +179,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
             </View>
             <StepInputDataTable
                 control={control}
+                errors={errors}
                 name="steps"
             />
             <Button

@@ -5,6 +5,5 @@ export const DeliveryServiceIdentifier = {
     Mapper: Symbol.for('DeliveryMapper'),
     BackendClientFacade: Symbol.for('DeliveryBackendClientFacade'),
     CustomBackendClientFacade: Symbol.for('DeliveryCustomBackendClientFacade'),
-    DropdownOptionsService: Symbol.for('DeliveryDropdownOptionsService'),
     StorageMiddleware: Symbol.for('DeliveryStorageMiddleware')
 }

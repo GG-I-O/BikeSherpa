@@ -37,7 +37,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
      public UpdateDeliveryCommandValidator(IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
      {
           RuleFor(x => x.Id).NotEmpty();
-          RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
+          RuleFor(x => x.PricingStrategy).IsInEnum();
           RuleFor(x => x.Status).IsInEnum();
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.Urgency).SetValidator(new UrgencyValidator(urgencies));

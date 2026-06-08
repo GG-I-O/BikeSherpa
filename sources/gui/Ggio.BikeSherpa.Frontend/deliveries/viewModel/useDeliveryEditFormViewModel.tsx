@@ -7,15 +7,15 @@ import {ICustomerService} from "@/spi/CustomerSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import Delivery from "@/deliveries/models/Delivery";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
-import useDeliveryDropdown from "@/deliveries/hooks/useDeliveryDropdown";
 import DeliveryEditFormViewModel from "@/deliveries/viewModel/DeliveryEditFormViewModel";
+import useDropdown from "@/hooks/useDropdown";
 
 export function useDeliveryEditFormViewModel(deliveryId: string) {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
     const viewModel = new DeliveryEditFormViewModel(deliveryServices, customerServices);
     
-    const { urgencies, pricingStrategies, packingSizes } = useDeliveryDropdown();
+    const { urgencies, pricingStrategies, packingSizes } = useDropdown();
     
     const delivery: Delivery = deliveryServices.getDelivery$(deliveryId).get();
 
@@ -33,8 +33,6 @@ export function useDeliveryEditFormViewModel(deliveryId: string) {
             totalPrice: delivery.totalPrice ?? 0,
             discount: delivery.discount ?? 0,
             extraCost: delivery.extraCost ?? 0,
-            distance: delivery.distance ?? 0,
-            reportId: delivery.reportId ?? '',
             steps: delivery.steps.map(step => ({
                ...step,
                contactName: step.stepAddress.name,

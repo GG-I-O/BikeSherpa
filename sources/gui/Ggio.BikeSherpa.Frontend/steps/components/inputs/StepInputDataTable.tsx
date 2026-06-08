@@ -1,15 +1,16 @@
 import {Button, DataTable, Text, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
 import StepRowInput from "./StepRowInput";
-import {Control, useFieldArray} from "react-hook-form";
+import {Control, FieldError, FieldErrors, useFieldArray} from "react-hook-form";
 import {Dimensions, View} from "react-native";
 
 type Props = {
     name: string;
-    control: Control<any>
+    control: Control<any>,
+    errors: FieldErrors;
 }
 
-export default function StepInputDataTable({name, control}: Props) {
+export default function StepInputDataTable({name, control, errors}: Props) {
     const theme = useTheme();
     const windowWidth = Dimensions.get('window').width;
 
@@ -71,6 +72,7 @@ export default function StepInputDataTable({name, control}: Props) {
                     <StepRowInput
                         key={step.id}
                         control={control}
+                        errors={errors}
                         name={name}
                         index={index}
                         deleteRow={() => remove(index)}

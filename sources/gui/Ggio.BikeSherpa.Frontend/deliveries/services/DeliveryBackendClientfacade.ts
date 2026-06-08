@@ -57,9 +57,11 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         // Fill fields for Zod
         const deliveryData = {
             ...item,
+            customerReference: item.customerReference ?? '',
             contractDate: new Date(item.contractDate).toISOString(),
             startDate: new Date(item.startDate).toISOString(),
             limitDate: null,
+            needEstimate: item.needEstimate ?? false,
             steps: []
         };
         const parsedDelivery = schemas.DeliveryCrud.safeParse(deliveryData);

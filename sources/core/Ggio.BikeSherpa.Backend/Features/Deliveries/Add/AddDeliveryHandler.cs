@@ -28,7 +28,7 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
      public AddDeliveryCommandValidator(IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
      {
-          RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
+          RuleFor(x => x.PricingStrategy).IsInEnum();
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.Urgency).SetValidator(new UrgencyValidator(urgencies));
           RuleFor(x => x.TotalPrice).NotEmpty();
