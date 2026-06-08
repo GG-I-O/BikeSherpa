@@ -14,16 +14,24 @@ using Ggio.BikeSherpa.Backend.Model;
 using Ggio.DddCore;
 using Mediator;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.AddByCustomer;
 
 public record AddDeliveryByCustomerRequest(CustomerCrud Customer, DeliveryCrud Delivery);
 
+/// <summary>
+///      This endpoint is implemented as composition of handlers to be able to mutualize at use-case level functionnalities
+///      and so avoid code duplication and
+///      refactoring at domain level
+/// </summary>
+/// <param name="logger">Dedicated logger for this endpoint</param>
+/// <param name="serviceProvider"></param>
 public class AddDeliveryByCustomerEndpoint(
      ILogger<AddDeliveryByCustomerEndpoint> logger,
-     IMediator mediator,
-     IReadRepository<Customer> customerRepository) : Endpoint<AddDeliveryByCustomerRequest>
+     IServiceProvider serviceProvider
+) : Endpoint<AddDeliveryByCustomerRequest>
 {
      public override void Configure()
      {
@@ -40,14 +48,14 @@ public class AddDeliveryByCustomerEndpoint(
 
           var customerId = await ManageCreationOrGetCustomer(req, ct);
 
-          var resultCreateDelivery = await CreateDeliveryAsync(req, ct, customerId);
+          var resultCreateDelivery = await CreateDeliveryAsync(req, customerId, ct);
           if (!resultCreateDelivery.IsSuccess)
           {
                await Send.ErrorsAsync(500, ct);
                return;
           }
 
-          var mailResult = await mediator.Send(new SendDeliveryCreationMailToCustomerCommand(resultCreateDelivery.Value), ct);
+          var mailResult = await SendCreationMailToCustomer(resultCreateDelivery, ct);
           if (!mailResult.IsSuccess)
           {
                await Send.ToEndpointResult(mailResult, ct);
@@ -57,9 +65,18 @@ public class AddDeliveryByCustomerEndpoint(
           await Send.CreatedAtAsync<GetDeliveryEndpoint>(resultCreateDelivery.Value, new AddResult<Guid>(resultCreateDelivery.Value), cancellation: ct);
      }
 
-     private async Task<Result<Guid>> CreateDeliveryAsync(AddDeliveryByCustomerRequest req, CancellationToken ct, Guid customerId)
+     private async Task<Result> SendCreationMailToCustomer(Result<Guid> resultCreateDelivery, CancellationToken ct)
      {
 
+          var mediator = serviceProvider.GetRequiredService<IMediator>();
+          var mailResult = await mediator.Send(new SendDeliveryCreationMailToCustomerCommand(resultCreateDelivery.Value), ct);
+          return mailResult;
+     }
+
+     private async Task<Result<Guid>> CreateDeliveryAsync(AddDeliveryByCustomerRequest req, Guid customerId, CancellationToken ct)
+     {
+          var serviceScope = serviceProvider.CreateScope();
+          var mediator = serviceScope.ServiceProvider.GetRequiredService<IMediator>();
           try
           {
                var createDeliveryCommand = new AddDeliveryCommand(
@@ -90,6 +107,10 @@ public class AddDeliveryByCustomerEndpoint(
 
      private async Task<Guid> ManageCreationOrGetCustomer(AddDeliveryByCustomerRequest req, CancellationToken ct)
      {
+
+          using var serviceScope = serviceProvider.CreateScope();
+          var customerRepository = serviceScope.ServiceProvider.GetRequiredService<IReadRepository<Customer>>();
+          var mediator = serviceScope.ServiceProvider.GetRequiredService<IMediator>();
 
           Guid? customerId;
           var checkCustomerResult = await customerRepository.SingleOrDefaultAsync(new CustomerByCodeAndEmailSpecification(req.Customer.Code, req.Customer.Email), ct);
