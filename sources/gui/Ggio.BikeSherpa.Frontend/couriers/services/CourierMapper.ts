@@ -1,4 +1,6 @@
-import Courier, { CourierDto } from "../models/Courier";
+import Courier, {CourierDto} from "../models/Courier";
+import {CourierFormValues} from "@/couriers/viewModels/zod/courierFormBaseSchema";
+import InputCourier from "@/couriers/models/InputCourier";
 
 class CourierMapper {
     public static CourierDtoToCourier(courierDto: CourierDto) {
@@ -13,6 +15,18 @@ class CourierMapper {
             links: courierDto.links ?? []
         };
         return courier;
+    }
+
+    public static CourierFormValuesToInputCourier(courier: CourierFormValues): InputCourier {
+        return {
+            ...courier,
+            address: {
+                ...courier.address,
+                fullAddress: `${courier.address.streetInfo} ${courier.address.postcode} ${courier.address.city}`,
+                name: `${courier.firstName} ${courier.lastName}`,
+                phone: courier.phoneNumber
+            }
+        };
     }
 }
 

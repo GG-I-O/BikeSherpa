@@ -3,7 +3,7 @@ import Courier from "../models/Courier";
 import { ICourierService } from "@/spi/CourierSPI";
 import { inject } from "inversify";
 import * as zod from "zod";
-import { courierFormBaseSchema } from "./zod/courierFormBaseSchema";
+import {courierFormBaseSchema, CourierFormValues} from "./zod/courierFormBaseSchema";
 
 export default class EditCourierFormViewModel {
     private courierServices: ICourierService;
@@ -14,9 +14,16 @@ export default class EditCourierFormViewModel {
         this.courierServices = courierServices;
     }
 
-    onSubmit = (courier: Courier) => {
-        courier.address.name = `${courier.firstName} ${courier.lastName}`;
-        courier.address.phone = courier.phoneNumber;
+    onSubmit = (oldCourier: Courier, newCourier: CourierFormValues) => {
+        const courier: Courier = {
+            ...oldCourier,
+            ...newCourier,
+            address: {
+                ...newCourier.address,
+                name: `${newCourier.firstName} ${newCourier.lastName}`,
+                phone: newCourier.phoneNumber,
+            }
+        }
         this.courierServices.updateCourier(courier);
     };
 
@@ -25,9 +32,6 @@ export default class EditCourierFormViewModel {
 
         return courierFormBaseSchema
             .extend({
-                id: zod
-                    .string()
-                    .min(1),
                 code: courierFormBaseSchema.shape.code.refine((value) => {
                     if (originalCode === value) {
                         return true;
