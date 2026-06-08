@@ -18,7 +18,8 @@ public record UpdateCustomerCommand(
      string? VatNumber,
      string Email,
      string PhoneNumber,
-     AddressCrud Address
+     AddressCrud Address,
+     DeliveryType? DefaultDeliveryType
 ) : ICommand<Result>;
 
 public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>
@@ -81,6 +82,7 @@ public class UpdateCustomerHandler(
           entity.Email = command.Email;
           entity.PhoneNumber = command.PhoneNumber;
           entity.Address = command.Address.ToSource<AddressCrud, Address>();
+          entity.DefaultDeliveryType = command.DefaultDeliveryType;
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
      }

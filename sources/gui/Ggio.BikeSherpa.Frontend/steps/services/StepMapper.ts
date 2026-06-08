@@ -5,7 +5,6 @@ import {inject, injectable} from "inversify";
 import IStepMapper from "@/steps/spi/IStepMapper";
 import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
 import {ICourierService} from "@/spi/CourierSPI";
-import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import unassignedCourierDisplay from "@/deliveries/data/unassignedCourierDisplay";
 
@@ -16,7 +15,7 @@ export default class StepMapper implements IStepMapper {
 
     constructor(
         @inject(ServicesIdentifiers.CourierServices) courierServices: ICourierService,
-        @inject(DeliveryServiceIdentifier.DropdownOptionsService) dropdownOptionsService: IDropdownOptionsService,
+        @inject(ServicesIdentifiers.DropdownOptionsService) dropdownOptionsService: IDropdownOptionsService,
     ) {
         this.courierServices = courierServices;
         this.dropdownOptionsService = dropdownOptionsService;

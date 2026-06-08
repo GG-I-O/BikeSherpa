@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import InputCustomer from '../models/InputCustomer';
 import { ICustomerService } from '@/spi/CustomerSPI';
 import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifiers';
 import { IOCContainer } from '@/bootstrapper/constants/IOCContainer';
@@ -8,6 +7,7 @@ import { useEffect, useState } from 'react';
 import Customer from '../models/Customer';
 import { observe } from '@legendapp/state';
 import NewCustomerFormViewModel from './NewCustomerFormViewModel';
+import {CustomerFormValues} from "@/customers/viewModels/zod/customerFormBaseSchema";
 
 export function useNewCustomerFormViewModel() {
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
@@ -27,7 +27,7 @@ export function useNewCustomerFormViewModel() {
         handleSubmit,
         formState: { errors },
         reset
-    } = useForm<InputCustomer>({
+    } = useForm<CustomerFormValues>({
         defaultValues: {
             name: '',
             code: '',
@@ -46,7 +46,8 @@ export function useNewCustomerFormViewModel() {
                 }
             },
             siret: '',
-            vatNumber: ''
+            vatNumber: '',
+            defaultDeliveryType: 0
         },
         resolver: zodResolver(newCustomerViewModel.getNewCustomerSchema(customerList))
     });

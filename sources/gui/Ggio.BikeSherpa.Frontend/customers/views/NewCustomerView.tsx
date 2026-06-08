@@ -1,13 +1,12 @@
 import { useNewCustomerFormViewModel } from "../viewModels/useNewCustomerFormViewModel";
-
 import CustomerForm from "../components/CustomerForm";
-import InputCustomer from "../models/InputCustomer";
+import {CustomerFormValues} from "@/customers/viewModels/zod/customerFormBaseSchema";
 
 export default function NewCustomerView() {
     const { control, errors, handleSubmit } = useNewCustomerFormViewModel();
 
     return (
-        <CustomerForm<InputCustomer>
+        <CustomerForm<CustomerFormValues>
             control={control}
             errors={errors}
             handleSubmit={handleSubmit}

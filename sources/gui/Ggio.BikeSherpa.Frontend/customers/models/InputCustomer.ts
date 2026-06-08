@@ -8,9 +8,10 @@ export default class InputCustomer {
     public email: string;
     public siret: string | null;
     public vatNumber: string | null;
+    public defaultDeliveryType: number;
 
     public constructor(
-        name: string, address: Address, code: string, phoneNumber: string, email: string, siret: string | null = null, vatNumber: string | null = null
+        name: string, address: Address, code: string, phoneNumber: string, email: string, siret: string | null = null, vatNumber: string | null = null, defaultDeliveryType: number
     ) {
         this.name = name;
         this.address = address;
@@ -19,5 +20,6 @@ export default class InputCustomer {
         this.email = email;
         this.siret = siret;
         this.vatNumber = vatNumber;
+        this.defaultDeliveryType = defaultDeliveryType;
     }
 }
