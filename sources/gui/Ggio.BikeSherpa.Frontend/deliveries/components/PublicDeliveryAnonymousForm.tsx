@@ -1,7 +1,6 @@
 import {Button, Divider, Text} from "react-native-paper";
 import PublicDeliveryStepForm from "@/steps/components/PublicDeliveryStepForm";
 import PublicDeliveryDetailsForm from "@/deliveries/components/PublicDeliveryDetailsForm";
-import PublicDeliveryStepDetailsForm from "@/steps/components/PublicDeliveryStepDetailsForm";
 import PublicDeliveryPrice from "@/deliveries/components/PublicDeliveryPrice";
 import PublicDeliveryCustomerForm from "@/deliveries/components/PublicDeliveryCustomerForm";
 import usePublicDeliveryFormViewModel from "@/deliveries/viewModel/usePublicDeliveryFormViewModel";
@@ -9,50 +8,54 @@ import {ScrollView} from "react-native";
 import formStyle from "@/style/formStyle";
 import React from "react";
 import PublicDeliveryCustomerType from "@/deliveries/components/PublicDeliveryCustomerType";
-import LoadingModal from "@/components/general/LoadingModal";
-import PublicDeliveryErrorModal from "@/deliveries/components/PublicDeliveryErrorModal";
+import {useController} from "react-hook-form";
 
 export default function PublicDeliveryAnonymousForm() {
 
     const viewModel = usePublicDeliveryFormViewModel();
 
+    const deliveryType = useController({
+        control: viewModel.control,
+        name: "pricingStrategy",
+    }).field;
+    
+    const isSimpleDelivery = 
+        viewModel.deliveryTypes.length > 0 &&
+        deliveryType.value.toString() === viewModel.deliveryTypes[0].value;
+    
     return (
         <ScrollView contentContainerStyle={{paddingInline: 16, paddingTop: 16, gap: 16, marginBottom: 64}}>
-            <LoadingModal visible={viewModel.isLoading} />
-            <PublicDeliveryErrorModal
-                visible={viewModel.showErrorModal}
-                setVisible={viewModel.setShowErrorModal}
-                onDismiss={viewModel.goToLogin} />
+            <PublicDeliveryCustomerType
+                customerType={viewModel.customerType}
+                setCustomerType={viewModel.setCustomerType}/>
+            <Divider/>
             <PublicDeliveryStepForm
                 control={viewModel.control}
+                errors={viewModel.errors}
+                customerType={viewModel.customerType}
                 totalDistance={viewModel.estimatedDistance}
             />
-            <Divider />
+            <Divider/>
             <PublicDeliveryDetailsForm
                 control={viewModel.control}
                 errors={viewModel.errors}
                 packingSizes={viewModel.packingSizes}
                 setUrgency={viewModel.setUrgency}
                 setStartDate={viewModel.setStartDate}
+                showUrgency={isSimpleDelivery}
             />
-            <Divider />
-            <PublicDeliveryPrice
-                control={viewModel.control}
-                price={viewModel.estimatedPrice}
-                priceWithTaxes={viewModel.estimatedPriceWithTaxes}
-            />
-            <Divider />
-            <PublicDeliveryCustomerType 
-                customerType={viewModel.customerType}
-                setCustomerType={viewModel.setCustomerType} />
-            <Divider />
+            <Divider/>
+            {isSimpleDelivery && (
+                <>
+                    <PublicDeliveryPrice
+                        control={viewModel.control}
+                        price={viewModel.estimatedPrice}
+                        priceWithTaxes={viewModel.estimatedPriceWithTaxes}
+                    />
+                    <Divider/>
+                </>
+            )}
             <PublicDeliveryCustomerForm
-                control={viewModel.control}
-                errors={viewModel.errors}
-                customerType={viewModel.customerType}
-            />
-            <Divider />
-            <PublicDeliveryStepDetailsForm
                 control={viewModel.control}
                 errors={viewModel.errors}
                 customerType={viewModel.customerType}

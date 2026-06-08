@@ -2,7 +2,6 @@ import PublicDeliveryCustomer from "@/deliveries/models/PublicDeliveryCustomer";
 import {Button, Divider, SegmentedButtons, Text} from "react-native-paper";
 import PublicDeliveryStepForm from "@/steps/components/PublicDeliveryStepForm";
 import PublicDeliveryDetailsForm from "@/deliveries/components/PublicDeliveryDetailsForm";
-import PublicDeliveryStepDetailsForm from "@/steps/components/PublicDeliveryStepDetailsForm";
 import PublicDeliveryPrice from "@/deliveries/components/PublicDeliveryPrice";
 import usePublicDeliveryFormViewModel from "@/deliveries/viewModel/usePublicDeliveryFormViewModel";
 import React from "react";
@@ -11,8 +10,6 @@ import {ScrollView, View} from "react-native";
 import AppStyle from "@/constants/AppStyle";
 import formStyle from "@/style/formStyle";
 import PublicDeliveryCustomerType from "@/deliveries/components/PublicDeliveryCustomerType";
-import LoadingModal from "@/components/general/LoadingModal";
-import PublicDeliveryErrorModal from "@/deliveries/components/PublicDeliveryErrorModal";
 
 type Props = {
     customer: PublicDeliveryCustomer
@@ -27,13 +24,16 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
         name: "pricingStrategy",
     });
 
+    const deliveryType = useController({
+        control: viewModel.control,
+        name: "pricingStrategy",
+    }).field;
+    const isSimpleDelivery = 
+        viewModel.deliveryTypes.length > 0 &&
+        deliveryType.value.toString() === viewModel.deliveryTypes[0].value;
+
     return (
         <ScrollView contentContainerStyle={{paddingInline: 16, paddingTop: 16, gap: 16, marginBottom: 64}}>
-            <LoadingModal visible={viewModel.isLoading} />
-            <PublicDeliveryErrorModal 
-                visible={viewModel.showErrorModal} 
-                setVisible={viewModel.setShowErrorModal}
-                onDismiss={viewModel.goToLogin} />
             <View style={{flexDirection: "row", gap: 16, alignItems: "center"}}>
                 <Text style={AppStyle.textStyle.h2}>Type de livraison</Text>
                 <SegmentedButtons
@@ -41,13 +41,19 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
                     onValueChange={(value) => field.onChange(parseInt(value))}
                     buttons={viewModel.deliveryTypes.map(b => ({
                         ...b,
-                        style: {width: 100}
+                        style: {width: 250}
                     }))}
                 />
             </View>
             <Divider/>
+            <PublicDeliveryCustomerType
+                customerType={viewModel.customerType}
+                setCustomerType={viewModel.setCustomerType}/>
+            <Divider/>
             <PublicDeliveryStepForm
                 control={viewModel.control}
+                errors={viewModel.errors}
+                customerType={viewModel.customerType}
                 totalDistance={viewModel.estimatedDistance}
                 canAddStep={viewModel.deliveryTypes.length > 0 && field.value.toString() === viewModel.deliveryTypes[1].value}
             />
@@ -58,23 +64,19 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
                 packingSizes={viewModel.packingSizes}
                 setUrgency={viewModel.setUrgency}
                 setStartDate={viewModel.setStartDate}
+                showUrgency={isSimpleDelivery}
             />
             <Divider/>
-            <PublicDeliveryPrice
-                control={viewModel.control}
-                price={viewModel.estimatedPrice}
-                priceWithTaxes={viewModel.estimatedPriceWithTaxes}
-            />
-            <Divider/>
-            <PublicDeliveryCustomerType
-                customerType={viewModel.customerType}
-                setCustomerType={viewModel.setCustomerType} />
-            <Divider />
-            <PublicDeliveryStepDetailsForm
-                control={viewModel.control}
-                errors={viewModel.errors}
-                customerType={viewModel.customerType}
-            />
+            {isSimpleDelivery && (
+                <>
+                    <PublicDeliveryPrice
+                        control={viewModel.control}
+                        price={viewModel.estimatedPrice}
+                        priceWithTaxes={viewModel.estimatedPriceWithTaxes}
+                    />
+                    <Divider/>
+                </>
+            )}
             <Button
                 testID="formButton"
                 mode="outlined"

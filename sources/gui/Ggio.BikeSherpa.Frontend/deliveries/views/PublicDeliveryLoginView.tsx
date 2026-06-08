@@ -5,13 +5,16 @@ import formStyle from "@/style/formStyle";
 import React from "react";
 import usePublicDeliveryLoginViewModel from "@/deliveries/viewModel/usePublicDeliveryLoginViewModel";
 import LoadingModal from "@/components/general/LoadingModal";
+import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 
 export default function PublicDeliveryLoginView() {
     const viewModel = usePublicDeliveryLoginViewModel();
+    
+    const { isLoadingModalVisible} = usePublicDeliveryModal();
 
     return (
         <>
-            <LoadingModal visible={viewModel.isLoading}/>
+            <LoadingModal visible={isLoadingModalVisible}/>
 
             <View style={{
                 justifyContent: 'center',

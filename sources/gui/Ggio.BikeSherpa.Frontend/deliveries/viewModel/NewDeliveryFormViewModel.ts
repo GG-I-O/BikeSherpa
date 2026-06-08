@@ -14,6 +14,7 @@ export default class NewDeliveryFormViewModel extends AbstractFormViewModel {
         const deliveryObject: Delivery = {
             id: Crypto.randomUUID(),
             operationId: Crypto.randomUUID(),
+            customerReference: '',
             ...delivery,
             steps: delivery.steps.map(step => {
                 return {

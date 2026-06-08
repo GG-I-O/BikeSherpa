@@ -8,6 +8,8 @@ type PublicDeliveryState = {
     isAnonymous: boolean;
     delivery: Delivery | null;
     estimatedValue: PublicDeliveryEstimatedValue | null;
+    isLoadingModalVisible: boolean;
+    isErrorModalVisible: boolean;
 };
 
 export const publicDeliveryStore$ = observable<PublicDeliveryState>({
@@ -15,4 +17,6 @@ export const publicDeliveryStore$ = observable<PublicDeliveryState>({
     isAnonymous: false,
     delivery: null,
     estimatedValue: null,
+    isLoadingModalVisible: false,
+    isErrorModalVisible: false,
 });

@@ -5,6 +5,7 @@ import {useEffect, useMemo, useRef, useState} from "react";
 import PublicDeliveryDetailsFormViewModel from "@/deliveries/viewModel/PublicDeliveryDetailsFormViewModel";
 import DateToolbox from "@/services/DateToolbox";
 import {DropdownOptions} from "@/models/DropdownOptions";
+import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 
 type UrgencyOption = { value: string; label: string; lastHourToOrder: number };
 
@@ -24,6 +25,8 @@ export default function usePublicDeliveryDetailsFormViewModel(
         []
     );
 
+    const {setIsLoadingModalVisible} = usePublicDeliveryModal();
+
     // Stable "now"
     const nowRef = useRef(new Date());
     const now = nowRef.current;
@@ -34,18 +37,24 @@ export default function usePublicDeliveryDetailsFormViewModel(
     const [allUrgencies, setAllUrgencies] = useState<UrgencyOption[]>([]);
 
     useEffect(() => {
-        viewModel.getLastHourToOrder()
-            .then(setLastHourToOrder);
-        viewModel.getWorkHours()
-            .then((wh) =>
-                setWorkHours({
-                    start: new Date(wh.startDate),
-                    end: new Date(wh.endDate)
-                })
-            );
-        viewModel.getUrgenciesLastHourToOrder()
-            .then(setAllUrgencies);
-    }, [viewModel]);
+        const loadData = async () => {
+            setIsLoadingModalVisible(true);
+
+            const resultLastHourToOrder = await viewModel.getLastHourToOrder()
+            setLastHourToOrder(resultLastHourToOrder);
+
+            const resultWorkHours = await viewModel.getWorkHours();
+            setWorkHours({
+                start: new Date(resultWorkHours.startDate),
+                end: new Date(resultWorkHours.endDate)
+            })
+
+            const resultUrgenciesLastHourToOrder = await viewModel.getUrgenciesLastHourToOrder();
+            setAllUrgencies(resultUrgenciesLastHourToOrder);
+        }
+
+        loadData().finally(() => setIsLoadingModalVisible(false))
+    }, [viewModel, setIsLoadingModalVisible]);
 
     // Helper field
     const isFieldToday = DateToolbox.dateFilterFunction(now, startDate);
@@ -78,22 +87,32 @@ export default function usePublicDeliveryDetailsFormViewModel(
 
     // Correct form values when they fall outside possible ranges
     useEffect(() => {
+        if (!isFieldToday) return;
         if (possibleUrgencies.length === 0 || hoursOptions.length === 0) return;
 
         const urgencyStillValid = possibleUrgencies.some((u) => u.value === urgency);
         if (!urgencyStillValid) {
             setUrgency(possibleUrgencies[0].value);
         }
+        
+        const corrected = new Date(startDate);
 
-        const hourStillValid = hoursOptions.some(
-            (h) => parseInt(h.value) === startDate.getHours()
-        );
+        // If hour is before possible hours, set to first possible hour
+        const hourStillValid = hoursOptions.some((h) => h.value === startDate.getHours().toString());
         if (!hourStillValid) {
-            const corrected = new Date(startDate);
             corrected.setHours(parseInt(hoursOptions[0].value));
             corrected.setMinutes(0);
-            setStartDate(corrected.toISOString());
         }
+        
+        // If hour is later than last possible hour, set to next day at first hour
+        const canDoSameDay = (startDate.getHours() + 1) <= (workHours?.end.getHours() ?? 17);
+        if (!canDoSameDay) {
+            corrected.setDate(corrected.getDate() + 1);
+            corrected.setHours(workHours?.start.getHours() ?? 8);
+            corrected.setMinutes(0);
+        }
+
+        setStartDate(corrected.toISOString());
     }, [possibleUrgencies, hoursOptions]); // Do not add dependencies that the linter asks, it's intentional
 
     return {

@@ -1,13 +1,13 @@
 const enum PublicDeliveryCustomerTypeEnum {
-    None,
     Sender,
-    Receiver
+    Receiver,
+    None
 }
 
 const PublicDeliveryCustomerTypeOptions = [
-    {value: PublicDeliveryCustomerTypeEnum.None.toString(), label: 'Aucun'},
     {value: PublicDeliveryCustomerTypeEnum.Sender.toString(), label: 'Expéditeur'},
-    {value: PublicDeliveryCustomerTypeEnum.Receiver.toString(), label: 'Destinataire'}
+    {value: PublicDeliveryCustomerTypeEnum.Receiver.toString(), label: 'Destinataire'},
+    {value: PublicDeliveryCustomerTypeEnum.None.toString(), label: "Tiers"}
 ];
 
 export { PublicDeliveryCustomerTypeEnum, PublicDeliveryCustomerTypeOptions };

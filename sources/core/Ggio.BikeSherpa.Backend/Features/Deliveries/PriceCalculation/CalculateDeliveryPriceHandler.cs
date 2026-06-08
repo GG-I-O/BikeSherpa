@@ -8,6 +8,7 @@ using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Mediator;
+using Namotion.Reflection;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.PriceCalculation;
 
@@ -52,7 +53,11 @@ public class CalculateDeliveryPriceHandler(
                Code = "temp",
                CustomerId = Guid.NewGuid(),
                Urgency = urgency,
-               Steps = query.Delivery.Steps.Select(step => DeliveryStepCrudMapper.Map(step.Data)).ToList(),
+               Steps = query.Delivery.Steps
+                    .Where(step => step.Data.StepAddress.StreetInfo != string.Empty)
+                    .Select(step => DeliveryStepCrudMapper
+                         .Map(step.Data)
+                    ).ToList(),
                PackingSize = packingSize,
                InsulatedBox = query.Delivery.InsulatedBox,
                StartDate = query.Delivery.StartDate,

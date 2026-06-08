@@ -10,19 +10,20 @@ import PublicDeliveryLoginViewModel from "@/deliveries/viewModel/PublicDeliveryL
 import {useRouter} from "expo-router";
 import {publicDeliveryStore$} from "@/deliveries/store/publicDeliveryStore";
 import {navigate} from "expo-router/build/global-state/routing";
+import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 
 export default function usePublicDeliveryLoginViewModel() {
     const publicDeliveryService = IOCContainer.get<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices);
     const viewModel = new PublicDeliveryLoginViewModel(publicDeliveryService);
     
     const router = useRouter();
-
     const [publicCustomer, setPublicCustomer] = useState<PublicDeliveryCustomer | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    
+    const { setIsLoadingModalVisible} = usePublicDeliveryModal();
 
     useEffect(() => {
         if (publicCustomer && publicCustomer.email && publicCustomer.code) {
-            setIsLoading(false);
+            setIsLoadingModalVisible(false);
             publicDeliveryStore$.customer.set(publicCustomer);
             publicDeliveryStore$.isAnonymous.set(false);
             navigate("/newDelivery/form");
@@ -47,7 +48,7 @@ export default function usePublicDeliveryLoginViewModel() {
         control,
         handleSubmit: handleSubmit(
             (data) => {
-                setIsLoading(true);
+                setIsLoadingModalVisible(true);
                 viewModel.login(data.email, data.code)
                     .then(customer => {
                             if (!customer) {
@@ -68,7 +69,7 @@ export default function usePublicDeliveryLoginViewModel() {
                             }
                         }
                     )
-                    .finally(() => setIsLoading(false))
+                    .finally(() => setIsLoadingModalVisible(false))
             },
             (errors) => {
                 console.error("Invalid delivery for creation");
@@ -80,7 +81,6 @@ export default function usePublicDeliveryLoginViewModel() {
             publicDeliveryStore$.customer.set(null);
             publicDeliveryStore$.isAnonymous.set(true);
             router.push("/newDelivery/form");
-        },
-        isLoading
+        }
     }
 }

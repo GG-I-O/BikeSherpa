@@ -19,7 +19,7 @@ public class GetAllPricingStrategiesHandler : IQueryHandler<GetAllPricingStrateg
                },
                new()
                {
-                    Label = "Tournée",
+                    Label = "Livraison partenaire",
                     Value = PricingStrategy.TourDeliveryStrategy
                },
                new()

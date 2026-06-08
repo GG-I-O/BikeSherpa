@@ -5,7 +5,6 @@ import {inject} from "inversify";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import Customer from "@/customers/models/Customer";
-import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
 import {publicDeliveryStore$} from "@/deliveries/store/publicDeliveryStore";
 import PublicDeliveryEstimatedValue from "@/deliveries/models/PublicDeliveryEstimatedValue";
 
@@ -18,8 +17,8 @@ export default class PublicDeliveryFormViewModel {
         this.publicDeliveryService = publicDeliveryService;
     }
 
-    public onSubmit = async (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): Promise<boolean> => {
-        const {deliveryObject, customerObject} = this.mapFormValuesToObject(delivery, customerType);
+    public onSubmit = async (delivery: PublicDeliveryFormValues): Promise<boolean> => {
+        const {deliveryObject, customerObject} = this.mapFormValuesToObject(delivery);
         
         const result = await this.publicDeliveryService.createDelivery(deliveryObject, customerObject);
         if (result) {
@@ -34,22 +33,12 @@ export default class PublicDeliveryFormViewModel {
         return result;
     }
     
-    public getEstimatedValue = async (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): Promise<PublicDeliveryEstimatedValue> => {
-        const {deliveryObject} = this.mapFormValuesToObject(delivery, customerType);
+    public getEstimatedValue = async (delivery: PublicDeliveryFormValues): Promise<PublicDeliveryEstimatedValue> => {
+        const {deliveryObject} = this.mapFormValuesToObject(delivery);
         return await this.publicDeliveryService.getEstimatedValue(deliveryObject);
     }
     
-    private mapFormValuesToObject = (delivery: PublicDeliveryFormValues, customerType: PublicDeliveryCustomerTypeEnum): {deliveryObject: Delivery, customerObject: Customer} => {
-        if (customerType === PublicDeliveryCustomerTypeEnum.Sender) {
-            delivery.customer.address = delivery.steps[0].stepAddress;
-            delivery.steps[0].contactName = delivery.customer.name;
-            delivery.steps[0].contactPhone = delivery.customer.phoneNumber;
-        }
-        if (customerType === PublicDeliveryCustomerTypeEnum.Receiver) {
-            delivery.customer.address = delivery.steps[1].stepAddress;
-            delivery.steps[1].contactName = delivery.customer.name;
-            delivery.steps[1].contactPhone = delivery.customer.phoneNumber;
-        }
+    private mapFormValuesToObject = (delivery: PublicDeliveryFormValues): {deliveryObject: Delivery, customerObject: Customer} => {
         
         const deliveryObject: Delivery = {
             ...delivery,
@@ -57,7 +46,7 @@ export default class PublicDeliveryFormViewModel {
             customerReference: "",
             contractDate: new Date().toISOString(),
             customerId: Crypto.randomUUID(),
-            details: [],
+            details: [""],
             discount: 0,
             extraCost: 0,
             status: 0,
@@ -91,11 +80,12 @@ export default class PublicDeliveryFormViewModel {
             code: "XXX",
             name: delivery.customer.name,
             email: delivery.customer.email,
-            phoneNumber: delivery.customer.phoneNumber ?? '',
+            phoneNumber: delivery.customer.phoneNumber ?? '06 00 00 00 00',
+            defaultDeliveryType: 0,
             address: {
                 ...delivery.customer.address,
                 name: delivery.customer.name ?? '',
-                phone: delivery.customer.phoneNumber ?? ''
+                phone: delivery.customer.phoneNumber ?? '06 00 00 00 00'
             },
             siret: null,
             vatNumber: null

@@ -13,6 +13,7 @@ interface ThemedAddressInputProps<T extends FieldValues = FieldValues> {
     placeholder?: string;
     error?: FieldError | undefined
     required?: boolean;
+    labelAsTitle?: boolean;
 }
 
 const ThemedAddressInput = <T extends FieldValues = FieldValues>(
@@ -22,7 +23,8 @@ const ThemedAddressInput = <T extends FieldValues = FieldValues>(
         label,
         placeholder,
         error,
-        required = false
+        required = false,
+        labelAsTitle = false
     }: ThemedAddressInputProps<T>
 ) => {
     const addressService = IOCContainer.get<IAddressService>(ServicesIdentifiers.AddressService);
@@ -39,6 +41,7 @@ const ThemedAddressInput = <T extends FieldValues = FieldValues>(
             getOptionLabel={(a) => a.fullAddress}
             getOptionValue={(a) => a}
             getLabelFromValue={a => a.fullAddress}
+            labelAsTitle={labelAsTitle}
         />
     );
 };

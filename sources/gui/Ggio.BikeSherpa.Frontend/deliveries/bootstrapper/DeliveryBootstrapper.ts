@@ -15,8 +15,6 @@ import DeliveryMapper from "@/deliveries/services/DeliveryMapper";
 import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import PublicDeliveryService from "@/deliveries/services/PublicDeliveryService";
 
-console.log('Binding with:', DeliveryServiceIdentifier.Services.toString());
-
 export default class DeliveryBootstrapper {
     public static init(IOCContainer: Container) {
         // Storage

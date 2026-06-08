@@ -17,22 +17,23 @@ type Props = {
     errors: FieldErrors;
     packingSizes: DropdownOptions[];
     setUrgency: (urgency: string) => void;
-    setStartDate: (startDate: string) => void;   
+    setStartDate: (startDate: string) => void;
+    showUrgency?: boolean;
 }
 
 export default function PublicDeliveryDetailsForm(props: Props) {
-    
+
     const startDate = useController({
         control: props.control,
         name: "startDate",
     }).field;
     const fieldDate = new Date(startDate.value);
-    
+
     const urgency = useController({
         control: props.control,
         name: "urgency",
     }).field;
-    
+
     const viewModel = usePublicDeliveryDetailsFormViewModel(
         fieldDate,
         props.setStartDate,
@@ -92,15 +93,6 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                 <Text style={AppStyle.textStyle.h3}> min </Text>
             </View>
             <ThemedDropdownInput
-                testID="deliveryFormUrgencyInput"
-                control={props.control}
-                name="urgency"
-                error={props.errors.urgency as FieldError | undefined}
-                label="Urgence"
-                options={viewModel.urgencies}
-                required
-            />
-            <ThemedDropdownInput
                 testID="deliveryFormPackingSizeInput"
                 control={props.control}
                 name="packingSize"
@@ -109,14 +101,27 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                 options={props.packingSizes}
                 required
             />
-            <ThemedCheckboxInput
-                testID="deliveryFormInsulatedInput"
-                control={props.control}
-                name="insulatedBox"
-                error={props.errors.insulatedBox as FieldError | undefined}
-                label="Caisson isotherme"
-                required
-            />
+            {props.showUrgency && (
+                <>
+                    <ThemedDropdownInput
+                        testID="deliveryFormUrgencyInput"
+                        control={props.control}
+                        name="urgency"
+                        error={props.errors.urgency as FieldError | undefined}
+                        label="Urgence"
+                        options={viewModel.urgencies}
+                        required
+                    />
+                    <ThemedCheckboxInput
+                        testID="deliveryFormInsulatedInput"
+                        control={props.control}
+                        name="insulatedBox"
+                        error={props.errors.insulatedBox as FieldError | undefined}
+                        label="Caisson isotherme"
+                        required
+                    />
+                </>
+            )}
         </View>
     );
 }

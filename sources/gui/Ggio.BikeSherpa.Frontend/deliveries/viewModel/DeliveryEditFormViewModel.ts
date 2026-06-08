@@ -12,6 +12,7 @@ export default class DeliveryEditFormViewModel extends AbstractFormViewModel {
         const deliveryObject: Delivery = {
             id: oldDelivery.id,
             operationId: oldDelivery.operationId,
+            customerReference: oldDelivery.customerReference,
             ...delivery,
             steps: delivery.steps.map(step => {
                 const oldStep = oldDelivery.steps.find(s => s.id === step.id);
