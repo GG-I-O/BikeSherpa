@@ -537,9 +537,31 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "post",
-    path: "/deliveries/:deliveryId/validate",
+    method: "put",
+    path: "/deliveries/:deliveryId/pending",
     alias: "ValidateDeliveryEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "put",
+    path: "/deliveries/:deliveryId/renew",
+    alias: "RenewDeliveryEndpoint",
     tags: ["delivery"],
     requestFormat: "json",
     parameters: [

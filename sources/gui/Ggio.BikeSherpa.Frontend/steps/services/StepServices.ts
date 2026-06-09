@@ -6,11 +6,11 @@ import {IStorageContext} from "@/spi/StorageSPI";
 import Delivery from "@/deliveries/models/Delivery";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
-import deliveryOperationAction from "@/steps/constants/deliveryOperationAction";
 import {Step} from "@/steps/models/Step";
 import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddleware";
 import {hateoasRel} from "@/models/HateoasLink";
 import UploadableFile from "@/models/UploadableFile";
+import deliveryStepOperationAction from "@/steps/data/deliveryStepOperationAction";
 
 @injectable()
 export default class StepServices implements IStepServices {
@@ -55,7 +55,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.patchTime
+            deliveryStepOperationAction.patchTime
         );
 
         observables.step$!.estimatedDeliveryDate.set(date.toISOString());
@@ -85,7 +85,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.putTime
+            deliveryStepOperationAction.putTime
         );
 
         observables.step$!.estimatedDeliveryDate.set(date.toISOString());
@@ -112,7 +112,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.patchOrder
+            deliveryStepOperationAction.patchOrder
         );
 
         observables.step$!.order.set(newOrder);
@@ -139,7 +139,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.putOrder
+            deliveryStepOperationAction.putOrder
         );
 
         observables.step$!.order.set(increment);
@@ -194,7 +194,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.postCourier
+            deliveryStepOperationAction.postCourier
         );
 
         observables.step$!.courierId.set(courierId);
@@ -221,7 +221,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.deleteCourier
+            deliveryStepOperationAction.deleteCourier
         );
 
         observables.step$!.courierId.set(null);
@@ -248,7 +248,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.patchComment
+            deliveryStepOperationAction.patchComment
         );
 
         observables.step$!.comment.set(comment);
@@ -275,7 +275,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.patchCourierComment
+            deliveryStepOperationAction.patchCourierComment
         );
 
         observables.step$!.courierComment.set(comment);
@@ -302,7 +302,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.putComplete
+            deliveryStepOperationAction.putComplete
         );
 
         observables.step$!.completed.set(complete);
@@ -334,7 +334,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryOperationAction.postAttachment
+            deliveryStepOperationAction.postAttachment
         );
 
         observables.step$!.attachmentFilePaths.set([...step.attachmentFilePaths ?? [], file.uri]);

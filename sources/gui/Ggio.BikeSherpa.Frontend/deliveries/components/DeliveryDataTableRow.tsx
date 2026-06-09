@@ -5,6 +5,7 @@ import { useState } from "react";
 import StepDataTable from "@/steps/components/StepDataTable";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
+import DeliveryStatusButton from "@/deliveries/components/DeliveryStatusButton";
 
 type Props = {
     delivery: DeliveryToDisplay,
@@ -32,6 +33,9 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                 }}
                 style={{ backgroundColor: isSelected ? theme.colors.primary : theme.colors.background }}
             >
+                <DataTable.Cell style={[style.column, style.width50]}>
+                    <DeliveryStatusButton deliveryId={delivery.id} status={delivery.status} />
+                </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
                     {delivery.code}
                 </DataTable.Cell>

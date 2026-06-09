@@ -31,7 +31,29 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         this.logger = this.logger.extend("DeliveryBackendClientFacade");
         this.deliveryMapper = deliveryMapper;
     }
+    
+    public async PutDeliveryPendingEndpoint(delivery: Delivery): Promise<void> {
+        if (!delivery.links)
+            throw new Error(`Delivery links empty`);
 
+        const link = delivery.links.find(link => link.rel === hateoasRel.delivery.put.pending);
+        if (!link)
+            throw new Error(`Delivery link for '${hateoasRel.delivery.put.pending}' not found`);
+
+        await axios.put(link.href);
+    }
+    
+    public async PutDeliveryRenewEndpoint(delivery: Delivery): Promise<void> {
+        if (!delivery.links)
+            throw new Error(`Delivery links empty`);
+
+        const link = delivery.links.find(link => link.rel === hateoasRel.delivery.put.renew);
+        if (!link)
+            throw new Error(`Delivery link for '${hateoasRel.delivery.put.renew}' not found`);
+
+        await axios.put(link.href);
+    }
+    
     public async GetAllEndpoint(lastSync?: string): Promise<Delivery[]> {
         const data = await this.apiClient.GetAllDeliveriesEndpoint({
             params: {lastSync: lastSync ?? ''}

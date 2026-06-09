@@ -1,4 +1,4 @@
-const deliveryOperationAction = {
+const deliveryStepOperationAction = {
     patchTime: "patchTime",
     patchOrder: "patchOrder",
     patchComment: "patchComment",
@@ -11,4 +11,4 @@ const deliveryOperationAction = {
     postAttachment: "postAttachment"
 }
 
-export default deliveryOperationAction;
+export default deliveryStepOperationAction;
