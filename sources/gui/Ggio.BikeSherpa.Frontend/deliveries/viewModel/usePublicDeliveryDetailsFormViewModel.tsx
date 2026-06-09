@@ -88,6 +88,18 @@ export default function usePublicDeliveryDetailsFormViewModel(
     // Correct form values when they fall outside possible ranges
     useEffect(() => {
         if (!isFieldToday) return;
+
+        const corrected = new Date(startDate);
+
+        // If hour is later than last possible hour, set to next day at first hour
+        const canDoSameDay = (startDate.getHours() + 1) <= (workHours?.end.getHours() ?? 17);
+        if (!canDoSameDay) {
+            corrected.setDate(corrected.getDate() + 1);
+            corrected.setHours(workHours?.start.getHours() ?? 8);
+            corrected.setMinutes(0);
+            setStartDate(corrected.toISOString());
+        }
+        
         if (possibleUrgencies.length === 0 || hoursOptions.length === 0) return;
 
         const urgencyStillValid = possibleUrgencies.some((u) => u.value === urgency);
@@ -95,25 +107,14 @@ export default function usePublicDeliveryDetailsFormViewModel(
             setUrgency(possibleUrgencies[0].value);
         }
         
-        const corrected = new Date(startDate);
-
         // If hour is before possible hours, set to first possible hour
         const hourStillValid = hoursOptions.some((h) => h.value === startDate.getHours().toString());
         if (!hourStillValid) {
             corrected.setHours(parseInt(hoursOptions[0].value));
             corrected.setMinutes(0);
-        }
-        
-        // If hour is later than last possible hour, set to next day at first hour
-        const canDoSameDay = (startDate.getHours() + 1) <= (workHours?.end.getHours() ?? 17);
-        if (!canDoSameDay) {
-            corrected.setDate(corrected.getDate() + 1);
-            corrected.setHours(workHours?.start.getHours() ?? 8);
-            corrected.setMinutes(0);
-        }
-
-        setStartDate(corrected.toISOString());
-    }, [possibleUrgencies, hoursOptions]); // Do not add dependencies that the linter asks, it's intentional
+            setStartDate(corrected.toISOString());
+        }        
+    }, [possibleUrgencies, hoursOptions, workHours]); // Do not add dependencies that the linter asks, it's intentional
 
     return {
         urgencies: possibleUrgencies,

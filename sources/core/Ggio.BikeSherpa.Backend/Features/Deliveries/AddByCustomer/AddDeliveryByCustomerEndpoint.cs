@@ -7,6 +7,7 @@ using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.BikeSherpa.Backend.Features.Customers.Delete;
 using Ggio.BikeSherpa.Backend.Features.Customers.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Delete;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Mails;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
@@ -55,6 +56,13 @@ public class AddDeliveryByCustomerEndpoint(
                return;
           }
 
+          var resultCreateSteps = await CreateStepsAsync(req, resultCreateDelivery.Value, customerId, ct);
+          if (!resultCreateSteps.IsSuccess)
+          {
+               await Send.ErrorsAsync(500, ct);
+               return;
+          }
+
           var mailResult = await SendCreationMailToCustomer(resultCreateDelivery, ct);
           if (!mailResult.IsSuccess)
           {
@@ -71,6 +79,28 @@ public class AddDeliveryByCustomerEndpoint(
           var mediator = serviceProvider.GetRequiredService<IMediator>();
           var mailResult = await mediator.Send(new SendDeliveryCreationMailToCustomerCommand(resultCreateDelivery.Value), ct);
           return mailResult;
+     }
+
+     private async Task<Result<Guid>> CreateStepsAsync(AddDeliveryByCustomerRequest req, Guid deliveryId, Guid customerId, CancellationToken ct)
+     {
+          var serviceScope = serviceProvider.CreateScope();
+          var mediator = serviceScope.ServiceProvider.GetRequiredService<IMediator>();
+          try
+          {
+               var stepList = req.Delivery.Steps
+                    .Select(stepDto => stepDto.Data).ToArray();
+
+               var addStepsCommand = new AddDeliveryStepsCommand(deliveryId, stepList);
+
+               return await mediator.Send(addStepsCommand, ct);
+          }
+          catch (Exception e)
+          {
+               await mediator.Send(new DeleteDeliveryCommand(deliveryId), ct);
+               await mediator.Send(new DeleteCustomerCommand(customerId), ct);
+               logger.LogError(e, "Error adding steps to delivery by customer");
+               return Result.Error(e.Message);
+          }
      }
 
      private async Task<Result<Guid>> CreateDeliveryAsync(AddDeliveryByCustomerRequest req, Guid customerId, CancellationToken ct)
@@ -94,25 +124,7 @@ public class AddDeliveryByCustomerEndpoint(
                     req.Delivery.NeedEstimate
                );
 
-               var deliveryResult = await mediator.Send(createDeliveryCommand, ct);
-
-               foreach (
-                    var createStepCommand in req.Delivery.Steps
-                         .Select(stepDto => stepDto.Data)
-                         .Select(step => new AddDeliveryStepCommand(
-                                   req.Delivery.Id,
-                                   step.StepType,
-                                   step.StepAddress,
-                                   step.Comment,
-                                   step.NotBilled
-                              )
-                         )
-               )
-               {
-                    await mediator.Send(createStepCommand, ct);
-               }
-
-               return deliveryResult;
+               return await mediator.Send(createDeliveryCommand, ct);
           }
           catch (Exception e)
           {
