@@ -53,6 +53,10 @@ npx expo start --clear
 choco install mkcert
 mkcert dev.bike.local
 mkcert --install
+
+# Linux:
+sudo apt install mkcert libnss3-tools
+npm run generate-local-cert
 ```
 
 ##### Proxy
