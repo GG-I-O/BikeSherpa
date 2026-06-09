@@ -36,22 +36,6 @@ else
   git pull --rebase origin main
 fi
 
-# 2. ask user current version
-echo "Please enter the version to build (e.g., 1.0.0):"
-read -r VERSION
-
-if [ -z "$VERSION" ]; then
-  echo "Version cannot be empty. Exiting."
-  exit 1
-fi
-
-# 3. add tag to current branch with current version value (unless --current-branch is used)
-if [ "$USE_CURRENT_BRANCH" = false ]; then
-  echo "Tagging current branch with version $VERSION..."
-  git tag -a "$VERSION" -m "Release version $VERSION"
-else
-  echo "Skipping tag creation (using current branch mode)..."
-fi
 
 # 4. call dotnet gitversion and set current version as variable
 echo "Running dotnet-gitversion..."
@@ -66,6 +50,13 @@ if [ -z "$GIT_VERSION" ]; then
 fi
 
 echo "Git Version detected: $GIT_VERSION"
+read -p "Contiune ?? " -n 1 -r
+
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    exit 1 || return 1 # handle exits from shell or function but don't exit interactive shell
+fi
 
 # Sanitize GIT_VERSION for Docker tag (replace + with -)
 DOCKER_TAG_VERSION="${GIT_VERSION//+/-}"
@@ -112,12 +103,5 @@ echo "Pushing Docker image of frontend to ACR..."
 docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:latest"
 docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$DOCKER_TAG_VERSION"
 
-# 8. push current version tag to origin (unless --current-branch is used)
-if [ "$USE_CURRENT_BRANCH" = false ]; then
-  echo "Pushing tag $VERSION to origin..."
-  git push origin "$VERSION"
-else
-  echo "Skipping tag push (using current branch mode)..."
-fi
 
 echo "Build and push completed successfully!"
