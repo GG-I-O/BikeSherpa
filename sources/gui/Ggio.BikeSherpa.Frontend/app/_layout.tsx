@@ -9,6 +9,7 @@ import {Platform} from "react-native";
 import {Auth0Provider, useAuth0} from "react-native-auth0";
 import {PaperProvider} from "react-native-paper";
 import {fr, registerTranslation} from "react-native-paper-dates";
+
 registerTranslation('fr', fr);
 
 AppBootstrapper.init();
@@ -40,15 +41,9 @@ function AppStack() {
 export default function RootLayout() {
     const authDomain = process.env.EXPO_PUBLIC_AUTH_DOMAIN;
 
-    let authClient;
-    if (Platform.OS === "android")
-        authClient = __DEV__ ?
-            process.env.EXPO_PUBLIC_AUTH_DEV_CLIENT_ANDROID :
-            process.env.EXPO_PUBLIC_AUTH_PROD_CLIENT_ANDROID;
-    else
-        authClient = __DEV__ ?
-            process.env.EXPO_PUBLIC_AUTH_DEV_CLIENT_WEB :
-            process.env.EXPO_PUBLIC_AUTH_PROD_CLIENT_WEB;
+    let authClient = Platform.OS === "android" ?
+        process.env.EXPO_PUBLIC_AUTH_ANDROID_CLIENT :
+        process.env.EXPO_PUBLIC_AUTH_WEB_CLIENT;
 
     return (
         <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
