@@ -94,8 +94,25 @@ public class AddDeliveryByCustomerEndpoint(
                     req.Delivery.NeedEstimate
                );
 
-               return await mediator.Send(createDeliveryCommand, ct);
+               var deliveryResult = await mediator.Send(createDeliveryCommand, ct);
 
+               foreach (
+                    var createStepCommand in req.Delivery.Steps
+                         .Select(stepDto => stepDto.Data)
+                         .Select(step => new AddDeliveryStepCommand(
+                                   req.Delivery.Id,
+                                   step.StepType,
+                                   step.StepAddress,
+                                   step.Comment,
+                                   step.NotBilled
+                              )
+                         )
+               )
+               {
+                    await mediator.Send(createStepCommand, ct);
+               }
+
+               return deliveryResult;
           }
           catch (Exception e)
           {
