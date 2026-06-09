@@ -7,7 +7,7 @@ import DispatcherRole from "@/infra/auth/dispatcherRole";
 export default class AuthService implements IAuthService {
     private getCredentials?: (scope?: string | undefined, minTtl?: number | undefined, parameters?: Record<string, unknown> | undefined, forceRefresh?: boolean) => Promise<Credentials>
     private readonly audience = process.env.EXPO_PUBLIC_AUTH_AUDIENCE;
-    private readonly scope = process.env.EXPO_PUBLIC_AUTH_DEV_SCOPE;
+    private readonly scope = process.env.EXPO_PUBLIC_AUTH_SCOPE;
 
     public setCredentialMethod(method: (params: any) => Promise<any>): void {
         this.getCredentials = method;

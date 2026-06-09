@@ -6,7 +6,7 @@ import { Button, Text, Card, ActivityIndicator, useTheme } from "react-native-pa
 export default function Login() {
     const { authorize, error, isLoading } = useAuth0();
     const audience = process.env.EXPO_PUBLIC_AUTH_AUDIENCE;
-    const scope = process.env.EXPO_PUBLIC_AUTH_DEV_SCOPE;
+    const scope = process.env.EXPO_PUBLIC_AUTH_SCOPE;
     const theme = useTheme();
 
     const onLogin = useCallback(async () => {
