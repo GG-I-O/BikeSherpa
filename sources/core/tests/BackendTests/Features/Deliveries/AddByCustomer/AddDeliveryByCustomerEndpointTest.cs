@@ -73,6 +73,10 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
+          
+          MockMediator
+               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(Result.Success());
 
           // Act
           var response = await Client.PostAsJsonAsync("/api/deliveries/by_customer", request, _cancellationToken);
@@ -118,6 +122,10 @@ public class AddDeliveryByCustomerEndpointTests
                .Setup(x => x.Send(
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
+               .ReturnsAsync(Result.Success());
+          
+          MockMediator
+               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
@@ -171,6 +179,10 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
+          
+          MockMediator
+               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(Result.Success());
 
           // Act
           var response = await Client.PostAsJsonAsync("/api/deliveries/by_customer", request, _cancellationToken);
@@ -213,6 +225,10 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(mailError);
+          
+          MockMediator
+               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(Result.Success());
 
           // Act
           var response = await Client.PostAsJsonAsync("/api/deliveries/by_customer", request, _cancellationToken);
@@ -251,6 +267,10 @@ public class AddDeliveryByCustomerEndpointTests
                .Setup(x => x.Send(
                     It.IsAny<DeleteCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
+               .ReturnsAsync(Result.Success());
+          
+          MockMediator
+               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
@@ -291,6 +311,10 @@ public class AddDeliveryByCustomerEndpointTests
                .Setup(x => x.Send(
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
+               .ReturnsAsync(Result.Success());
+          
+          MockMediator
+               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
@@ -349,6 +373,10 @@ public class AddDeliveryByCustomerEndpointTests
                .Setup(x => x.Send(
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
+               .ReturnsAsync(Result.Success());
+          
+          MockMediator
+               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
