@@ -135,15 +135,15 @@ export function DeliveryListView() {
                     onStepPress={isAssigning ? toggleStepSelection : undefined}
                     onDetails={
                         (delivery: DeliveryToDisplay) => navigate({
-                            pathname: '/(tabs)/(deliveries)/[deliveryId]',
+                            pathname: '/(tabs)/deliveries/[deliveryId]',
                             params: {deliveryId: delivery.id}
                         })}
                     onEdit={(delivery: DeliveryToDisplay) => navigate({
-                        pathname: '/(tabs)/(deliveries)/edit',
+                        pathname: '/(tabs)/deliveries/edit',
                         params: {deliveryId: delivery.id}
                     })}
                     onCopy={(delivery: DeliveryToDisplay) => navigate({
-                        pathname: '/(tabs)/(deliveries)/copy',
+                        pathname: '/(tabs)/deliveries/copy',
                         params: {deliveryId: delivery.id}
                     })}
                     onDelete={(delivery: DeliveryToDisplay) => {

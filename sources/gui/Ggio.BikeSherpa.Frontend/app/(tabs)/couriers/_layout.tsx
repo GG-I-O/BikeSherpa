@@ -1,23 +1,23 @@
 import { Stack } from 'expo-router';
-import { navigate } from "expo-router/build/global-state/routing";
+import { navigate } from 'expo-router/build/global-state/routing';
 import React from 'react';
 import { Button, Text } from 'react-native-paper';
 
-export default function DeliveryLayout() {
+export default function CourierLayout() {
     return (
         <Stack>
             <Stack.Screen
                 name="index"
                 options={{
                     headerShown: true,
-                    title: "Courses",
+                    title: "Livreurs",
                     headerRight: () =>
                         <Button
                             style={{ marginRight: 8 }}
                             mode='outlined'
                             onPress={() => {
                                 navigate({
-                                    pathname: '/(tabs)/(deliveries)/new'
+                                    pathname: '/(tabs)/couriers/new'
                                 });
                             }}
                         >
@@ -29,35 +29,14 @@ export default function DeliveryLayout() {
                 name="new"
                 options={{
                     headerShown: true,
-                    title: 'Nouvelle course'
-                }}
-            />
-            <Stack.Screen
-                name="copy"
-                options={{
-                    headerShown: true,
-                    title: "Copier"
+                    title: "Nouveau livreur"
                 }}
             />
             <Stack.Screen
                 name="edit"
                 options={{
                     headerShown: true,
-                    title: "Modifier"
-                }}
-            />
-            <Stack.Screen
-                name="assign"
-                options={{
-                    headerShown: true,
-                    title: "Détails"
-                }}
-            />
-            <Stack.Screen
-                name="[deliveryId]"
-                options={{
-                    headerShown: true,
-                    title: "Détails"
+                    title: "Modifier le livreur"
                 }}
             />
         </Stack>

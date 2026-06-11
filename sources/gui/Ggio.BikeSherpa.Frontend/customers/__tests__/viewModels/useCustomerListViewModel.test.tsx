@@ -34,7 +34,7 @@ describe("useCustomerListViewModel", () => {
         result.current.displayEditForm("editForm");
 
         expect(mockNavigate).toHaveBeenCalledWith({
-            pathname: '/(tabs)/(customers)/edit',
+            pathname: '/(tabs)/customers/edit',
             params: { customerId: "editForm" }
         });
     });

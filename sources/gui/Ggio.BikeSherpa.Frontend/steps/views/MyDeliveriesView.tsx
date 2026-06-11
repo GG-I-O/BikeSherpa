@@ -30,7 +30,7 @@ export function MyDeliveriesView() {
                 steps={viewModel.steps}
                 onCardPress={
                     (step) => navigate({
-                        pathname: '/(tabs)/(myDeliveries)/[stepId]',
+                        pathname: '/(tabs)/myDeliveries/[stepId]',
                         params: { stepId: step.id }
                     })
                 }

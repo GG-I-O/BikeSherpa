@@ -14,7 +14,7 @@ export default function useCourierListViewModel() {
 
     function displayEditForm(id: string) {
         navigate({
-            pathname: '/(tabs)/(couriers)/edit',
+            pathname: '/(tabs)/couriers/edit',
             params: { courierId: id }
         });
     }

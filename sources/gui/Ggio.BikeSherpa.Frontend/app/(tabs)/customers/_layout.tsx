@@ -17,7 +17,7 @@ export default function CustomerLayout() {
                             mode='outlined'
                             onPress={() => {
                                 navigate({
-                                    pathname: '/(tabs)/(customers)/new'
+                                    pathname: '/(tabs)/customers/new'
                                 });
                             }}
                         >
