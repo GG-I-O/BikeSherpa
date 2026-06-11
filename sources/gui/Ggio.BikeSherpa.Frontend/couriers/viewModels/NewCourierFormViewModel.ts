@@ -29,6 +29,9 @@ export default class NewCourierFormViewModel {
     }
 
     public getNewCourierSchema(courierList: Courier[]) {
+        if (courierList.length === 0)
+            return courierFormBaseSchema;
+        
         return courierFormBaseSchema.extend({
             code: courierFormBaseSchema.shape.code.refine(
                 (value) => !courierList.some((c) => c.code === value),
