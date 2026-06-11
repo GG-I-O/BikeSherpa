@@ -8,7 +8,7 @@ using Moq;
 
 namespace BackendTests.Services;
 
-public abstract class TestWebApplicationFactory(string policyName = "", string scope = "", string? email = null) : WebApplicationFactory<Program>
+public abstract class TestWebApplicationFactory(string policyName = "", string scope = "", string? email = null, Action<IServiceCollection>? serviceBuilder = null) : WebApplicationFactory<Program>
 {
      public Mock<IMediator> MockMediator { get; } = new();
 
@@ -40,7 +40,9 @@ public abstract class TestWebApplicationFactory(string policyName = "", string s
                     });
 
                services.AddAuthorizationBuilder()
-                   .AddPolicy(PolicyName, policy => policy.RequireClaim("scope", Scope));
+                    .AddPolicy(PolicyName, policy => policy.RequireClaim("scope", Scope));
+
+               serviceBuilder?.Invoke(services);
           });
 
           builder.Configure(app =>

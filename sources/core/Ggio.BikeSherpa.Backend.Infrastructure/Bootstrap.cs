@@ -1,7 +1,9 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
+using Ggio.BikeSherpa.Backend.Domain.Spi;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
+using Ggio.BikeSherpa.Backend.Infrastructure.Mail;
 using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 using Ggio.BikeSherpa.Backend.Infrastructure.Storage;
 using Ggio.DddCore.Infrastructure;
@@ -45,6 +47,10 @@ public static class Bootstrap
                services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
                services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
                services.AddScoped<IUrgencyRepository, UrgencyRepository>();
+               services.AddScoped<IParameterRepository, ParameterRepository>();
+               services.AddScoped<IMailService, MailService>();
+               services.Configure<PostmarkOptions>(configuration.GetSection(PostmarkOptions.SectionName));
+               services.AddScoped<IMailSender, MailSender>();
 
                services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
                services.AddSingleton<IDeliveryStepAttachmentSaveService, StorageService>();

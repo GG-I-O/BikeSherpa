@@ -23,12 +23,11 @@ const stepFormBaseSchema = zod.object({
         .boolean(),
     contactName: zod
         .string()
-        .optional()
-        .nullable(),
+        .trim()
+        .min(1, "Nom requis"),
     contactPhone: zod
         .string()
-        .optional()
-        .nullable()
+        .trim()
 });
 
 type StepFormValues = zod.infer<typeof stepFormBaseSchema>;

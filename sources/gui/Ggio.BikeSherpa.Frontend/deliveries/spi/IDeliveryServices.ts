@@ -8,4 +8,7 @@ export interface IDeliveryServices {
     createDelivery(delivery: Delivery): void;
     updateDelivery(delivery: Delivery): void;
     deleteDelivery(deliveryId: string): void;
+    
+    updateDeliveryStatusToPending(deliveryId: string): void;
+    updateDeliveryStatusToNew(deliveryId: string): void;
 }

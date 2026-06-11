@@ -3,6 +3,7 @@ using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Ggio.DddCore;
 using Mediator;
 
@@ -15,28 +16,24 @@ public record AddDeliveryCommand(
      double? TotalPrice,
      double? Discount,
      double? ExtraCost,
-     double? Distance,
      string[] Details,
      string PackingSize,
      bool InsulatedBox,
      DateTimeOffset ContractDate,
-     DateTimeOffset StartDate
+     DateTimeOffset StartDate,
+     bool NeedEstimate
      ) : ICommand<Result<Guid>>;
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
      public AddDeliveryCommandValidator(IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
      {
-          RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
+          RuleFor(x => x.PricingStrategy).IsInEnum();
           RuleFor(x => x.CustomerId).NotNull();
-          RuleFor(x => x.Urgency)
-               .NotEmpty()
-               .Must(urgency => urgencies.GetAll().Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
-               .WithMessage("Valeur d'urgence saisie invalide.");
+          RuleFor(x => x.Urgency).SetValidator(new UrgencyValidator(urgencies));
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.PackingSize).NotEmpty().Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
-               .WithMessage("Taille de colis saisie invalide.");
+          RuleFor(x => x.PackingSize).SetValidator(new PackingSizeValidator(packingSizes));
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -57,19 +54,20 @@ public class AddDeliveryHandler(
           var urgency = urgencyRepository.GetByName(command.Urgency)!;
           var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
 
-          var delivery = await factory.CreateDeliveryAsync(
-               command.PricingStrategy,
-               command.CustomerId,
-               urgency,
-               command.TotalPrice,
-               command.Discount,
-               command.ExtraCost,
-               command.Distance,
-               command.Details,
-               packingSize,
-               command.InsulatedBox,
-               command.ContractDate,
-               command.StartDate
+          var delivery = await factory.CreateDeliveryAsync(new DeliveryFactoryParameters(
+                    command.PricingStrategy,
+                    command.CustomerId,
+                    urgency,
+                    command.TotalPrice,
+                    command.Discount,
+                    command.ExtraCost,
+                    command.Details,
+                    packingSize,
+                    command.InsulatedBox,
+                    command.ContractDate,
+                    command.StartDate,
+                    command.NeedEstimate
+                    )
                );
 
           await transaction.CommitAsync(cancellationToken);

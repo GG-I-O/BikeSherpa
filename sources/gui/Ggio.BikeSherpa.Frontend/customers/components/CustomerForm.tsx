@@ -1,10 +1,12 @@
 import ThemedInput from "@/components/themed/ThemedInput";
 import formStyle from "@/style/formStyle";
-import { Control, FieldError, FieldErrors, FieldValues } from "react-hook-form";
-import { ScrollView } from "react-native";
-import { Button, Text, useTheme } from "react-native-paper";
+import {Control, FieldError, FieldErrors, FieldValues} from "react-hook-form";
+import {ScrollView} from "react-native";
+import {Button, Text, useTheme} from "react-native-paper";
 import React from 'react'
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
+import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
+import useDropdown from "@/hooks/useDropdown";
 
 interface CustomerFormProps<T extends FieldValues> {
     control: Control<T, any, T>;
@@ -16,11 +18,14 @@ interface CustomerFormProps<T extends FieldValues> {
 export default function CustomerForm<T extends FieldValues>(props: CustomerFormProps<T>) {
     const theme = useTheme();
 
-    const { control, errors, handleSubmit, buttonName } = props;
+    const {control, errors, handleSubmit, buttonName} = props;
 
+    const {pricingStrategies} = useDropdown();
+    const defaultDeliveryTypeOptions = pricingStrategies.slice(0, 2);
+    
     return (
         <ScrollView
-            style={[formStyle.container, { backgroundColor: theme.colors.background }]}
+            style={[formStyle.container, {backgroundColor: theme.colors.background}]}
             contentContainerStyle={formStyle.elements}
         >
             <ThemedInput
@@ -71,8 +76,15 @@ export default function CustomerForm<T extends FieldValues>(props: CustomerFormP
                 control={control}
                 name="address.complement"
                 error={(errors.address as any)?.complement as FieldError | undefined}
-                label="Complément d’adresse"
+                label="Complément d'adresse"
                 placeholder="Bâtiment B"
+            />
+            <ThemedDropdownInput
+                name="defaultDeliveryType" 
+                control={control}
+                label="Type de livraison par défaut" 
+                options={defaultDeliveryTypeOptions}
+                isNumber
             />
             <ThemedInput
                 testID="customerFormSiretInput"

@@ -21,7 +21,10 @@ export default function DeliveryDetailView({canEdit = false}: Props) {
     const [delivery, setDelivery] = useState<DeliveryToDisplay | undefined>();
 
     useEffect(() => {
-        setDelivery(viewModel.getDelivery(deliveryId));
+        if (!deliveryId) return;
+
+        if (!delivery || deliveryId != delivery.id)
+            setDelivery(viewModel.getDelivery(deliveryId));
     }, [deliveryId, viewModel]);
 
     if (!delivery)

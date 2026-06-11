@@ -1,7 +1,7 @@
 import * as zod from "zod";
 import { addressSchema } from "@/models/Address";
 
-export const customerFormBaseSchema = zod
+const customerFormBaseSchema = zod
     .object({
         name: zod
             .string()
@@ -11,8 +11,7 @@ export const customerFormBaseSchema = zod
         code: zod
             .string()
             .trim()
-            .min(1, "Code requis")
-            .max(3, "Code trop long"),
+            .min(1, "Code requis"),
         email: zod
             .string()
             .min(1, "Adresse e-mail requise")
@@ -30,5 +29,11 @@ export const customerFormBaseSchema = zod
         phoneNumber: zod
             .string()
             .trim()
-            .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide")
+            .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide"),
+        defaultDeliveryType: zod
+            .number()
     });
+
+type CustomerFormValues = zod.infer<typeof customerFormBaseSchema>;
+
+export {customerFormBaseSchema, CustomerFormValues}

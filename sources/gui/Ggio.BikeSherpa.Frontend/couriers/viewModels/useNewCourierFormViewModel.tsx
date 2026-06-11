@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import InputCourier from "../models/InputCourier";
 import { ICourierService } from "@/spi/CourierSPI";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
@@ -8,6 +7,7 @@ import { useEffect, useState } from "react";
 import Courier from "../models/Courier";
 import { observe } from "@legendapp/state";
 import NewCourierFormViewModel from "./NewCourierFormViewModel";
+import {CourierFormValues} from "@/couriers/viewModels/zod/courierFormBaseSchema";
 
 export function useNewCourierFormViewModel() {
     const courierServices = IOCContainer.get<ICourierService>(ServicesIdentifiers.CourierServices);
@@ -27,7 +27,7 @@ export function useNewCourierFormViewModel() {
         handleSubmit,
         formState: { errors },
         reset
-    } = useForm<InputCourier>({
+    } = useForm<CourierFormValues>({
         defaultValues: {
             firstName: "",
             lastName: "",

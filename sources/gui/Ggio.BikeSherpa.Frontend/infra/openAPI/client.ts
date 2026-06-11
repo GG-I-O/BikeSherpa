@@ -1,11 +1,19 @@
 import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
-const UrgencyDto = z.object({ label: z.string(), value: z.string() });
+const UrgencyDto = z.object({
+  label: z.string(),
+  value: z.string(),
+  lastHourToOrder: z.number().int(),
+});
 const PricingStrategy = z.union([z.literal(0), z.literal(1), z.literal(2)]);
 const PricingStrategyDto = z.object({
   label: z.string(),
   value: PricingStrategy,
+});
+const WorkHourDto = z.object({
+  startDate: z.string().datetime({ offset: true }),
+  endDate: z.string().datetime({ offset: true }),
 });
 const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
 const DeliveryReportDetail = z.object({
@@ -71,6 +79,7 @@ const DeliveryStatus = z.union([
   z.literal(1),
   z.literal(2),
   z.literal(3),
+  z.literal(4),
 ]);
 const DeliveryCrud = z.object({
   steps: z.array(DeliveryStepDto),
@@ -84,12 +93,12 @@ const DeliveryCrud = z.object({
   totalPrice: z.number().nullable(),
   discount: z.number().nullable(),
   extraCost: z.number().nullable(),
-  distance: z.number().nullable(),
-  reportId: z.string().nullable(),
+  customerReference: z.string().nullable(),
   details: z.array(z.string()),
   insulatedBox: z.boolean(),
   startDate: z.string().datetime({ offset: true }),
   contractDate: z.string().datetime({ offset: true }),
+  needEstimate: z.boolean(),
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
   id: z.string(),
@@ -108,6 +117,11 @@ const UpdateDeliveryStepOrderRequest = z.object({
 const UpdateDeliveryStepTimeRequest = z.object({
   date: z.string().datetime({ offset: true }),
 });
+const CalculateDeliveryPriceResult = z.object({
+  price: z.number(),
+  priceWithVat: z.number(),
+  totalDistance: z.number(),
+});
 const OperationBase = z.object({
   path: z.string(),
   op: z.string(),
@@ -118,7 +132,6 @@ const OperationOfDeliveryStep = Operation.and(z.object({}));
 const JsonPatchDocumentOfDeliveryStep = z.object({
   operations: z.array(OperationOfDeliveryStep),
 });
-const AddResultOfGuid = z.object({ id: z.string() });
 const AddressCrud = z.object({
   name: z.string(),
   streetInfo: z.string(),
@@ -128,6 +141,7 @@ const AddressCrud = z.object({
   coordinates: GeoPoint,
   phone: z.string().nullable(),
 });
+const DeliveryType = z.union([z.literal(0), z.literal(1)]);
 const CustomerCrud = z.object({
   name: z.string(),
   code: z.string(),
@@ -138,12 +152,24 @@ const CustomerCrud = z.object({
   address: AddressCrud,
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
+  defaultDeliveryType: DeliveryType.nullable(),
   id: z.string(),
 });
+const AddDeliveryByCustomerRequest = z.object({
+  customer: CustomerCrud,
+  delivery: DeliveryCrud,
+});
+const AddResultOfGuid = z.object({ id: z.string() });
+const AttachmentRequest = z.object({ file: z.instanceof(File) });
 const CustomerDto = z.object({
   data: CustomerCrud,
   links: z.array(Link).nullable(),
 });
+const CheckCustomerResponse = z.object({
+  defaultDeliveryType: DeliveryType.nullable(),
+  customerName: z.string(),
+});
+const ProblemDetails = z.record(z.unknown().nullable());
 const CourierCrud = z.object({
   firstName: z.string(),
   lastName: z.string(),
@@ -164,6 +190,7 @@ export const schemas = {
   UrgencyDto,
   PricingStrategy,
   PricingStrategyDto,
+  WorkHourDto,
   PackingSizeDto,
   DeliveryReportDetail,
   DeliveryReport,
@@ -183,14 +210,20 @@ export const schemas = {
   UpdateDeliveryStepCourierRequest,
   UpdateDeliveryStepOrderRequest,
   UpdateDeliveryStepTimeRequest,
+  CalculateDeliveryPriceResult,
   OperationBase,
   Operation,
   OperationOfDeliveryStep,
   JsonPatchDocumentOfDeliveryStep,
-  AddResultOfGuid,
   AddressCrud,
+  DeliveryType,
   CustomerCrud,
+  AddDeliveryByCustomerRequest,
+  AddResultOfGuid,
+  AttachmentRequest,
   CustomerDto,
+  CheckCustomerResponse,
+  ProblemDetails,
   CourierCrud,
   CourierDto,
 };
@@ -477,6 +510,77 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "post",
+    path: "/customers/check",
+    alias: "CheckCustomerEndpoint",
+    tags: ["customer"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "code",
+        type: "Query",
+        schema: z.string(),
+      },
+      {
+        name: "email",
+        type: "Query",
+        schema: z.string(),
+      },
+    ],
+    response: CheckCustomerResponse,
+    errors: [
+      {
+        status: 404,
+        description: `Not Found`,
+        schema: z.record(z.unknown().nullable()),
+      },
+    ],
+  },
+  {
+    method: "put",
+    path: "/deliveries/:deliveryId/pending",
+    alias: "ValidateDeliveryEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "put",
+    path: "/deliveries/:deliveryId/renew",
+    alias: "RenewDeliveryEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "get",
     path: "/deliveries/:lastSync",
     alias: "GetAllDeliveriesEndpoint",
@@ -504,6 +608,21 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "post",
+    path: "/deliveries/by_customer",
+    alias: "AddDeliveryByCustomerEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: AddDeliveryByCustomerRequest,
+      },
+    ],
+    response: z.void(),
+  },
+  {
     method: "get",
     path: "/deliveries/dailyDeliveries/:date",
     alias: "GetAllDailyDeliveriesEndpoint",
@@ -529,6 +648,21 @@ const endpoints = makeApi([
         schema: z.void(),
       },
     ],
+  },
+  {
+    method: "post",
+    path: "/deliveries/price",
+    alias: "CalculateDeliveryPriceEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: DeliveryCrud,
+      },
+    ],
+    response: CalculateDeliveryPriceResult,
   },
   {
     method: "post",
@@ -772,6 +906,48 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "post",
+    path: "/delivery/:deliveryId/step/:stepId/attachment",
+    alias: "AddDeliveryStepAttachmentEndpoint",
+    tags: ["delivery"],
+    requestFormat: "form-data",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({ file: z.instanceof(File) }),
+      },
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "stepId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+      {
+        status: 404,
+        description: `Not Found`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "put",
     path: "/delivery/:deliveryId/step/:stepId/changeOrder",
     alias: "UpdateDeliveryStepOrderEndpoint",
@@ -995,18 +1171,30 @@ const endpoints = makeApi([
     tags: ["general"],
     requestFormat: "json",
     response: z.array(PackingSizeDto),
-    errors: [
-      {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
+  },
+  {
+    method: "get",
+    path: "/general/parameters/lastHourToOrder",
+    alias: "GetParameterLastHourToOrderEndpoint",
+    tags: ["general"],
+    requestFormat: "json",
+    response: z.number().int(),
+  },
+  {
+    method: "get",
+    path: "/general/parameters/vatRate",
+    alias: "GetParameterVatRateEndpoint",
+    tags: ["general"],
+    requestFormat: "json",
+    response: z.number(),
+  },
+  {
+    method: "get",
+    path: "/general/parameters/workHours",
+    alias: "GetParameterWorkHoursEndpoint",
+    tags: ["general"],
+    requestFormat: "json",
+    response: WorkHourDto,
   },
   {
     method: "get",
@@ -1015,18 +1203,6 @@ const endpoints = makeApi([
     tags: ["general"],
     requestFormat: "json",
     response: z.array(PricingStrategyDto),
-    errors: [
-      {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
   },
   {
     method: "get",
@@ -1035,18 +1211,6 @@ const endpoints = makeApi([
     tags: ["general"],
     requestFormat: "json",
     response: z.array(UrgencyDto),
-    errors: [
-      {
-        status: 401,
-        description: `Unauthorized`,
-        schema: z.void(),
-      },
-      {
-        status: 403,
-        description: `Forbidden`,
-        schema: z.void(),
-      },
-    ],
   },
   {
     method: "get",

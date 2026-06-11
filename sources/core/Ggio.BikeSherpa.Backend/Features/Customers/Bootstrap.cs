@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Ggio.BikeSherpa.Backend.Features.Customers.Add;
+using Ggio.BikeSherpa.Backend.Features.Customers.Check;
 using Ggio.BikeSherpa.Backend.Features.Customers.Services;
 using Ggio.BikeSherpa.Backend.Features.Customers.Update;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,8 @@ public static class Bootstrap
                services.AddScoped<ICustomerLinks, CustomerLinks>();
                services.AddScoped<IValidator<AddCustomerCommand>, AddCustomerCommandValidator>();
                services.AddScoped<IValidator<UpdateCustomerCommand>, UpdateCustomerCommandValidator>();
+               services.AddScoped<IValidator<AddTemporaryCustomerCommand>, AddTemporaryCustomerCommandValidator>();
+               services.AddTransient<IValidator<CheckCustomerQuery>, CheckCustomerQueryValidator>();
                return services;
           }
      }

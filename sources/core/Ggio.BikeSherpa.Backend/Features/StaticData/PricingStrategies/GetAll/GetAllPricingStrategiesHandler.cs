@@ -14,18 +14,18 @@ public class GetAllPricingStrategiesHandler : IQueryHandler<GetAllPricingStrateg
           {
                new()
                {
-                    Label = "Personnalisé",
-                    Value = PricingStrategy.CustomStrategy
-               },
-               new()
-               {
                     Label = "Course",
                     Value = PricingStrategy.SimpleDeliveryStrategy
                },
                new()
                {
-                    Label = "Tournée",
+                    Label = "Livraison partenaire",
                     Value = PricingStrategy.TourDeliveryStrategy
+               },
+               new()
+               {
+                    Label = "Personnalisé",
+                    Value = PricingStrategy.CustomStrategy
                }
           };
 

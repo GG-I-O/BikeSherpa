@@ -7,6 +7,7 @@ import {ICustomerService} from "@/spi/CustomerSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import IStepMapper from "@/steps/spi/IStepMapper";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
+import {DeliveryStatusEnum} from "@/deliveries/data/deliveryStatusEnum";
 
 @injectable()
 export default class DeliveryMapper implements IDeliveryMapper {
@@ -44,6 +45,7 @@ export default class DeliveryMapper implements IDeliveryMapper {
         return {
             id: delivery.id,
             code: delivery.code,
+            status: delivery.status as DeliveryStatusEnum,
             customerName: this.customerServices.getCustomer$(delivery.customerId).get().name,
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,

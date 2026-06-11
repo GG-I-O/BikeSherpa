@@ -4,6 +4,7 @@ export const ServicesIdentifiers = {
     UserService: Symbol.for('UserService'),
     AuthService: Symbol.for('AuthService'),
     NotificationService: Symbol.for('NotificationService'),
+    DropdownOptionsService: Symbol.for('DropdownOptionsService'),
     CustomerStorage: Symbol.for('CustomerStorageContext'),
     CourierStorage: Symbol.for('CourierStorageContext'),
     CustomerServices: Symbol.for('CustomerServices'),

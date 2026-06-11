@@ -1,14 +1,15 @@
 import React from 'react';
-import {Control, FieldError, useController} from 'react-hook-form';
+import {Control, FieldError, FieldValues, Path, useController} from 'react-hook-form';
 import {Text, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
 import {StyleProp, View, ViewStyle} from 'react-native';
 import {DatePickerInput} from "react-native-paper-dates";
 
-interface CustomDateInputProps {
+interface CustomDateInputProps<T extends FieldValues = FieldValues> {
     name: string;
-    control: Control<any>;
+    control: Control<T>;
     label: string;
+    validRange?: { startDate: Date | undefined, endDate: Date | undefined, disabledDates: Date[] | undefined }
     error?: FieldError | undefined;
     required?: boolean;
     testID?: string;
@@ -16,21 +17,23 @@ interface CustomDateInputProps {
     style?: StyleProp<ViewStyle>
 }
 
-const ThemedDateInput: React.FC<CustomDateInputProps> = (
+const ThemedDateInput = <T extends FieldValues = FieldValues>(
     {
         name,
         control,
         label,
+        validRange,
         error,
         required = false,
         disabled,
         style
-    }) => {
+    }: CustomDateInputProps<T>
+) => {
     const theme = useTheme();
 
     const {field} = useController({
         control,
-        name,
+        name: name as Path<T>
     });
 
     return (
@@ -42,6 +45,8 @@ const ThemedDateInput: React.FC<CustomDateInputProps> = (
             <DatePickerInput
                 locale={"fr"}
                 inputMode={"start"}
+                startWeekOnMonday
+                validRange={validRange}
                 onChange={(date: Date | undefined): void => {
                     if (!date) return;
 
@@ -55,6 +60,8 @@ const ThemedDateInput: React.FC<CustomDateInputProps> = (
                 }}
                 value={field.value ? new Date(field.value) : undefined}
                 disabled={disabled}
+                label="Sélectionner une date"
+                saveLabel="Confirmer"
             />
             {error && (<Text style={{color: theme.colors.error}}>{error.message}</Text>)}
         </View>

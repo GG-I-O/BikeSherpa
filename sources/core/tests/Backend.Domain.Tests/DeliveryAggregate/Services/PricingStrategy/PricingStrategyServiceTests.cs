@@ -17,7 +17,7 @@ public class PricingStrategyServiceTests
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private static DateTimeOffset _startDate;
      private static DateTimeOffset _contractDate;
-     private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null);
+     private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null, 12);
      private readonly static PackingSize PackingSize = new("packing", 1, "label", 3, 10);
      private readonly static DeliveryZone CoreZone = new("Centre");
      private readonly static DeliveryZone BorderZone = new("Limitrophe");
@@ -83,7 +83,6 @@ public class PricingStrategyServiceTests
           var delivery = MakeDelivery(totalPrice: totalPrice);
           delivery.Discount = discount;
           delivery.ExtraCost = extraCost;
-          delivery.Distance = distance;
 
           return delivery;
      }
@@ -372,39 +371,7 @@ public class PricingStrategyServiceTests
                It.IsAny<double>(),
                It.IsAny<double>()), Times.Once);
      }
-
-     [Fact]
-     public void CalculatePrice_WhenDeliveryDistanceIsProvided_UsesDeliveryDistanceInsteadOfStepsDistance()
-     {
-          // Arrange
-          const double deliveryDistance = 24.5;
-          var delivery = MakeDeliveryWithAdjustments(distance: deliveryDistance);
-          var steps = new List<DeliveryStep>
-          {
-               MakeStep(delivery, StepType.Pickup, CoreZone, distance: 10),
-               MakeStep(delivery, StepType.Dropoff, CoreZone, distance: 15),
-          };
-
-          delivery.Steps = steps;
-
-          // Act
-          _sut.CalculateDeliveryPriceWithoutVat(delivery);
-
-          // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<PackingSize>(),
-               It.IsAny<Urgency>(),
-               deliveryDistance,
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Once);
-     }
+    
 
      [Fact]
      public void CalculatePrice_WhenDeliveryDistanceIsZero_SumsBillableStepsDistance()

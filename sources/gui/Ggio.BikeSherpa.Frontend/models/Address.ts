@@ -48,3 +48,5 @@ export const addressSchema = zod
                 message: "La latitude doit être entre -90 et 90"
             })
     })
+
+export type AddressFormValues = zod.infer<typeof addressSchema>;

@@ -11,8 +11,13 @@ public class DeliveryStatusMachine
      {
           _statusMachine = new StateMachine<DeliveryStatus, DeliveryStatusTrigger>(() => delivery.Status, status => delivery.Status = status);
 
+          _statusMachine.Configure(DeliveryStatus.New)
+               .Permit(DeliveryStatusTrigger.Validate, DeliveryStatus.Pending)
+               .Permit(DeliveryStatusTrigger.Cancel, DeliveryStatus.Cancelled);
+
           _statusMachine.Configure(DeliveryStatus.Pending)
                .PermitIf(DeliveryStatusTrigger.Start, DeliveryStatus.Started, () => delivery.Steps.Any(s => s is { StepType: StepType.Pickup, Completed: true }), "Aucune étape de collecte n’est terminée.")
+               .PermitIf(DeliveryStatusTrigger.Renew, DeliveryStatus.New, () => delivery.Steps.All(s => !s.Completed), "Aucune étape ne doit être terminée pour pouvoir repasser à l'état à valider.")
                .Permit(DeliveryStatusTrigger.Cancel, DeliveryStatus.Cancelled);
 
           _statusMachine.Configure(DeliveryStatus.Started)

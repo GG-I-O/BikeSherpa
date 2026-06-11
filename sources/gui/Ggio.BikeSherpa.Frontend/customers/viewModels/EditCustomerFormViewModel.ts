@@ -2,8 +2,7 @@ import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifier
 import Customer from "../models/Customer";
 import { ICustomerService } from "@/spi/CustomerSPI";
 import { inject } from "inversify";
-import * as zod from 'zod';
-import { customerFormBaseSchema } from "./zod/customerFormBaseSchema";
+import {customerFormBaseSchema, CustomerFormValues} from "./zod/customerFormBaseSchema";
 
 export default class EditCustomerFormViewModel {
     private customerServices: ICustomerService;
@@ -14,9 +13,16 @@ export default class EditCustomerFormViewModel {
         this.customerServices = customerServices;
     }
 
-    onSubmit = (customer: Customer) => {
-        customer.address.name = customer.name;
-        customer.address.phone = customer.phoneNumber;
+    onSubmit = (oldCustomer: Customer, newCustomer: CustomerFormValues) => {
+        const customer: Customer = {
+            ...oldCustomer,
+            ...newCustomer,
+            address: {
+                ...newCustomer.address,
+                name: newCustomer.name,
+                phone: newCustomer.phoneNumber
+            }
+        };
         this.customerServices.updateCustomer(customer);
     };
 
@@ -25,9 +31,6 @@ export default class EditCustomerFormViewModel {
 
         return customerFormBaseSchema
             .extend({
-                id: zod
-                    .string()
-                    .min(1),
                 code: customerFormBaseSchema.shape.code
                     .refine((value) => {
                         if (originalCode === value) {

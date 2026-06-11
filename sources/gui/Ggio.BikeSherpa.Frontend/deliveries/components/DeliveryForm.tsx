@@ -41,7 +41,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
             style={[formStyle.container, {backgroundColor: theme.colors.background}]}
             contentContainerStyle={formStyle.elements}
         >
-            <ThemedRHFSuggestiveInput<Customer, string>
+            <ThemedRHFSuggestiveInput<T, Customer, string>
                 name="customerId"
                 control={control}
                 label="Code client"
@@ -179,6 +179,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
             </View>
             <StepInputDataTable
                 control={control}
+                errors={errors}
                 name="steps"
             />
             <Button

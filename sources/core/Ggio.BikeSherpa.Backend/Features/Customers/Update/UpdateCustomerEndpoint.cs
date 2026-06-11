@@ -25,7 +25,8 @@ public class UpdateCustomerEndpoint(IMediator mediator) : Endpoint<CustomerCrud>
                req.VatNumber,
                req.Email,
                req.PhoneNumber,
-               req.Address
+               req.Address,
+               req.DefaultDeliveryType
           );
 
           var result = await mediator.Send(command, ct);

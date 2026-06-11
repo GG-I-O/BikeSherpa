@@ -7,7 +7,7 @@ import { mock } from "ts-jest-mocker";
 
 const customerService = mock<ICustomerService>();
 
-describe("NewCustomerFormViewModel", () => {
+describe("EditCustomerFormViewModel", () => {
     const mockCustomer = createRandomCustomer(true, linkType.none);
     customerService.updateCustomer = jest.fn();
     const viewModel = new EditCustomerFormViewModel(customerService);
@@ -17,10 +17,25 @@ describe("NewCustomerFormViewModel", () => {
     })
 
     it("onSubmit calls updateCustomer with correct customer", () => {
-        viewModel.onSubmit(mockCustomer);
-        mockCustomer.address.name = mockCustomer.name;
+        const newCustomerFormValues = {
+            ...mockCustomer,
+            phoneNumber: mockCustomer.address.phone ?? '',
+        };
+
+        viewModel.onSubmit(mockCustomer, newCustomerFormValues);
+
+        const expectedCustomer: Customer = {
+            ...mockCustomer,
+            ...newCustomerFormValues,
+            address: {
+                ...newCustomerFormValues.address,
+                name: newCustomerFormValues.name,
+                phone: newCustomerFormValues.phoneNumber,
+            }
+        };
+
         expect(customerService.updateCustomer).toHaveBeenCalledTimes(1);
-        expect(customerService.updateCustomer).toHaveBeenCalledWith(mockCustomer);
+        expect(customerService.updateCustomer).toHaveBeenCalledWith(expectedCustomer);
     })
 
     describe("getEditCustomerSchema", () => {
@@ -61,21 +76,6 @@ describe("NewCustomerFormViewModel", () => {
             expect(result.success).toBe(false);
             if (!result.success) {
                 expect(result.error.issues[0].message).toBe("Code requis");
-            }
-        });
-
-        it("validates code max length", () => {
-            //arrange
-            const schema = viewModel.getEditCustomerSchema(customerToEdit, existingCustomers);
-            customerToEdit.code = "ESTEST";
-
-            //act
-            const result = schema.safeParse(customerToEdit);
-
-            //assert
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.error.issues[0].message).toBe("Code trop long");
             }
         });
 

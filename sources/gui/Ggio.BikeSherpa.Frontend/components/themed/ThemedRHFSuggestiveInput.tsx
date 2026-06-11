@@ -1,13 +1,18 @@
-import { Control, useController } from 'react-hook-form';
+import {Control, FieldValues, Path, useController} from 'react-hook-form';
 import {SuggestiveInputProps, ThemedSuggestiveInput} from "@/components/themed/ThemedSuggestiveInput";
 
-interface RHFSuggestiveInputProps<T, V> extends Omit<SuggestiveInputProps<T, V>, 'value' | 'onChange'> {
+interface RHFSuggestiveInputProps<TForm extends FieldValues, T, V> extends Omit<SuggestiveInputProps<T, V>, 'value' | 'onChange'> {
     name: string;
-    control: Control<any>;
+    control: Control<TForm>;
 }
 
-export function ThemedRHFSuggestiveInput<T, V>({ name, control, ...props }: RHFSuggestiveInputProps<T, V>) {
-    const { field } = useController({ name, control });
+export function ThemedRHFSuggestiveInput<TForm extends FieldValues = FieldValues, T = any, V = any>(
+    { name, control, ...props }: RHFSuggestiveInputProps<TForm, T, V>) {
+    const { field } = useController(
+        { 
+            control,
+            name: name as Path<TForm>
+        });
 
     return (
         <ThemedSuggestiveInput

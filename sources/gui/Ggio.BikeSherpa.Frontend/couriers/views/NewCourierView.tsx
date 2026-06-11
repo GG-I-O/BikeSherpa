@@ -1,13 +1,12 @@
 import { useNewCourierFormViewModel } from "../viewModels/useNewCourierFormViewModel";
-
 import CourierForm from "../components/CourierForm";
-import InputCourier from "../models/InputCourier";
+import {CourierFormValues} from "@/couriers/viewModels/zod/courierFormBaseSchema";
 
 export default function NewCourierView() {
     const { control, errors, handleSubmit } = useNewCourierFormViewModel();
 
     return (
-        <CourierForm<InputCourier>
+        <CourierForm<CourierFormValues>
             control={control}
             errors={errors}
             handleSubmit={handleSubmit}

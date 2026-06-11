@@ -2,8 +2,7 @@
 using AutoFixture;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 using Ggio.BikeSherpa.Backend.Features.Customers.Add;
 using Ggio.DddCore;
 using Moq;
@@ -26,14 +25,7 @@ public class AddCustomerHandlerTests
           _mockCustomer = _fixture.Create<Customer>();
 
           _mockFactory
-               .Setup(x => x.CreateCustomerAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Address>()))
+               .Setup(x => x.CreateCustomerAsync(It.IsAny<CustomerFactoryParameters>()))
                .ReturnsAsync(_mockCustomer);
      }
 
@@ -73,14 +65,7 @@ public class AddCustomerHandlerTests
      private void VerifyFactoryCalledOnce()
      {
           _mockFactory.Verify(
-               x => x.CreateCustomerAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Address>()),
+               x => x.CreateCustomerAsync(It.IsAny<CustomerFactoryParameters>()),
                Times.Once);
      }
 
@@ -124,14 +109,21 @@ public class AddCustomerHandlerTests
           Assert.True(result.IsSuccess);
           Assert.Equal(_mockCustomer.Id, result.Value);
           _mockFactory.Verify(
-               x => x.CreateCustomerAsync(
-                    _mockCommand.Name,
-                    _mockCommand.Code,
-                    _mockCommand.Siret,
-                    _mockCommand.VatNumber,
-                    _mockCommand.Email,
-                    _mockCommand.PhoneNumber,
-                    It.IsAny<Address>()),
+               x => x.CreateCustomerAsync(It.Is<CustomerFactoryParameters>(cmd => cmd.Name == _mockCommand.Name &&
+                                                                                  cmd.Code == _mockCommand.Code &&
+                                                                                  cmd.Siret == _mockCommand.Siret &&
+                                                                                  cmd.VatNumber == _mockCommand.VatNumber &&
+                                                                                  cmd.Email == _mockCommand.Email &&
+                                                                                  cmd.PhoneNumber == _mockCommand.PhoneNumber &&
+                                                                                  cmd.Address.Name == _mockCommand.Address.Name 
+                                                                                  && cmd.Address.City == _mockCommand.Address.City
+                                                                                  && cmd.Address.Postcode == _mockCommand.Address.Postcode
+                                                                                  && cmd.Address.City == _mockCommand.Address.City
+                                                                                  && cmd.Address.Complement == _mockCommand.Address.Complement
+                                                                                 
+                                                                                  && cmd.Siret == _mockCommand.Siret &&
+                                                                                  cmd.VatNumber == _mockCommand.VatNumber &&
+                                                                                  cmd.DefaultDeliveryType == _mockCommand.DefaultDeliveryType)),
                Times.Once);
      }
 
@@ -150,14 +142,7 @@ public class AddCustomerHandlerTests
                sut.Handle(commandWithEmptyName, CancellationToken.None).AsTask());
 
           _mockFactory.Verify(
-               x => x.CreateCustomerAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Address>()),
+               x => x.CreateCustomerAsync(It.IsAny<CustomerFactoryParameters>()),
                Times.Never);
 
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -178,14 +163,7 @@ public class AddCustomerHandlerTests
                sut.Handle(commandWithEmptyCode, CancellationToken.None).AsTask());
 
           _mockFactory.Verify(
-               x => x.CreateCustomerAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Address>()),
+               x => x.CreateCustomerAsync(It.IsAny<CustomerFactoryParameters>()),
                Times.Never);
 
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -206,14 +184,7 @@ public class AddCustomerHandlerTests
                sut.Handle(commandWithEmptyEmail, CancellationToken.None).AsTask());
 
           _mockFactory.Verify(
-               x => x.CreateCustomerAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Address>()),
+               x => x.CreateCustomerAsync(It.IsAny<CustomerFactoryParameters>()),
                Times.Never);
 
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -234,14 +205,7 @@ public class AddCustomerHandlerTests
                sut.Handle(commandWithEmptyPhoneNumber, CancellationToken.None).AsTask());
 
           _mockFactory.Verify(
-               x => x.CreateCustomerAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Address>()),
+               x => x.CreateCustomerAsync(It.IsAny<CustomerFactoryParameters>()),
                Times.Never);
 
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -261,14 +225,7 @@ public class AddCustomerHandlerTests
                sut.Handle(_mockCommand, CancellationToken.None).AsTask());
 
           _mockFactory.Verify(
-               x => x.CreateCustomerAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Address>()),
+               x => x.CreateCustomerAsync(It.IsAny<CustomerFactoryParameters>()),
                Times.Never);
 
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -289,14 +246,7 @@ public class AddCustomerHandlerTests
                sut.Handle(commandWithSiret, CancellationToken.None).AsTask());
 
           _mockFactory.Verify(
-               x => x.CreateCustomerAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Address>()),
+               x => x.CreateCustomerAsync(It.IsAny<CustomerFactoryParameters>()),
                Times.Never);
 
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -317,14 +267,7 @@ public class AddCustomerHandlerTests
                sut.Handle(commandWithVatNumber, CancellationToken.None).AsTask());
 
           _mockFactory.Verify(
-               x => x.CreateCustomerAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string?>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<Address>()),
+               x => x.CreateCustomerAsync(It.IsAny<CustomerFactoryParameters>()),
                Times.Never);
 
           _mockTransaction.Verify(x => x.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
@@ -334,7 +277,7 @@ public class AddCustomerHandlerTests
      public async Task Handle_ShouldRespectCancellationToken()
      {
           // Arrange
-          var cancellationTokenSource = new CancellationTokenSource();
+          using var cancellationTokenSource = new CancellationTokenSource();
           await cancellationTokenSource.CancelAsync();
           SetupRepositoryTestingIfCodeExists(false);
           SetupRepositoryTestingIfSiretExists(false);

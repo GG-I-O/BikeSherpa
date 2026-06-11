@@ -1,5 +1,5 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.DddCore;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Step;
@@ -12,12 +12,17 @@ public class DeliveryChangeTimeService(
      public async Task ChangeTime(DeliveryStep step, DateTimeOffset date, CancellationToken cancellationToken)
      {
           var steps = await GetDeliveriesAndSteps(step, date, cancellationToken);
-          if (steps.Count == 0) return;
-          
+          if (steps.Count == 0)
+          {
+               return;
+          }
+
           var stepIndex = steps.FindIndex(s => s.Id == step.Id);
           if (stepIndex < 0 || stepIndex >= steps.Count)
+          {
                return;
-          
+          }
+
           var timeOffset = date - step.EstimatedDeliveryDate;
 
           // If it does not disrupt the order, we change following step time
@@ -33,17 +38,22 @@ public class DeliveryChangeTimeService(
 
           step.UpdateEstimatedDeliveryDate(date);
      }
-     
+
      public async Task ChangeOrder(DeliveryStep step, MoveDirection moveDirection, CancellationToken cancellationToken)
      {
           var steps = await GetDeliveriesAndSteps(step, step.EstimatedDeliveryDate, cancellationToken);
-          if (steps.Count == 0) return;
-          
+          if (steps.Count == 0)
+          {
+               return;
+          }
+
           var increment = (int)moveDirection;
-          
+
           var stepIndex = steps.FindIndex(s => s.Id == step.Id);
           if (stepIndex < 0 || stepIndex + increment < 0 || stepIndex + increment >= steps.Count)
+          {
                return;
+          }
 
           var stepToMove = steps[stepIndex + increment];
 
@@ -62,7 +72,9 @@ public class DeliveryChangeTimeService(
      private async Task<List<DeliveryStep>> GetDeliveriesAndSteps(DeliveryStep step, DateTimeOffset date, CancellationToken cancellationToken)
      {
           if (step.CourierId is null)
+          {
                return [];
+          }
 
           var courierId = step.CourierId.Value;
 

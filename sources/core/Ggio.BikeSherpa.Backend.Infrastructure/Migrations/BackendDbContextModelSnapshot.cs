@@ -17,7 +17,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -71,6 +71,9 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("DefaultDeliveryType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -215,14 +218,15 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CustomerReference")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.PrimitiveCollection<string[]>("Details")
                         .IsRequired()
                         .HasColumnType("text[]");
 
                     b.Property<double?>("Discount")
-                        .HasColumnType("double precision");
-
-                    b.Property<double?>("Distance")
                         .HasColumnType("double precision");
 
                     b.Property<double?>("ExtraCost")
@@ -231,16 +235,15 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.Property<bool>("InsulatedBox")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("NeedEstimate")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("PackingSizeName")
                         .IsRequired()
                         .HasColumnType("character varying(100)");
 
                     b.Property<int>("PricingStrategy")
                         .HasColumnType("integer");
-
-                    b.Property<string>("ReportId")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -394,6 +397,9 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("LastHourToOrder")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
@@ -410,6 +416,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "Eco",
                             FixedTimeLimit = new TimeSpan(0, 17, 0, 0, 0),
                             Label = "Avant 17h le jour-même (Eco)",
+                            LastHourToOrder = 12,
                             Order = 1,
                             PriceCoefficient = 0.75
                         },
@@ -418,6 +425,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "Standard",
                             AddTimeLimit = new TimeSpan(0, 2, 30, 0, 0),
                             Label = "2h30 (Standard)",
+                            LastHourToOrder = 15,
                             Order = 2,
                             PriceCoefficient = 1.25
                         },
@@ -426,8 +434,66 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "Urgent",
                             AddTimeLimit = new TimeSpan(0, 1, 0, 0, 0),
                             Label = "1h (Urgent)",
+                            LastHourToOrder = 20,
                             Order = 3,
                             PriceCoefficient = 2.0
+                        });
+                });
+
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Infrastructure.Repositories.Parameter", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("Parameters", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Key = "VAT_RATE",
+                            Value = "20"
+                        },
+                        new
+                        {
+                            Key = "LAST_HOUR_TO_ORDER",
+                            Value = "15"
+                        },
+                        new
+                        {
+                            Key = "WORK_START_DATE",
+                            Value = "0001-01-01T08:00:00"
+                        },
+                        new
+                        {
+                            Key = "WORK_END_DATE",
+                            Value = "0001-01-01T19:00:00"
+                        },
+                        new
+                        {
+                            Key = "SIMPLE_DELIVERY_MAIL_TEMPLATE",
+                            Value = "Your delivery is ready for pickup at {pickupLocation} on {pickupDate}. {deliverycode} { pickupaddress} { destinationaddress} {PickupDate} {LoadingSlot} "
+                        },
+                        new
+                        {
+                            Key = "SIMPLE_DELIVERY_MAIL_SUBJECT",
+                            Value = "Delivery Ready for Pickup"
+                        },
+                        new
+                        {
+                            Key = "TOUR_DELIVERY_MAIL_TEMPLATE",
+                            Value = "Your delivery is ready for pickup at {pickupLocation} on {pickupDate}. {deliverycode} { pickupaddress} { destinationaddress} {PickupDate} {LoadingSlot} "
+                        },
+                        new
+                        {
+                            Key = "TOUR_DELIVERY_MAIL_SUBJECT",
+                            Value = "Tour delivery Ready for Pickup"
                         });
                 });
 

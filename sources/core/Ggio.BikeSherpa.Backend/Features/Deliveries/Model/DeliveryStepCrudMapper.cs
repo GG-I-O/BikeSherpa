@@ -16,4 +16,27 @@ public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, D
           target.CreatedAt = source.CreatedAt;
           target.UpdatedAt = source.UpdatedAt;
      }
+     
+     public static DeliveryStep Map(DeliveryStepCrud source)
+     {
+          var target = new DeliveryStep(source.StepType, source.Order, source.StepAddress, source.Comment)
+          {
+               Id = source.Id,
+               Completed = source.Completed,
+               StepZone = source.StepZone,
+               Distance = source.Distance,
+               CourierId = source.CourierId,
+               CourierComment = null,
+               AttachmentFilePaths = source.AttachmentFilePaths,
+               NotBilled = false,
+               EstimatedDeliveryDate = source.EstimatedDeliveryDate,
+               RealDeliveryDate = source.RealDeliveryDate,
+               CreatedAt = source.CreatedAt,
+               UpdatedAt = source.UpdatedAt,
+               ParentDelivery = null!,
+               StepAddress = source.StepAddress,
+          };
+          Map(source, target);
+          return target;
+     }
 }

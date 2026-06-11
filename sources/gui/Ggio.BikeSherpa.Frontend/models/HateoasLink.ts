@@ -13,6 +13,12 @@ export const hateoasRel = {
     update: "update",
     delete: "delete",
     patch: "patch",
+    delivery: {
+        put: {
+            pending: "putDeliveryPending",
+            renew: "putDeliveryRenew",
+        }  
+    },
     stepCourier: {
         post: "postCourier",
         delete: "deleteCourier",

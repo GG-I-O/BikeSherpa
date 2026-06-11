@@ -6,6 +6,6 @@ public class DeliveryByReportIdSpecification : SingleResultSpecification<Deliver
 {
      public DeliveryByReportIdSpecification(string reportId)
      {
-          Query.Where(x => x.ReportId == reportId);
+          Query.Where(x => x.CustomerReference == reportId);
      }
 }

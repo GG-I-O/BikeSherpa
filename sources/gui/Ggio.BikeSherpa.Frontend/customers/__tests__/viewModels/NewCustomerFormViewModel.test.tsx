@@ -74,21 +74,6 @@ describe("NewCustomerFormViewModel", () => {
             }
         });
 
-        it("validates code max length", () => {
-            //arrange
-            const schema = viewModel.getNewCustomerSchema(existingCustomers);
-            customerToValidate.code = "ESTEST";
-
-            //act
-            const result = schema.safeParse(customerToValidate);
-
-            //assert
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.error.issues[0].message).toBe("Code trop long");
-            }
-        });
-
         it("validates code uniqueness", () => {
             //arrange
             const schema = viewModel.getNewCustomerSchema(existingCustomers);

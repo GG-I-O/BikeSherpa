@@ -1,5 +1,5 @@
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
@@ -8,22 +8,24 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
+
+public record DeliveryFactoryParameters(
+     PricingStrategy PricingStrategy,
+     Guid CustomerId,
+     Urgency Urgency,
+     double? TotalPrice,
+     double? Discount,
+     double? ExtraCost,
+     string[] Details,
+     PackingSize PackingSize,
+     bool InsulatedBox,
+     DateTimeOffset ContractDate,
+     DateTimeOffset StartDate,
+     bool NeedEstimate);
+
 public interface IDeliveryFactory
 {
-     Task<Delivery> CreateDeliveryAsync(
-          PricingStrategy pricingStrategy,
-          Guid customerId,
-          Urgency urgency,
-          double? totalPrice,
-          double? discount,
-          double? extraCost,
-          double? distance,
-          string[] details,
-          PackingSize packingSize,
-          bool insulatedBox,
-          DateTimeOffset contractDate,
-          DateTimeOffset startDate
-     );
+     Task<Delivery> CreateDeliveryAsync(DeliveryFactoryParameters parameters);
 }
 
 public class DeliveryFactory(
@@ -33,41 +35,28 @@ public class DeliveryFactory(
      IPricingStrategyService pricingStrategyService
 ) : FactoryBase(mediator), IDeliveryFactory
 {
-     public async Task<Delivery> CreateDeliveryAsync(
-          PricingStrategy pricingStrategy,
-          Guid customerId,
-          Urgency urgency,
-          double? totalPrice,
-          double? discount,
-          double? extraCost,
-          double? distance,
-          string[] details,
-          PackingSize packingSize,
-          bool insulatedBox,
-          DateTimeOffset contractDate,
-          DateTimeOffset startDate
-     )
+     public async Task<Delivery> CreateDeliveryAsync(DeliveryFactoryParameters parameters)
      {
           var delivery = new Delivery
           {
                Id = Guid.NewGuid(),
-               PricingStrategy = pricingStrategy,
+               PricingStrategy = parameters.PricingStrategy,
                Code = "",
-               CustomerId = customerId,
-               Urgency = urgency,
-               TotalPrice = totalPrice,
-               Discount = discount,
-               ExtraCost = extraCost,
-               Distance = distance,
-               Details = details,
+               CustomerId = parameters.CustomerId,
+               Urgency = parameters.Urgency,
+               TotalPrice = parameters.TotalPrice,
+               Discount = parameters.Discount,
+               ExtraCost = parameters.ExtraCost,
+               Details = parameters.Details,
                Steps = [],
-               PackingSize = packingSize,
-               InsulatedBox = insulatedBox,
-               ContractDate = contractDate,
-               StartDate = startDate
+               PackingSize = parameters.PackingSize,
+               InsulatedBox = parameters.InsulatedBox,
+               ContractDate = parameters.ContractDate,
+               StartDate = parameters.StartDate,
+               NeedEstimate = parameters.NeedEstimate
           };
 
-          var customer = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(customerId));
+          var customer = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(parameters.CustomerId));
 
           if (customer is not null)
           {

@@ -26,6 +26,8 @@ import { ICourierService } from "@/spi/CourierSPI";
 import DeliveryBootstrapper from "@/deliveries/bootstrapper/DeliveryBootstrapper";
 import StepBootstrapper from "@/steps/bootstrapper/StepBootstrapper";
 import ReportBootstrapper from "@/reports/bootstrapper/ReportBootstrapper";
+import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
+import DropdownOptionsService from "@/services/DropdownOptionsService";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -37,6 +39,9 @@ export default class IOCContainerBootstrapper {
         IOCContainerBootstrapper.bindLogger();
 
         IOCContainerBootstrapper.bindNotificationHub();
+
+        // DropdownOptionsService
+        IOCContainer.bind<IDropdownOptionsService>(ServicesIdentifiers.DropdownOptionsService).to(DropdownOptionsService).inSingletonScope();
 
         IOCContainerBootstrapper.bindCustomerStorageContext();
 

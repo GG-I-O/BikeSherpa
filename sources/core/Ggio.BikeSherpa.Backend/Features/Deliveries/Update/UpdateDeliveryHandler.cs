@@ -5,8 +5,9 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Ggio.DddCore;
 using Mediator;
 
@@ -22,7 +23,6 @@ public record UpdateDeliveryCommand(
      double? TotalPrice,
      double? Discount,
      double? ExtraCost,
-     double? Distance,
      string ReportId,
      List<DeliveryStepCrud> Steps,
      string[] Details,
@@ -37,14 +37,10 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
      public UpdateDeliveryCommandValidator(IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
      {
           RuleFor(x => x.Id).NotEmpty();
-          RuleFor(x => x.PricingStrategy).IsInEnum().NotEmpty();
+          RuleFor(x => x.PricingStrategy).IsInEnum();
           RuleFor(x => x.Status).IsInEnum();
           RuleFor(x => x.CustomerId).NotNull();
-          RuleFor(x => x.Urgency)
-               .NotEmpty()
-               .Must(urgency => urgencies.GetAll().Any(u => string.Equals(u.Name, urgency, StringComparison.OrdinalIgnoreCase)))
-               .WithMessage("Valeur d'urgence saisie invalide.");
-
+          RuleFor(x => x.Urgency).SetValidator(new UrgencyValidator(urgencies));
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.Discount).NotEmpty();
           RuleForEach(x => x.Steps)
@@ -55,13 +51,8 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                     step.RuleFor(s => s.EstimatedDeliveryDate).NotEmpty();
                });
 
-          RuleFor(x => x.PackingSize).NotEmpty();
+          RuleFor(x => x.PackingSize).SetValidator(new PackingSizeValidator(packingSizes));
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.PackingSize)
-               .NotEmpty()
-               .Must(packingSize => packingSizes.GetAll().Any(p => string.Equals(p.Name, packingSize, StringComparison.OrdinalIgnoreCase)))
-               .WithMessage("Taille de colis saisie invalide.");
-
           RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
@@ -84,7 +75,9 @@ public class UpdateDeliveryHandler(
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           var entity = await repository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.Id), cancellationToken);
           if (entity is null)
+          {
                return Result.NotFound();
+          }
 
           var urgency = urgencyRepository.GetByName(command.Urgency)!;
           var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
@@ -97,8 +90,7 @@ public class UpdateDeliveryHandler(
           entity.TotalPrice = command.TotalPrice;
           entity.Discount = command.Discount;
           entity.ExtraCost = command.ExtraCost;
-          entity.Distance = command.Distance;
-          entity.ReportId = command.ReportId;
+          entity.CustomerReference = command.ReportId;
           entity.Details = command.Details;
           entity.PackingSize = packingSize;
           entity.InsulatedBox = command.InsulatedBox;
@@ -117,9 +109,9 @@ public class UpdateDeliveryHandler(
                          Id = step.Id,
                          StepAddress = step.StepAddress,
                          StepZone = step.StepZone,
-                         ParentDelivery = entity,
+                         ParentDelivery = entity
                     };
-                    
+
                     DeliveryStepCrudMapper.Map(step, deliveryStep);
                     return deliveryStep;
                })

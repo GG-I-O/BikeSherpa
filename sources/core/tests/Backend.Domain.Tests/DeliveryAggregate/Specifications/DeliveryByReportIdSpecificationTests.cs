@@ -29,14 +29,14 @@ public class DeliveryByReportIdSpecificationTests
      {
           // Arrange
           Delivery[0].GenerateReportId(Customer[0]);
-          var spec = new DeliveryByReportIdSpecification(Delivery.First().ReportId!);
+          var spec = new DeliveryByReportIdSpecification(Delivery.First().CustomerReference!);
 
           // Act
           var result = InMemorySpecificationEvaluator.Default.Evaluate(Delivery, spec).SingleOrDefault();
 
           // Assert
           result.Should().NotBeNull();
-          result.ReportId.Should().Be(Delivery.First().ReportId);
+          result.CustomerReference.Should().Be(Delivery.First().CustomerReference);
      }
 
      [Fact]
@@ -60,13 +60,13 @@ public class DeliveryByReportIdSpecificationTests
           {
                Deliveries[i].GenerateReportId(Customers[i]);
           }
-          var spec = new DeliveryByReportIdSpecification(Deliveries.First().ReportId!);
+          var spec = new DeliveryByReportIdSpecification(Deliveries.First().CustomerReference!);
 
           // Act
           var results = InMemorySpecificationEvaluator.Default.Evaluate(Deliveries, spec).ToList();
 
           // Assert
           results.Should().HaveCount(1);
-          results[0].ReportId.Should().Be(Deliveries.First().ReportId);
+          results[0].CustomerReference.Should().Be(Deliveries.First().CustomerReference);
      }
 }

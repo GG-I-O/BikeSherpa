@@ -1,7 +1,7 @@
 import * as zod from "zod";
 import { addressSchema } from "@/models/Address";
 
-export const courierFormBaseSchema = zod
+const courierFormBaseSchema = zod
     .object({
         firstName: zod
             .string()
@@ -30,3 +30,7 @@ export const courierFormBaseSchema = zod
             .min(1, "Numéro de téléphone requis")
             .regex(/^(?:\+33\s?[1-9]|0[1-9])(?:[\s.-]?\d{2}){4}$/, "Numéro de téléphone invalide"),
     });
+
+type CourierFormValues = zod.infer<typeof courierFormBaseSchema>;
+
+export {courierFormBaseSchema, CourierFormValues}

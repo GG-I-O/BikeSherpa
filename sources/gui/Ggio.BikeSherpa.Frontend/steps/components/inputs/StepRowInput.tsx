@@ -1,6 +1,6 @@
 import {DataTable, IconButton} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import {Control, useWatch} from "react-hook-form";
+import {Control, FieldError, FieldErrors} from "react-hook-form";
 import StepTypeInput from "@/steps/components/inputs/StepTypeInput";
 import React from "react";
 import ThemedInput from "@/components/themed/ThemedInput";
@@ -10,6 +10,7 @@ import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 
 type Props = {
     control: Control<any>;
+    errors: FieldErrors;
     name: string;
     index: number;
     deleteRow: () => void;
@@ -17,9 +18,7 @@ type Props = {
     moveRow?: (from: number, to: number) => void;
 }
 
-export default function StepRowInput({control, name, index, deleteRow, moveRow, listLength}: Props) {
-    const currentName = useWatch({ control, name: `${name}.${index}.stepAddress.name` }) ?? "";
-    const currentPhone = useWatch({ control, name: `${name}.${index}.stepAddress.phone` }) ?? "";
+export default function StepRowInput({control, errors, name, index, deleteRow, moveRow, listLength}: Props) {
     
     return (
         <DataTable.Row style={{padding: 0}}>
@@ -59,6 +58,7 @@ export default function StepRowInput({control, name, index, deleteRow, moveRow, 
                 <ThemedAddressInput
                     control={control}
                     name={`${name}.${index}.stepAddress`}
+                    error={errors.steps ? (errors.steps as any)[index]?.stepAddress?.streetInfo as FieldError | undefined : undefined}
                     label=""
                     placeholder="Adresse..."
                 />
@@ -66,6 +66,7 @@ export default function StepRowInput({control, name, index, deleteRow, moveRow, 
                     testID="StepAddressName"
                     control={control}
                     name={`${name}.${index}.contactName`}
+                    error={errors.steps ? (errors.steps as any)[index]?.contactName as FieldError | undefined : undefined}
                     label=""
                     placeholder="Nom..."
                 />
@@ -73,6 +74,7 @@ export default function StepRowInput({control, name, index, deleteRow, moveRow, 
                     testID="StepAddressPhone"
                     control={control}
                     name={`${name}.${index}.contactPhone`}
+                    error={errors.steps ? (errors.steps as any)[index]?.contactPhone as FieldError | undefined : undefined}
                     label=""
                     placeholder="Téléphone..."
                 />

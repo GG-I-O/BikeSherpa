@@ -7,14 +7,14 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {ICustomerService} from "@/spi/CustomerSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
-import useDeliveryDropdown from "@/deliveries/hooks/useDeliveryDropdown";
+import useDropdown from "@/hooks/useDropdown";
 
 export function useNewDeliveryFormViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
     const viewModel = new NewDeliveryFormViewModel(deliveryServices, customerServices);
 
-    const { urgencies, pricingStrategies, packingSizes } = useDeliveryDropdown();
+    const { urgencies, pricingStrategies, packingSizes } = useDropdown();
 
     const {
         control,
@@ -26,7 +26,7 @@ export function useNewDeliveryFormViewModel() {
             code: '',
             status: 0,
             customerId: '',
-            pricingStrategy: pricingStrategies.length > 0 ? parseInt(packingSizes[0].value) : 1,
+            pricingStrategy: pricingStrategies.length > 0 ? parseInt(packingSizes[0].value) : 0,
             urgency: urgencies.length > 0 ? urgencies[0].value : 'Standard',
             totalPrice: 0,
             discount: 0,

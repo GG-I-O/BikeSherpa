@@ -1,7 +1,7 @@
 import { Address } from '@/models/Address';
 import { fakerFR as faker } from '@faker-js/faker';
 
-export function createRandomAddress(name: string): Address {
+export function createRandomAddress(name: string, phoneNumber: string): Address {
     const fakeStreetInfo = faker.location.streetAddress();
     const fakePostcode = faker.location.zipCode();
     const fakeCity = faker.location.city();
@@ -10,6 +10,7 @@ export function createRandomAddress(name: string): Address {
         fullAddress: `${fakeStreetInfo} ${fakePostcode} ${fakeCity}`,
         streetInfo: fakeStreetInfo,
         complement: null,
+        phone: phoneNumber,
         postcode: fakePostcode,
         city: fakeCity,
         coordinates: {

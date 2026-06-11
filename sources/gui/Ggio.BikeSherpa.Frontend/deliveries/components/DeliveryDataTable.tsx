@@ -26,6 +26,7 @@ export default function DeliveryDataTable({ deliveries, isDeliverySelected, isSt
         <ScrollView>
             <DataTable style={{ backgroundColor: theme.colors.background }}>
                 <DataTable.Header>
+                    <DataTable.Title style={[style.column, style.width50]}>Status</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Code</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Client</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Nb étapes</DataTable.Title>

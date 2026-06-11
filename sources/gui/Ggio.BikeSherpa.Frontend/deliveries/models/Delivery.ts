@@ -23,15 +23,15 @@ export default class Delivery extends InputDelivery implements Storable, Hateoas
         totalPrice: number,
         discount: number,
         extraCost: number,
-        distance: number,
-        reportId: string,
         steps: Step[],
         details: string[],
         packingSize: string,
         insulatedBox: boolean,
         contractDate: string,
         startDate: string,
-        limitDate: string
+        limitDate: string,
+        needEstimate: boolean,
+        customerReference: string,
     ) {
         super(
             code,
@@ -42,15 +42,15 @@ export default class Delivery extends InputDelivery implements Storable, Hateoas
             totalPrice,
             discount,
             extraCost,
-            distance,
-            reportId,
             steps,
             details,
             packingSize,
             insulatedBox,
             contractDate,
             startDate,
-            limitDate
+            limitDate,
+            needEstimate,
+            customerReference
         )
         this.id = Crypto.randomUUID();
         this.links = [];

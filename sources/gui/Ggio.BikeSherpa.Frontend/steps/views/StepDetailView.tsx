@@ -6,11 +6,11 @@ import useStepDetailViewModel from "@/steps/viewModel/useStepDetailViewModel";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import {Icon} from "react-native-paper/src";
 import {StepType} from "@/steps/models/StepType";
-import unassignedPhoneNumber from "@/steps/constants/unassignedPhoneNumber";
 import React from "react";
 import Signature from "@/steps/components/attachmentFile/Signature";
 import Photo from "@/steps/components/attachmentFile/Photo";
 import Document from "@/steps/components/attachmentFile/Document";
+import unassignedPhoneNumber from "@/steps/data/unassignedPhoneNumber";
 
 export default function StepDetailView() {
     const theme = useTheme();

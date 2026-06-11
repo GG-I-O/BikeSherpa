@@ -7,6 +7,7 @@ import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifier
 import { useEffect, useState } from "react";
 import { observe } from "@legendapp/state";
 import EditCourierFormViewModel from "./EditCourierFormViewModel";
+import {CourierFormValues} from "@/couriers/viewModels/zod/courierFormBaseSchema";
 
 export function useEditCourierFormViewModel(courierId: string) {
     const courierServices = IOCContainer.get<ICourierService>(ServicesIdentifiers.CourierServices);
@@ -28,10 +29,23 @@ export function useEditCourierFormViewModel(courierId: string) {
         handleSubmit,
         formState: { errors },
         setValue
-    } = useForm<Courier>({
+    } = useForm<CourierFormValues>({
         defaultValues: courier,
         resolver: zodResolver(editCourierFormViewModel.getEditCourierSchema(courier, courierList))
     });
 
-    return { control, handleSubmit: handleSubmit(editCourierFormViewModel.onSubmit), errors, setValue };
+    return { 
+        control,
+        handleSubmit: handleSubmit(
+            (data) => {
+                editCourierFormViewModel.onSubmit(courier, data);
+            },
+            (errors) => {
+                console.error("Invalid delivery for creation");
+                console.error(errors);
+            }
+        ),
+        errors, 
+        setValue 
+    };
 }

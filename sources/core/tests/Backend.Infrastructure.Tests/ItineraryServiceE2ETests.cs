@@ -1,6 +1,6 @@
 ﻿using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.SPI;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +17,7 @@ public class ItineraryServiceE2ETest
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddJsonFile("appsettings.json")
                .Build();
+
           var services = new ServiceCollection();
           services.AddLogging();
           services.AddBackendInfrastructure(configuration);

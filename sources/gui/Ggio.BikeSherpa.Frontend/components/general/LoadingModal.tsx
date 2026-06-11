@@ -1,0 +1,31 @@
+import {ActivityIndicator, useTheme} from "react-native-paper";
+import {useEffect, useState} from "react";
+import {SafeAreaView} from "react-native-safe-area-context";
+import modalStyle from "@/style/modalStyle";
+import {Modal, View} from "react-native";
+
+type LoadingModalProps = {
+    visible: boolean;
+}
+
+export default function LoadingModal(props: LoadingModalProps) {
+    const theme = useTheme();
+    const [modalVisible, setModalVisible] = useState(false);
+
+    useEffect(() => {
+        setModalVisible(props.visible);
+    }, [props.visible]);
+
+    return (
+        <SafeAreaView style={modalStyle.safeArea}>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}>
+                <View style={[modalStyle.safeArea, {backgroundColor: 'rgba(0, 0, 0, 0.75)'}]}>
+                    <ActivityIndicator animating color={theme.colors.background} size="large"/>
+                </View>
+            </Modal>
+        </SafeAreaView>
+    )
+}

@@ -4,6 +4,7 @@ import {TextInput, Text, Button, Portal, useTheme} from 'react-native-paper';
 import formStyle from "@/style/formStyle";
 import {FieldError} from "react-hook-form";
 import {useDebounce} from "@/hooks/useDebounce";
+import AppStyle from "@/constants/AppStyle";
 
 export type SuggestionFetcher<T> = (query: string) => Promise<T[] | null>;
 export type SuggestionRenderer<T> = (item: T) => string;
@@ -11,19 +12,21 @@ export type SuggestionRenderer<T> = (item: T) => string;
 export interface SuggestiveInputProps<T, V> {
     value: V | null;
     onChange: (value: V | null) => void;
-    
+
     label?: string;
     required?: boolean;
     placeholder?: string;
     error?: FieldError | undefined
-    
+
     fetchSuggestions: SuggestionFetcher<T>;
     getOptionLabel: SuggestionRenderer<T>;
     getOptionValue: (item: T) => V;
 
     getLabelFromValue?: (value: V) => string;
-    
+
     minLength?: number;
+
+    labelAsTitle?: boolean;
 }
 
 export function ThemedSuggestiveInput<T, V>(
@@ -38,7 +41,8 @@ export function ThemedSuggestiveInput<T, V>(
         getOptionLabel,
         getOptionValue,
         getLabelFromValue,
-        minLength = 3
+        minLength = 3,
+        labelAsTitle = false,
     }: SuggestiveInputProps<T, V>
 ) {
     const theme = useTheme();
@@ -65,13 +69,13 @@ export function ThemedSuggestiveInput<T, V>(
             setOpen(false);
             return;
         }
-        
+
         if (!query || query.length < minLength) {
             setSuggestions([]);
             setOpen(false);
             return;
         }
-        
+
         fetchSuggestions(query).then((res) => {
             setSuggestions(res);
             setOpen(true);
@@ -93,7 +97,8 @@ export function ThemedSuggestiveInput<T, V>(
         <View style={formStyle.intputContainer}>
             <Text
                 testID='themedSuggestiveInputLabel'
-                style={[formStyle.label, {color: theme.colors.onBackground}, theme.fonts.labelLarge]}>
+                style={[formStyle.label, {color: theme.colors.onBackground}, theme.fonts.labelLarge, labelAsTitle ? AppStyle.textStyle.h3 : undefined]}
+            >
                 {label}
                 {required && <Text style={{color: theme.colors.error}}> *</Text>}
             </Text>
