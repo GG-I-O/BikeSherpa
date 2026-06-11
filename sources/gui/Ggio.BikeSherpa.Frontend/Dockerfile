@@ -7,7 +7,7 @@ RUN npm install
 
 COPY . .
 
-RUN NODE_TLS_REJECT_UNAUTHORIZED=0 npx expo export --platform web
+RUN npx expo export --platform web
 
 FROM nginx:alpine
 

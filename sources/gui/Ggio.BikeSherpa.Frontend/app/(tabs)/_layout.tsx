@@ -52,10 +52,11 @@ export default function TabLayout() {
     ];
 
     const items = userIsDispatcher ? dispatcherItems : courierItems;
+    const initialRoute = userIsDispatcher ? "deliveries" : "myDeliveries";
 
     return (
         <>
-            <Stack screenOptions={{headerShown: false}}/>
+            <Stack screenOptions={{headerShown: false}} initialRouteName={initialRoute}/>
             <BottomNavBar items={items}/>
         </>
     );
