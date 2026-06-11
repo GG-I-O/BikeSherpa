@@ -14,30 +14,32 @@ export default function useReportViewModel() {
     const reportServices = IOCContainer.get<IReportServices>(ReportServiceIdentifier.Services);
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
     const viewModel = new ReportViewModel(reportServices);
-    
+
     const customerStore$ = customerServices.getCustomerList$();
-    
+
     const [report, setReport] = useState<Report | null>(null);
     const [startDateFilter, setStartDateFilter] = useState<Date>(DateToolbox.getFirstDayOfTheMonth(new Date()));
     const [endDateFilter, setEndDateFilter] = useState<Date>(DateToolbox.getLastDayOfTheMonth(new Date()));
     const [customerFilter, setCustomerFilter] = useState<string | undefined>();
 
     const [customersOptions, setCustomersOptions] = useState<{ label: string, value: string }[]>([]);
-    
+
     useEffect(() => {
         return observe(() => {
-          viewModel.getReport(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
-              .then(report => setReport(report));
-          
+            viewModel.getReport(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
+                .then(report => setReport(report));
+
             let customerList: { label: string, value: string }[] = [];
             customerList.push(...defaultDropdownOption);
-            Object.values(customerStore$.peek()).forEach(customer =>
-                customerList.push({label: customer.code + " - " + customer.name, value: customer.id})
+
+            Object.values(customerStore$.peek()).forEach(customer => {
+                    customer ? customerList.push({label: customer.code + " - " + customer.name, value: customer.id}) : {};
+                }
             );
             setCustomersOptions(customerList);
         });
     }, [customerStore$, setReport, setCustomersOptions, startDateFilter, endDateFilter, customerFilter])
-    
+
     return {
         report,
         setReport,
