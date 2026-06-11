@@ -1,6 +1,6 @@
 import datatableStyle from "@/style/datatableStyle";
 import { ScrollView } from "react-native";
-import { DataTable, IconButton, useTheme } from "react-native-paper";
+import {DataTable, IconButton, Text, useTheme} from "react-native-paper";
 import useCustomerListViewModel from "../viewModels/useCustomerListViewModel";
 import ThemedConfirmationModal from "@/components/themed/ThemedConfirmationModal";
 import { useState } from "react";
@@ -10,6 +10,9 @@ export default function CustomerListView() {
     const backgroundColor = theme.colors.background;
     const { customerList, displayEditForm, deleteCustomer, setCustomerToDelete } = useCustomerListViewModel();
     const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
+    
+    if (customerList.length === 0 || !customerList[0])
+        return <Text>Aucun client trouvé</Text>
 
     return (
         <ScrollView testID="customerListView" style={{ backgroundColor, height: '100%' }}>

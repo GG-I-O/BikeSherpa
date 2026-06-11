@@ -6,6 +6,7 @@ COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
 RUN npm install
 
 COPY . .
+
 RUN npx expo export --platform web
 
 FROM nginx:alpine

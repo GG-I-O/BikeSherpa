@@ -54,7 +54,7 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
             (data) => {
                 viewModel.onSubmit(data);
                 navigate({
-                    pathname: '/(tabs)/(deliveries)',
+                    pathname: '/(tabs)/deliveries',
                 });
             },
             (errors) => {

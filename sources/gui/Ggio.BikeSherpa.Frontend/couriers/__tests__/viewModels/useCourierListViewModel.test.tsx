@@ -34,7 +34,7 @@ describe("useCourierListViewModel", () => {
         result.current.displayEditForm("editForm");
 
         expect(mockNavigate).toHaveBeenCalledWith({
-            pathname: '/(tabs)/(couriers)/edit',
+            pathname: '/(tabs)/couriers/edit',
             params: { courierId: "editForm" }
         });
     });

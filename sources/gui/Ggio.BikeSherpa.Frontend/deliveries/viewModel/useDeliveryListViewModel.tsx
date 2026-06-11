@@ -37,7 +37,7 @@ export default function useDeliveryListViewModel() {
 
     function displayEditForm(id: string) {
         navigate({
-            pathname: '/(tabs)/(deliveries)/edit',
+            pathname: '/(tabs)/deliveries/edit',
             params: {deliveryId: id}
         });
     }

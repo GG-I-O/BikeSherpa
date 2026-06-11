@@ -32,7 +32,7 @@ function AppStack() {
                 <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
             </Stack.Protected>
             <Stack.Protected guard={!loggedIn}>
-                <Stack.Screen name="login" options={{headerShown: false}}/>
+                <Stack.Screen name="index" options={{headerShown: false}}/>
                 <Stack.Screen name="newDelivery" options={{headerShown: false}}/>
             </Stack.Protected>
         </Stack>

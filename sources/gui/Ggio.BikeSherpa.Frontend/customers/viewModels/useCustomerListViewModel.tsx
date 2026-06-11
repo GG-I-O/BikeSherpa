@@ -14,7 +14,7 @@ export default function useCustomerListViewModel() {
 
     function displayEditForm(id: string) {
         navigate({
-            pathname: '/(tabs)/(customers)/edit',
+            pathname: '/(tabs)/customers/edit',
             params: { customerId: id }
         });
     }

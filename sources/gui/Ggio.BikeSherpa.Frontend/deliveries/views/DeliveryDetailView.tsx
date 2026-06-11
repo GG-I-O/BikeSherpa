@@ -42,7 +42,7 @@ export default function DeliveryDetailView({canEdit = false}: Props) {
                         <Button
                             mode="outlined"
                             onPress={() => navigate({
-                                pathname: '/(tabs)/(deliveries)/edit',
+                                pathname: '/(tabs)/deliveries/edit',
                                 params: {deliveryId: delivery.id}
                             })}
                         >
@@ -51,7 +51,7 @@ export default function DeliveryDetailView({canEdit = false}: Props) {
                         <Button
                             mode="outlined"
                             onPress={() => navigate({
-                                pathname: '/(tabs)/(deliveries)/copy',
+                                pathname: '/(tabs)/deliveries/copy',
                                 params: {deliveryId: delivery.id}
                             })}
                         >
