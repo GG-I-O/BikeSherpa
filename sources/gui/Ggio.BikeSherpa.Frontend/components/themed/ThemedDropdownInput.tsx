@@ -42,7 +42,7 @@ const ThemedDropdownInput = <T extends FieldValues = FieldValues>(
                 <Text style={{color: theme.colors.error}}> *</Text>}
             </Text>
             <Dropdown
-                value={isNumber ? field.value.toString() : field.value}
+                value={isNumber ? (field.value ?? "").toString() : field.value ?? ""}
                 onSelect={(value) => isNumber ? field.onChange(parseInt(value ?? "0")) : field.onChange(value)}
                 mode='outlined'
                 error={error !== undefined}

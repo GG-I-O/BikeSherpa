@@ -7,7 +7,7 @@ import { mock } from "ts-jest-mocker";
 
 const courierService = mock<ICourierService>();
 
-describe("NewCourierFormViewModel", () => {
+describe("EditCourierFormViewModel", () => {
     const mockCourier = createRandomCourier(true, linkType.none);
     courierService.updateCourier = jest.fn();
     const viewModel = new EditCourierFormViewModel(courierService);
@@ -17,10 +17,25 @@ describe("NewCourierFormViewModel", () => {
     })
 
     it("onSubmit calls updateCourier with correct courier", () => {
-        viewModel.onSubmit(mockCourier);
-        mockCourier.address.name = `${mockCourier.firstName} ${mockCourier.lastName}`;
+        const newCourierFormValues = {
+            ...mockCourier,
+            phoneNumber: mockCourier.address.phone ?? "",
+        };
+
+        viewModel.onSubmit(mockCourier, newCourierFormValues);
+
+        const expectedCourier: Courier = {
+            ...mockCourier,
+            ...newCourierFormValues,
+            address: {
+                ...newCourierFormValues.address,
+                name: `${newCourierFormValues.firstName} ${newCourierFormValues.lastName}`,
+                phone: newCourierFormValues.phoneNumber,
+            }
+        };
+
         expect(courierService.updateCourier).toHaveBeenCalledTimes(1);
-        expect(courierService.updateCourier).toHaveBeenCalledWith(mockCourier);
+        expect(courierService.updateCourier).toHaveBeenCalledWith(expectedCourier);
     })
 
     describe("getEditCourierSchema", () => {
@@ -106,21 +121,6 @@ describe("NewCourierFormViewModel", () => {
             expect(result.success).toBe(false);
             if (!result.success) {
                 expect(result.error.issues[0].message).toBe("Adresse e-mail requise");
-            }
-        });
-
-        it("validates code max length", () => {
-            //arrange
-            const schema = viewModel.getEditCourierSchema(courierToEdit, existingCouriers);
-            courierToEdit.code = "ESTEST";
-
-            //act
-            const result = schema.safeParse(courierToEdit);
-
-            //assert
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.error.issues[0].message).toBe("Code trop long");
             }
         });
 

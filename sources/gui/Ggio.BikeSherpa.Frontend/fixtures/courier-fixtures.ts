@@ -9,14 +9,15 @@ export enum linkType { "none", "update", "delete", "get", "getAndUpdate", "updat
 export function createRandomInputCourier(): InputCourier {
     const fakeFirstName = faker.person.firstName();
     const fakeLastName = faker.person.lastName();
+    const fakePhoneNumber = faker.phone.number();
     const courierFullName = `${fakeFirstName} ${fakeLastName}`
-    const fakeAddress = createRandomAddress(courierFullName);
+    const fakeAddress = createRandomAddress(courierFullName, fakePhoneNumber);
     return {
         firstName: fakeFirstName,
         lastName: fakeLastName,
         address: fakeAddress,
         code: faker.string.alpha(3).toUpperCase(),
-        phoneNumber: faker.phone.number(),
+        phoneNumber: fakePhoneNumber,
         email: faker.internet.email()
     };
 }

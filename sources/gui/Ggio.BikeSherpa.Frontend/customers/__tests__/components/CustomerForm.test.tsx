@@ -4,12 +4,20 @@ import { useForm } from "react-hook-form";
 import { UserEventInstance } from '@testing-library/react-native/build/user-event/setup';
 import ThemedInputModule from '@/components/themed/ThemedInput';
 import ThemedAddressInputModule from '@/components/themed/ThemedAddressInput';
+import ThemedDropdownInputModule from "@/components/themed/ThemedDropdownInput";
 
 jest.mock('react-native-safe-area-context', () => ({
     useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 })
 }));
 
-jest.mock("@/bootstrapper/constants/IOCContainer");
+jest.mock("@/hooks/useDropdown", () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        urgencies: [],
+        pricingStrategies: [],
+        packingSizes: [],
+    })),
+}));
 
 jest.mock('@/components/themed/ThemedInput', () => ({
     __esModule: true,
@@ -21,8 +29,14 @@ jest.mock('@/components/themed/ThemedAddressInput', () => ({
     default: jest.fn(() => null),
 }));
 
+jest.mock('@/components/themed/ThemedDropdownInput', () => ({
+    __esModule: true,
+    default: jest.fn(() => null),
+}));
+
 const ThemedInput = jest.mocked(ThemedInputModule);
 const ThemedAddressInput = jest.mocked(ThemedAddressInputModule);
+const ThemedDropdownInput = jest.mocked(ThemedDropdownInputModule);
 
 describe("CustomerForm", () => {
     let userAction: UserEventInstance;
@@ -32,6 +46,7 @@ describe("CustomerForm", () => {
     beforeEach(() => {
         ThemedInput.mockClear();
         ThemedAddressInput.mockClear();
+        ThemedDropdownInput.mockClear();
         userAction = userEvent.setup();
     });
 
@@ -87,13 +102,13 @@ describe("CustomerForm", () => {
         expect(call4Props.testID).toBe("customerFormPhoneInput");
 
         // Check fifth call - Complement input (not required)
-        expect(call5Props.label).toBe("Complément d’adresse");
+        expect(call5Props.label).toBe("Complément d'adresse");
         expect(call5Props.placeholder).toBe("Bâtiment B");
         expect(call5Props.name).toBe("address.complement");
         expect(call5Props.required).toBeUndefined();
         expect(call5Props.testID).toBe("customerFormComplementInput");
 
-        // Check sifth call - Siret input (not required)
+        // Check sixth call - Siret input (not required)
         expect(call6Props.label).toBe("Siret");
         expect(call6Props.placeholder).toBe("12345678910123");
         expect(call6Props.name).toBe("siret");
@@ -120,7 +135,7 @@ describe("CustomerForm", () => {
         expect(buttonName).toHaveTextContent("Modifier le client");
     })
 
-    it("", async () => {
+    it("calls handleSubmit when form button is pressed", async () => {
         render(<CustomerForm
             control={result.current.control}
             errors={{}}
