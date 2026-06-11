@@ -16,7 +16,6 @@ type Props = {
 export function BottomNavBar({ items }: Props) {
     const theme = useTheme();
     const pathname = usePathname();
-    console.log('current pathname:', pathname);
 
     return (
         <View style={[styles.bar, { backgroundColor: theme.colors.surface }]}>
@@ -68,15 +67,12 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 0,
     },
-    // Link itself is the touchable — stretch it to fill the tab
     link: {
         display: 'flex',
         flex: 1,
         width: '100%',
         height: '100%',
-
-        justifyContent: 'center',
-        alignItems: 'center'
+        textAlign: "center",
     },
     tabInner: {
         flex: 1,
