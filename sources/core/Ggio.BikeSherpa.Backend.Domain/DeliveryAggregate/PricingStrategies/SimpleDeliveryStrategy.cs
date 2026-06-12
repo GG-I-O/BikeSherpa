@@ -11,55 +11,29 @@ public class SimpleDeliveryStrategy : IPricingStrategy
 
      public PricingStrategy ImplementedStrategy => PricingStrategy.SimpleDeliveryStrategy;
 
-     public double SameDayExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate)
-     {
-          return PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate);
-     }
+     public double SameDayExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate) => PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate);
 
-     public double DelayCost(DateTimeOffset startDate, DateTimeOffset contractDate)
-     {
-          return PricingRules.CalculateDelayCost(startDate, contractDate);
-     }
+     public double DelayCost(DateTimeOffset startDate, DateTimeOffset contractDate) => PricingRules.CalculateDelayCost(startDate, contractDate);
 
-     public double PickupCost(int pickupNumber)
-     {
-          return 0;
-     }
+     public double PickupCost(int pickupNumber) => 0;
 
-     public double DropOffInCoreCost(int dropOffStepsInCore)
-     {
-          return dropOffStepsInCore * StepPriceInCore;
-     }
+     public double DropOffInCoreCost(int dropOffStepsInCore) => dropOffStepsInCore * StepPriceInCore;
 
-     public double DropOffInBorderCost(int dropOffStepsInBorder)
-     {
-          return dropOffStepsInBorder * StepPriceInBorder;
-     }
+     public double DropOffInBorderCost(int dropOffStepsInBorder) => dropOffStepsInBorder * StepPriceInBorder;
 
-     public double DropOffInPeripheryCost(int dropOffStepsInPeriphery)
-     {
-          return dropOffStepsInPeriphery * StepPriceInPeriphery;
-     }
+     public double DropOffInPeripheryCost(int dropOffStepsInPeriphery) => dropOffStepsInPeriphery * StepPriceInPeriphery;
 
-     public double DropOffOutsideCost(int dropOffStepsOutside)
-     {
-          return dropOffStepsOutside * StepPriceOutside;
-     }
+     public double DropOffOutsideCost(int dropOffStepsOutside) => dropOffStepsOutside * StepPriceOutside;
 
-     public double TotalDistanceCost(double totalDistance, Urgency urgency)
-     {
-          return urgency.PriceCoefficient * totalDistance;
-     }
+     public double TotalDistanceCost(double totalDistance, Urgency urgency) => urgency.PriceCoefficient * totalDistance;
 
-     public double CalculateDeliveryPriceWithoutVat(
-          DateTimeOffset startDate,
+     public double CalculateDeliveryPriceWithoutVat(DateTimeOffset startDate,
           DateTimeOffset contractDate,
           int pickupNumber,
           int dropOffStepsInCore,
           int dropOffStepsInBorder,
           int dropOffStepsInPeriphery,
           int dropOffStepsOutside,
-          PackingSize packingSize,
           Urgency urgency,
           double totalDistance,
           double discount,
@@ -80,7 +54,7 @@ public class SimpleDeliveryStrategy : IPricingStrategy
                inBorderCost +
                inPeripheryCost +
                outsideCost +
-               packingSize.Price +
+               //TODO packingSize.Price +
                distanceCost +
                extraCost - discount
                , 2);

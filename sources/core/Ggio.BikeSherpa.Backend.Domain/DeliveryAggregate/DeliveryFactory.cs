@@ -8,7 +8,6 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-
 public record DeliveryFactoryParameters(
      PricingStrategy PricingStrategy,
      Guid CustomerId,
@@ -17,7 +16,6 @@ public record DeliveryFactoryParameters(
      double? Discount,
      double? ExtraCost,
      string[] Details,
-     PackingSize PackingSize,
      bool InsulatedBox,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate,
@@ -49,7 +47,6 @@ public class DeliveryFactory(
                ExtraCost = parameters.ExtraCost,
                Details = parameters.Details,
                Steps = [],
-               PackingSize = parameters.PackingSize,
                InsulatedBox = parameters.InsulatedBox,
                ContractDate = parameters.ContractDate,
                StartDate = parameters.StartDate,

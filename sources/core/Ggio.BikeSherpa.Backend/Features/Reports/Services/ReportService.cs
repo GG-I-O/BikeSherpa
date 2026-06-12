@@ -116,7 +116,7 @@ public class ReportService(
                     deliveryReport.Details.Add(new DeliveryReportDetail
                     {
                          Description = "Colisage",
-                         Price = delivery.PackingSize.Price,
+                         Price =  0, //TODO delivery.PackingSize.Price,
                          Quantity = 1
                     });
 
@@ -124,7 +124,7 @@ public class ReportService(
                     deliveryReport.Details.Add(new DeliveryReportDetail
                     {
                          Description = "Colisage",
-                         Price = delivery.PackingSize.TourPrice,
+                         Price = 0, //TODO delivery.PackingSize.TourPrice,
                          Quantity = 1
                     });
 

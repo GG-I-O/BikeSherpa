@@ -14,7 +14,6 @@ public interface IPricingStrategy
           int dropOffStepsInBorder,
           int dropOffStepsInPeriphery,
           int dropOffStepsOutside,
-          PackingSize packingSize,
           Urgency urgency,
           double totalDistance,
           double discount,

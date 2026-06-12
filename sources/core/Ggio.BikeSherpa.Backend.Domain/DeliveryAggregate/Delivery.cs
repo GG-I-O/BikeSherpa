@@ -29,7 +29,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public string? CustomerReference { get; set; }
      public required List<DeliveryStep> Steps { get; set; } = [];
      public string[] Details { get; set; } = [];
-     public required PackingSize PackingSize { get; set; }
      public required bool InsulatedBox { get; set; }
      public required DateTimeOffset StartDate { get; set; }
      public required DateTimeOffset ContractDate { get; set; }
@@ -201,6 +200,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           Address stepAddress,
           string? comment,
           bool notBilled,
+          PackingSize packingSize,
           IDeliveryZoneRepository deliveryZones,
           IPricingStrategyService pricingStrategyService,
           IItinerarySpi itineraryService)
@@ -215,7 +215,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                StepAddress = stepAddress,
                StepZone = deliveryZones.GetByAddress(stepAddress.City),
                ParentDelivery = this,
-               NotBilled = notBilled
+               NotBilled = notBilled,
+               PackingSize = packingSize
           };
 
           newStep.Distance = await GetDistanceAsync(newStep, itineraryService);
@@ -281,7 +282,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          StepAddress = steps[index].StepAddress,
                          StepZone = deliveryZones.GetByAddress(steps[index].StepAddress.City),
                          ParentDelivery = this,
-                         NotBilled = steps[index].NotBilled
+                         NotBilled = steps[index].NotBilled,
+                         PackingSize = steps[index].PackingSize
                     };
                }
                else
@@ -295,7 +297,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          steps[index].Distance,
                          steps[index].Comment,
                          steps[index].NotBilled,
-                         steps[index].EstimatedDeliveryDate);
+                         steps[index].EstimatedDeliveryDate,
+                         steps[index].PackingSize
+                    );
 
                     steps[index] = existing;
                }

@@ -14,7 +14,7 @@ public class PricingStrategyService(
           {
                return (double)delivery.TotalPrice!;
           }
-          
+
           var pickupCount = delivery.Steps.Count(s => s.StepType == StepType.Pickup);
           var dropOffsInCore = delivery.Steps.Count(s => s.StepZone.Name == StepZone.InCore && s.StepType == StepType.Dropoff);
           var dropOffsInBorder = delivery.Steps.Count(s => s.StepZone.Name == StepZone.InBorder && s.StepType == StepType.Dropoff);
@@ -22,7 +22,7 @@ public class PricingStrategyService(
           var dropOffsOutside = delivery.Steps.Count(s => s.StepZone.Name == StepZone.Outside && s.StepType == StepType.Dropoff);
 
           var totalDistance = delivery.Steps.Where(s => !s.NotBilled).Sum(s => s.Distance);
-          
+
           var price = strategy.CalculateDeliveryPriceWithoutVat(
                delivery.StartDate,
                delivery.ContractDate,
@@ -31,13 +31,12 @@ public class PricingStrategyService(
                dropOffsInBorder,
                dropOffsInPeriphery,
                dropOffsOutside,
-               delivery.PackingSize,
                delivery.Urgency,
                totalDistance,
                delivery.Discount ?? 0,
                delivery.ExtraCost ?? 0
           );
-          
+
           return price;
      }
 }

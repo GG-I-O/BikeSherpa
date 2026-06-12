@@ -4,17 +4,15 @@ using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
-using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Moq;
+using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 
 namespace Backend.Domain.Tests.DeliveryAggregate.Services.PricingStrategy;
 
 public class PricingStrategyServiceTests
 {
-     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private static DateTimeOffset _startDate;
      private static DateTimeOffset _contractDate;
      private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null, 12);
@@ -24,6 +22,7 @@ public class PricingStrategyServiceTests
      private readonly static DeliveryZone PeripheryZone = new("Périphérie");
      private readonly static DeliveryZone OutsideZone = new("Extérieur");
      private static Address? _defaultAddress;
+     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly Mock<IPricingStrategy> _mockPricingStrategy;
      private readonly PricingStrategyService _sut;
@@ -44,7 +43,6 @@ public class PricingStrategyServiceTests
                     It.IsAny<int>(),
                     It.IsAny<int>(),
                     It.IsAny<int>(),
-                    It.IsAny<PackingSize>(),
                     It.IsAny<Urgency>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
@@ -87,18 +85,15 @@ public class PricingStrategyServiceTests
           return delivery;
      }
 
-     private static DeliveryStep MakeStep(Delivery parentDelivery, StepType type, DeliveryZone zone, double distance = 0, bool notBilled = false)
+     private static DeliveryStep MakeStep(Delivery parentDelivery, StepType type, DeliveryZone zone, double distance = 0, bool notBilled = false) => new(type, 1, _defaultAddress!)
      {
-          return new DeliveryStep(type, 1, _defaultAddress!)
-          {
-               Id = Guid.NewGuid(),
-               StepAddress = _defaultAddress!,
-               StepZone = zone,
-               Distance = distance,
-               ParentDelivery = parentDelivery,
-               NotBilled = notBilled
-          };
-     }
+          Id = Guid.NewGuid(),
+          StepAddress = _defaultAddress!,
+          StepZone = zone,
+          Distance = distance,
+          ParentDelivery = parentDelivery,
+          NotBilled = notBilled
+     };
 
      private PricingStrategyService MakeSutWith(
           params IPricingStrategy[] strategies) =>
@@ -118,7 +113,6 @@ public class PricingStrategyServiceTests
                     It.IsAny<int>(),
                     It.IsAny<int>(),
                     It.IsAny<int>(),
-                    It.IsAny<PackingSize>(),
                     It.IsAny<Urgency>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
@@ -135,7 +129,6 @@ public class PricingStrategyServiceTests
                     It.IsAny<int>(),
                     It.IsAny<int>(),
                     It.IsAny<int>(),
-                    It.IsAny<PackingSize>(),
                     It.IsAny<Urgency>(),
                     It.IsAny<double>(),
                     It.IsAny<double>(),
@@ -143,7 +136,7 @@ public class PricingStrategyServiceTests
                .Returns(99.0);
 
           // Act
-          var sut = MakeSutWith(strategies: [matchingMock.Object, otherMock.Object]);
+          var sut = MakeSutWith([matchingMock.Object, otherMock.Object]);
           var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
           // Assert
@@ -156,7 +149,6 @@ public class PricingStrategyServiceTests
                It.IsAny<int>(),
                It.IsAny<int>(),
                It.IsAny<int>(),
-               It.IsAny<PackingSize>(),
                It.IsAny<Urgency>(),
                It.IsAny<double>(),
                It.IsAny<double>(),
@@ -170,7 +162,6 @@ public class PricingStrategyServiceTests
                It.IsAny<int>(),
                It.IsAny<int>(),
                It.IsAny<int>(),
-               It.IsAny<PackingSize>(),
                It.IsAny<Urgency>(),
                It.IsAny<double>(),
                It.IsAny<double>(),
@@ -183,11 +174,11 @@ public class PricingStrategyServiceTests
           // Arrange
           var customMock = new Mock<IPricingStrategy>();
           customMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.CustomStrategy);
-          var sut = MakeSutWith(strategies: [customMock.Object]);
+          var sut = MakeSutWith([customMock.Object]);
 
           // Act
           var result = sut.CalculateDeliveryPriceWithoutVat(
-               MakeDelivery(pricingStrategy: PricingStrategyEnum.CustomStrategy, totalPrice: 99.5));
+               MakeDelivery(PricingStrategyEnum.CustomStrategy, totalPrice: 99.5));
 
           // Assert
           result.Should().Be(99.5);
@@ -199,7 +190,6 @@ public class PricingStrategyServiceTests
                It.IsAny<int>(),
                It.IsAny<int>(),
                It.IsAny<int>(),
-               It.IsAny<PackingSize>(),
                It.IsAny<Urgency>(),
                It.IsAny<double>(),
                It.IsAny<double>(),
@@ -212,7 +202,7 @@ public class PricingStrategyServiceTests
           // Arrange
           var tourMock = new Mock<IPricingStrategy>();
           tourMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.TourDeliveryStrategy);
-          var sut = MakeSutWith(strategies: [tourMock.Object]);
+          var sut = MakeSutWith([tourMock.Object]);
 
           // Act
           var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(totalPrice: 123.45));
@@ -227,7 +217,6 @@ public class PricingStrategyServiceTests
                It.IsAny<int>(),
                It.IsAny<int>(),
                It.IsAny<int>(),
-               It.IsAny<PackingSize>(),
                It.IsAny<Urgency>(),
                It.IsAny<double>(),
                It.IsAny<double>(),
@@ -243,7 +232,7 @@ public class PricingStrategyServiceTests
           {
                MakeStep(delivery, StepType.Pickup, CoreZone),
                MakeStep(delivery, StepType.Pickup, CoreZone),
-               MakeStep(delivery, StepType.Dropoff, CoreZone),
+               MakeStep(delivery, StepType.Dropoff, CoreZone)
           };
 
           delivery.Steps = steps;
@@ -260,7 +249,6 @@ public class PricingStrategyServiceTests
                It.IsAny<int>(),
                It.IsAny<int>(),
                It.IsAny<int>(),
-               It.IsAny<PackingSize>(),
                It.IsAny<Urgency>(),
                It.IsAny<double>(),
                It.IsAny<double>(),
@@ -279,7 +267,7 @@ public class PricingStrategyServiceTests
                MakeStep(delivery, StepType.Dropoff, BorderZone),
                MakeStep(delivery, StepType.Dropoff, PeripheryZone),
                MakeStep(delivery, StepType.Dropoff, OutsideZone),
-               MakeStep(delivery, StepType.Dropoff, OutsideZone),
+               MakeStep(delivery, StepType.Dropoff, OutsideZone)
           };
 
           delivery.Steps = steps;
@@ -296,7 +284,6 @@ public class PricingStrategyServiceTests
                1,
                1,
                2,
-               It.IsAny<PackingSize>(),
                It.IsAny<Urgency>(),
                It.IsAny<double>(),
                It.IsAny<double>(),
@@ -312,8 +299,8 @@ public class PricingStrategyServiceTests
           var delivery = MakeDelivery();
           var steps = new List<DeliveryStep>
           {
-               MakeStep(delivery, StepType.Pickup, CoreZone, distance: distance1),
-               MakeStep(delivery, StepType.Dropoff, CoreZone, distance: distance2),
+               MakeStep(delivery, StepType.Pickup, CoreZone, distance1),
+               MakeStep(delivery, StepType.Dropoff, CoreZone, distance2)
           };
 
           delivery.Steps = steps;
@@ -330,7 +317,6 @@ public class PricingStrategyServiceTests
                It.IsAny<int>(),
                It.IsAny<int>(),
                It.IsAny<int>(),
-               It.IsAny<PackingSize>(),
                It.IsAny<Urgency>(),
                distance1 + distance2,
                It.IsAny<double>(),
@@ -346,9 +332,9 @@ public class PricingStrategyServiceTests
           var delivery = MakeDelivery();
           var steps = new List<DeliveryStep>
           {
-               MakeStep(delivery, StepType.Pickup, CoreZone, distance: distance1),
-               MakeStep(delivery, StepType.Dropoff, CoreZone, distance: distance2, notBilled: true),
-               MakeStep(delivery, StepType.Dropoff, CoreZone, distance: distance2),
+               MakeStep(delivery, StepType.Pickup, CoreZone, distance1),
+               MakeStep(delivery, StepType.Dropoff, CoreZone, distance2, true),
+               MakeStep(delivery, StepType.Dropoff, CoreZone, distance2)
           };
 
           delivery.Steps = steps;
@@ -365,13 +351,12 @@ public class PricingStrategyServiceTests
                It.IsAny<int>(),
                It.IsAny<int>(),
                It.IsAny<int>(),
-               It.IsAny<PackingSize>(),
                It.IsAny<Urgency>(),
                distance1 + distance2,
                It.IsAny<double>(),
                It.IsAny<double>()), Times.Once);
      }
-    
+
 
      [Fact]
      public void CalculatePrice_WhenDeliveryDistanceIsZero_SumsBillableStepsDistance()
@@ -382,8 +367,8 @@ public class PricingStrategyServiceTests
           var delivery = MakeDeliveryWithAdjustments(distance: 0);
           var steps = new List<DeliveryStep>
           {
-               MakeStep(delivery, StepType.Pickup, CoreZone, distance: billableDistance),
-               MakeStep(delivery, StepType.Dropoff, CoreZone, distance: ignoredDistance, notBilled: true),
+               MakeStep(delivery, StepType.Pickup, CoreZone, billableDistance),
+               MakeStep(delivery, StepType.Dropoff, CoreZone, ignoredDistance, true)
           };
 
           delivery.Steps = steps;
@@ -400,7 +385,6 @@ public class PricingStrategyServiceTests
                It.IsAny<int>(),
                It.IsAny<int>(),
                It.IsAny<int>(),
-               It.IsAny<PackingSize>(),
                It.IsAny<Urgency>(),
                billableDistance,
                It.IsAny<double>(),
@@ -425,7 +409,6 @@ public class PricingStrategyServiceTests
                It.IsAny<int>(),
                It.IsAny<int>(),
                It.IsAny<int>(),
-               packing,
                It.IsAny<Urgency>(),
                It.IsAny<double>(),
                It.IsAny<double>(),
