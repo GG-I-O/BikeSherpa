@@ -5,12 +5,13 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 
 public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, DeliveryStep>,
-     IFacetMapConfiguration<DeliveryStep, DeliveryStepCrud>
+     IFacetMapConfiguration<DeliveryStep, DeliveryStepCrud>, IFacetMapConfigurationInstance<DeliveryStep, DeliveryStepCrud>
 {
      public static void Map(DeliveryStep source, DeliveryStepCrud target)
      {
           target.PackingSize = source.PackingSize.Name;
      }
+
 
      public static void Map(DeliveryStepCrud source, DeliveryStep target)
      {
@@ -22,6 +23,11 @@ public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, D
           target.RealDeliveryDate = source.RealDeliveryDate;
           target.CreatedAt = source.CreatedAt;
           target.UpdatedAt = source.UpdatedAt;
+     }
+
+     void IFacetMapConfigurationInstance<DeliveryStep, DeliveryStepCrud>.Map(DeliveryStep source, DeliveryStepCrud target)
+     {
+          Map(source, target);
      }
 
      public static DeliveryStep Map(DeliveryStepCrud source, IPackingSizeRepository packingSizeRepository)

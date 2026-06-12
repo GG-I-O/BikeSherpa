@@ -11,7 +11,7 @@ public class DeliveryCrudMapper : IFacetMapConfiguration<Delivery, DeliveryCrud>
           target.Steps = source.Steps
                .Select(step => new DeliveryStepDto
                {
-                    Data = step.ToFacet<DeliveryStep, DeliveryStepCrud>()
+                    Data = step.ToFacet<DeliveryStep, DeliveryStepCrud>(new DeliveryStepCrudMapper())
                })
                .ToList();
 
