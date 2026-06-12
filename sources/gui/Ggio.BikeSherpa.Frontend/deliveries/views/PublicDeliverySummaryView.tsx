@@ -1,10 +1,11 @@
 import {publicDeliveryStore$} from "@/deliveries/store/publicDeliveryStore";
 import {View} from "react-native";
-import {Divider, Text} from "react-native-paper";
+import {Divider, Text, useTheme} from "react-native-paper";
 import AppStyle from "@/constants/AppStyle";
 import DateToolbox from "@/services/DateToolbox";
 
 export default function PublicDeliverySummaryView() {
+    const theme = useTheme();
     
     const delivery = publicDeliveryStore$.delivery.get();
     const customer = publicDeliveryStore$.customer.get();
@@ -12,14 +13,14 @@ export default function PublicDeliverySummaryView() {
     
     if (!delivery || !customer || !estimatedValue)
         return (
-            <View>
+            <View style={{backgroundColor: theme.colors.background, alignItems: 'center', justifyContent: 'center'}}>
                 <Text>Erreur lors du chargement du résumé de la commande</Text>
                 <Text>Vérifiez vos emails pour obtenir la confirmation de votre commande</Text>
             </View>
         );
     
     return (
-        <View style={{gap: 16, paddingInline: 32}}>
+        <View style={{gap: 16, paddingInline: 32, backgroundColor: theme.colors.background}}>
             <Text style={AppStyle.textStyle.h1}>{`Commande pour ${customer.name} `}</Text>
             <Text>Vous allez recevoir un mail de confirmation</Text>
             {delivery.steps.map((step, index) => (

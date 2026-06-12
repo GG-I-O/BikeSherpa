@@ -5,15 +5,19 @@ import {Stack} from "expo-router";
 import React from "react";
 import PublicDeliveryErrorModal from "@/deliveries/components/PublicDeliveryErrorModal";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
+import {useTheme} from "react-native-paper";
+import {ScrollView, View} from "react-native";
 
 export default function PublicDeliveryFormView() {
+    const theme = useTheme();
+    
     const customer = publicDeliveryStore$.customer.get();
     const isAnonymous = publicDeliveryStore$.isAnonymous.get();
 
     const {isErrorModalVisible, setIsErrorModalVisible, onErrorModalDismiss} = usePublicDeliveryModal();
     
     return (
-        <>
+        <ScrollView style={{ backgroundColor: theme.colors.background}}>
             <PublicDeliveryErrorModal
                 visible={isErrorModalVisible}
                 setVisible={setIsErrorModalVisible}
@@ -26,6 +30,6 @@ export default function PublicDeliveryFormView() {
             ) : (
                 <PublicDeliveryAnonymousForm/>
             )}
-        </>
+        </ScrollView>
     );
 }

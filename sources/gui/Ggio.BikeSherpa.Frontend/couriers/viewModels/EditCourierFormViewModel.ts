@@ -28,6 +28,9 @@ export default class EditCourierFormViewModel {
     };
 
     public getEditCourierSchema(courierToEdit: Courier, courierList: Courier[]) {
+        if (courierList.length === 0)
+            return courierFormBaseSchema;
+        
         const originalCode = courierToEdit.code;
 
         return courierFormBaseSchema

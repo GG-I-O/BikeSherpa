@@ -66,7 +66,7 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
                 value={isAnArray ? field.value[0] : field.value}
                 onChangeText={(value) => onChange(value)}
                 placeholder={placeholder}
-                placeholderTextColor={placeholderTextColor || '#3636367e'}
+                placeholderTextColor={placeholderTextColor || theme.colors.outline}
                 secureTextEntry={secureTextEntry}
                 mode='outlined'
                 style={[formStyle.input,

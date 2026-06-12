@@ -1,7 +1,7 @@
-import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import Customer from "../models/Customer";
-import { ICustomerService } from "@/spi/CustomerSPI";
-import { inject } from "inversify";
+import {ICustomerService} from "@/spi/CustomerSPI";
+import {inject} from "inversify";
 import {customerFormBaseSchema, CustomerFormValues} from "./zod/customerFormBaseSchema";
 
 export default class EditCustomerFormViewModel {
@@ -27,6 +27,9 @@ export default class EditCustomerFormViewModel {
     };
 
     public getEditCustomerSchema(customerToEdit: Customer, customerList: Customer[]) {
+        if (customerList.length === 0)
+            return customerFormBaseSchema;
+
         const originalCode = customerToEdit.code;
 
         return customerFormBaseSchema

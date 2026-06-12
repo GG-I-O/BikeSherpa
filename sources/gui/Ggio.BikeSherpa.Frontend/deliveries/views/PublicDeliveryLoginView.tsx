@@ -1,6 +1,6 @@
 import {View} from "react-native";
 import ThemedInput from "@/components/themed/ThemedInput";
-import {Button, Divider, Text} from "react-native-paper";
+import {Button, Divider, Text, useTheme} from "react-native-paper";
 import formStyle from "@/style/formStyle";
 import React from "react";
 import usePublicDeliveryLoginViewModel from "@/deliveries/viewModel/usePublicDeliveryLoginViewModel";
@@ -8,12 +8,17 @@ import LoadingModal from "@/components/general/LoadingModal";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 
 export default function PublicDeliveryLoginView() {
+    const theme = useTheme();
     const viewModel = usePublicDeliveryLoginViewModel();
     
     const { isLoadingModalVisible} = usePublicDeliveryModal();
 
     return (
-        <>
+        <View style={{
+            backgroundColor: theme.colors.background,
+            width: '100%',
+            height: '100%'
+        }}>
             <LoadingModal visible={isLoadingModalVisible}/>
 
             <View style={{
@@ -57,6 +62,6 @@ export default function PublicDeliveryLoginView() {
                     <Text>{"Je n'ai pas d'identifiant"}</Text>
                 </Button>
             </View>
-        </>
+        </View>
     );
 }
