@@ -8,7 +8,9 @@ export default class InputDelivery {
     public urgency: string;
     public totalPrice: number | null;
     public discount: number | null;
+    public discountReason: string | null;
     public extraCost: number | null;
+    public extraCostReason: string | null;
     public steps: Step[];
     public details: string[];
     public insulatedBox: boolean;
@@ -26,7 +28,9 @@ export default class InputDelivery {
         urgency: string,
         totalPrice: number, 
         discount: number,
+        discountReason: string,
         extraCost: number,
+        extraCostReason: string,
         steps: Step[],
         details: string[],
         insulatedBox: boolean,
@@ -43,7 +47,9 @@ export default class InputDelivery {
         this.urgency = urgency;
         this.totalPrice = totalPrice;
         this.discount = discount;
+        this.discountReason = discountReason;
         this.extraCost = extraCost;
+        this.extraCostReason = extraCostReason;
         this.steps = steps;
         this.details = details;
         this.insulatedBox = insulatedBox;

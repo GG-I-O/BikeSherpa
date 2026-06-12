@@ -99,6 +99,14 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 isNumeric
             />
             <ThemedInput
+                testID="deliveryFormDiscountReasonInput"
+                control={control}
+                name="discountReason"
+                error={errors.discountReason as FieldError | undefined}
+                label="Raison de la remise"
+                placeholder="Je suis gentil"
+            />
+            <ThemedInput
                 testID="deliveryFormDiscountInput"
                 control={control}
                 name="extraCost"
@@ -106,6 +114,14 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 label="Surcout (en €)"
                 placeholder="0"
                 isNumeric
+            />
+            <ThemedInput
+                testID="deliveryFormExtraCostReasonInput"
+                control={control}
+                name="extraCostReason"
+                error={errors.extraCostReason as FieldError | undefined}
+                label="Raison du Surcout"
+                placeholder="J'avais envie"
             />
             <ThemedInput
                 testID="deliveryFormDetailsInput"
