@@ -20,7 +20,9 @@ public record AddDeliveryCommand(
      bool InsulatedBox,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate,
-     bool NeedEstimate
+     bool NeedEstimate,
+     string? DiscountReason,
+     string? ExtraCostReason
 ) : ICommand<Result<Guid>>;
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
@@ -61,7 +63,9 @@ public class AddDeliveryHandler(
                     command.InsulatedBox,
                     command.ContractDate,
                     command.StartDate,
-                    command.NeedEstimate
+                    command.NeedEstimate,
+                    command.DiscountReason,
+                    command.ExtraCostReason
                )
           );
 

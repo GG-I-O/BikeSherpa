@@ -32,7 +32,9 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
                req.Details,
                req.InsulatedBox,
                req.ContractDate,
-               req.StartDate
+               req.StartDate,
+               req.DiscountReason,
+               req.ExtraCostReason
           );
 
           var result = await mediator.Send(command, ct);

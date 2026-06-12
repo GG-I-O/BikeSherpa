@@ -3,6 +3,7 @@ using System;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(BackendDbContext))]
-    partial class BackendDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260612091412_AddDusiscountAndExtracostReasons")]
+    partial class AddDusiscountAndExtracostReasons
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,6 +247,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.Property<bool>("NeedEstimate")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("PackingSizeName")
+                        .IsRequired()
+                        .HasColumnType("character varying(100)");
+
                     b.Property<int>("PricingStrategy")
                         .HasColumnType("integer");
 
@@ -264,6 +271,8 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PackingSizeName");
 
                     b.HasIndex("UrgencyName");
 
@@ -609,6 +618,12 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery", b =>
                 {
+                    b.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PackingSize", "PackingSize")
+                        .WithMany()
+                        .HasForeignKey("PackingSizeName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Urgency", "Urgency")
                         .WithMany()
                         .HasForeignKey("UrgencyName")
@@ -653,10 +668,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             b1.Property<int>("Order")
                                 .HasColumnType("integer");
 
-                            b1.Property<string>("PackingSizeName")
-                                .IsRequired()
-                                .HasColumnType("character varying(100)");
-
                             b1.Property<DateTimeOffset?>("RealDeliveryDate")
                                 .HasColumnType("timestamp with time zone");
 
@@ -674,20 +685,12 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.HasIndex("DeliveryId");
 
-                            b1.HasIndex("PackingSizeName");
-
                             b1.HasIndex("StepZoneName");
 
                             b1.ToTable("DeliverySteps", (string)null);
 
                             b1.WithOwner("ParentDelivery")
                                 .HasForeignKey("DeliveryId");
-
-                            b1.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PackingSize", "PackingSize")
-                                .WithMany()
-                                .HasForeignKey("PackingSizeName")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
 
                             b1.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryZone", "StepZone")
                                 .WithMany()
@@ -740,8 +743,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                                         .HasForeignKey("DeliveryStepId");
                                 });
 
-                            b1.Navigation("PackingSize");
-
                             b1.Navigation("ParentDelivery");
 
                             b1.Navigation("StepAddress")
@@ -749,6 +750,8 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.Navigation("StepZone");
                         });
+
+                    b.Navigation("PackingSize");
 
                     b.Navigation("Steps");
 

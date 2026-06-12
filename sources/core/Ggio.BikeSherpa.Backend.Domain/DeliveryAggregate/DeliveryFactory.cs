@@ -19,7 +19,9 @@ public record DeliveryFactoryParameters(
      bool InsulatedBox,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate,
-     bool NeedEstimate);
+     bool NeedEstimate,
+     string? DiscountReason,
+     string? ExtraCostReason);
 
 public interface IDeliveryFactory
 {
@@ -50,7 +52,9 @@ public class DeliveryFactory(
                InsulatedBox = parameters.InsulatedBox,
                ContractDate = parameters.ContractDate,
                StartDate = parameters.StartDate,
-               NeedEstimate = parameters.NeedEstimate
+               NeedEstimate = parameters.NeedEstimate,
+               DiscountReason = parameters.DiscountReason,
+               ExtraCostReason = parameters.ExtraCostReason
           };
 
           var customer = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(parameters.CustomerId));

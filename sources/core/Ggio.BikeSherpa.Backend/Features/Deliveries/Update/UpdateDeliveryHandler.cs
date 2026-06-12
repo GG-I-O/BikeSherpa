@@ -28,7 +28,9 @@ public record UpdateDeliveryCommand(
      string[] Details,
      bool InsulatedBox,
      DateTimeOffset ContractDate,
-     DateTimeOffset StartDate
+     DateTimeOffset StartDate,
+     string? DiscountReason,
+     string? ExtraCostReason
 ) : ICommand<Result>;
 
 public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCommand>
@@ -91,6 +93,8 @@ public class UpdateDeliveryHandler(
           entity.InsulatedBox = command.InsulatedBox;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
+          entity.DiscountReason = command.DiscountReason;
+          entity.ExtraCostReason = command.ExtraCostReason;
 
           var steps = command.Steps
                .Select(step =>

@@ -25,7 +25,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required Urgency Urgency { get; set; }
      public double? TotalPrice { get; set; }
      public double? Discount { get; set; }
+     public string? DiscountReason { get; set; }
      public double? ExtraCost { get; set; }
+     public string? ExtraCostReason { get; set; }
      public string? CustomerReference { get; set; }
      public required List<DeliveryStep> Steps { get; set; } = [];
      public string[] Details { get; set; } = [];

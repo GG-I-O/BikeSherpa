@@ -1,4 +1,4 @@
-﻿using Ardalis.Specification;
+using Ardalis.Specification;
 using AutoFixture;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
@@ -84,7 +84,9 @@ public class DeliveryFactoryTests
                     insulatedBox,
                     contractDate ?? ContractDate,
                     startDate ?? StartDate,
-                    needEstimate ?? NeedEstimate
+                    needEstimate ?? NeedEstimate,
+                    null,
+                    null
                )
           );
 
