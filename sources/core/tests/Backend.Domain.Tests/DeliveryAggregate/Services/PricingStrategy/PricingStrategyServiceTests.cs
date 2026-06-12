@@ -35,18 +35,7 @@ public class PricingStrategyServiceTests
           _defaultAddress = _fixture.Create<Address>();
           _mockPricingStrategy.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
           _mockPricingStrategy
-               .Setup(s => s.CalculateDeliveryPriceWithoutVat(
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<Urgency>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>()))
+               .Setup(s => s.CalculateDeliveryPriceWithoutVat(TODO))
                .Returns(0);
 
           _sut = new PricingStrategyService([_mockPricingStrategy.Object]);
@@ -110,34 +99,12 @@ public class PricingStrategyServiceTests
           // Arrange
           var matchingMock = new Mock<IPricingStrategy>();
           matchingMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
-          matchingMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<Urgency>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>()))
+          matchingMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(TODO))
                .Returns(42.0);
 
           var otherMock = new Mock<IPricingStrategy>();
           otherMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.TourDeliveryStrategy);
-          otherMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<DateTimeOffset>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<int>(),
-                    It.IsAny<Urgency>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>(),
-                    It.IsAny<double>()))
+          otherMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(TODO))
                .Returns(99.0);
 
           // Act
@@ -146,31 +113,9 @@ public class PricingStrategyServiceTests
 
           // Assert
           result.Should().Be(42.0);
-          matchingMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<Urgency>(),
-               It.IsAny<double>(),
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Once);
+          matchingMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
 
-          otherMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<Urgency>(),
-               It.IsAny<double>(),
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Never);
+          otherMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Never);
      }
 
      [Fact]
@@ -187,18 +132,7 @@ public class PricingStrategyServiceTests
 
           // Assert
           result.Should().Be(99.5);
-          customMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<Urgency>(),
-               It.IsAny<double>(),
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Never);
+          customMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Never);
      }
 
      [Fact]
@@ -214,18 +148,7 @@ public class PricingStrategyServiceTests
 
           // Assert
           result.Should().Be(123.45);
-          tourMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<Urgency>(),
-               It.IsAny<double>(),
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Never);
+          tourMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Never);
      }
 
      [Fact]
@@ -246,18 +169,7 @@ public class PricingStrategyServiceTests
           _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               2,
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<Urgency>(),
-               It.IsAny<double>(),
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
      }
 
      [Fact]
@@ -281,18 +193,7 @@ public class PricingStrategyServiceTests
           _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               2,
-               1,
-               1,
-               2,
-               It.IsAny<Urgency>(),
-               It.IsAny<double>(),
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
      }
 
      [Fact]
@@ -314,18 +215,7 @@ public class PricingStrategyServiceTests
           _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<Urgency>(),
-               distance1 + distance2,
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
      }
 
      [Fact]
@@ -348,18 +238,7 @@ public class PricingStrategyServiceTests
           _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<Urgency>(),
-               distance1 + distance2,
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
      }
 
 
@@ -382,18 +261,7 @@ public class PricingStrategyServiceTests
           _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<Urgency>(),
-               billableDistance,
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
      }
 
      [Fact]
@@ -406,17 +274,6 @@ public class PricingStrategyServiceTests
           _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<DateTimeOffset>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<int>(),
-               It.IsAny<Urgency>(),
-               It.IsAny<double>(),
-               It.IsAny<double>(),
-               It.IsAny<double>()), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
      }
 }

@@ -1,4 +1,4 @@
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.StaticData.PackingSizes.Model;
 using Mediator;
 

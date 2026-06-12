@@ -20,10 +20,10 @@ public class DeliveryZoneConfiguration : IEntityTypeConfiguration<DeliveryZone>
           builder.Navigation(z => z.Cities).AutoInclude();
 
           builder.HasData(
-               new { Name = "Centre" },
-               new { Name = "Limitrophe" },
-               new { Name = "Périphérie" },
-               new { Name = DeliveryZoneRepository.FallbackZoneForUnknownCity }
+               new { Name = "Centre", TourPrice = 5.0, SimplePrice = 1.0 },
+               new { Name = "Limitrophe", TourPrice = 8.0, SimplePrice = 2.5 },
+               new { Name = "Périphérie", TourPrice = 0.0, SimplePrice = 5.5 },
+               new { Name = DeliveryZoneRepository.FallbackZoneForUnknownCity, TourPrice = 0.0, SimplePrice = 11.0 }
           );
      }
 }

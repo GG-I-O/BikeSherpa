@@ -147,10 +147,6 @@ public class ReportServiceTests
      {
           // Arrange
           _pricingStrategyMock
-               .Setup(s => s.SameDayExtraCost(_startDate, _contractDate))
-               .Returns(2);
-
-          _pricingStrategyMock
                .Setup(s => s.DelayCost(_startDate, _contractDate))
                .Returns(-2);
 
@@ -180,10 +176,10 @@ public class ReportServiceTests
      {
           // Arrange
           _pricingStrategyMock.Setup(s => s.PickupCost(2)).Returns(14);
-          _pricingStrategyMock.Setup(s => s.DropOffInCoreCost(2)).Returns(10);
-          _pricingStrategyMock.Setup(s => s.DropOffInBorderCost(1)).Returns(8);
-          _pricingStrategyMock.Setup(s => s.DropOffInPeripheryCost(1)).Returns(5.5);
-          _pricingStrategyMock.Setup(s => s.DropOffOutsideCost(2)).Returns(22);
+          _pricingStrategyMock.Setup(s => s.GetStepsInCoreCost(2)).Returns(10);
+          _pricingStrategyMock.Setup(s => s.GetStepsInBorderCost(1)).Returns(8);
+          _pricingStrategyMock.Setup(s => s.GetStepsInPeripheryCost(1)).Returns(5.5);
+          _pricingStrategyMock.Setup(s => s.GetOutsideStepsCost(2)).Returns(22);
 
           var delivery = MakeDelivery();
           delivery.Steps =
@@ -312,8 +308,7 @@ public class ReportServiceTests
      {
           // Arrange
           var packingSize = new PackingSize("Small", 1, "Small", 3, 10);
-          var delivery = MakeDelivery(
-               pricingStrategy: PricingStrategyEnum.SimpleDeliveryStrategy);
+          var delivery = MakeDelivery();
 
           // Act
           var report = _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
@@ -322,7 +317,7 @@ public class ReportServiceTests
           report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
           {
                Description = "Colisage",
-               packingSize.Price,
+               Price = packingSize.SimplePrice,
                Quantity = 1
           });
      }
@@ -340,7 +335,7 @@ public class ReportServiceTests
 
           var packingSize = new PackingSize("Large", 2, "Large", 3, 10);
           var delivery = MakeDelivery(
-               pricingStrategy: PricingStrategyEnum.TourDeliveryStrategy);
+               PricingStrategyEnum.TourDeliveryStrategy);
 
           // Act
           var report = sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
@@ -390,7 +385,7 @@ public class ReportServiceTests
 
           var sut = MakeSutWith(tourStrategyMock.Object);
 
-          var delivery = MakeDelivery(PricingStrategyEnum.SimpleDeliveryStrategy);
+          var delivery = MakeDelivery();
 
           // Act
           var report = sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);

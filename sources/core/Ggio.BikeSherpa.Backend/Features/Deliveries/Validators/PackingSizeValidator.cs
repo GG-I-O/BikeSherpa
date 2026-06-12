@@ -1,5 +1,5 @@
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 

@@ -7,25 +7,16 @@ public interface IPricingStrategy
      PricingStrategy ImplementedStrategy { get; }
 
      double CalculateDeliveryPriceWithoutVat(
-          DateTimeOffset startDate,
-          DateTimeOffset contractDate,
-          int pickupNumber,
-          int dropOffStepsInCore,
-          int dropOffStepsInBorder,
-          int dropOffStepsInPeriphery,
-          int dropOffStepsOutside,
-          Urgency urgency,
-          double totalDistance,
-          double discount,
-          double extraCost
+          Delivery delivery
      );
 
-     double SameDayExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate);
      double DelayCost(DateTimeOffset startDate, DateTimeOffset contractDate);
-     double PickupCost(int pickupNumber);
-     double DropOffInCoreCost(int dropOffStepsInCore);
-     double DropOffInBorderCost(int dropOffStepsInBorder);
-     double DropOffInPeripheryCost(int dropOffStepsInPeriphery);
-     double DropOffOutsideCost(int dropOffStepsOutside);
+
+     double GetStepsInCoreCost(int dropOffStepsInCore);
+     double GetStepsInBorderCost(int dropOffStepsInBorder);
+     double GetStepsInPeripheryCost(int dropOffStepsInPeriphery);
+     double GetOutsideStepsCost(int dropOffStepsOutside);
      double TotalDistanceCost(double totalDistance, Urgency urgency);
+
+     public double GetPackingCost(DeliveryStep deliveryStep);
 }

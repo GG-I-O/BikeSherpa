@@ -14,7 +14,7 @@ public class PackingSizeConfiguration : IEntityTypeConfiguration<PackingSize>
           builder.Property(u => u.Label).IsRequired();
           builder.Property(s => s.Name).HasMaxLength(100).IsRequired();
           builder.Property(s => s.TourPrice).IsRequired();
-          builder.Property(s => s.Price).IsRequired();
+          builder.Property(s => s.SimplePrice).IsRequired();
           builder.HasData(
                new
                {

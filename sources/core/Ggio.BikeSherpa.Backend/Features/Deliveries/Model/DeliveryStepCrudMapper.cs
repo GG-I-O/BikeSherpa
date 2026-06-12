@@ -1,6 +1,6 @@
 using Facet.Mapping;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 

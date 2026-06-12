@@ -34,7 +34,7 @@ public class TourDeliveryStrategyTests
           var startDate = new DateTimeOffset(2026, 1, 14, 20, 0, 0, TimeSpan.Zero);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, pickupNumber, 0, 0, 0, 0, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(2 + expectedPickupCost);
@@ -49,7 +49,7 @@ public class TourDeliveryStrategyTests
           var startDate = BaseDate.AddHours(5);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(2);
@@ -64,7 +64,7 @@ public class TourDeliveryStrategyTests
           var startDate = new DateTimeOffset(2026, 1, 16, 10, 0, 0, TimeSpan.Zero);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(2);
@@ -79,7 +79,7 @@ public class TourDeliveryStrategyTests
           var startDate = BaseDate.AddHours(25);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(-2);
@@ -94,7 +94,7 @@ public class TourDeliveryStrategyTests
           var startDate = BaseDate.AddHours(1);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(2 + 3);
@@ -109,7 +109,7 @@ public class TourDeliveryStrategyTests
           var startDate = BaseDate.AddHours(2);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(2 + 3);
@@ -124,7 +124,7 @@ public class TourDeliveryStrategyTests
           var startDate = BaseDate.AddHours(6);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(2);
@@ -144,7 +144,7 @@ public class TourDeliveryStrategyTests
           var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, core, border, periphery, outside, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(2 + expectedZoneCost);
@@ -160,7 +160,7 @@ public class TourDeliveryStrategyTests
           var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(2 + 7.0);
@@ -176,8 +176,8 @@ public class TourDeliveryStrategyTests
           var urgency = DefaultUrgency with { PriceCoefficient = 10 };
 
           // Act
-          var resultWithoutUrgency = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, DefaultUrgency, 0, 0, 0);
-          var resultWithUrgency = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 0, 0, 0, 0, 0, urgency, 100, 0, 0);
+          var resultWithoutUrgency = sut.CalculateDeliveryPriceWithoutVat(TODO);
+          var resultWithUrgency = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           resultWithUrgency.Should().Be(resultWithoutUrgency);
@@ -193,7 +193,7 @@ public class TourDeliveryStrategyTests
           var startDate = new DateTimeOffset(2026, 1, 14, 16, 0, 0, TimeSpan.Zero);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(startDate, contractDate, 2, 1, 2, 1, 1, DefaultUrgency, 0, 0, 0);
+          var result = sut.CalculateDeliveryPriceWithoutVat(TODO);
 
           // Assert
           result.Should().Be(14 * 2 + 2 + 4 + 1 * 5 + 2 * 8 + 1 * 0 + 1 * 0,
