@@ -50,7 +50,7 @@ if [ -z "$GIT_VERSION" ]; then
 fi
 
 echo "Git Version detected: $GIT_VERSION"
-read -p "Contiune ?? " -n 1 -r
+read -p "Contine ?? [Yy] or else to stop " -n 1 -r
 
 
 if [[ ! $REPLY =~ ^[Yy]$ ]]
