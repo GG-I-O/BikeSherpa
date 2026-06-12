@@ -30,7 +30,6 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
                req.CustomerReference!,
                req.Steps.Select(dto => dto.Data).ToList(),
                req.Details,
-               req.PackingSize,
                req.InsulatedBox,
                req.ContractDate,
                req.StartDate

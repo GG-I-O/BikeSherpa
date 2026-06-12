@@ -1,5 +1,6 @@
 using Facet.Mapping;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 
@@ -16,8 +17,8 @@ public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, D
           target.CreatedAt = source.CreatedAt;
           target.UpdatedAt = source.UpdatedAt;
      }
-     
-     public static DeliveryStep Map(DeliveryStepCrud source)
+
+     public static DeliveryStep Map(DeliveryStepCrud source, IPackingSizeRepository packingSizeRepository)
      {
           var target = new DeliveryStep(source.StepType, source.Order, source.StepAddress, source.Comment)
           {
@@ -35,7 +36,9 @@ public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, D
                UpdatedAt = source.UpdatedAt,
                ParentDelivery = null!,
                StepAddress = source.StepAddress,
+               PackingSize = packingSizeRepository.GetByName(source.PackingSize) ?? throw new InvalidOperationException("Packing size not found")
           };
+
           Map(source, target);
           return target;
      }

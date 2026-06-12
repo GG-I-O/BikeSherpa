@@ -12,18 +12,17 @@ namespace BackendTests.Features.Reports.Services;
 
 public class ReportServiceTests
 {
-     private readonly Fixture _fixture = new();
-     private readonly Mock<IPricingStrategy> _pricingStrategyMock = new();
-
      private readonly static Urgency Urgency = new("Standard", 1, "Standard", 1, null, null, 12);
      private readonly static PackingSize PackingSize = new("Small", 1, "Small", 3, 10);
      private readonly static DeliveryZone CoreZone = new(StepZone.InCore);
      private readonly static DeliveryZone BorderZone = new(StepZone.InBorder);
      private readonly static DeliveryZone PeripheryZone = new(StepZone.InPeriphery);
      private readonly static DeliveryZone OutsideZone = new(StepZone.Outside);
+     private readonly DateTimeOffset _contractDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+     private readonly Fixture _fixture = new();
+     private readonly Mock<IPricingStrategy> _pricingStrategyMock = new();
 
      private readonly DateTimeOffset _startDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
-     private readonly DateTimeOffset _contractDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
      private readonly ReportService _sut;
 
      public ReportServiceTests()
@@ -44,32 +43,28 @@ public class ReportServiceTests
           double? discount = null,
           double? extraCost = null,
           List<DeliveryStep>? steps = null,
-          PackingSize? packingSize = null,
-          Urgency? urgency = null)
+          Urgency? urgency = null) => new()
      {
-          return new Delivery
-          {
-               PricingStrategy = pricingStrategy,
-               Code = code ?? _fixture.Create<string>(),
-               CustomerId = _fixture.Create<Guid>(),
-               Urgency = urgency ?? Urgency,
-               PackingSize = packingSize ?? PackingSize,
-               InsulatedBox = false,
-               ContractDate = contractDate ?? _contractDate,
-               StartDate = startDate ?? _startDate,
-               Steps = steps ?? [],
-               TotalPrice = totalPrice,
-               Discount = discount,
-               ExtraCost = extraCost
-          };
-     }
+          PricingStrategy = pricingStrategy,
+          Code = code ?? _fixture.Create<string>(),
+          CustomerId = _fixture.Create<Guid>(),
+          Urgency = urgency ?? Urgency,
+          InsulatedBox = false,
+          ContractDate = contractDate ?? _contractDate,
+          StartDate = startDate ?? _startDate,
+          Steps = steps ?? [],
+          TotalPrice = totalPrice,
+          Discount = discount,
+          ExtraCost = extraCost
+     };
 
      private DeliveryStep MakeStep(
           Delivery parentDelivery,
           StepType stepType,
           DeliveryZone zone,
           double distance = 0,
-          bool notBilled = false)
+          bool notBilled = false,
+          PackingSize? packingSize = null)
      {
           var address = _fixture.Create<Address>();
 
@@ -80,14 +75,12 @@ public class ReportServiceTests
                StepZone = zone,
                Distance = distance,
                ParentDelivery = parentDelivery,
-               NotBilled = notBilled
+               NotBilled = notBilled,
+               PackingSize = packingSize ?? new PackingSize("Small", 1, "Small", 3, 10)
           };
      }
 
-     private static ReportService MakeSutWith(params IPricingStrategy[] strategies)
-     {
-          return new ReportService(strategies);
-     }
+     private static ReportService MakeSutWith(params IPricingStrategy[] strategies) => new(strategies);
 
      [Fact]
      public void GenerateReport_MapsReportHeader()
@@ -254,10 +247,10 @@ public class ReportServiceTests
           var delivery = MakeDelivery();
           delivery.Steps =
           [
-               MakeStep(delivery, StepType.Pickup, CoreZone, distance: 10),
-               MakeStep(delivery, StepType.Dropoff, CoreZone, distance: 15)
+               MakeStep(delivery, StepType.Pickup, CoreZone, 10),
+               MakeStep(delivery, StepType.Dropoff, CoreZone, 15)
           ];
-          
+
           var totalDistance = delivery.Steps.Sum(s => s.Distance);
 
           _pricingStrategyMock
@@ -290,8 +283,8 @@ public class ReportServiceTests
           var delivery = MakeDelivery();
           delivery.Steps =
           [
-               MakeStep(delivery, StepType.Pickup, CoreZone, distance: billableDistance),
-               MakeStep(delivery, StepType.Dropoff, CoreZone, distance: ignoredDistance, notBilled: true)
+               MakeStep(delivery, StepType.Pickup, CoreZone, billableDistance),
+               MakeStep(delivery, StepType.Dropoff, CoreZone, ignoredDistance, true)
           ];
 
           _pricingStrategyMock
@@ -320,8 +313,7 @@ public class ReportServiceTests
           // Arrange
           var packingSize = new PackingSize("Small", 1, "Small", 3, 10);
           var delivery = MakeDelivery(
-               pricingStrategy: PricingStrategyEnum.SimpleDeliveryStrategy,
-               packingSize: packingSize);
+               pricingStrategy: PricingStrategyEnum.SimpleDeliveryStrategy);
 
           // Act
           var report = _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
@@ -348,8 +340,7 @@ public class ReportServiceTests
 
           var packingSize = new PackingSize("Large", 2, "Large", 3, 10);
           var delivery = MakeDelivery(
-               pricingStrategy: PricingStrategyEnum.TourDeliveryStrategy,
-               packingSize: packingSize);
+               pricingStrategy: PricingStrategyEnum.TourDeliveryStrategy);
 
           // Act
           var report = sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
@@ -399,7 +390,7 @@ public class ReportServiceTests
 
           var sut = MakeSutWith(tourStrategyMock.Object);
 
-          var delivery = MakeDelivery(pricingStrategy: PricingStrategyEnum.SimpleDeliveryStrategy);
+          var delivery = MakeDelivery(PricingStrategyEnum.SimpleDeliveryStrategy);
 
           // Act
           var report = sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);

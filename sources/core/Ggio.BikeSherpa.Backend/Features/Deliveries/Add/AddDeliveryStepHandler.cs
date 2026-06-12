@@ -7,6 +7,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Ggio.DddCore;
 using JetBrains.Annotations;
 using Mediator;
@@ -18,17 +19,19 @@ public record AddDeliveryStepCommand(
      StepType StepType,
      Address StepAddress,
      string? Comment,
-     bool NotBilled
+     bool NotBilled,
+     string PackingSize
 ) : ICommand<Result<Guid>>;
 
 [UsedImplicitly]
 public class AddDeliveryStepCommandValidator : AbstractValidator<AddDeliveryStepCommand>
 {
-     public AddDeliveryStepCommandValidator()
+     public AddDeliveryStepCommandValidator(IPackingSizeRepository packingSizeRepository)
      {
           RuleFor(x => x.DeliveryId).NotEmpty();
           RuleFor(x => x.StepType).IsInEnum();
           RuleFor(x => x.StepAddress).NotEmpty();
+          RuleFor(x => x.PackingSize).SetValidator(new PackingSizeValidator(packingSizeRepository));
      }
 }
 
@@ -38,7 +41,8 @@ public class AddDeliveryStepHandler(
      IReadRepository<Delivery> deliveryRepository,
      IDeliveryZoneRepository deliveryZones,
      IPricingStrategyService pricingStrategyService,
-     IItinerarySpi itineraryService
+     IItinerarySpi itineraryService,
+     IPackingSizeRepository packingSizeRepository
 ) : ICommandHandler<AddDeliveryStepCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryStepCommand command, CancellationToken cancellationToken)
@@ -52,7 +56,14 @@ public class AddDeliveryStepHandler(
                return Result<Guid>.NotFound();
           }
 
-          var deliveryStep = await delivery.AddStepAsync(command.StepType, command.StepAddress, command.Comment, command.NotBilled, deliveryZones, pricingStrategyService, itineraryService);
+          var deliveryStep = await delivery.AddStepAsync(command.StepType,
+               command.StepAddress,
+               command.Comment,
+               command.NotBilled,
+               packingSizeRepository.GetByName(command.PackingSize)!,
+               deliveryZones,
+               pricingStrategyService,
+               itineraryService);
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);

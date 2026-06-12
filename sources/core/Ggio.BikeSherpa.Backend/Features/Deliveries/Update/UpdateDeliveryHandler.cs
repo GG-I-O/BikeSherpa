@@ -26,7 +26,6 @@ public record UpdateDeliveryCommand(
      string ReportId,
      List<DeliveryStepCrud> Steps,
      string[] Details,
-     string PackingSize,
      bool InsulatedBox,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate
@@ -34,7 +33,7 @@ public record UpdateDeliveryCommand(
 
 public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCommand>
 {
-     public UpdateDeliveryCommandValidator(IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
+     public UpdateDeliveryCommandValidator(IUrgencyRepository urgencies)
      {
           RuleFor(x => x.Id).NotEmpty();
           RuleFor(x => x.PricingStrategy).IsInEnum();
@@ -51,9 +50,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                     step.RuleFor(s => s.EstimatedDeliveryDate).NotEmpty();
                });
 
-          RuleFor(x => x.PackingSize).SetValidator(new PackingSizeValidator(packingSizes));
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -80,7 +77,6 @@ public class UpdateDeliveryHandler(
           }
 
           var urgency = urgencyRepository.GetByName(command.Urgency)!;
-          var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
 
           entity.PricingStrategy = command.PricingStrategy;
           entity.Status = command.Status;
@@ -92,7 +88,6 @@ public class UpdateDeliveryHandler(
           entity.ExtraCost = command.ExtraCost;
           entity.CustomerReference = command.ReportId;
           entity.Details = command.Details;
-          entity.PackingSize = packingSize;
           entity.InsulatedBox = command.InsulatedBox;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
@@ -109,7 +104,8 @@ public class UpdateDeliveryHandler(
                          Id = step.Id,
                          StepAddress = step.StepAddress,
                          StepZone = step.StepZone,
-                         ParentDelivery = entity
+                         ParentDelivery = entity,
+                         PackingSize = packingSizeRepository.GetByName(step.PackingSize)!
                     };
 
                     DeliveryStepCrudMapper.Map(step, deliveryStep);

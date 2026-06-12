@@ -45,8 +45,7 @@ public class CalculateDeliveryPriceHandlerTest
                               .Create()
                     }
                ],
-               Urgency = urgency.Name,
-               PackingSize = packingSize.Name
+               Urgency = urgency.Name
           };
 
           var query = new CalculateDeliveryPriceQuery(deliveryCrud);
@@ -87,8 +86,7 @@ public class CalculateDeliveryPriceHandlerTest
 
                     }
                ],
-               Urgency = urgency.Name,
-               PackingSize = packingSize.Name
+               Urgency = urgency.Name
           };
 
           var query = new CalculateDeliveryPriceQuery(deliveryCrud);
@@ -141,8 +139,7 @@ public class CalculateDeliveryPriceHandlerTest
                               .Create()
                     }
                ],
-               Urgency = urgency.Name,
-               PackingSize = packingSize.Name
+               Urgency = urgency.Name
           };
 
           var query = new CalculateDeliveryPriceQuery(deliveryCrud);
@@ -175,7 +172,7 @@ public class CalculateDeliveryPriceHandlerTest
           return new CalculateDeliveryPriceHandler(pricingStrategyServiceMock.Object,
                urgencyMock.Object,
                packingSizeMock.Object,
-               new CalculateDeliveryPriceQueryValidator(urgencyMock.Object, packingSizeMock.Object),
+               new CalculateDeliveryPriceQueryValidator(urgencyMock.Object),
                itineraryService.Object,
                vatServiceMock.Object);
      }

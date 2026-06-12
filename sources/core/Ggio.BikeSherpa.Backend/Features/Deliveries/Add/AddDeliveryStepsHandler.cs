@@ -6,6 +6,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Ggio.DddCore;
 using JetBrains.Annotations;
 using Mediator;
@@ -20,7 +21,7 @@ public record AddDeliveryStepsCommand(
 [UsedImplicitly]
 public class AddDeliveryStepsCommandValidator : AbstractValidator<AddDeliveryStepsCommand>
 {
-     public AddDeliveryStepsCommandValidator()
+     public AddDeliveryStepsCommandValidator(IPackingSizeRepository packingSizeRepository)
      {
           RuleFor(x => x.DeliveryId).NotEmpty();
           RuleFor(x => x.Steps).NotEmpty();
@@ -28,6 +29,7 @@ public class AddDeliveryStepsCommandValidator : AbstractValidator<AddDeliverySte
           {
                step.RuleFor(x => x.StepType).IsInEnum();
                step.RuleFor(x => x.StepAddress).NotEmpty();
+               step.RuleFor(x => x.PackingSize).SetValidator(new PackingSizeValidator(packingSizeRepository));
           });
      }
 }
@@ -38,7 +40,8 @@ public class AddDeliveryStepsHandler(
      IReadRepository<Delivery> deliveryRepository,
      IDeliveryZoneRepository deliveryZones,
      IPricingStrategyService pricingStrategyService,
-     IItinerarySpi itineraryService
+     IItinerarySpi itineraryService,
+     IPackingSizeRepository packingSizeRepository
 ) : ICommandHandler<AddDeliveryStepsCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryStepsCommand command, CancellationToken cancellationToken)
@@ -56,9 +59,10 @@ public class AddDeliveryStepsHandler(
           {
                await delivery.AddStepAsync(
                     step.StepType,
-                    step.StepAddress, 
+                    step.StepAddress,
                     step.Comment,
                     step.NotBilled,
+                    packingSizeRepository.GetByName(step.PackingSize)!,
                     deliveryZones,
                     pricingStrategyService,
                     itineraryService

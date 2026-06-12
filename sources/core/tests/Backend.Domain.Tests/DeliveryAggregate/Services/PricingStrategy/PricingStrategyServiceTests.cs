@@ -56,15 +56,13 @@ public class PricingStrategyServiceTests
           PricingStrategyEnum pricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
           List<DeliveryStep>? steps = null,
           double? totalPrice = null,
-          Urgency? urgency = null,
-          PackingSize? packingSize = null) =>
+          Urgency? urgency = null) =>
           new()
           {
                PricingStrategy = pricingStrategy,
                Code = _fixture.Create<string>(),
                CustomerId = _fixture.Create<Guid>(),
                Urgency = urgency ?? Urgency,
-               PackingSize = packingSize ?? PackingSize,
                InsulatedBox = false,
                ContractDate = _contractDate,
                StartDate = _startDate,
@@ -85,17 +83,24 @@ public class PricingStrategyServiceTests
           return delivery;
      }
 
-     private static DeliveryStep MakeStep(Delivery parentDelivery, StepType type, DeliveryZone zone, double distance = 0, bool notBilled = false) => new(type, 1, _defaultAddress!)
-     {
-          Id = Guid.NewGuid(),
-          StepAddress = _defaultAddress!,
-          StepZone = zone,
-          Distance = distance,
-          ParentDelivery = parentDelivery,
-          NotBilled = notBilled
-     };
+     private static DeliveryStep MakeStep(Delivery parentDelivery,
+          StepType type,
+          DeliveryZone zone,
+          double distance = 0,
+          bool notBilled = false,
+          PackingSize? packingSize = null) =>
+          new(type, 1, _defaultAddress!)
+          {
+               Id = Guid.NewGuid(),
+               StepAddress = _defaultAddress!,
+               StepZone = zone,
+               Distance = distance,
+               ParentDelivery = parentDelivery,
+               NotBilled = notBilled,
+               PackingSize = packingSize ?? new PackingSize("Small", 1, "Small Label", 1, 10)
+          };
 
-     private PricingStrategyService MakeSutWith(
+     private static PricingStrategyService MakeSutWith(
           params IPricingStrategy[] strategies) =>
           new(strategies);
 
@@ -136,7 +141,7 @@ public class PricingStrategyServiceTests
                .Returns(99.0);
 
           // Act
-          var sut = MakeSutWith([matchingMock.Object, otherMock.Object]);
+          var sut = MakeSutWith(matchingMock.Object, otherMock.Object);
           var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
           // Assert
@@ -174,7 +179,7 @@ public class PricingStrategyServiceTests
           // Arrange
           var customMock = new Mock<IPricingStrategy>();
           customMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.CustomStrategy);
-          var sut = MakeSutWith([customMock.Object]);
+          var sut = MakeSutWith(customMock.Object);
 
           // Act
           var result = sut.CalculateDeliveryPriceWithoutVat(
@@ -202,7 +207,7 @@ public class PricingStrategyServiceTests
           // Arrange
           var tourMock = new Mock<IPricingStrategy>();
           tourMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.TourDeliveryStrategy);
-          var sut = MakeSutWith([tourMock.Object]);
+          var sut = MakeSutWith(tourMock.Object);
 
           // Act
           var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(totalPrice: 123.45));
@@ -398,7 +403,7 @@ public class PricingStrategyServiceTests
           PackingSize packing = new("Large", 2, "Large Label", 10, 20);
 
           // Act
-          _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(packingSize: packing));
+          _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
           // Assert
           _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(

@@ -339,6 +339,7 @@ public class DeliveryTests
                address,
                "CommentPickup",
                false,
+               new PackingSize("packing", 1, "label", 3, 10),
                mockDeliveryZoneRepository.Object,
                mockPricingStrategyService.Object,
                mockItineraryService.Object
@@ -349,6 +350,7 @@ public class DeliveryTests
                address,
                "CommentDropoff",
                false,
+               new PackingSize("packing", 1, "label", 3, 10),
                mockDeliveryZoneRepository.Object,
                mockPricingStrategyService.Object,
                mockItineraryService.Object
@@ -380,6 +382,7 @@ public class DeliveryTests
                address,
                "CommentDropoff",
                false,
+               new PackingSize("packing", 1, "label", 3, 10),
                mockDeliveryZoneRepository.Object,
                mockPricingStrategyService.Object,
                mockItineraryService.Object);
@@ -402,6 +405,7 @@ public class DeliveryTests
                address,
                "CommentPickup",
                false,
+               new PackingSize("packing", 1, "label", 3, 10),
                mockDeliveryZoneRepository.Object,
                mockPricingStrategyService.Object,
                mockItineraryService.Object);
@@ -422,6 +426,7 @@ public class DeliveryTests
                address,
                "CommentPickup",
                false,
+               new PackingSize("packing", 1, "label", 3, 10),
                mockDeliveryZoneRepository.Object,
                mockPricingStrategyService.Object,
                mockItineraryService.Object);
@@ -519,7 +524,8 @@ public class DeliveryTests
                Id = existingStep.Id,
                StepAddress = existingStep.StepAddress,
                StepZone = zone,
-               ParentDelivery = delivery
+               ParentDelivery = delivery,
+               PackingSize = new PackingSize("packing", 1, "label", 3, 10)
           };
 
           await delivery.UpdateStepsAsync(
@@ -563,7 +569,8 @@ public class DeliveryTests
                Distance = 12.5,
                EstimatedDeliveryDate = existingStep.EstimatedDeliveryDate,
                Completed = true,
-               ParentDelivery = delivery
+               ParentDelivery = delivery,
+               PackingSize = new PackingSize("packing", 1, "label", 3, 10)
           };
 
           var newStep = CreateDropoffStep();

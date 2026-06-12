@@ -73,9 +73,9 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
-          
+
           MockMediator
-               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(x => x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
@@ -123,9 +123,9 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
-          
+
           MockMediator
-               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(x => x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
@@ -144,7 +144,6 @@ public class AddDeliveryByCustomerEndpointTests
                          cmd.Discount == request.Delivery.Discount &&
                          cmd.ExtraCost == request.Delivery.ExtraCost &&
                          string.Join(",", cmd.Details) == string.Join(",", request.Delivery.Details) &&
-                         cmd.PackingSize == request.Delivery.PackingSize &&
                          cmd.InsulatedBox == request.Delivery.InsulatedBox &&
                          cmd.ContractDate == request.Delivery.ContractDate &&
                          cmd.StartDate == request.Delivery.StartDate &&
@@ -179,9 +178,9 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
-          
+
           MockMediator
-               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(x => x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
@@ -225,9 +224,9 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(mailError);
-          
+
           MockMediator
-               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(x => x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
@@ -268,9 +267,9 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<DeleteCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
-          
+
           MockMediator
-               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(x => x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
@@ -312,9 +311,9 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
-          
+
           MockMediator
-               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(x => x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act
@@ -374,9 +373,9 @@ public class AddDeliveryByCustomerEndpointTests
                     It.IsAny<SendDeliveryCreationMailToCustomerCommand>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
-          
+
           MockMediator
-               .Setup(x=>x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
+               .Setup(x => x.Send(It.IsAny<AddDeliveryStepsCommand>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(Result.Success());
 
           // Act

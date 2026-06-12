@@ -185,7 +185,6 @@ public class UpdateDeliveryHandlerTests
           _delivery.Discount.Should().Be(_command.Discount);
           _delivery.CustomerReference.Should().Be(_command.ReportId);
           _delivery.Details.Should().BeEquivalentTo(_command.Details);
-          _delivery.PackingSize.Should().Be(PackingSize);
           _delivery.InsulatedBox.Should().Be(_command.InsulatedBox);
           _delivery.ContractDate.Should().Be(_command.ContractDate);
           _delivery.StartDate.Should().Be(_command.StartDate);

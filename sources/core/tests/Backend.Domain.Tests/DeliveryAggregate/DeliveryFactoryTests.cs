@@ -16,8 +16,7 @@ public class DeliveryFactoryTests
 {
      private readonly static Guid CustomerId = Guid.NewGuid();
      private readonly static string CustomerCode = "T01";
-     private readonly static Urgency Urgency = new ("urgency", 1, "urgency", 1, null, null, 12);
-     private readonly static PackingSize PackingSize = new ("packing", 1, "label", 3, 10);
+     private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null, 12);
      private readonly static DateTimeOffset ContractDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
      private readonly static bool NeedEstimate = true;
@@ -70,7 +69,6 @@ public class DeliveryFactoryTests
           double? totalPrice = null,
           double? discount = null,
           string[]? details = null,
-          PackingSize? packingSize = null,
           bool insulatedBox = false,
           DateTimeOffset? contractDate = null,
           DateTimeOffset? startDate = null,
@@ -83,12 +81,11 @@ public class DeliveryFactoryTests
                     discount,
                     0,
                     details ?? [],
-                    packingSize ?? PackingSize,
                     insulatedBox,
                     contractDate ?? ContractDate,
                     startDate ?? StartDate,
-                    NeedEstimate: needEstimate ?? NeedEstimate
-                    )
+                    needEstimate ?? NeedEstimate
+               )
           );
 
      [Fact]
@@ -109,13 +106,12 @@ public class DeliveryFactoryTests
 
           // Assert
           delivery.PricingStrategy.Should().Be(PricingStrategy.TourDeliveryStrategy);
-          delivery.Code.Should().Be($"60114-T01-2");
+          delivery.Code.Should().Be("60114-T01-2");
           delivery.CustomerId.Should().Be(CustomerId);
           delivery.Urgency.Should().Be(Urgency);
           delivery.TotalPrice.Should().Be(55);
           delivery.Discount.Should().Be(5.0);
           delivery.Details.Should().BeEquivalentTo(details);
-          delivery.PackingSize.Should().Be(PackingSize);
           delivery.InsulatedBox.Should().BeTrue();
           delivery.ContractDate.Should().Be(ContractDate);
           delivery.StartDate.Should().Be(StartDate);

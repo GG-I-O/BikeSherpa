@@ -25,6 +25,7 @@ public class AddDeliveryStepHandlerTest
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
      private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
      private readonly Mock<IItinerarySpi> _mockItineraryApi = new();
+     private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
      private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
 
@@ -49,14 +50,15 @@ public class AddDeliveryStepHandlerTest
 
      private AddDeliveryStepHandler CreateSut()
      {
-          var validator = new AddDeliveryStepCommandValidator();
+          var validator = new AddDeliveryStepCommandValidator(_mockPackingSizeRepository.Object);
           return new AddDeliveryStepHandler(
                validator,
                _mockTransaction.Object,
                _mockDeliveryRepository.Object,
                _mockDeliveryZoneRepository.Object,
                _mockPricingStrategyService.Object,
-               _mockItineraryApi.Object
+               _mockItineraryApi.Object,
+               _mockPackingSizeRepository.Object
           );
      }
 

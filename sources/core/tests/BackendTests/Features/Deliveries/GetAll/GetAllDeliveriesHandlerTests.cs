@@ -10,26 +10,25 @@ namespace BackendTests.Features.Deliveries.GetAll;
 
 public class GetAllDeliveriesHandlerTests
 {
-     private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly Delivery _mockDeliveryA;
      private readonly Delivery _mockDeliveryB;
+     private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
 
      public GetAllDeliveriesHandlerTests()
      {
           _mockDeliveryA = _fixture.Build<Delivery>()
                .With(d => d.Steps, [])
                .Create();
+
           _mockDeliveryB = _fixture.Build<Delivery>()
                .With(d => d.Steps, [])
                .Create();
 
           _mockDeliveryA.Code = "AAA";
-          _mockDeliveryA.PackingSize = new PackingSize("Xxl", 1, "Label Xxl", 0, 0);
 
           _mockDeliveryB.Code = "BBB";
-          _mockDeliveryB.PackingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
      }
 
      [Fact]
@@ -40,22 +39,26 @@ public class GetAllDeliveriesHandlerTests
                .With(s => s.ParentDelivery, _mockDeliveryA)
                .With(s => s.Order, 1)
                .Create();
+
           var mockStepA2 = _fixture.Build<DeliveryStep>()
                .With(s => s.ParentDelivery, _mockDeliveryA)
                .With(s => s.Order, 2)
                .Create();
+
           _mockDeliveryA.Steps = [mockStepA1, mockStepA2];
-          
+
           var mockStepB1 = _fixture.Build<DeliveryStep>()
                .With(s => s.ParentDelivery, _mockDeliveryB)
                .With(s => s.Order, 1)
                .Create();
+
           var mockStepB2 = _fixture.Build<DeliveryStep>()
                .With(s => s.ParentDelivery, _mockDeliveryB)
                .With(s => s.Order, 2)
                .Create();
+
           _mockDeliveryB.Steps = [mockStepB2, mockStepB1];
-          
+
           var deliveries = new List<Delivery>
           {
                _mockDeliveryA,
@@ -70,14 +73,12 @@ public class GetAllDeliveriesHandlerTests
 
           // Assert
           result.Should().HaveCount(2);
-          
+
           var deliveryA = result.Single(d => d.Code == "AAA");
           var deliveryB = result.Single(d => d.Code == "BBB");
 
-          deliveryA.PackingSize.Should().Be("Xxl");
           deliveryA.Steps.Select(s => s.Data.Order).Should().Equal(1, 2);
 
-          deliveryB.PackingSize.Should().Be("Xl");
           deliveryB.Steps.Select(s => s.Data.Order).Should().Equal(1, 2);
 
           VerifyRepositoryCalledOnce();
