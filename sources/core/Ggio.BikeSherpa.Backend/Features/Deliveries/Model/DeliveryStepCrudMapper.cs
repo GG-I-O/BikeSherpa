@@ -4,8 +4,14 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 
-public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, DeliveryStep>
+public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, DeliveryStep>,
+     IFacetMapConfiguration<DeliveryStep, DeliveryStepCrud>
 {
+     public static void Map(DeliveryStep source, DeliveryStepCrud target)
+     {
+          target.PackingSize = source.PackingSize.Name;
+     }
+
      public static void Map(DeliveryStepCrud source, DeliveryStep target)
      {
           target.Completed = source.Completed;
