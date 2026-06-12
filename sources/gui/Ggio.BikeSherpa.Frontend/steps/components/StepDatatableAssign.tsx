@@ -32,6 +32,7 @@ export default function StepDataTableAssign(
                         <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width110]}>Code</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width180]}>Adresse</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width60]}>Colisage</DataTable.Title>
                         <DataTable.Title style={[style.column, style.minWidth150]}>Commentaire</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width90]}>Date</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width60]}>Heure début</DataTable.Title>

@@ -24,6 +24,7 @@ export default function StepDataTable({ steps, isStepSelected, onRowPress, canCh
                     )}
                     <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
                     <DataTable.Title style={[style.column, style.minWidth150]}>Adresse</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width60]}>Colisage</DataTable.Title>
                     <DataTable.Title style={[style.column, style.minWidth150]}>Commentaire</DataTable.Title>
                     <DataTable.Title style={[style.column, style.minWidth150]}>Pièces jointes</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width60]}>Livreur</DataTable.Title>

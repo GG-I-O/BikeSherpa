@@ -11,7 +11,6 @@ export default class InputDelivery {
     public extraCost: number | null;
     public steps: Step[];
     public details: string[];
-    public packingSize: string;
     public insulatedBox: boolean;
     public contractDate: string;
     public startDate: string;
@@ -30,7 +29,6 @@ export default class InputDelivery {
         extraCost: number,
         steps: Step[],
         details: string[],
-        packingSize: string,
         insulatedBox: boolean,
         contractDate: string,
         startDate: string,
@@ -48,7 +46,6 @@ export default class InputDelivery {
         this.extraCost = extraCost;
         this.steps = steps;
         this.details = details;
-        this.packingSize = packingSize;
         this.insulatedBox = insulatedBox;
         this.contractDate = contractDate;
         this.startDate = startDate;

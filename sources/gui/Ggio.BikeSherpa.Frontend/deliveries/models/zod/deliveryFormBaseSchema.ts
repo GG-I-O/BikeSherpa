@@ -45,9 +45,6 @@ const deliveryFormBaseSchema = zod
             .array(stepFormBaseSchema),
         details: zod
             .array(zod.string()),
-        packingSize: zod
-            .string()
-            .trim(),
         insulatedBox: zod
             .boolean(),
         contractDate: zod

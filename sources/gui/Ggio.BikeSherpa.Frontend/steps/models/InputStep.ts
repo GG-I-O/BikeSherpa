@@ -6,6 +6,7 @@ export default class InputStep {
     public completed: boolean;
     public stepAddress: Address;
     public stepZone: { name: string, cities: { name: string }[] };
+    public packingSize: string;
     public distance: number;
     public courierId: string | null;
     public comment: string | null;
@@ -21,6 +22,7 @@ export default class InputStep {
         completed: boolean,
         stepAddress: Address,
         stepZone: { name: string, cities: { name: string }[] },
+        packingSize: string,
         distance: number,
         courierId: string | null,
         comment: string | null,
@@ -35,6 +37,7 @@ export default class InputStep {
         this.completed = completed;
         this.stepAddress = stepAddress;
         this.stepZone = stepZone;
+        this.packingSize = packingSize;
         this.distance = distance;
         this.courierId = courierId;
         this.comment = comment;

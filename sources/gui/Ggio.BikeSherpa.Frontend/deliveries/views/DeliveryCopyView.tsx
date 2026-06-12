@@ -13,8 +13,7 @@ export default function DeliveryCopyView() {
         getCustomerOptions,
         getCustomer,
         urgencies,
-        pricingStrategies,
-        packingSizes
+        pricingStrategies
     } = useDeliveryCopyFormViewModel(deliveryId);
 
     return (
@@ -27,7 +26,6 @@ export default function DeliveryCopyView() {
             getCustomer={getCustomer}
             urgencies={urgencies}
             pricingStrategies={pricingStrategies}
-            packingSizes={packingSizes}
             update
         />
     );

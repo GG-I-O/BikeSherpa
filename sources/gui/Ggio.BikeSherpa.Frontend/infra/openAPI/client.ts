@@ -48,6 +48,7 @@ const Address = z.object({
 const City = z.object({ name: z.string() });
 const DeliveryZone = z.object({ name: z.string(), cities: z.array(City) });
 const DeliveryStepCrud = z.object({
+  packingSize: z.string(),
   stepType: StepType,
   order: z.number().int(),
   completed: z.boolean(),
@@ -84,7 +85,6 @@ const DeliveryStatus = z.union([
 const DeliveryCrud = z.object({
   steps: z.array(DeliveryStepDto),
   urgency: z.string(),
-  packingSize: z.string(),
   limitDate: z.string().datetime({ offset: true }).nullable(),
   pricingStrategy: PricingStrategy,
   status: DeliveryStatus,

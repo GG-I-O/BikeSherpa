@@ -8,8 +8,7 @@ export default function NewDeliveryView() {
         handleSubmit,
         getCustomerOptions,
         urgencies,
-        pricingStrategies,
-        packingSizes
+        pricingStrategies
     } = useNewDeliveryFormViewModel();
 
     return (
@@ -21,7 +20,6 @@ export default function NewDeliveryView() {
             getCustomerOptions={getCustomerOptions}
             urgencies={urgencies}
             pricingStrategies={pricingStrategies}
-            packingSizes={packingSizes}
         />
     );
 }

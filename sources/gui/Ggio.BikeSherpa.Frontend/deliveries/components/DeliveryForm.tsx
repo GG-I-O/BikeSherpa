@@ -23,7 +23,6 @@ interface DeliveryFormProps<T extends FieldValues> {
     getCustomer?: (id: string) => Customer;
     urgencies: DropdownOptions[];
     pricingStrategies: DropdownOptions[];
-    packingSizes: DropdownOptions[];
 }
 
 export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormProps<T>) {
@@ -125,15 +124,6 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 label="Infos de la course"
                 placeholder="Message lambda"
                 isAnArray
-            />
-            <ThemedDropdownInput
-                testID="deliveryFormPackingSizeInput"
-                control={control}
-                name="packingSize"
-                error={errors.packingSize as FieldError | undefined}
-                label="Taille"
-                options={props.packingSizes}
-                required
             />
             <ThemedCheckboxInput
                 testID="deliveryFormInsulatedInput"

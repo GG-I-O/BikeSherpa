@@ -14,7 +14,7 @@ export function useNewDeliveryFormViewModel() {
     const customerServices = IOCContainer.get<ICustomerService>(ServicesIdentifiers.CustomerServices);
     const viewModel = new NewDeliveryFormViewModel(deliveryServices, customerServices);
 
-    const { urgencies, pricingStrategies, packingSizes } = useDropdown();
+    const { urgencies, pricingStrategies } = useDropdown();
 
     const {
         control,
@@ -26,7 +26,7 @@ export function useNewDeliveryFormViewModel() {
             code: '',
             status: 0,
             customerId: '',
-            pricingStrategy: pricingStrategies.length > 0 ? parseInt(packingSizes[0].value) : 0,
+            pricingStrategy: pricingStrategies.length > 0 ? parseInt(pricingStrategies[0].value) : 0,
             urgency: urgencies.length > 0 ? urgencies[0].value : 'Standard',
             totalPrice: 0,
             discount: 0,
@@ -35,7 +35,6 @@ export function useNewDeliveryFormViewModel() {
             reportId: '',
             steps: [],
             details: [""],
-            packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
             insulatedBox: false,
             startDate: new Date().toISOString(),
             contractDate: new Date().toISOString(),
@@ -59,7 +58,6 @@ export function useNewDeliveryFormViewModel() {
         errors,
         urgencies,
         pricingStrategies,
-        packingSizes,
         getCustomerOptions: viewModel.getCustomerOptions
     };
 }

@@ -27,6 +27,7 @@ export default function StepInputDataTable({name, control, errors}: Props) {
             notBilled: false,
             contactName: '',
             contactPhone: '',
+            packingSize: 'S',
             stepAddress: {
                 name: '',
                 fullAddress: '',
@@ -62,6 +63,9 @@ export default function StepInputDataTable({name, control, errors}: Props) {
                     </DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column, datatableStyle.width90]}>
                         <Text>Retour dispatch</Text>
+                    </DataTable.Title>
+                    <DataTable.Title style={[datatableStyle.column]}>
+                        <Text>Colisage</Text>
                     </DataTable.Title>
                     <DataTable.Title style={[datatableStyle.column]}>
                         <Text>Infos livraison</Text>

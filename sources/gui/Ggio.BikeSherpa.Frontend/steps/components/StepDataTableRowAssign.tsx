@@ -67,6 +67,9 @@ export default function StepDataTableRowAssign(
                 <Text numberOfLines={3}>{step.address.streetInfo}</Text>
                 <Text numberOfLines={3}>{`${step.address.postcode} ${step.address.city}`}</Text>
             </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>
+                {step.packing}
+            </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <TextInput
                     value={viewModel.comment}

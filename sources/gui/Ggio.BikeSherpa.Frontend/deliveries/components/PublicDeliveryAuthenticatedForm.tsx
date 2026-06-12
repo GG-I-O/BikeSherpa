@@ -53,6 +53,7 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
             <PublicDeliveryStepForm
                 control={viewModel.control}
                 errors={viewModel.errors}
+                packingSizes={viewModel.packingSizes}
                 customerType={viewModel.customerType}
                 totalDistance={viewModel.estimatedDistance}
                 canAddStep={viewModel.deliveryTypes.length > 0 && field.value.toString() === viewModel.deliveryTypes[1].value}
@@ -61,7 +62,6 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
             <PublicDeliveryDetailsForm
                 control={viewModel.control}
                 errors={viewModel.errors}
-                packingSizes={viewModel.packingSizes}
                 setUrgency={viewModel.setUrgency}
                 setStartDate={viewModel.setStartDate}
                 showUrgency={isSimpleDelivery}

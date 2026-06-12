@@ -27,6 +27,7 @@ export default function PublicDeliverySummaryView() {
                 <View key={index} style={{gap: 8}}>
                     <Text style={AppStyle.textStyle.h2}>{step.stepType === 0 ? 'Adresse de ramasse' : 'Adresse de livraison'}</Text>
                     <Text style={{marginBottom: 8}}>{`${step.stepAddress.streetInfo} ${step.stepAddress.postcode} ${step.stepAddress.city}`}</Text>
+                    <Text style={{marginBottom: 8}}>Colisage : {step.packingSize}</Text>
                 </View>
             ))}
             <Divider />

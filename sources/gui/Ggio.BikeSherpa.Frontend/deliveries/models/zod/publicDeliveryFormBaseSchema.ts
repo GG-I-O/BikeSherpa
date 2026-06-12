@@ -42,9 +42,6 @@ const publicDeliveryFormBaseSchema = zod
             }),
         steps: zod
             .array(stepFormBaseSchema),
-        packingSize: zod
-            .string()
-            .trim(),
         insulatedBox: zod
             .boolean(),
         startDate: zod

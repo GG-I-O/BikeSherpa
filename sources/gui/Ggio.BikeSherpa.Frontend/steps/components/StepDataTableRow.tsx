@@ -71,6 +71,7 @@ export default function StepDataTableRow(
                     <Text>{`${step.address.postcode} ${step.address.city}`}</Text>
                 </View>
             </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.width60]}>{step.packing}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <TextInput
                     value={viewModel.comment}

@@ -34,7 +34,7 @@ export default class StepMapper implements IStepMapper {
             courierCode: step.courierId ? this.courierServices.getCourier$(step.courierId).get().code : unassignedCourierDisplay,
             comment: step.comment ?? '',
             courierComment: step.courierComment ?? '',
-            packing: this.dropdownOptionsService.GetPackingLabel(delivery.packingSize),
+            packing: this.dropdownOptionsService.GetPackingLabel(step.packingSize),
             deliveryDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
             deliveryTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
             estimatedIsoDate: step.estimatedDeliveryDate,

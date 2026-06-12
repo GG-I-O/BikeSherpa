@@ -21,6 +21,9 @@ const stepFormBaseSchema = zod.object({
         .nullable(),
     notBilled: zod
         .boolean(),
+    packingSize: zod
+        .string()
+        .trim(),
     contactName: zod
         .string()
         .trim()
