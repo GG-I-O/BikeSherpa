@@ -6,6 +6,7 @@ import StepDataTable from "@/steps/components/StepDataTable";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import DeliveryStatusButton from "@/deliveries/components/DeliveryStatusButton";
+import {Icon} from "react-native-paper/src";
 
 type Props = {
     delivery: DeliveryToDisplay,
@@ -47,6 +48,11 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
                     {delivery.totalPrice}€
+                </DataTable.Cell>
+                <DataTable.Cell style={[style.column, style.width40]}>
+                    {delivery.steps.some(s => s.courierComment && s.courierComment !== "") && (
+                        <Icon size={20} source="flag" color={theme.colors.error}/>
+                    )}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
                     {delivery.startDate}
