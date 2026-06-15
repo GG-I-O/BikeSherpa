@@ -9,7 +9,7 @@ public class SimpleDeliveryStrategy(IDelayService delayService) : IPricingStrate
      public async Task<double> CalculateDeliveryPriceWithoutVat(Delivery delivery)
      {
           var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
-          var dropSteps = delivery.Steps.Where(s => s.StepType == StepType.Dropoff).ToList();
+          var dropSteps = delivery.Steps.Where(s => s is { StepType: StepType.Dropoff, NotBilled: false }).ToList();
           var pickZonePrice = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Pickup)?.StepZone.SimplePrice ?? 0;
           var dropZonePrice = dropSteps.Sum(s => s.StepZone.SimplePrice);
           var packingPrice = dropSteps.Sum(s => s.PackingSize.SimplePrice);
@@ -29,7 +29,7 @@ public class SimpleDeliveryStrategy(IDelayService delayService) : IPricingStrate
      {
           if (deliveryStep.StepType == StepType.Pickup)
           {
-               var dropSteps = delivery.Steps.Where(s => s.StepType == StepType.Dropoff).ToList();
+               var dropSteps = delivery.Steps.Where(s => s is { StepType: StepType.Dropoff, NotBilled: false }).ToList();
 
                var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
                var packingPrice = dropSteps.Sum(s => s.PackingSize.SimplePrice);

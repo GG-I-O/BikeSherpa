@@ -135,7 +135,8 @@ public class ReportService(
           var description = "";
           if (deliveryStep.StepType == StepType.Pickup)
           {
-               var endStep = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Dropoff);
+               var dropSteps = delivery.Steps.Where(s => s is { StepType: StepType.Dropoff, NotBilled: false }).ToList();
+               var endStep = dropSteps[0];
                description += "Livraison ";
                description += $"{(await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Label} ";
                description += $"(Colis {endStep?.PackingSize.Name}) : ";
