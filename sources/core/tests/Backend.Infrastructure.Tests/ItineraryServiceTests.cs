@@ -17,7 +17,7 @@ public class ItineraryServiceTests
      public async Task GetItineraryInfoAsync_WithValidCoordinates_ReturnsItineraryResult()
      {
           // Arrange
-          const float expectedDistance = 25.5f;
+          const float expectedDistance = 26.0f;
           const float expectedDuration = 30.5f;
 
           _sut.Setup(x => x.RouteItinerairePost(

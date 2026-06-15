@@ -57,7 +57,7 @@ public class DeliveryFactoryTests
 
           _pricingStrategyServiceMock
                .Setup(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
-               .Returns(55);
+               .ReturnsAsync(55);
 
           _sut = new DeliveryFactory(_mediatorMock.Object, _customerRepositoryMock.Object, _deliveryRepositoryMock.Object, _pricingStrategyServiceMock.Object);
      }

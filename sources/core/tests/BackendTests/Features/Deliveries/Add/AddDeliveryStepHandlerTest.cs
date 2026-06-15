@@ -36,7 +36,11 @@ public class AddDeliveryStepHandlerTest
                .Create();
 
           _mockDelivery.GenerateReportId(mockCustomer);
-          _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
+          _mockPricingStrategyService.Setup(s => s.CalculateDeliveryPriceWithoutVat(_mockDelivery))
+               .ReturnsAsync(10.0);
+          _mockDelivery.TotalPrice = 10.0;
+
+          _mockPackingSizeRepository.Setup(x => x.GetByName(It.IsAny<string>())).Returns(_fixture.Create<PackingSize>());
 
           _mockCommand = _fixture.Build<AddDeliveryStepCommand>().Create();
 

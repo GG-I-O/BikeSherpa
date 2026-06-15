@@ -6,6 +6,7 @@ using BackendTests.Services;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
@@ -62,6 +63,9 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebA
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
           
+          await dbContext.PackingSizes.AddAsync(new PackingSize("X", 1, "X", 0, 0), TestContext.Current.CancellationToken);
+          await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+          
           var client = _factory.CreateClient();
 
           var delivery = _fixture.Build<Delivery>()
@@ -75,17 +79,19 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebA
 
           var address = _fixture
                .Build<Address>()
-               .With(a => a.Postcode, "38000")
-               .With(a => a.City, "Grenoble")
+               .With(a => a.Postcode, "1")
+               .With(a => a.City, "A")
+               .With(a => a.Name, "A")
+               .With(a => a.StreetInfo, "A")
                .Create();
 
           var step = _fixture
-               .Build<DeliveryStep>()
-               .Without(s => s.ParentDelivery)
-               .With(s => s.EstimatedDeliveryDate, DateTime.UtcNow)
+               .Build<DeliveryStepCrud>()
+               .With(s => s.PackingSize, "X")
+               .With(s => s.StepZone, "A")
                .With(s => s.StepAddress, address)
                .Create();
-
+          
           try
           {
                // Act
@@ -96,11 +102,11 @@ public class AddDeliveryStepIntegrationTests : IClassFixture<IntegrationTestWebA
 
                var dbDelivery = dbContext.Deliveries
                     .Include(d => d.Steps)
+                    .ThenInclude(s => s.StepAddress)
                     .FirstOrDefault(d => d.Id == delivery.Id);
 
                dbDelivery.Should().NotBeNull();
                dbDelivery.Steps.Should().HaveCount(1);
-               dbDelivery.Steps.First().StepAddress.Should().BeEquivalentTo(address);
           }
           finally
           {

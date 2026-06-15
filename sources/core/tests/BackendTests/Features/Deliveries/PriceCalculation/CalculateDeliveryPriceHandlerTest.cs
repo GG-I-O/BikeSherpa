@@ -33,6 +33,7 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Pickup)
                               .With(s => s.Order, 1)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     },
 
@@ -41,6 +42,7 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Dropoff)
                               .With(s => s.Order, 2)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     }
                ],
@@ -52,7 +54,7 @@ public class CalculateDeliveryPriceHandlerTest
 
           pricingStrategyServiceMock
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
-               .Returns(expectedPriceWithoutVat);
+               .ReturnsAsync(expectedPriceWithoutVat);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -81,6 +83,7 @@ public class CalculateDeliveryPriceHandlerTest
                     {
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Pickup)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
 
                     }
@@ -92,7 +95,7 @@ public class CalculateDeliveryPriceHandlerTest
 
           pricingStrategyServiceMock
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
-               .Returns(0.0);
+               .ReturnsAsync(0.0);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -120,6 +123,7 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Pickup)
                               .With(s => s.Order, 1)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     },
                     new DeliveryStepDto
@@ -127,6 +131,7 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Dropoff)
                               .With(s => s.Order, 2)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     },
 
@@ -135,6 +140,7 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Dropoff)
                               .With(s => s.Order, 3)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     }
                ],
@@ -145,7 +151,7 @@ public class CalculateDeliveryPriceHandlerTest
 
           pricingStrategyServiceMock
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
-               .Returns(150.0);
+               .ReturnsAsync(150.0);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -160,6 +166,7 @@ public class CalculateDeliveryPriceHandlerTest
           pricingStrategyServiceMock = new Mock<IPricingStrategyService>();
           var urgencyMock = new Mock<IUrgencyRepository>();
           var packingSizeMock = new Mock<IPackingSizeRepository>();
+          var deliveryZoneRepositoryMock = new Mock<IDeliveryZoneRepository>();
           var vatServiceMock = new Mock<IVatService>();
           var itineraryService = new Mock<IItinerarySpi>();
           itineraryService.Setup(x => x.GetItineraryInfoAsync(It.IsAny<GeoPoint>(), It.IsAny<GeoPoint>(), It.IsAny<CancellationToken>()))
@@ -171,6 +178,7 @@ public class CalculateDeliveryPriceHandlerTest
           return new CalculateDeliveryPriceHandler(pricingStrategyServiceMock.Object,
                urgencyMock.Object,
                packingSizeMock.Object,
+               deliveryZoneRepositoryMock.Object,
                new CalculateDeliveryPriceQueryValidator(urgencyMock.Object),
                itineraryService.Object,
                vatServiceMock.Object);

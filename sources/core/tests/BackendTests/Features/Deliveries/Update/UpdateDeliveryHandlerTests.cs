@@ -53,7 +53,7 @@ public class UpdateDeliveryHandlerTests
 
           _mockPricingStrategyService
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
-               .Returns(123.45);
+               .ReturnsAsync(123.45);
 
           _mockItineraryService
                .Setup(x => x.GetItineraryInfoAsync(
@@ -98,7 +98,7 @@ public class UpdateDeliveryHandlerTests
                     .With(s => s.StepType, step.StepType)
                     .With(s => s.Order, step.Order)
                     .With(s => s.StepAddress, step.StepAddress)
-                    .With(s => s.StepZone, _deliveryZone)
+                    .With(s => s.StepZone, _deliveryZone.Name)
                     .With(s => s.EstimatedDeliveryDate, step.EstimatedDeliveryDate)
                     .Create())
                .ToList();

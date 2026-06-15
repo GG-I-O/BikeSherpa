@@ -283,7 +283,7 @@ public class GetReportHandlerTests
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<List<Delivery>>()))
-               .Returns(report);
+               .ReturnsAsync(report);
 
           var validator = new GetReportQueryValidator(_customerRepositoryMock.Object);
 

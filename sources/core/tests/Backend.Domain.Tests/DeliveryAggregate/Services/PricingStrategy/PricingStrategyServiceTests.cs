@@ -16,7 +16,6 @@ public class PricingStrategyServiceTests
      private static DateTimeOffset _startDate;
      private static DateTimeOffset _contractDate;
      private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null, 12);
-     private readonly static PackingSize PackingSize = new("packing", 1, "label", 3, 10);
      private readonly static DeliveryZone CoreZone = new("Centre");
      private readonly static DeliveryZone BorderZone = new("Limitrophe");
      private readonly static DeliveryZone PeripheryZone = new("Périphérie");
@@ -35,8 +34,8 @@ public class PricingStrategyServiceTests
           _defaultAddress = _fixture.Create<Address>();
           _mockPricingStrategy.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
           _mockPricingStrategy
-               .Setup(s => s.CalculateDeliveryPriceWithoutVat(TODO))
-               .Returns(0);
+               .Setup(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
+               .ReturnsAsync(0);
 
           _sut = new PricingStrategyService([_mockPricingStrategy.Object]);
      }
@@ -62,7 +61,6 @@ public class PricingStrategyServiceTests
      private Delivery MakeDeliveryWithAdjustments(
           double? discount = null,
           double? extraCost = null,
-          double? distance = null,
           double? totalPrice = null)
      {
           var delivery = MakeDelivery(totalPrice: totalPrice);
@@ -94,32 +92,32 @@ public class PricingStrategyServiceTests
           new(strategies);
 
      [Fact]
-     public void CalculatePrice_DelegatesToMatchingStrategy_AndNotToOthers()
+     public async Task CalculatePrice_DelegatesToMatchingStrategy_AndNotToOthers()
      {
           // Arrange
           var matchingMock = new Mock<IPricingStrategy>();
           matchingMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
-          matchingMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(TODO))
-               .Returns(42.0);
+          matchingMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
+               .ReturnsAsync(42.0);
 
           var otherMock = new Mock<IPricingStrategy>();
           otherMock.Setup(s => s.ImplementedStrategy).Returns(PricingStrategyEnum.TourDeliveryStrategy);
-          otherMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(TODO))
-               .Returns(99.0);
+          otherMock.Setup(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
+               .ReturnsAsync(99.0);
 
           // Act
           var sut = MakeSutWith(matchingMock.Object, otherMock.Object);
-          var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
+          var result = await sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
           // Assert
           result.Should().Be(42.0);
-          matchingMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
+          matchingMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Once);
 
-          otherMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Never);
+          otherMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Never);
      }
 
      [Fact]
-     public void CalculatePrice_WhenCustomStrategy_ReturnsTotalPriceWithoutCallingStrategy()
+     public async Task CalculatePrice_WhenCustomStrategy_ReturnsTotalPriceWithoutCallingStrategy()
      {
           // Arrange
           var customMock = new Mock<IPricingStrategy>();
@@ -127,16 +125,16 @@ public class PricingStrategyServiceTests
           var sut = MakeSutWith(customMock.Object);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(
+          var result = await sut.CalculateDeliveryPriceWithoutVat(
                MakeDelivery(PricingStrategyEnum.CustomStrategy, totalPrice: 99.5));
 
           // Assert
           result.Should().Be(99.5);
-          customMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Never);
+          customMock.Verify<Task<double>>(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Never);
      }
 
      [Fact]
-     public void CalculatePrice_WhenNoStrategyMatches_ReturnsTotalPrice()
+     public async Task CalculatePrice_WhenNoStrategyMatches_ReturnsTotalPrice()
      {
           // Arrange
           var tourMock = new Mock<IPricingStrategy>();
@@ -144,15 +142,15 @@ public class PricingStrategyServiceTests
           var sut = MakeSutWith(tourMock.Object);
 
           // Act
-          var result = sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(totalPrice: 123.45));
+          var result = await sut.CalculateDeliveryPriceWithoutVat(MakeDelivery(totalPrice: 123.45));
 
           // Assert
           result.Should().Be(123.45);
-          tourMock.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Never);
+          tourMock.Verify<Task<double>>(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Never);
      }
 
      [Fact]
-     public void CalculatePrice_CountsOnlyPickupStepsAsPickups()
+     public async Task CalculatePrice_CountsOnlyPickupStepsAsPickups()
      {
           // Arrange
           var delivery = MakeDelivery();
@@ -166,14 +164,14 @@ public class PricingStrategyServiceTests
           delivery.Steps = steps;
 
           // Act
-          _sut.CalculateDeliveryPriceWithoutVat(delivery);
+          await _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Once);
      }
 
      [Fact]
-     public void CalculatePrice_CountsDropoffStepsPerZone()
+     public async Task CalculatePrice_CountsDropoffStepsPerZone()
      {
           // Arrange
           var delivery = MakeDelivery();
@@ -190,14 +188,14 @@ public class PricingStrategyServiceTests
           delivery.Steps = steps;
 
           // Act
-          _sut.CalculateDeliveryPriceWithoutVat(delivery);
+          await _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Once);
      }
 
      [Fact]
-     public void CalculatePrice_SumsDistanceAcrossAllSteps()
+     public async Task CalculatePrice_SumsDistanceAcrossAllSteps()
      {
           // Arrange
           var distance1 = _fixture.Create<double>();
@@ -212,14 +210,14 @@ public class PricingStrategyServiceTests
           delivery.Steps = steps;
 
           // Act
-          _sut.CalculateDeliveryPriceWithoutVat(delivery);
+          await _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Once);
      }
 
      [Fact]
-     public void CalculatePrice_SumsDistanceAcrossAllSteps_WhileIgnoringNotBilledSteps()
+     public async Task CalculatePrice_SumsDistanceAcrossAllSteps_WhileIgnoringNotBilledSteps()
      {
           // Arrange
           var distance1 = _fixture.Create<double>();
@@ -235,20 +233,20 @@ public class PricingStrategyServiceTests
           delivery.Steps = steps;
 
           // Act
-          _sut.CalculateDeliveryPriceWithoutVat(delivery);
+          await _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Once);
      }
 
 
      [Fact]
-     public void CalculatePrice_WhenDeliveryDistanceIsZero_SumsBillableStepsDistance()
+     public async Task CalculatePrice_WhenDeliveryDistanceIsZero_SumsBillableStepsDistance()
      {
           // Arrange
           const double billableDistance = 12.5;
           const double ignoredDistance = 8.5;
-          var delivery = MakeDeliveryWithAdjustments(distance: 0);
+          var delivery = MakeDeliveryWithAdjustments();
           var steps = new List<DeliveryStep>
           {
                MakeStep(delivery, StepType.Pickup, CoreZone, billableDistance),
@@ -258,22 +256,21 @@ public class PricingStrategyServiceTests
           delivery.Steps = steps;
 
           // Act
-          _sut.CalculateDeliveryPriceWithoutVat(delivery);
+          await _sut.CalculateDeliveryPriceWithoutVat(delivery);
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Once);
      }
 
      [Fact]
-     public void CalculatePrice_PassesPackingSizeFromRepository()
+     public async Task CalculatePrice_PassesPackingSizeFromRepository()
      {
           // Arrange
-          PackingSize packing = new("Large", 2, "Large Label", 10, 20);
 
           // Act
-          _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
+          await _sut.CalculateDeliveryPriceWithoutVat(MakeDelivery());
 
           // Assert
-          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(TODO), Times.Once);
+          _mockPricingStrategy.Verify(s => s.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()), Times.Once);
      }
 }

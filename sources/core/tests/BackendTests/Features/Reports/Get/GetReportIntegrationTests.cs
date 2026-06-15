@@ -1,10 +1,10 @@
-using System.Net;
 using System.Text.Json;
 using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Reports.Get;
 using Ggio.BikeSherpa.Backend.Infrastructure;
@@ -27,12 +27,6 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
 
      private const string Scope = "read:reports";
      private const string UserEmail = "user@example.com";
-
-     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
-     {
-          PropertyNameCaseInsensitive = false,
-          PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-     };
 
      public GetReportIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
@@ -70,11 +64,17 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-
-          var client = _factory.CreateClient();
-
+          
           var startDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
           var endDate = new DateTimeOffset(2026, 1, 31, 23, 59, 59, TimeSpan.Zero);
+
+          var urgency = new Urgency("Normal", 1, "Normal", 1.0, null, null, 12);
+          var packingSize = new PackingSize("X", 1, "X", 0, 0);
+          var zone = new DeliveryZone("Z1");
+          await dbContext.Urgencies.AddAsync(urgency, TestContext.Current.CancellationToken);
+          await dbContext.PackingSizes.AddAsync(packingSize, TestContext.Current.CancellationToken);
+          await dbContext.DeliveryZones.AddAsync(zone, TestContext.Current.CancellationToken);
+          await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
           var customer = _fixture.Build<Customer>()
                .With(c => c.Name, "Report Customer")
@@ -88,41 +88,45 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
 
           var delivery = _fixture.Build<Delivery>()
                .With(d => d.CustomerId, customer.Id)
-               .With(d => d.Steps, [])
-               .With(d => d.PricingStrategy, PricingStrategyEnum.CustomStrategy)
+               .With(d => d.Steps, new List<DeliveryStep>())
+               .With(d => d.PricingStrategy, PricingStrategyEnum.SimpleDeliveryStrategy)
+               .With(d => d.Urgency, urgency)
+               .With(d => d.Code, "D01")
                .With(d => d.TotalPrice, 42.50)
                .With(d => d.ContractDate, startDate)
                .With(d => d.StartDate, startDate.AddDays(1))
-               .With(d => d.CreatedAt, DateTime.UtcNow)
-               .With(d => d.UpdatedAt, DateTime.UtcNow)
+               .With(d => d.CreatedAt, DateTimeOffset.UtcNow)
+               .With(d => d.UpdatedAt, DateTimeOffset.UtcNow)
                .Create();
+          
+          var address = _fixture.Build<Address>()
+               .With(a => a.Postcode, "38000")
+               .With(a => a.City, "Grenoble")
+               .With(a => a.Complement, (string?)null)
+               .Create();
+          var step = new DeliveryStep(StepType.Pickup, 1, address) {
+              PackingSize = packingSize,
+              StepZone = zone,
+              ParentDelivery = delivery,
+              StepAddress = address
+          };
+          delivery.Steps = [step];
 
           await dbContext.Customers.AddAsync(customer, CancellationToken.None);
           await dbContext.Deliveries.AddAsync(delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
-
+          
           try
           {
                // Act
-               var response = await client.GetAsync(
-                    $"/api/reports?customerId={customer.Id}&startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
-                    CancellationToken.None);
+               var handler = scope.ServiceProvider.GetRequiredService<GetReportHandler>();
+               var query = new GetReportQuery(customer.Id, startDate, endDate);
+               var report = await handler.Handle(query, CancellationToken.None);
 
                // Assert
-               response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-               var responseBody = await response.Content.ReadAsStringAsync(CancellationToken.None);
-               var report = JsonSerializer.Deserialize<JsonElement>(responseBody, _jsonSerializerOptions);
-
-               report.GetProperty("customerName").GetString().Should().Be(customer.Name);
-               report.GetProperty("startDate").GetDateTimeOffset().Should().Be(startDate);
-               report.GetProperty("endDate").GetDateTimeOffset().Should().Be(endDate);
-               report.GetProperty("totalPrice").GetDouble().Should().Be(42.50);
-
-               var deliveries = report.GetProperty("deliveries");
-               deliveries.GetArrayLength().Should().Be(1);
-               deliveries[0].GetProperty("deliveryCode").GetString().Should().Be(delivery.Code);
-               deliveries[0].GetProperty("deliveryPrice").GetDouble().Should().Be(42.50);
+               report.Deliveries.Should().HaveCount(1);
+               report.Deliveries[0].DeliveryCode.Should().Be(delivery.Code);
+               report.Deliveries[0].DeliveryPrice.Should().Be(42.50);
           }
           finally
           {

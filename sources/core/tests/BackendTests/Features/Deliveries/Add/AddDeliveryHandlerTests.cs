@@ -34,7 +34,9 @@ public class AddDeliveryHandlerTests
                .Create();
 
           _mockDelivery.GenerateReportId(mockCustomer);
-          _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
+          _mockPricingStrategyService.Setup(s => s.CalculateDeliveryPriceWithoutVat(_mockDelivery))
+               .ReturnsAsync(10.0);
+          _mockDelivery.TotalPrice = 10.0;
 
           var urgencies = new List<Urgency>(_fixture.CreateMany<Urgency>(2));
           _mockUrgencyRepository
@@ -95,7 +97,7 @@ public class AddDeliveryHandlerTests
      public async Task Handle_ShouldCreateDeliveryAndReturnId_WhenCommandIsValid()
      {
           // Arrange
-          SetupRepositoryTestingIfCodeExists(false); // Tell the validator that the code does not exist
+          SetupRepositoryTestingIfCodeExists(false);
           var sut = CreateSut();
 
           // Act

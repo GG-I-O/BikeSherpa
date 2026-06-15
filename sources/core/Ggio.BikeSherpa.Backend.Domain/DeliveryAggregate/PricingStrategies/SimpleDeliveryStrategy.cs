@@ -9,11 +9,11 @@ public class SimpleDeliveryStrategy(IDelayService delayService) : IPricingStrate
      public async Task<double> CalculateDeliveryPriceWithoutVat(Delivery delivery)
      {
           var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
-          var dropStep = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Dropoff);
+          var dropSteps = delivery.Steps.Where(s => s.StepType == StepType.Dropoff).ToList();
           var pickZonePrice = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Pickup)?.StepZone.SimplePrice ?? 0;
-          var dropZonePrice = dropStep?.StepZone.SimplePrice ?? 0;
-          var packingPrice = dropStep?.PackingSize.SimplePrice ?? 0;
-          var distancePrice = delivery.Urgency.PriceCoefficient * dropStep?.Distance ?? 0;
+          var dropZonePrice = dropSteps.Sum(s => s.StepZone.SimplePrice);
+          var packingPrice = dropSteps.Sum(s => s.PackingSize.SimplePrice);
+          var distancePrice = delivery.Urgency.PriceCoefficient * dropSteps.Sum(s => s.Distance);
 
           return Math.Round(
                delayPrice +
@@ -29,12 +29,12 @@ public class SimpleDeliveryStrategy(IDelayService delayService) : IPricingStrate
      {
           if (deliveryStep.StepType == StepType.Pickup)
           {
-               var dropStep = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Dropoff);
+               var dropSteps = delivery.Steps.Where(s => s.StepType == StepType.Dropoff).ToList();
                
                var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
-               var packingPrice = dropStep?.PackingSize.SimplePrice ?? 0;
+               var packingPrice = dropSteps.Sum(s => s.PackingSize.SimplePrice);
                var pickZonePrice = deliveryStep.StepZone.SimplePrice;
-               var dropZonePrice = dropStep?.StepZone.SimplePrice ?? 0;
+               var dropZonePrice = dropSteps.Sum(s => s.StepZone.SimplePrice);
                return delayPrice + packingPrice + pickZonePrice + dropZonePrice;
           }
           else // StepType.Dropoff

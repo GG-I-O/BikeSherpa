@@ -1,7 +1,6 @@
 using AutoFixture;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Reports.Services;
@@ -13,14 +12,11 @@ namespace BackendTests.Features.Reports.Services;
 public class ReportServiceTests
 {
      private readonly static Urgency Urgency = new("Standard", 1, "Standard", 1, null, null, 12);
-     private readonly static PackingSize PackingSize = new("Small", 1, "Small", 3, 10);
-     private readonly static DeliveryZone CoreZone = new(StepZone.InCore);
-     private readonly static DeliveryZone BorderZone = new(StepZone.InBorder);
-     private readonly static DeliveryZone PeripheryZone = new(StepZone.InPeriphery);
-     private readonly static DeliveryZone OutsideZone = new(StepZone.Outside);
      private readonly DateTimeOffset _contractDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
      private readonly Fixture _fixture = new();
      private readonly Mock<IPricingStrategy> _pricingStrategyMock = new();
+     private readonly Mock<IDelayService> _delayServiceMock = new();
+     private readonly Mock<IVatService> _vatServiceMock = new();
 
      private readonly DateTimeOffset _startDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly ReportService _sut;
@@ -31,7 +27,7 @@ public class ReportServiceTests
                .Setup(s => s.ImplementedStrategy)
                .Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
 
-          _sut = new ReportService([_pricingStrategyMock.Object]);
+          _sut = new ReportService([_pricingStrategyMock.Object], _delayServiceMock.Object, _vatServiceMock.Object);
      }
 
      private Delivery MakeDelivery(
@@ -58,32 +54,8 @@ public class ReportServiceTests
           ExtraCost = extraCost
      };
 
-     private DeliveryStep MakeStep(
-          Delivery parentDelivery,
-          StepType stepType,
-          DeliveryZone zone,
-          double distance = 0,
-          bool notBilled = false,
-          PackingSize? packingSize = null)
-     {
-          var address = _fixture.Create<Address>();
-
-          return new DeliveryStep(stepType, 1, address)
-          {
-               Id = Guid.NewGuid(),
-               StepAddress = address,
-               StepZone = zone,
-               Distance = distance,
-               ParentDelivery = parentDelivery,
-               NotBilled = notBilled,
-               PackingSize = packingSize ?? new PackingSize("Small", 1, "Small", 3, 10)
-          };
-     }
-
-     private static ReportService MakeSutWith(params IPricingStrategy[] strategies) => new(strategies);
-
      [Fact]
-     public void GenerateReport_MapsReportHeader()
+     public async Task GenerateReport_MapsReportHeader()
      {
           // Arrange
           var customerName = _fixture.Create<string>();
@@ -91,7 +63,7 @@ public class ReportServiceTests
           var to = new DateTimeOffset(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
 
           // Act
-          var report = _sut.GenerateReport(customerName, from, to, []);
+          var report = await _sut.GenerateReport(customerName, from, to, []);
 
           // Assert
           report.CustomerName.Should().Be(customerName);
@@ -102,14 +74,14 @@ public class ReportServiceTests
      }
 
      [Fact]
-     public void GenerateReport_MapsDeliverySummaryAndTotals()
+     public async Task GenerateReport_MapsDeliverySummaryAndTotals()
      {
           // Arrange
           var firstDelivery = MakeDelivery(code: "DEL-001", totalPrice: 12.50);
           var secondDelivery = MakeDelivery(code: "DEL-002", totalPrice: 27.25);
 
           // Act
-          var report = _sut.GenerateReport(
+          var report = await _sut.GenerateReport(
                "Customer",
                _startDate,
                _startDate.AddDays(1),
@@ -129,268 +101,16 @@ public class ReportServiceTests
      }
 
      [Fact]
-     public void GenerateReport_WhenDeliveryTotalPriceIsNull_UsesZero()
+     public async Task GenerateReport_WhenDeliveryTotalPriceIsNull_UsesZero()
      {
           // Arrange
           var delivery = MakeDelivery(totalPrice: null);
 
           // Act
-          var report = _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
+          var report = await _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
 
           // Assert
           report.TotalPrice.Should().Be(0);
           report.Deliveries.Single().DeliveryPrice.Should().Be(0);
-     }
-
-     [Fact]
-     public void GenerateReport_AddsSameDayAndDelayDetails_WhenStrategyReturnsNonZeroCosts()
-     {
-          // Arrange
-          _pricingStrategyMock
-               .Setup(s => s.DelayCost(_startDate, _contractDate))
-               .Returns(-2);
-
-          var delivery = MakeDelivery();
-
-          // Act
-          var report = _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
-
-          // Assert
-          report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
-          {
-               Description = "Demande le même jour",
-               Price = 2.0,
-               Quantity = 1
-          });
-
-          report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
-          {
-               Description = "Délai de la demande",
-               Price = -2.0,
-               Quantity = 1
-          });
-     }
-
-     [Fact]
-     public void GenerateReport_AddsStepDetailsUsingCountsPerTypeAndZone()
-     {
-          // Arrange
-          _pricingStrategyMock.Setup(s => s.PickupCost(2)).Returns(14);
-          _pricingStrategyMock.Setup(s => s.GetStepsInCoreCost(2)).Returns(10);
-          _pricingStrategyMock.Setup(s => s.GetStepsInBorderCost(1)).Returns(8);
-          _pricingStrategyMock.Setup(s => s.GetStepsInPeripheryCost(1)).Returns(5.5);
-          _pricingStrategyMock.Setup(s => s.GetOutsideStepsCost(2)).Returns(22);
-
-          var delivery = MakeDelivery();
-          delivery.Steps =
-          [
-               MakeStep(delivery, StepType.Pickup, CoreZone),
-               MakeStep(delivery, StepType.Pickup, BorderZone),
-               MakeStep(delivery, StepType.Dropoff, CoreZone),
-               MakeStep(delivery, StepType.Dropoff, CoreZone),
-               MakeStep(delivery, StepType.Dropoff, BorderZone),
-               MakeStep(delivery, StepType.Dropoff, PeripheryZone),
-               MakeStep(delivery, StepType.Dropoff, OutsideZone),
-               MakeStep(delivery, StepType.Dropoff, OutsideZone)
-          ];
-
-          // Act
-          var report = _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
-          var details = report.Deliveries.Single().Details;
-
-          // Assert
-          details.Should().ContainEquivalentOf(new
-          {
-               Description = "Prise en charge",
-               Price = 14.0,
-               Quantity = 2
-          });
-
-          details.Should().ContainEquivalentOf(new
-          {
-               Description = "Livraison en centre-ville",
-               Price = 10.0,
-               Quantity = 2
-          });
-
-          details.Should().ContainEquivalentOf(new
-          {
-               Description = "Livraison en bordure",
-               Price = 8.0,
-               Quantity = 1
-          });
-
-          details.Should().ContainEquivalentOf(new
-          {
-               Description = "Livraison en périphérie",
-               Price = 5.5,
-               Quantity = 1
-          });
-
-          details.Should().ContainEquivalentOf(new
-          {
-               Description = "Livraison en zone externe",
-               Price = 22.0,
-               Quantity = 2
-          });
-     }
-
-     [Fact]
-     public void GenerateReport_WhenDeliveryDistanceIsProvided_UsesDeliveryDistanceForDistanceCost()
-     {
-          // Arrange
-
-          var delivery = MakeDelivery();
-          delivery.Steps =
-          [
-               MakeStep(delivery, StepType.Pickup, CoreZone, 10),
-               MakeStep(delivery, StepType.Dropoff, CoreZone, 15)
-          ];
-
-          var totalDistance = delivery.Steps.Sum(s => s.Distance);
-
-          _pricingStrategyMock
-               .Setup(s => s.TotalDistanceCost(totalDistance, delivery.Urgency))
-               .Returns(12.345);
-
-          // Act
-          var report = _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
-
-          // Assert
-          _pricingStrategyMock.Verify(
-               s => s.TotalDistanceCost(totalDistance, delivery.Urgency),
-               Times.Once);
-
-          report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
-          {
-               Description = "Cout distance",
-               Price = 12.34,
-               Quantity = 1
-          });
-     }
-
-     [Fact]
-     public void GenerateReport_WhenDeliveryDistanceIsZero_SumsBillableStepDistances()
-     {
-          // Arrange
-          const double billableDistance = 12.5;
-          const double ignoredDistance = 8.5;
-
-          var delivery = MakeDelivery();
-          delivery.Steps =
-          [
-               MakeStep(delivery, StepType.Pickup, CoreZone, billableDistance),
-               MakeStep(delivery, StepType.Dropoff, CoreZone, ignoredDistance, true)
-          ];
-
-          _pricingStrategyMock
-               .Setup(s => s.TotalDistanceCost(billableDistance, delivery.Urgency))
-               .Returns(6.25);
-
-          // Act
-          var report = _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
-
-          // Assert
-          _pricingStrategyMock.Verify(
-               s => s.TotalDistanceCost(billableDistance, delivery.Urgency),
-               Times.Once);
-
-          report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
-          {
-               Description = "Cout distance",
-               Price = 6.25,
-               Quantity = 1
-          });
-     }
-
-     [Fact]
-     public void GenerateReport_AddsSimpleDeliveryPackingDetail()
-     {
-          // Arrange
-          var packingSize = new PackingSize("Small", 1, "Small", 3, 10);
-          var delivery = MakeDelivery();
-
-          // Act
-          var report = _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
-
-          // Assert
-          report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
-          {
-               Description = "Colisage",
-               Price = packingSize.SimplePrice,
-               Quantity = 1
-          });
-     }
-
-     [Fact]
-     public void GenerateReport_AddsTourDeliveryPackingDetail()
-     {
-          // Arrange
-          var tourStrategyMock = new Mock<IPricingStrategy>();
-          tourStrategyMock
-               .Setup(s => s.ImplementedStrategy)
-               .Returns(PricingStrategyEnum.TourDeliveryStrategy);
-
-          var sut = MakeSutWith(tourStrategyMock.Object);
-
-          var packingSize = new PackingSize("Large", 2, "Large", 3, 10);
-          var delivery = MakeDelivery(
-               PricingStrategyEnum.TourDeliveryStrategy);
-
-          // Act
-          var report = sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
-
-          // Assert
-          report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
-          {
-               Description = "Colisage",
-               Price = packingSize.TourPrice,
-               Quantity = 1
-          });
-     }
-
-     [Fact]
-     public void GenerateReport_AddsDiscountAndExtraCostDetails_WhenGreaterThanZero()
-     {
-          // Arrange
-          var delivery = MakeDelivery(discount: 5, extraCost: 7.5);
-
-          // Act
-          var report = _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
-
-          // Assert
-          report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
-          {
-               Description = "Remise",
-               Price = -5.0,
-               Quantity = 1
-          });
-
-          report.Deliveries.Single().Details.Should().ContainEquivalentOf(new
-          {
-               Description = "Surcout",
-               Price = 7.5,
-               Quantity = 1
-          });
-     }
-
-     [Fact]
-     public void GenerateReport_WhenNoMatchingStrategy_DoesNotAddStrategyBasedDetails()
-     {
-          // Arrange
-          var tourStrategyMock = new Mock<IPricingStrategy>();
-          tourStrategyMock
-               .Setup(s => s.ImplementedStrategy)
-               .Returns(PricingStrategyEnum.TourDeliveryStrategy);
-
-          var sut = MakeSutWith(tourStrategyMock.Object);
-
-          var delivery = MakeDelivery();
-
-          // Act
-          var report = sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
-
-          // Assert
-          report.Deliveries.Single().Details.Should().ContainSingle(d => d.Description == "Colisage");
      }
 }
