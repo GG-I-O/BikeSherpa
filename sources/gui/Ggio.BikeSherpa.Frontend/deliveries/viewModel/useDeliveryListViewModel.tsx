@@ -14,6 +14,7 @@ import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier"
 import dateFilterEnum from "@/deliveries/data/dateFilterEnum";
 import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
 import defaultDropdownOption from "@/deliveries/data/defaultDropdownOption";
+import useDropdown from "@/hooks/useDropdown";
 
 export default function useDeliveryListViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -34,6 +35,8 @@ export default function useDeliveryListViewModel() {
     const [datePicker, setDatePicker] = useState<Date|undefined>(new Date());
     const [dateFilter, setDateFilter] = useState<string>(dateFilterEnum.Date);
     const [courierFilter, setCourierFilter] = useState<string[]>([]);
+    
+    const { packingSizes } = useDropdown();
 
     function displayEditForm(id: string) {
         navigate({
@@ -60,7 +63,7 @@ export default function useDeliveryListViewModel() {
             setCouriers(courierList);
         });
 
-    }, [deliveryStore$, courierStore$, setDeliveries, setSteps, dateFilter, datePicker, courierFilter]);
+    }, [deliveryStore$, courierStore$, setDeliveries, setSteps, dateFilter, datePicker, courierFilter, packingSizes]);
 
     return {
         deliveries,

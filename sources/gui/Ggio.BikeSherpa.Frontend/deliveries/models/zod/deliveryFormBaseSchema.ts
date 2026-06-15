@@ -40,13 +40,6 @@ const deliveryFormBaseSchema = zod
         extraCostReason: zod
             .string()
             .nullable(),
-        distance: zod
-            .number()
-            .gte(0, "La distance ne peut pas être négative")
-            .nullable(),
-        reportId: zod
-            .string()
-            .nullable(),
         steps: zod
             .array(stepFormBaseSchema),
         details: zod

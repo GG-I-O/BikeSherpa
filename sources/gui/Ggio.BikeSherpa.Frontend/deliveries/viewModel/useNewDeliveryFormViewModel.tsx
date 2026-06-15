@@ -8,6 +8,7 @@ import {ICustomerService} from "@/spi/CustomerSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 import useDropdown from "@/hooks/useDropdown";
+import {router} from "expo-router";
 
 export function useNewDeliveryFormViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -33,8 +34,6 @@ export function useNewDeliveryFormViewModel() {
             discountReason: "",
             extraCost: 0,
             extraCostReason: "",
-            distance: 0,
-            reportId: '',
             steps: [],
             details: [""],
             insulatedBox: false,
@@ -51,6 +50,7 @@ export function useNewDeliveryFormViewModel() {
         handleSubmit: handleSubmit(
             (data) => {
                 viewModel.onSubmit(data);
+                router.back();
             },
             (errors) => {
                 console.error("Invalid delivery for creation");

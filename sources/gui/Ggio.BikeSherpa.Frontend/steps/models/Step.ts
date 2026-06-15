@@ -17,7 +17,7 @@ export class Step extends InputStep implements Storable, HateoasLinks {
         order: number,
         completed: boolean,
         stepAddress: Address,
-        stepZone: { name: string, cities: { name: string }[] },
+        stepZone: string,
         packingSize: string,
         distance: number,
         courierId: string,

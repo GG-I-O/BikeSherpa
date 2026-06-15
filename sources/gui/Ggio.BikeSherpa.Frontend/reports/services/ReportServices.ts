@@ -8,13 +8,13 @@ import DateToolbox from "@/services/DateToolbox";
 @injectable()
 export default class ReportServices implements IReportServices {
     private apiClient;
-    
+
     public constructor() {
         this.apiClient = createApiClient(axios.defaults.baseURL || '', {
             axiosInstance: axios
         });
     }
-    
+
     public async getReport(customerId: string, startDate: string, endDate: string): Promise<Report> {
         const data = await this.apiClient.GetReportEndpoint({
             queries: {
@@ -29,12 +29,27 @@ export default class ReportServices implements IReportServices {
             startDate: DateToolbox.getFormattedDateFromISO(new Date(data.startDate).toISOString()),
             endDate: DateToolbox.getFormattedDateFromISO(new Date(data.endDate).toISOString()),
             totalPrice: data.totalPrice,
+            totalPriceWithVat: data.totalPriceWithVat,
             deliveries: data.deliveries.map(delivery => ({
                 deliveryCode: delivery.deliveryCode,
                 deliveryDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.deliveryDate).toISOString()),
                 deliveryTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.deliveryDate).toISOString()),
                 deliveryPrice: delivery.deliveryPrice,
-                details: delivery.details
+                deliveryPriceWithVat: delivery.deliveryPriceWithVat,
+                details: delivery.details.map(detail => ({
+                    ...detail,
+                    address: {
+                        ...detail.address,
+                        name: detail.address?.name ?? "",
+                        streetInfo: detail.address?.streetInfo ?? "",
+                        postcode: detail.address?.postcode ?? "",
+                        city: detail.address?.city ?? "",
+                        complement: detail.address?.complement ?? "",
+                        phone: detail.address?.phone ?? "",
+                        coordinates: detail.address?.coordinates ?? {longitude: 0, latitude: 0},
+                        fullAddress: detail.address ? `${detail.address.name} - ${detail.address.streetInfo} ${detail.address.postcode} ${detail.address.city}` : ""
+                    }
+                }))
             }))
         };
     }

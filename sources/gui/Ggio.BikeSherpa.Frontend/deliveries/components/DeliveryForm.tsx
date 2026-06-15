@@ -85,7 +85,7 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 error={errors.totalPrice as FieldError | undefined}
                 label="Prix total (en €)"
                 placeholder="10"
-                disabled={props.pricingStrategies.length === 0 || field.value !== parseInt(props.pricingStrategies[0].value)}
+                disabled={props.pricingStrategies.length === 0 || field.value !== parseInt(props.pricingStrategies[2].value)}
                 required
                 isNumeric
             />
@@ -129,8 +129,9 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                 name="distance"
                 error={errors.details as FieldError | undefined}
                 label="Distance (en Km)"
-                placeholder="Message lambda"
+                placeholder="0"
                 isNumeric
+                disabled
             />
             <ThemedInput
                 testID="deliveryFormDetailsInput"

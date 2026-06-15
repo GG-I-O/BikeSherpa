@@ -16,25 +16,6 @@ const WorkHourDto = z.object({
   endDate: z.string().datetime({ offset: true }),
 });
 const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
-const DeliveryReportDetail = z.object({
-  description: z.string(),
-  price: z.number(),
-  quantity: z.number().int(),
-});
-const DeliveryReport = z.object({
-  deliveryCode: z.string(),
-  deliveryDate: z.string().datetime({ offset: true }),
-  deliveryPrice: z.number(),
-  details: z.array(DeliveryReportDetail),
-});
-const Report = z.object({
-  customerName: z.string(),
-  startDate: z.string().datetime({ offset: true }),
-  endDate: z.string().datetime({ offset: true }),
-  totalPrice: z.number(),
-  deliveries: z.array(DeliveryReport),
-});
-const StepType = z.union([z.literal(0), z.literal(1)]);
 const GeoPoint = z.object({ longitude: z.number(), latitude: z.number() });
 const Address = z.object({
   name: z.string(),
@@ -45,15 +26,35 @@ const Address = z.object({
   coordinates: GeoPoint,
   phone: z.string().nullable(),
 });
-const City = z.object({ name: z.string() });
-const DeliveryZone = z.object({ name: z.string(), cities: z.array(City) });
+const DeliveryReportDetail = z.object({
+  description: z.string(),
+  address: Address.nullable(),
+  price: z.number(),
+  quantity: z.number().int(),
+});
+const DeliveryReport = z.object({
+  deliveryCode: z.string(),
+  deliveryDate: z.string().datetime({ offset: true }),
+  deliveryPrice: z.number(),
+  deliveryPriceWithVat: z.number(),
+  details: z.array(DeliveryReportDetail),
+});
+const Report = z.object({
+  customerName: z.string(),
+  startDate: z.string().datetime({ offset: true }),
+  endDate: z.string().datetime({ offset: true }),
+  totalPrice: z.number(),
+  totalPriceWithVat: z.number(),
+  deliveries: z.array(DeliveryReport),
+});
+const StepType = z.union([z.literal(0), z.literal(1)]);
 const DeliveryStepCrud = z.object({
   packingSize: z.string(),
+  stepZone: z.string(),
   stepType: StepType,
   order: z.number().int(),
   completed: z.boolean(),
   stepAddress: Address,
-  stepZone: DeliveryZone,
   distance: z.number(),
   courierId: z.string().nullable(),
   comment: z.string().nullable(),
@@ -194,14 +195,12 @@ export const schemas = {
   PricingStrategyDto,
   WorkHourDto,
   PackingSizeDto,
+  GeoPoint,
+  Address,
   DeliveryReportDetail,
   DeliveryReport,
   Report,
   StepType,
-  GeoPoint,
-  Address,
-  City,
-  DeliveryZone,
   DeliveryStepCrud,
   Link,
   DeliveryStepDto,

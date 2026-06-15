@@ -7,9 +7,9 @@ import Delivery from "@/deliveries/models/Delivery";
 import {useForm} from "react-hook-form";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {navigate} from "expo-router/build/global-state/routing";
 import NewDeliveryFormViewModel from "@/deliveries/viewModel/NewDeliveryFormViewModel";
 import useDropdown from "@/hooks/useDropdown";
+import {router} from "expo-router";
 
 export function useDeliveryCopyFormViewModel(deliveryId: string) {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -33,14 +33,15 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,
             discount: delivery.discount ?? 0,
+            discountReason: delivery.discountReason ?? "",
             extraCost: delivery.extraCost ?? 0,
+            extraCostReason: delivery.extraCostReason ?? "",
             steps: delivery.steps.map(step => ({
                 ...step,
                 contactName: step.stepAddress.name,
                 contactPhone: step.stepAddress.phone ?? ''
             })),
             details: delivery.details,
-            packingSize: delivery.packingSize,
             insulatedBox: delivery.insulatedBox,
             startDate: delivery.startDate,
             contractDate: delivery.contractDate,
@@ -53,9 +54,7 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
         handleSubmit: handleSubmit(
             (data) => {
                 viewModel.onSubmit(data);
-                navigate({
-                    pathname: '/(tabs)/deliveries',
-                });
+                router.back();
             },
             (errors) => {
                 console.error("Invalid delivery for creation");
