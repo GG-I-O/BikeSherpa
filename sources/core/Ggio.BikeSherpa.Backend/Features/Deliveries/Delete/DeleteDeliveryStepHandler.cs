@@ -30,7 +30,8 @@ public class DeleteDeliveryStepHandler(
                return Result.NotFound();
           }
 
-          await entity.DeleteStepAsync(step, pricingStrategyService, itineraryService);
+          await entity.DeleteStepAsync(step, itineraryService);
+          entity.TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(entity);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

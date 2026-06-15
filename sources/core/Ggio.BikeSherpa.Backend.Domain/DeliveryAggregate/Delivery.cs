@@ -1,7 +1,6 @@
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
@@ -101,12 +100,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           RegisterDomainEvent(new DeliveryCancelledEvent(Id));
      }
 
-     public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime, IPricingStrategyService pricingStrategyService)
-     {
-          StartDate = deliveryDateTime;
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
-     }
-
      public async Task ReorderStepsAsync(Guid movedStepId, int newOrder, IItinerarySpi itineraryService)
      {
           var movedStep = Steps.Single(s => s.Id == movedStepId);
@@ -203,7 +196,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           bool notBilled,
           PackingSize packingSize,
           IDeliveryZoneRepository deliveryZones,
-          IPricingStrategyService pricingStrategyService,
           IItinerarySpi itineraryService)
      {
           var newStep = new DeliveryStep(
@@ -233,14 +225,11 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
 
           Steps.Add(newStep);
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
-
           return newStep;
      }
 
      public async Task DeleteStepAsync(
           DeliveryStep removedStep,
-          IPricingStrategyService pricingStrategyService,
           IItinerarySpi itineraryService)
      {
           var nextStep = Steps.FirstOrDefault(s => s.Order == removedStep.Order + 1);
@@ -249,7 +238,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           ReorderStepsOnDeletion();
           UpdateStepDeliveryTimeOnDelete(removedStep.Order, timeOffset);
           await RecalculateStepDistancesAsync(itineraryService);
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
      private static TimeSpan CalculateDeliveryTimeOffset(DeliveryStep removedStep, DeliveryStep? nextStep) => nextStep is null ? TimeSpan.Zero : nextStep.EstimatedDeliveryDate - removedStep.EstimatedDeliveryDate;
@@ -264,7 +252,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public async Task UpdateStepsAsync(List<DeliveryStep> steps,
           IDeliveryZoneRepository deliveryZones,
-          IPricingStrategyService pricingStrategyService,
           IItinerarySpi itineraryService)
      {
           for (var index = 0; index < steps.Count; index++)
@@ -319,7 +306,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           DeleteOldSteps(steps);
           Steps = steps;
           await RecalculateStepDistancesAsync(itineraryService);
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
      private void DeleteOldSteps(List<DeliveryStep> steps)

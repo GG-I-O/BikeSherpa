@@ -30,4 +30,7 @@ public interface IParameterRepository
      ValueTask<string> GetSimpleDeliveryMailSubjectAsync();
      ValueTask<string> GetTourDeliveryMailTemplateContent();
      ValueTask<string> GetTourDeliveryMailSubjectAsync();
+     
+     ValueTask<int> GetEarlyOrderLimitInHoursAsync();
+     ValueTask<int> GetLastMinuteOrderLimitInHoursAsync();
 }

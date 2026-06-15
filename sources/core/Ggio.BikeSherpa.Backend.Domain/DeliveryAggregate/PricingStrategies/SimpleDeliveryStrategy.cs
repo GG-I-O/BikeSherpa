@@ -2,39 +2,18 @@
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
-public class SimpleDeliveryStrategy : IPricingStrategy
+public class SimpleDeliveryStrategy(IDelayService delayService) : IPricingStrategy
 {
      public PricingStrategy ImplementedStrategy => PricingStrategy.SimpleDeliveryStrategy;
 
-     public double DelayCost(DateTimeOffset startDate, DateTimeOffset contractDate) => DelayService.CalculateDelay(startDate, contractDate);
-
-     public double GetStepsInCoreCost(int dropOffStepsInCore) => dropOffStepsInCore * StepPriceInCore;
-
-     public double GetStepsInBorderCost(int dropOffStepsInBorder) => dropOffStepsInBorder * StepPriceInBorder;
-
-     public double GetStepsInPeripheryCost(int dropOffStepsInPeriphery) => dropOffStepsInPeriphery * StepPriceInPeriphery;
-
-     public double GetOutsideStepsCost(int dropOffStepsOutside) => dropOffStepsOutside * StepPriceOutside;
-
-     public double TotalDistanceCost(double totalDistance, Urgency urgency) => urgency.PriceCoefficient * totalDistance;
-
-     public double GetPackingCost(DeliveryStep deliveryStep) => deliveryStep.PackingSize.SimplePrice;
-
-     public double CalculateDeliveryPriceWithoutVat(Delivery delivery)
+     public async Task<double> CalculateDeliveryPriceWithoutVat(Delivery delivery)
      {
-          var delayPrice = DelayCost(delivery.StartDate, delivery.ContractDate);
-          var dropStep = delivery.Steps.Single(s => s.StepType == StepType.Dropoff);
-          var pickZonePrice = delivery.Steps.Single(s => s.StepType == StepType.Pickup).StepZone.SimplePrice;
-          var dropZonePrice = dropStep.StepZone.SimplePrice;
-          var packingPrice = dropStep.PackingSize.SimplePrice;
-          var distancePrice = delivery.Urgency.PriceCoefficient * dropStep.Distance;
-
-          //TODO
-          // var inCoreCost = GetStepsInCoreCost(delivery.Steps.Count(s => s.StepZone.Name == StepZone.InCore));
-          // var inBorderCost = GetStepsInBorderCost(delivery.Steps.Count(s => s.StepZone.Name == StepZone.InBorder));
-          // var inPeripheryCost = GetStepsInPeripheryCost(delivery.Steps.Count(s => s.StepZone.Name == StepZone.InPeriphery));
-          // var outsideCost = GetOutsideStepsCost(delivery.Steps.Count(s => s.StepZone.Name == StepZone.Outside));
-          // var distanceCost = TotalDistanceCost(delivery.Steps.Where(s => !s.NotBilled).Sum(s => s.Distance), delivery.Urgency);
+          var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
+          var dropStep = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Dropoff);
+          var pickZonePrice = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Pickup)?.StepZone.SimplePrice ?? 0;
+          var dropZonePrice = dropStep?.StepZone.SimplePrice ?? 0;
+          var packingPrice = dropStep?.PackingSize.SimplePrice ?? 0;
+          var distancePrice = delivery.Urgency.PriceCoefficient * dropStep?.Distance ?? 0;
 
           return Math.Round(
                delayPrice +
@@ -42,7 +21,25 @@ public class SimpleDeliveryStrategy : IPricingStrategy
                distancePrice +
                dropZonePrice +
                packingPrice +
-               delivery.ExtraCost ?? 0 - delivery.Discount ?? 0
+               (delivery.ExtraCost ?? 0) - (delivery.Discount ?? 0)
                , 2);
+     }
+
+     public async Task<double> GetStepPrice(Delivery delivery, DeliveryStep deliveryStep)
+     {
+          if (deliveryStep.StepType == StepType.Pickup)
+          {
+               var dropStep = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Dropoff);
+               
+               var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
+               var packingPrice = dropStep?.PackingSize.SimplePrice ?? 0;
+               var pickZonePrice = deliveryStep.StepZone.SimplePrice;
+               var dropZonePrice = dropStep?.StepZone.SimplePrice ?? 0;
+               return delayPrice + packingPrice + pickZonePrice + dropZonePrice;
+          }
+          else // StepType.Dropoff
+          {
+               return delivery.Urgency.PriceCoefficient * deliveryStep.Distance;
+          }
      }
 }

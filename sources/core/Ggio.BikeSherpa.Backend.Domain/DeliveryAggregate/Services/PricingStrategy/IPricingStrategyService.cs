@@ -2,5 +2,5 @@
 
 public interface IPricingStrategyService
 {
-     public double CalculateDeliveryPriceWithoutVat(Delivery delivery);
+     public Task<double> CalculateDeliveryPriceWithoutVat(Delivery delivery);
 }

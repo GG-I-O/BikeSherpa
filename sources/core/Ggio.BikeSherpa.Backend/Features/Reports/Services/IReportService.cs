@@ -5,5 +5,5 @@ namespace Ggio.BikeSherpa.Backend.Features.Reports.Services;
 
 public interface IReportService
 {
-     Report GenerateReport(string customerName, DateTimeOffset startDate, DateTimeOffset endDate, List<Delivery> deliveries);
+     Task<Report> GenerateReport(string customerName, DateTimeOffset startDate, DateTimeOffset endDate, List<Delivery> deliveries);
 }

@@ -55,7 +55,7 @@ public class GetReportHandler(
                     , cancellationToken
                );
 
-          return service.GenerateReport(
+          return await service.GenerateReport(
                customer!.Name,
                query.From,
                query.To,

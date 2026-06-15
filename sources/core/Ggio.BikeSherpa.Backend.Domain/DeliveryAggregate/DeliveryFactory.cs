@@ -70,7 +70,7 @@ public class DeliveryFactory(
                delivery.GenerateCode(customer, deliveries.Count + 1);
           }
 
-          delivery.TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
+          delivery.TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
 
           await NotifyNewAggregateRootAdded(delivery);
 

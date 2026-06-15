@@ -34,6 +34,7 @@ public class CalculateDeliveryPriceHandler(
      IPricingStrategyService pricingStrategyService,
      IUrgencyRepository urgencyRepository,
      IPackingSizeRepository packingSizeRepository,
+     IDeliveryZoneRepository deliveryZoneRepository,
      IValidator<CalculateDeliveryPriceQuery> validator,
      IItinerarySpi itineraryService,
      IVatService vatService) : IQueryHandler<CalculateDeliveryPriceQuery, CalculateDeliveryPriceResult>
@@ -52,7 +53,7 @@ public class CalculateDeliveryPriceHandler(
                Steps = query.Delivery.Steps
                     .Where(step => step.Data.StepAddress.StreetInfo != string.Empty)
                     .Select(step => DeliveryStepCrudMapper
-                         .Map(step.Data, packingSizeRepository)
+                         .Map(step.Data, packingSizeRepository, deliveryZoneRepository)
                     ).ToList(),
                InsulatedBox = query.Delivery.InsulatedBox,
                StartDate = query.Delivery.StartDate,
@@ -61,7 +62,7 @@ public class CalculateDeliveryPriceHandler(
 
           await delivery.RecalculateStepDistancesAsync(itineraryService);
 
-          var price = pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
+          var price = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
           var priceWithVat = await vatService.GetPriceWithVatAsync(price);
           var totalDistance = delivery.GetTotalDistance();
 

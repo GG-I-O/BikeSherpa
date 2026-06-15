@@ -6,24 +6,9 @@ public class TourDeliveryStrategy(IDelayService delayService) : IPricingStrategy
 {
      public PricingStrategy ImplementedStrategy => PricingStrategy.TourDeliveryStrategy;
 
-     public double DelayCost(DateTimeOffset startDate, DateTimeOffset contractDate) => delayService.CalculateDelay(startDate, contractDate).Price;
-
-
-     public double GetStepsInCoreCost(int dropOffStepsInCore) => dropOffStepsInCore * StepPriceInCore;
-
-     public double GetStepsInBorderCost(int dropOffStepsInBorder) => dropOffStepsInBorder * StepPriceInBorder;
-
-     public double GetStepsInPeripheryCost(int dropOffStepsInPeriphery) => dropOffStepsInPeriphery * StepPriceInPeriphery;
-
-     public double GetOutsideStepsCost(int dropOffStepsOutside) => dropOffStepsOutside * StepPriceOutside;
-
-     // public double GetPackingCost(DeliveryStep deliveryStep) => deliveryStep.PackingSize.TourPrice + deliveryStep.StepZone.
-     public double TotalDistanceCost(double totalDistance, Urgency urgency) => 0;
-
-     public double CalculateDeliveryPriceWithoutVat(Delivery delivery)
+     public async Task<double> CalculateDeliveryPriceWithoutVat(Delivery delivery)
      {
-
-          var delayCost = DelayCost(delivery.StartDate, delivery.ContractDate);
+          var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
 
           var pickZonePrice = delivery.Steps.Where(s => s is { StepType: StepType.Pickup, NotBilled: false })
                .Sum(step => step.StepZone.TourPrice);
@@ -34,20 +19,28 @@ public class TourDeliveryStrategy(IDelayService delayService) : IPricingStrategy
           var dropStepPrices = dropSteps.Sum(step => step.StepZone.TourPrice);
           var dropStepPackingPrices = dropSteps.Sum(step => step.PackingSize.TourPrice);
 
-
-          //TODO voir si on garde
-          //
-          // var inCoreCost = GetStepsInCoreCost(delivery.Steps.Count(s => s.StepZone.Name == StepZone.InCore));
-          // var inBorderCost = GetStepsInBorderCost(delivery.Steps.Count(s => s.StepZone.Name == StepZone.InBorder));
-          // var inPeripheryCost = GetStepsInPeripheryCost(delivery.Steps.Count(s => s.StepZone.Name == StepZone.InPeriphery));
-          // var outsideCost = GetOutsideStepsCost(delivery.Steps.Count(s => s.StepZone.Name == StepZone.Outside));
-
           return Math.Round(
-               delayCost +
+               delayPrice +
                pickZonePrice +
                dropStepPackingPrices +
                dropStepPrices +
-               delivery.ExtraCost ?? 0 - delivery.Discount ?? 0
+               (delivery.ExtraCost ?? 0) - (delivery.Discount ?? 0)
                , 2);
+     }
+
+     public async Task<double> GetStepPrice(Delivery delivery, DeliveryStep deliveryStep)
+     {
+          if (deliveryStep.StepType == StepType.Pickup)
+          {
+               var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
+               var pickZonePrice = deliveryStep.StepZone.TourPrice;
+               return delayPrice + pickZonePrice;
+          }
+          else // StepType.Dropoff
+          {
+               var packingPrice = deliveryStep.PackingSize.TourPrice;
+               var dropZonePrice = deliveryStep.StepZone.TourPrice;
+               return packingPrice + dropZonePrice;
+          }
      }
 }

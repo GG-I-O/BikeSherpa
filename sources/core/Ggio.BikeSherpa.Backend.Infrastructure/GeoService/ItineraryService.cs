@@ -21,7 +21,7 @@ public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryServi
                EnsureApiReturnedResult(result);
 
                return new ItineraryResult(
-                    result.Distance,
+                    Math.Ceiling(result.Distance),
                     result.Duration
                );
           }

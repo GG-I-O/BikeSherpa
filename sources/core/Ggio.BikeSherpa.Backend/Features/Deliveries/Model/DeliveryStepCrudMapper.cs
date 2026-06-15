@@ -5,14 +5,14 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 
 public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, DeliveryStep>,
-     IFacetMapConfiguration<DeliveryStep, DeliveryStepCrud>, IFacetMapConfigurationInstance<DeliveryStep, DeliveryStepCrud>
+     IFacetMapConfiguration<DeliveryStep, DeliveryStepCrud>
 {
      public static void Map(DeliveryStep source, DeliveryStepCrud target)
      {
           target.PackingSize = source.PackingSize.Name;
+          target.StepZone = source.StepZone.Name;
      }
-
-
+     
      public static void Map(DeliveryStepCrud source, DeliveryStep target)
      {
           target.Completed = source.Completed;
@@ -25,18 +25,17 @@ public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, D
           target.UpdatedAt = source.UpdatedAt;
      }
 
-     void IFacetMapConfigurationInstance<DeliveryStep, DeliveryStepCrud>.Map(DeliveryStep source, DeliveryStepCrud target)
-     {
-          Map(source, target);
-     }
-
-     public static DeliveryStep Map(DeliveryStepCrud source, IPackingSizeRepository packingSizeRepository)
+     public static DeliveryStep Map(
+          DeliveryStepCrud source, 
+          IPackingSizeRepository packingSizeRepository,
+               IDeliveryZoneRepository deliveryZoneRepository
+          )
      {
           var target = new DeliveryStep(source.StepType, source.Order, source.StepAddress, source.Comment)
           {
                Id = source.Id,
                Completed = source.Completed,
-               StepZone = source.StepZone,
+               StepZone = deliveryZoneRepository.GetByAddress(source.StepAddress.City),
                Distance = source.Distance,
                CourierId = source.CourierId,
                CourierComment = null,

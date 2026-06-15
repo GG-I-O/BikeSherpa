@@ -61,9 +61,9 @@ public class AddDeliveryStepHandler(
                command.NotBilled,
                packingSizeRepository.GetByName(command.PackingSize)!,
                deliveryZones,
-               pricingStrategyService,
                itineraryService);
 
+          delivery.TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(deliveryStep.Id);
      }

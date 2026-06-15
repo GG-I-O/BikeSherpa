@@ -106,7 +106,7 @@ public class UpdateDeliveryHandler(
                     {
                          Id = step.Id,
                          StepAddress = step.StepAddress,
-                         StepZone = step.StepZone,
+                         StepZone = deliveryZones.GetByAddress(step.StepAddress.City),
                          ParentDelivery = entity,
                          PackingSize = packingSizeRepository.GetByName(step.PackingSize)!
                     };
@@ -116,8 +116,9 @@ public class UpdateDeliveryHandler(
                })
                .ToList();
 
-          await entity.UpdateStepsAsync(steps, deliveryZones, pricingStrategyService, itineraryService);
+          await entity.UpdateStepsAsync(steps, deliveryZones, itineraryService);
 
+          entity.TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(entity);
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
      }

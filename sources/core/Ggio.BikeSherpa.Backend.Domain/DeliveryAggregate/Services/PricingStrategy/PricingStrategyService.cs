@@ -6,7 +6,7 @@ public class PricingStrategyService(
      IEnumerable<IPricingStrategy> strategies
 ) : IPricingStrategyService
 {
-     public double CalculateDeliveryPriceWithoutVat(Delivery delivery)
+     public async Task<double> CalculateDeliveryPriceWithoutVat(Delivery delivery)
      {
           var strategy = strategies.SingleOrDefault(s => s.ImplementedStrategy == delivery.PricingStrategy);
           if (strategy is null || strategy.ImplementedStrategy == Enumerations.PricingStrategy.CustomStrategy)
@@ -14,6 +14,6 @@ public class PricingStrategyService(
                return (double)delivery.TotalPrice!;
           }
 
-          return strategy.CalculateDeliveryPriceWithoutVat(delivery);
+          return await strategy.CalculateDeliveryPriceWithoutVat(delivery);
      }
 }
