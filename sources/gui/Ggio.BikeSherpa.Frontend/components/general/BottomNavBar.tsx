@@ -1,7 +1,7 @@
-// components/general/BottomNavBar.tsx
 import { Link, usePathname } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
 import { Icon, Text, useTheme } from 'react-native-paper';
+import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 type NavItem = {
     href: string;
@@ -15,10 +15,11 @@ type Props = {
 
 export function BottomNavBar({ items }: Props) {
     const theme = useTheme();
+    const areaInsets = useSafeAreaInsets();
     const pathname = usePathname();
 
     return (
-        <View style={[styles.bar, { backgroundColor: theme.colors.surface }]}>
+        <View style={[styles.bar, { backgroundColor: theme.colors.surface, marginBottom: areaInsets.bottom }]}>
             {items.map((item) => {
                 const isActive = pathname.startsWith(item.href.replace('/(tabs)/', '/'));
                 return (
