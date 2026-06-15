@@ -117,11 +117,12 @@ public class AddDeliveryByCustomerEndpoint(
                     req.Delivery.Discount,
                     req.Delivery.ExtraCost,
                     req.Delivery.Details,
-                    req.Delivery.PackingSize,
                     req.Delivery.InsulatedBox,
                     req.Delivery.ContractDate,
                     req.Delivery.StartDate,
-                    req.Delivery.NeedEstimate
+                    req.Delivery.NeedEstimate,
+                    null,
+                    null
                );
 
                return await mediator.Send(createDeliveryCommand, ct);

@@ -7,6 +7,8 @@ import ThemedInput from "@/components/themed/ThemedInput";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";
 import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
+import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
+import useDropdown from "@/hooks/useDropdown";
 
 type Props = {
     control: Control<any>;
@@ -19,6 +21,7 @@ type Props = {
 }
 
 export default function StepRowInput({control, errors, name, index, deleteRow, moveRow, listLength}: Props) {
+    const { packingSizes } = useDropdown();
     
     return (
         <DataTable.Row style={{padding: 0}}>
@@ -55,29 +58,29 @@ export default function StepRowInput({control, errors, name, index, deleteRow, m
             </DataTable.Cell>
             <DataTable.Cell style={[datatableStyle.column]}>
                 <View style={{flexDirection: 'column', width: '100%', gap: 4}}>
-                <ThemedAddressInput
-                    control={control}
-                    name={`${name}.${index}.stepAddress`}
-                    error={errors.steps ? (errors.steps as any)[index]?.stepAddress?.streetInfo as FieldError | undefined : undefined}
-                    label=""
-                    placeholder="Adresse..."
-                />
-                <ThemedInput
-                    testID="StepAddressName"
-                    control={control}
-                    name={`${name}.${index}.contactName`}
-                    error={errors.steps ? (errors.steps as any)[index]?.contactName as FieldError | undefined : undefined}
-                    label=""
-                    placeholder="Nom..."
-                />
-                <ThemedInput
-                    testID="StepAddressPhone"
-                    control={control}
-                    name={`${name}.${index}.contactPhone`}
-                    error={errors.steps ? (errors.steps as any)[index]?.contactPhone as FieldError | undefined : undefined}
-                    label=""
-                    placeholder="Téléphone..."
-                />
+                    <ThemedAddressInput
+                        control={control}
+                        name={`${name}.${index}.stepAddress`}
+                        error={errors.steps ? (errors.steps as any)[index]?.stepAddress?.streetInfo as FieldError | undefined : undefined}
+                        label=""
+                        placeholder="Adresse..."
+                    />
+                    <ThemedInput
+                        testID="StepAddressName"
+                        control={control}
+                        name={`${name}.${index}.contactName`}
+                        error={errors.steps ? (errors.steps as any)[index]?.contactName as FieldError | undefined : undefined}
+                        label=""
+                        placeholder="Nom..."
+                    />
+                    <ThemedInput
+                        testID="StepAddressPhone"
+                        control={control}
+                        name={`${name}.${index}.contactPhone`}
+                        error={errors.steps ? (errors.steps as any)[index]?.contactPhone as FieldError | undefined : undefined}
+                        label=""
+                        placeholder="Téléphone..."
+                    />
                 </View>
             </DataTable.Cell>
             <DataTable.Cell style={[datatableStyle.column, datatableStyle.width90]}>
@@ -86,6 +89,17 @@ export default function StepRowInput({control, errors, name, index, deleteRow, m
                     control={control}
                     name={`${name}.${index}.notBilled`}
                     label=""
+                />
+            </DataTable.Cell>
+            <DataTable.Cell style={[datatableStyle.column]}>
+                <ThemedDropdownInput
+                    testID="StepPackingSizeInput"
+                    control={control}
+                    name={`${name}.${index}.packingSize`}
+                    error={errors.steps ? (errors.steps as any)[index]?.packingSize as FieldError | undefined : undefined}
+                    label="Taille"
+                    options={packingSizes}
+                    required
                 />
             </DataTable.Cell>
             <DataTable.Cell style={[datatableStyle.column]}>

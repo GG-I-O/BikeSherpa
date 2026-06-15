@@ -5,5 +5,6 @@ export type DeliveryReport = {
     deliveryDate: string;
     deliveryTime: string;
     deliveryPrice: number;
+    deliveryPriceWithVat: number;
     details: DeliveryReportDetail[];
 }

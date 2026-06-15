@@ -1,6 +1,5 @@
 import {Address} from "@/models/Address";
 
-
 export interface StepToDisplay { 
     id: string;
     deliveryId: string;

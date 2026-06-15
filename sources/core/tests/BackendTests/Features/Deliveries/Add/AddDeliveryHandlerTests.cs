@@ -5,8 +5,8 @@ using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 using Ggio.DddCore;
 using Moq;
@@ -15,16 +15,16 @@ namespace BackendTests.Features.Deliveries.Add;
 
 public class AddDeliveryHandlerTests
 {
-     private readonly Mock<IDeliveryFactory> _mockFactory = new();
-     private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
-     private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
-     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
-     private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
-     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly AddDeliveryCommand _mockCommand;
      private readonly Delivery _mockDelivery;
+     private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
+     private readonly Mock<IDeliveryFactory> _mockFactory = new();
+     private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
+     private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
+     private readonly Mock<IApplicationTransaction> _mockTransaction = new();
+     private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
 
      public AddDeliveryHandlerTests()
      {
@@ -32,13 +32,17 @@ public class AddDeliveryHandlerTests
           _mockDelivery = _fixture.Build<Delivery>()
                .With(d => d.Steps, [])
                .Create();
+
           _mockDelivery.GenerateReportId(mockCustomer);
-          _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
+          _mockPricingStrategyService.Setup(s => s.CalculateDeliveryPriceWithoutVat(_mockDelivery))
+               .ReturnsAsync(10.0);
+          _mockDelivery.TotalPrice = 10.0;
 
           var urgencies = new List<Urgency>(_fixture.CreateMany<Urgency>(2));
           _mockUrgencyRepository
                .Setup(x => x.GetAll())
                .Returns(urgencies);
+
           _mockUrgencyRepository
                .Setup(x => x.GetByName(It.IsAny<string>()))
                .Returns(urgencies[0]);
@@ -47,25 +51,25 @@ public class AddDeliveryHandlerTests
           _mockPackingSizeRepository
                .Setup(x => x.GetAll())
                .Returns(packingSizes);
+
           _mockPackingSizeRepository
                .Setup(x => x.GetByName(It.IsAny<string>()))
                .Returns(packingSizes[0]);
 
           _mockCommand = _fixture.Build<AddDeliveryCommand>()
-          .With(c => c.Urgency, urgencies[0].Name)
-          .With(c => c.PackingSize, packingSizes[0].Name)
-          .Create();
+               .With(c => c.Urgency, urgencies[0].Name)
+               .Create();
 
           _mockFactory
                .Setup(x => x.CreateDeliveryAsync(It.IsAny<DeliveryFactoryParameters>()
-                    ))
+               ))
                .ReturnsAsync(_mockDelivery);
      }
 
      private AddDeliveryHandler CreateSut()
      {
-          var validator = new AddDeliveryCommandValidator(_mockUrgencyRepository.Object, _mockPackingSizeRepository.Object);
-          return new AddDeliveryHandler(_mockFactory.Object, _mockUrgencyRepository.Object, _mockPackingSizeRepository.Object, validator, _mockTransaction.Object);
+          var validator = new AddDeliveryCommandValidator(_mockUrgencyRepository.Object);
+          return new AddDeliveryHandler(_mockFactory.Object, _mockUrgencyRepository.Object, validator, _mockTransaction.Object);
      }
 
      private void SetupRepositoryTestingIfCodeExists(bool doesCodeExist)
@@ -93,7 +97,7 @@ public class AddDeliveryHandlerTests
      public async Task Handle_ShouldCreateDeliveryAndReturnId_WhenCommandIsValid()
      {
           // Arrange
-          SetupRepositoryTestingIfCodeExists(false); // Tell the validator that the code does not exist
+          SetupRepositoryTestingIfCodeExists(false);
           var sut = CreateSut();
 
           // Act

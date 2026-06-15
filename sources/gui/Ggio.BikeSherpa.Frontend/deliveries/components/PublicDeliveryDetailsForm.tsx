@@ -2,7 +2,6 @@ import {Text} from "react-native-paper";
 import {View} from "react-native";
 import ThemedDateInput from "@/components/themed/ThemedDateInput";
 import {Control, FieldError, FieldErrors, useController} from "react-hook-form";
-import {DropdownOptions} from "@/models/DropdownOptions";
 import formStyle from "@/style/formStyle";
 import React, {useMemo} from "react";
 import {Dropdown} from "react-native-paper-dropdown";
@@ -15,7 +14,6 @@ import usePublicDeliveryDetailsFormViewModel from "@/deliveries/viewModel/usePub
 type Props = {
     control: Control<PublicDeliveryFormValues>;
     errors: FieldErrors;
-    packingSizes: DropdownOptions[];
     setUrgency: (urgency: string) => void;
     setStartDate: (startDate: string) => void;
     showUrgency?: boolean;
@@ -92,15 +90,6 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                 />
                 <Text style={AppStyle.textStyle.h3}> min </Text>
             </View>
-            <ThemedDropdownInput
-                testID="deliveryFormPackingSizeInput"
-                control={props.control}
-                name="packingSize"
-                error={props.errors.packingSize as FieldError | undefined}
-                label="Tranche - selon poids ET plus grande dimension du colis"
-                options={props.packingSizes}
-                required
-            />
             {props.showUrgency && (
                 <>
                     <ThemedDropdownInput

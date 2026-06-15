@@ -1,4 +1,4 @@
-﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+﻿namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 
 public interface IUrgencyRepository
 {

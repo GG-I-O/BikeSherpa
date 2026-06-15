@@ -70,7 +70,9 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                     notBilled: false,
                     contactName: '',
                     contactPhone: '',
-                    stepAddress: emptyAddress
+                    stepAddress: emptyAddress,
+                    packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
+
                 },
                 {
                     stepType: 1,
@@ -79,10 +81,10 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                     notBilled: false,
                     contactName: '',
                     contactPhone: '',
-                    stepAddress: emptyAddress
+                    stepAddress: emptyAddress,
+                    packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
                 },
             ],
-            packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
             insulatedBox: false,
             startDate: new Date().toISOString(),
             needEstimate: false,
@@ -131,7 +133,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             }
         }
     }, [customerType]);
-    
+
     // Keep infos updated for hided field depending on customer type
     const customerField = useWatch({control, name: "customer"});
     useEffect(() => {
@@ -146,7 +148,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 break;
         }
     }, [customerField.name, customerField.phoneNumber]);
-    
+
     const senderStepAddress = useWatch({control, name: "steps.0.stepAddress"});
     useEffect(() => {
         if (customerType === PublicDeliveryCustomerTypeEnum.Sender) {
@@ -167,9 +169,13 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         control,
         name: stepAddresses.map((_, index) => `steps.${index}.stepAddress.coordinates` as const)
     });
+    const stepPackings = useWatch({
+        control,
+        name: stepAddresses.map((_, index) => `steps.${index}.packingSize` as const)
+    });
     const triggerFields = useWatch({
         control,
-        name: ["pricingStrategy", "packingSize", "urgency", "startDate"]
+        name: ["pricingStrategy", "urgency", "startDate"]
     });
     const cancelledRef = useRef(false);
 
@@ -195,7 +201,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         return () => {
             cancelledRef.current = true;
         };
-    }, 400, [stepCoordinates, triggerFields]);
+    }, 400, [stepCoordinates, stepPackings, triggerFields]);
 
     // Keep estimated price and distance dynamical
     const estimatedDistance = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.totalDistance ?? 0);
@@ -205,14 +211,18 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
     // Slice first packingSize option if deliveryType === 1
     const deliveryTypes = pricingStrategies.slice(0, 2);
     const deliveryType = useWatch({control, name: "pricingStrategy"});
-    const packingSize = useWatch({control, name: "packingSize"});
     if (
         deliveryTypes.length > 0 &&
         deliveryType.toString() === deliveryTypes[1].value
     ) {
+        // Limit dropdown
         packingSizes = packingSizes.slice(1);
-        if (packingSizes.find(ps => ps.value === packingSize) === undefined)
-            setValue("packingSize", packingSizes[0].value);
+        
+        // Change step packing if the option is not available anymore
+        stepPackings.forEach((packing, index) => {
+            if (packingSizes.find(ps => ps.value === packing) === undefined)
+                setValue(`steps.${index}.packingSize`, packingSizes[0].value);
+        })
     }
 
     return {

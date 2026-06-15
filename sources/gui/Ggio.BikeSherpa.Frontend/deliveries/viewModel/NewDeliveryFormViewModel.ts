@@ -22,7 +22,7 @@ export default class NewDeliveryFormViewModel extends AbstractFormViewModel {
                     id: Crypto.randomUUID(),
                     order: 0,
                     completed: false,
-                    stepZone: {name: '', cities: []},
+                    stepZone: '',
                     courierId: null,
                     comment: step.comment ?? null,
                     courierComment: step.courierComment ?? null,

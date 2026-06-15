@@ -52,6 +52,16 @@ public class ParameterConfiguration : IEntityTypeConfiguration<Parameter>
               {
                    Key = ParameterRepository.TourDeliveryMailSubjectKey,
                    Value = "Tour delivery Ready for Pickup"
+              },
+              new
+              {
+                   Key = ParameterRepository.EarlyOrderLimitInHours,
+                   Value = "18"
+              },
+              new
+              {
+                   Key = ParameterRepository.LastMinuteOrderLimitInHours,
+                   Value = "2"
               }
          );
      }

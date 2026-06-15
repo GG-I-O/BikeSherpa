@@ -8,7 +8,6 @@ using FluentValidation.Results;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
@@ -54,7 +53,7 @@ public class UpdateDeliveryHandlerTests
 
           _mockPricingStrategyService
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
-               .Returns(123.45);
+               .ReturnsAsync(123.45);
 
           _mockItineraryService
                .Setup(x => x.GetItineraryInfoAsync(
@@ -99,7 +98,7 @@ public class UpdateDeliveryHandlerTests
                     .With(s => s.StepType, step.StepType)
                     .With(s => s.Order, step.Order)
                     .With(s => s.StepAddress, step.StepAddress)
-                    .With(s => s.StepZone, _deliveryZone)
+                    .With(s => s.StepZone, _deliveryZone.Name)
                     .With(s => s.EstimatedDeliveryDate, step.EstimatedDeliveryDate)
                     .Create())
                .ToList();
@@ -185,7 +184,6 @@ public class UpdateDeliveryHandlerTests
           _delivery.Discount.Should().Be(_command.Discount);
           _delivery.CustomerReference.Should().Be(_command.ReportId);
           _delivery.Details.Should().BeEquivalentTo(_command.Details);
-          _delivery.PackingSize.Should().Be(PackingSize);
           _delivery.InsulatedBox.Should().Be(_command.InsulatedBox);
           _delivery.ContractDate.Should().Be(_command.ContractDate);
           _delivery.StartDate.Should().Be(_command.StartDate);

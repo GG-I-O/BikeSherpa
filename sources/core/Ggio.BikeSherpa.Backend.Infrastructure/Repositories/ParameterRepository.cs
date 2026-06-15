@@ -19,6 +19,9 @@ public class ParameterRepository(BackendDbContext dbContext) : IParameterReposit
      public const string TourDeliveryMailTemplateKey = "TOUR_DELIVERY_MAIL_TEMPLATE";
      public const string TourDeliveryMailSubjectKey = "TOUR_DELIVERY_MAIL_SUBJECT";
 
+     public const string EarlyOrderLimitInHours = "EARLY_ORDER_LIMIT_IN_HOURS";
+     public const string LastMinuteOrderLimitInHours = "LAST_MINUTE_ORDER_LIMIT_IN_HOURS";
+
      public async ValueTask<double> GetVatRateAsync()
      {
           return Convert.ToDouble((await dbContext.Parameters.FindAsync(VatRateKey))!.Value);
@@ -43,4 +46,9 @@ public class ParameterRepository(BackendDbContext dbContext) : IParameterReposit
      public async ValueTask<string> GetSimpleDeliveryMailSubjectAsync() => (await dbContext.Parameters.FindAsync(SimpleDeliveryMailSubjectKey))!.Value;
      public async ValueTask<string> GetTourDeliveryMailTemplateContent() => (await dbContext.Parameters.FindAsync(TourDeliveryMailTemplateKey))!.Value;
      public async ValueTask<string> GetTourDeliveryMailSubjectAsync() => (await dbContext.Parameters.FindAsync(TourDeliveryMailSubjectKey))!.Value;
+
+     public async ValueTask<int> GetEarlyOrderLimitInHoursAsync() =>
+          int.Parse((await dbContext.Parameters.FindAsync(EarlyOrderLimitInHours))!.Value);
+     public async ValueTask<int> GetLastMinuteOrderLimitInHoursAsync() =>
+          int.Parse((await dbContext.Parameters.FindAsync(LastMinuteOrderLimitInHours))!.Value);
 }

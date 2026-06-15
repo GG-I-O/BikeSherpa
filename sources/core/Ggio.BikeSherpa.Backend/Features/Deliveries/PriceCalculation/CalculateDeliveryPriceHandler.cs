@@ -2,13 +2,11 @@ using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Mediator;
-using Namotion.Reflection;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.PriceCalculation;
 
@@ -18,11 +16,10 @@ public record CalculateDeliveryPriceResult(double Price, double PriceWithVat, do
 
 public class CalculateDeliveryPriceQueryValidator : AbstractValidator<CalculateDeliveryPriceQuery>
 {
-     public CalculateDeliveryPriceQueryValidator(IUrgencyRepository urgencyRepository, IPackingSizeRepository packingSizeRepository)
+     public CalculateDeliveryPriceQueryValidator(IUrgencyRepository urgencyRepository)
      {
           RuleFor(x => x.Delivery).NotNull();
           RuleFor(x => x.Delivery.Urgency).SetValidator(new UrgencyValidator(urgencyRepository));
-          RuleFor(x => x.Delivery.PackingSize).SetValidator(new PackingSizeValidator(packingSizeRepository));
           RuleFor(x => x.Delivery.PricingStrategy)
                .Must(val => val is PricingStrategy.SimpleDeliveryStrategy or PricingStrategy.TourDeliveryStrategy)
                .WithMessage("Le type de tarification pour le calcul doit être 'Course' ou 'Tournée'");
@@ -37,6 +34,7 @@ public class CalculateDeliveryPriceHandler(
      IPricingStrategyService pricingStrategyService,
      IUrgencyRepository urgencyRepository,
      IPackingSizeRepository packingSizeRepository,
+     IDeliveryZoneRepository deliveryZoneRepository,
      IValidator<CalculateDeliveryPriceQuery> validator,
      IItinerarySpi itineraryService,
      IVatService vatService) : IQueryHandler<CalculateDeliveryPriceQuery, CalculateDeliveryPriceResult>
@@ -45,7 +43,6 @@ public class CalculateDeliveryPriceHandler(
      {
           await validator.ValidateAndThrowAsync(query, cancellationToken);
           var urgency = urgencyRepository.GetByName(query.Delivery.Urgency)!;
-          var packingSize = packingSizeRepository.GetByName(query.Delivery.PackingSize)!;
 
           var delivery = new Delivery
           {
@@ -56,9 +53,8 @@ public class CalculateDeliveryPriceHandler(
                Steps = query.Delivery.Steps
                     .Where(step => step.Data.StepAddress.StreetInfo != string.Empty)
                     .Select(step => DeliveryStepCrudMapper
-                         .Map(step.Data)
+                         .Map(step.Data, packingSizeRepository, deliveryZoneRepository)
                     ).ToList(),
-               PackingSize = packingSize,
                InsulatedBox = query.Delivery.InsulatedBox,
                StartDate = query.Delivery.StartDate,
                ContractDate = query.Delivery.ContractDate
@@ -66,7 +62,7 @@ public class CalculateDeliveryPriceHandler(
 
           await delivery.RecalculateStepDistancesAsync(itineraryService);
 
-          var price = pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
+          var price = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
           var priceWithVat = await vatService.GetPriceWithVatAsync(price);
           var totalDistance = delivery.GetTotalDistance();
 

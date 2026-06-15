@@ -8,10 +8,13 @@ import AppStyle from "@/constants/AppStyle";
 import {StepType} from "@/steps/models/StepType";
 import ThemedInput from "@/components/themed/ThemedInput";
 import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
+import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
+import {DropdownOptions} from "@/models/DropdownOptions";
 
 type Props = {
     control: Control<PublicDeliveryFormValues>,
     errors: FieldErrors,
+    packingSizes: DropdownOptions[],
     totalDistance: number,
     customerType: PublicDeliveryCustomerTypeEnum,
     canAddStep?: boolean
@@ -32,6 +35,7 @@ export default function PublicDeliveryStepForm(props: Props) {
             notBilled: false,
             contactName: '',
             contactPhone: '',
+            packingSize: props.packingSizes.length > 0 ? props.packingSizes[0].value : 'S',
             stepAddress: {
                 name: '',
                 fullAddress: '',
@@ -92,6 +96,15 @@ export default function PublicDeliveryStepForm(props: Props) {
                                 />
                             </View>
                         )}
+                    <ThemedDropdownInput
+                        testID="deliveryFormPackingSizeInput"
+                        control={props.control}
+                        name="packingSize"
+                        error={props.errors.packingSize as FieldError | undefined}
+                        label="Tranche - selon poids ET plus grande dimension du colis"
+                        options={props.packingSizes}
+                        required
+                    />
                     <View>
                         <ThemedInput
                             testID="stepComment"

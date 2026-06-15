@@ -1,5 +1,4 @@
 ﻿using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Model;
@@ -24,7 +23,8 @@ public class AddDeliveryStepEndpoint(IMediator mediator) : Endpoint<DeliveryStep
                req.StepType,
                req.StepAddress,
                req.Comment,
-               req.NotBilled
+               req.NotBilled,
+               req.PackingSize
           );
 
           var result = await mediator.Send(command, ct);

@@ -5,7 +5,6 @@ using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
@@ -25,6 +24,7 @@ public class AddDeliveryStepHandlerTest
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
      private readonly Mock<IDeliveryZoneRepository> _mockDeliveryZoneRepository = new();
      private readonly Mock<IItinerarySpi> _mockItineraryApi = new();
+     private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
      private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
 
@@ -36,7 +36,11 @@ public class AddDeliveryStepHandlerTest
                .Create();
 
           _mockDelivery.GenerateReportId(mockCustomer);
-          _mockDelivery.TotalPrice = _mockPricingStrategyService.Object.CalculateDeliveryPriceWithoutVat(_mockDelivery);
+          _mockPricingStrategyService.Setup(s => s.CalculateDeliveryPriceWithoutVat(_mockDelivery))
+               .ReturnsAsync(10.0);
+          _mockDelivery.TotalPrice = 10.0;
+
+          _mockPackingSizeRepository.Setup(x => x.GetByName(It.IsAny<string>())).Returns(_fixture.Create<PackingSize>());
 
           _mockCommand = _fixture.Build<AddDeliveryStepCommand>().Create();
 
@@ -49,14 +53,15 @@ public class AddDeliveryStepHandlerTest
 
      private AddDeliveryStepHandler CreateSut()
      {
-          var validator = new AddDeliveryStepCommandValidator();
+          var validator = new AddDeliveryStepCommandValidator(_mockPackingSizeRepository.Object);
           return new AddDeliveryStepHandler(
                validator,
                _mockTransaction.Object,
                _mockDeliveryRepository.Object,
                _mockDeliveryZoneRepository.Object,
                _mockPricingStrategyService.Object,
-               _mockItineraryApi.Object
+               _mockItineraryApi.Object,
+               _mockPackingSizeRepository.Object
           );
      }
 

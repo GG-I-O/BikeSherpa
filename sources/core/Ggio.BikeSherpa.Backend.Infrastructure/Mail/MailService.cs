@@ -43,7 +43,7 @@ public class MailService(IParameterRepository parameterService, IMailSender mail
                PickupDate = delivery.StartDate.ToString("dd/MM/yyyy"),
                TimeSlot = delivery.StartDate.ToString("HH:mm"),
                LoadingSlot = delivery.Urgency.Label,
-               Options = $"{delivery.PackingSize.Label}{(delivery.InsulatedBox ? " - Box Isotherme" : "")}",
+               Options = $"{string.Join(", ", delivery.Steps.Select(step => step.PackingSize.Label))} {(delivery.InsulatedBox ? " - Box Isotherme" : "")}",
                Price = delivery.TotalPrice?.ToString("C2") ?? "Sur devis",
                Comments = string.Join(", ", delivery.Details)
           };
@@ -64,12 +64,12 @@ public class MailService(IParameterRepository parameterService, IMailSender mail
                PickupAddress = pickupStep != null ? $"{pickupStep.StepAddress.StreetInfo}, {pickupStep.StepAddress.Postcode} {pickupStep.StepAddress.City}" : string.Empty,
                Destinations = dropoffSteps.Select(s => new TourDeliveryMailModel.DestinationInfo(
                     $"{s.StepAddress.StreetInfo}, {s.StepAddress.Postcode} {s.StepAddress.City}",
-                    $"{delivery.PackingSize.Label}{(delivery.InsulatedBox ? " - Box Isotherme" : "")}"
+                    $"{string.Join(", ", delivery.Steps.Select(step => step.PackingSize.Label))} - {(delivery.InsulatedBox ? " - Box Isotherme" : "")}"
                )).ToArray(),
                PickupDate = delivery.StartDate.ToString("dd/MM/yyyy"),
                TimeSlot = delivery.StartDate.ToString("HH:mm"),
                LoadingSlot = delivery.Urgency.Label,
-               Options = $"{delivery.PackingSize.Label}{(delivery.InsulatedBox ? " - Box Isotherme" : "")}",
+               Options = $"{string.Join(", ", delivery.Steps.Select(step => step.PackingSize.Label))} {(delivery.InsulatedBox ? " - Box Isotherme" : "")}",
                Comments = string.Join(", ", delivery.Details)
           };
      }

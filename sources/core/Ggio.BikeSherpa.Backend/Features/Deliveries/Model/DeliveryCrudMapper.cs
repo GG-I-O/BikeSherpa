@@ -1,5 +1,5 @@
-using Facet.Mapping;
 using Facet.Extensions;
+using Facet.Mapping;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
@@ -14,8 +14,8 @@ public class DeliveryCrudMapper : IFacetMapConfiguration<Delivery, DeliveryCrud>
                     Data = step.ToFacet<DeliveryStep, DeliveryStepCrud>()
                })
                .ToList();
+
           target.Urgency = source.Urgency.Name;
-          target.PackingSize = source.PackingSize.Name;
           target.LimitDate = source.GetLimitDate();
      }
 }

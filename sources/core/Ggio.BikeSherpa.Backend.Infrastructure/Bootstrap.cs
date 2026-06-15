@@ -1,4 +1,3 @@
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.Spi;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
@@ -49,6 +48,7 @@ public static class Bootstrap
                services.AddScoped<IUrgencyRepository, UrgencyRepository>();
                services.AddScoped<IParameterRepository, ParameterRepository>();
                services.AddScoped<IMailService, MailService>();
+               services.AddScoped<IDelayRepository, DelayRepository>();
                services.Configure<PostmarkOptions>(configuration.GetSection(PostmarkOptions.SectionName));
                services.AddScoped<IMailSender, MailSender>();
 

@@ -9,6 +9,7 @@ import Delivery from "@/deliveries/models/Delivery";
 import {DeliveryFormValues} from "@/deliveries/models/zod/deliveryFormBaseSchema";
 import DeliveryEditFormViewModel from "@/deliveries/viewModel/DeliveryEditFormViewModel";
 import useDropdown from "@/hooks/useDropdown";
+import {router} from "expo-router";
 
 export function useDeliveryEditFormViewModel(deliveryId: string) {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -32,14 +33,15 @@ export function useDeliveryEditFormViewModel(deliveryId: string) {
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,
             discount: delivery.discount ?? 0,
+            discountReason: delivery.discountReason ?? "",
             extraCost: delivery.extraCost ?? 0,
+            extraCostReason: delivery.extraCostReason ?? "",
             steps: delivery.steps.map(step => ({
                ...step,
                contactName: step.stepAddress.name,
                contactPhone: step.stepAddress.phone ?? ''
             })),
             details: delivery.details,
-            packingSize: delivery.packingSize,
             insulatedBox: delivery.insulatedBox,
             startDate: delivery.startDate,
             contractDate: delivery.contractDate,
@@ -52,6 +54,7 @@ export function useDeliveryEditFormViewModel(deliveryId: string) {
         handleSubmit: handleSubmit(
             (data) => {
                 viewModel.onSubmit(data, delivery);
+                router.back();
             },
             (errors) => {
                 console.error("Invalid delivery for creation");

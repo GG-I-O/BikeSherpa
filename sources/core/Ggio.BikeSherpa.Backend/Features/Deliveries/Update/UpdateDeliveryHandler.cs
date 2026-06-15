@@ -3,7 +3,6 @@ using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
@@ -26,15 +25,16 @@ public record UpdateDeliveryCommand(
      string ReportId,
      List<DeliveryStepCrud> Steps,
      string[] Details,
-     string PackingSize,
      bool InsulatedBox,
      DateTimeOffset ContractDate,
-     DateTimeOffset StartDate
+     DateTimeOffset StartDate,
+     string? DiscountReason,
+     string? ExtraCostReason
 ) : ICommand<Result>;
 
 public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCommand>
 {
-     public UpdateDeliveryCommandValidator(IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
+     public UpdateDeliveryCommandValidator(IUrgencyRepository urgencies)
      {
           RuleFor(x => x.Id).NotEmpty();
           RuleFor(x => x.PricingStrategy).IsInEnum();
@@ -51,9 +51,7 @@ public class UpdateDeliveryCommandValidator : AbstractValidator<UpdateDeliveryCo
                     step.RuleFor(s => s.EstimatedDeliveryDate).NotEmpty();
                });
 
-          RuleFor(x => x.PackingSize).SetValidator(new PackingSizeValidator(packingSizes));
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.PackingSize).NotEmpty();
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -80,7 +78,6 @@ public class UpdateDeliveryHandler(
           }
 
           var urgency = urgencyRepository.GetByName(command.Urgency)!;
-          var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
 
           entity.PricingStrategy = command.PricingStrategy;
           entity.Status = command.Status;
@@ -92,10 +89,11 @@ public class UpdateDeliveryHandler(
           entity.ExtraCost = command.ExtraCost;
           entity.CustomerReference = command.ReportId;
           entity.Details = command.Details;
-          entity.PackingSize = packingSize;
           entity.InsulatedBox = command.InsulatedBox;
           entity.ContractDate = command.ContractDate;
           entity.StartDate = command.StartDate;
+          entity.DiscountReason = command.DiscountReason;
+          entity.ExtraCostReason = command.ExtraCostReason;
 
           var steps = command.Steps
                .Select(step =>
@@ -108,8 +106,9 @@ public class UpdateDeliveryHandler(
                     {
                          Id = step.Id,
                          StepAddress = step.StepAddress,
-                         StepZone = step.StepZone,
-                         ParentDelivery = entity
+                         StepZone = deliveryZones.GetByAddress(step.StepAddress.City),
+                         ParentDelivery = entity,
+                         PackingSize = packingSizeRepository.GetByName(step.PackingSize)!
                     };
 
                     DeliveryStepCrudMapper.Map(step, deliveryStep);
@@ -117,8 +116,9 @@ public class UpdateDeliveryHandler(
                })
                .ToList();
 
-          await entity.UpdateStepsAsync(steps, deliveryZones, pricingStrategyService, itineraryService);
+          await entity.UpdateStepsAsync(steps, deliveryZones, itineraryService);
 
+          entity.TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(entity);
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
      }

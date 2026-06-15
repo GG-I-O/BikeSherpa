@@ -8,10 +8,11 @@ export default class InputDelivery {
     public urgency: string;
     public totalPrice: number | null;
     public discount: number | null;
+    public discountReason: string | null;
     public extraCost: number | null;
+    public extraCostReason: string | null;
     public steps: Step[];
     public details: string[];
-    public packingSize: string;
     public insulatedBox: boolean;
     public contractDate: string;
     public startDate: string;
@@ -27,10 +28,11 @@ export default class InputDelivery {
         urgency: string,
         totalPrice: number, 
         discount: number,
+        discountReason: string,
         extraCost: number,
+        extraCostReason: string,
         steps: Step[],
         details: string[],
-        packingSize: string,
         insulatedBox: boolean,
         contractDate: string,
         startDate: string,
@@ -45,10 +47,11 @@ export default class InputDelivery {
         this.urgency = urgency;
         this.totalPrice = totalPrice;
         this.discount = discount;
+        this.discountReason = discountReason;
         this.extraCost = extraCost;
+        this.extraCostReason = extraCostReason;
         this.steps = steps;
         this.details = details;
-        this.packingSize = packingSize;
         this.insulatedBox = insulatedBox;
         this.contractDate = contractDate;
         this.startDate = startDate;

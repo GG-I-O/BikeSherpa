@@ -26,11 +26,12 @@ public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, Ad
                req.Discount,
                req.ExtraCost,
                req.Details,
-               req.PackingSize,
                req.InsulatedBox,
                req.ContractDate,
                req.StartDate,
-               req.NeedEstimate
+               req.NeedEstimate,
+               req.DiscountReason,
+               req.ExtraCostReason
           );
 
           var result = await mediator.Send(command, ct);

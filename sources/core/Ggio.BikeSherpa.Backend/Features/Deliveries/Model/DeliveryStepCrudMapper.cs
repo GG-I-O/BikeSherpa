@@ -1,10 +1,18 @@
 using Facet.Mapping;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 
-public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, DeliveryStep>
+public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, DeliveryStep>,
+     IFacetMapConfiguration<DeliveryStep, DeliveryStepCrud>
 {
+     public static void Map(DeliveryStep source, DeliveryStepCrud target)
+     {
+          target.PackingSize = source.PackingSize.Name;
+          target.StepZone = source.StepZone.Name;
+     }
+     
      public static void Map(DeliveryStepCrud source, DeliveryStep target)
      {
           target.Completed = source.Completed;
@@ -16,14 +24,18 @@ public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, D
           target.CreatedAt = source.CreatedAt;
           target.UpdatedAt = source.UpdatedAt;
      }
-     
-     public static DeliveryStep Map(DeliveryStepCrud source)
+
+     public static DeliveryStep Map(
+          DeliveryStepCrud source, 
+          IPackingSizeRepository packingSizeRepository,
+               IDeliveryZoneRepository deliveryZoneRepository
+          )
      {
           var target = new DeliveryStep(source.StepType, source.Order, source.StepAddress, source.Comment)
           {
                Id = source.Id,
                Completed = source.Completed,
-               StepZone = source.StepZone,
+               StepZone = deliveryZoneRepository.GetByAddress(source.StepAddress.City),
                Distance = source.Distance,
                CourierId = source.CourierId,
                CourierComment = null,
@@ -35,7 +47,9 @@ public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, D
                UpdatedAt = source.UpdatedAt,
                ParentDelivery = null!,
                StepAddress = source.StepAddress,
+               PackingSize = packingSizeRepository.GetByName(source.PackingSize) ?? throw new InvalidOperationException("Packing size not found")
           };
+
           Map(source, target);
           return target;
      }

@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 

@@ -8,7 +8,6 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 
-
 public record DeliveryFactoryParameters(
      PricingStrategy PricingStrategy,
      Guid CustomerId,
@@ -17,11 +16,12 @@ public record DeliveryFactoryParameters(
      double? Discount,
      double? ExtraCost,
      string[] Details,
-     PackingSize PackingSize,
      bool InsulatedBox,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate,
-     bool NeedEstimate);
+     bool NeedEstimate,
+     string? DiscountReason,
+     string? ExtraCostReason);
 
 public interface IDeliveryFactory
 {
@@ -49,11 +49,12 @@ public class DeliveryFactory(
                ExtraCost = parameters.ExtraCost,
                Details = parameters.Details,
                Steps = [],
-               PackingSize = parameters.PackingSize,
                InsulatedBox = parameters.InsulatedBox,
                ContractDate = parameters.ContractDate,
                StartDate = parameters.StartDate,
-               NeedEstimate = parameters.NeedEstimate
+               NeedEstimate = parameters.NeedEstimate,
+               DiscountReason = parameters.DiscountReason,
+               ExtraCostReason = parameters.ExtraCostReason
           };
 
           var customer = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(parameters.CustomerId));
@@ -69,7 +70,7 @@ public class DeliveryFactory(
                delivery.GenerateCode(customer, deliveries.Count + 1);
           }
 
-          delivery.TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
+          delivery.TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
 
           await NotifyNewAggregateRootAdded(delivery);
 

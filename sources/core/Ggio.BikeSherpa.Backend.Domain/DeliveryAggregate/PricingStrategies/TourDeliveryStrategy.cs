@@ -2,89 +2,46 @@
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 
-public class TourDeliveryStrategy : IPricingStrategy
+public class TourDeliveryStrategy(IDelayService delayService) : IPricingStrategy
 {
-     private const double PickupBasePrice = 14;
-     private const double StepPriceInCore = 5;
-     private const double StepPriceInBorder = 8;
-     private const double StepPriceInPeriphery = 0;
-     private const double StepPriceOutside = 0;
-
      public PricingStrategy ImplementedStrategy => PricingStrategy.TourDeliveryStrategy;
 
-     public double SameDayExtraCost(DateTimeOffset startDate, DateTimeOffset contractDate)
+     public async Task<double> CalculateDeliveryPriceWithoutVat(Delivery delivery)
      {
-          return PricingRules.CalculateSameDayDeliveryExtraCost(startDate, contractDate);
-     }
+          var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
 
-     public double DelayCost(DateTimeOffset startDate, DateTimeOffset contractDate)
-     {
-          return PricingRules.CalculateDelayCost(startDate, contractDate);
-     }
+          var pickZonePrice = delivery.Steps.Where(s => s is { StepType: StepType.Pickup, NotBilled: false })
+               .Sum(step => step.StepZone.TourPrice);
 
-     public double PickupCost(int pickupNumber)
-     {
-          return pickupNumber * PickupBasePrice;
-     }
+          var dropSteps = delivery.Steps.Where(s => s is { StepType: StepType.Dropoff, NotBilled: false })
+               .ToList();
 
-     public double DropOffInCoreCost(int dropOffStepsInCore)
-     {
-          return dropOffStepsInCore * StepPriceInCore;
-     }
+          var dropStepPrices = dropSteps.Sum(step => step.StepZone.TourPrice);
+          var dropStepPackingPrices = dropSteps.Sum(step => step.PackingSize.TourPrice);
 
-     public double DropOffInBorderCost(int dropOffStepsInBorder)
-     {
-          return dropOffStepsInBorder * StepPriceInBorder;
-     }
-
-     public double DropOffInPeripheryCost(int dropOffStepsInPeriphery)
-     {
-          return dropOffStepsInPeriphery * StepPriceInPeriphery;
-     }
-
-     public double DropOffOutsideCost(int dropOffStepsOutside)
-     {
-          return dropOffStepsOutside * StepPriceOutside;
-     }
-
-     public double TotalDistanceCost(double totalDistance, Urgency urgency)
-     {
-          return 0;
-     }
-
-     public double CalculateDeliveryPriceWithoutVat(
-          DateTimeOffset startDate,
-          DateTimeOffset contractDate,
-          int pickupNumber,
-          int dropOffStepsInCore,
-          int dropOffStepsInBorder,
-          int dropOffStepsInPeriphery,
-          int dropOffStepsOutside,
-          PackingSize packingSize,
-          Urgency urgency,
-          double totalDistance,
-          double discount,
-          double extraCost)
-     {
-          
-          var sameDayCost = SameDayExtraCost(startDate, contractDate);
-          var delayCost = DelayCost(startDate, contractDate);
-          var pickupCost = PickupCost(pickupNumber);
-          var inCoreCost = DropOffInCoreCost(dropOffStepsInCore);
-          var inBorderCost = DropOffInBorderCost(dropOffStepsInBorder);
-          var inPeripheryCost = DropOffInPeripheryCost(dropOffStepsInPeriphery);
-          var outsideCost = DropOffOutsideCost(dropOffStepsOutside);
-          
           return Math.Round(
-               sameDayCost +
-               delayCost +
-               pickupCost +
-               packingSize.TourPrice +
-               inCoreCost +
-               inBorderCost +
-               inPeripheryCost +
-               outsideCost +
-               extraCost - discount
+               delayPrice +
+               pickZonePrice +
+               dropStepPackingPrices +
+               dropStepPrices +
+               (delivery.ExtraCost ?? 0) - (delivery.Discount ?? 0)
                , 2);
+     }
+
+     public async Task<double> GetStepPrice(Delivery delivery, DeliveryStep deliveryStep)
+     {
+          if (deliveryStep.StepType == StepType.Pickup)
+          {
+               var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
+               var pickZonePrice = deliveryStep.StepZone.TourPrice;
+
+               return delayPrice + pickZonePrice;
+          }
+
+          // StepType.Dropoff
+          var packingPrice = deliveryStep.PackingSize.TourPrice;
+          var dropZonePrice = deliveryStep.StepZone.TourPrice;
+
+          return packingPrice + dropZonePrice;
      }
 }

@@ -32,6 +32,7 @@ export default function PublicDeliveryAnonymousForm() {
             <PublicDeliveryStepForm
                 control={viewModel.control}
                 errors={viewModel.errors}
+                packingSizes={viewModel.packingSizes}
                 customerType={viewModel.customerType}
                 totalDistance={viewModel.estimatedDistance}
             />
@@ -39,7 +40,6 @@ export default function PublicDeliveryAnonymousForm() {
             <PublicDeliveryDetailsForm
                 control={viewModel.control}
                 errors={viewModel.errors}
-                packingSizes={viewModel.packingSizes}
                 setUrgency={viewModel.setUrgency}
                 setStartDate={viewModel.setStartDate}
                 showUrgency={isSimpleDelivery}

@@ -2,7 +2,6 @@ using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
@@ -25,11 +24,12 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required Urgency Urgency { get; set; }
      public double? TotalPrice { get; set; }
      public double? Discount { get; set; }
+     public string? DiscountReason { get; set; }
      public double? ExtraCost { get; set; }
+     public string? ExtraCostReason { get; set; }
      public string? CustomerReference { get; set; }
      public required List<DeliveryStep> Steps { get; set; } = [];
      public string[] Details { get; set; } = [];
-     public required PackingSize PackingSize { get; set; }
      public required bool InsulatedBox { get; set; }
      public required DateTimeOffset StartDate { get; set; }
      public required DateTimeOffset ContractDate { get; set; }
@@ -99,12 +99,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      {
           _statusMachine.Fire(DeliveryStatusTrigger.Cancel);
           RegisterDomainEvent(new DeliveryCancelledEvent(Id));
-     }
-
-     public void UpdateDeliveryStartDateTime(DateTimeOffset deliveryDateTime, IPricingStrategyService pricingStrategyService)
-     {
-          StartDate = deliveryDateTime;
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
      public async Task ReorderStepsAsync(Guid movedStepId, int newOrder, IItinerarySpi itineraryService)
@@ -201,9 +195,10 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           Address stepAddress,
           string? comment,
           bool notBilled,
+          PackingSize packingSize,
           IDeliveryZoneRepository deliveryZones,
-          IPricingStrategyService pricingStrategyService,
-          IItinerarySpi itineraryService)
+          IItinerarySpi itineraryService,
+          IPricingStrategyService pricingStrategyService)
      {
           var newStep = new DeliveryStep(
                stepType,
@@ -215,7 +210,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                StepAddress = stepAddress,
                StepZone = deliveryZones.GetByAddress(stepAddress.City),
                ParentDelivery = this,
-               NotBilled = notBilled
+               NotBilled = notBilled,
+               PackingSize = packingSize
           };
 
           newStep.Distance = await GetDistanceAsync(newStep, itineraryService);
@@ -231,15 +227,13 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
 
           Steps.Add(newStep);
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+          TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
 
           return newStep;
      }
 
-     public async Task DeleteStepAsync(
-          DeliveryStep removedStep,
-          IPricingStrategyService pricingStrategyService,
-          IItinerarySpi itineraryService)
+     public async Task DeleteStepAsync(DeliveryStep removedStep,
+          IItinerarySpi itineraryService, IPricingStrategyService pricingStrategyService)
      {
           var nextStep = Steps.FirstOrDefault(s => s.Order == removedStep.Order + 1);
           var timeOffset = CalculateDeliveryTimeOffset(removedStep, nextStep);
@@ -247,7 +241,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           ReorderStepsOnDeletion();
           UpdateStepDeliveryTimeOnDelete(removedStep.Order, timeOffset);
           await RecalculateStepDistancesAsync(itineraryService);
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+          TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
      private static TimeSpan CalculateDeliveryTimeOffset(DeliveryStep removedStep, DeliveryStep? nextStep) => nextStep is null ? TimeSpan.Zero : nextStep.EstimatedDeliveryDate - removedStep.EstimatedDeliveryDate;
@@ -262,7 +256,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public async Task UpdateStepsAsync(List<DeliveryStep> steps,
           IDeliveryZoneRepository deliveryZones,
-          IPricingStrategyService pricingStrategyService,
           IItinerarySpi itineraryService)
      {
           for (var index = 0; index < steps.Count; index++)
@@ -281,7 +274,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          StepAddress = steps[index].StepAddress,
                          StepZone = deliveryZones.GetByAddress(steps[index].StepAddress.City),
                          ParentDelivery = this,
-                         NotBilled = steps[index].NotBilled
+                         NotBilled = steps[index].NotBilled,
+                         PackingSize = steps[index].PackingSize
                     };
                }
                else
@@ -295,7 +289,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                          steps[index].Distance,
                          steps[index].Comment,
                          steps[index].NotBilled,
-                         steps[index].EstimatedDeliveryDate);
+                         steps[index].EstimatedDeliveryDate,
+                         steps[index].PackingSize
+                    );
 
                     steps[index] = existing;
                }
@@ -314,7 +310,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           DeleteOldSteps(steps);
           Steps = steps;
           await RecalculateStepDistancesAsync(itineraryService);
-          TotalPrice = pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
      private void DeleteOldSteps(List<DeliveryStep> steps)

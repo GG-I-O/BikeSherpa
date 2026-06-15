@@ -2,7 +2,7 @@ using Ardalis.Result;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Ggio.DddCore;
 using Mediator;
@@ -17,23 +17,23 @@ public record AddDeliveryCommand(
      double? Discount,
      double? ExtraCost,
      string[] Details,
-     string PackingSize,
      bool InsulatedBox,
      DateTimeOffset ContractDate,
      DateTimeOffset StartDate,
-     bool NeedEstimate
-     ) : ICommand<Result<Guid>>;
+     bool NeedEstimate,
+     string? DiscountReason,
+     string? ExtraCostReason
+) : ICommand<Result<Guid>>;
 
 public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 {
-     public AddDeliveryCommandValidator(IUrgencyRepository urgencies, IPackingSizeRepository packingSizes)
+     public AddDeliveryCommandValidator(IUrgencyRepository urgencies)
      {
           RuleFor(x => x.PricingStrategy).IsInEnum();
           RuleFor(x => x.CustomerId).NotNull();
           RuleFor(x => x.Urgency).SetValidator(new UrgencyValidator(urgencies));
           RuleFor(x => x.TotalPrice).NotEmpty();
           RuleFor(x => x.Details).NotEmpty();
-          RuleFor(x => x.PackingSize).SetValidator(new PackingSizeValidator(packingSizes));
           RuleFor(x => x.ContractDate).NotEmpty();
           RuleFor(x => x.StartDate).NotEmpty();
      }
@@ -42,17 +42,15 @@ public class AddDeliveryCommandValidator : AbstractValidator<AddDeliveryCommand>
 public class AddDeliveryHandler(
      IDeliveryFactory factory,
      IUrgencyRepository urgencyRepository,
-     IPackingSizeRepository packingSizeRepository,
      IValidator<AddDeliveryCommand> validator,
      IApplicationTransaction transaction
-     ) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
+) : ICommandHandler<AddDeliveryCommand, Result<Guid>>
 {
      public async ValueTask<Result<Guid>> Handle(AddDeliveryCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
-          
+
           var urgency = urgencyRepository.GetByName(command.Urgency)!;
-          var packingSize = packingSizeRepository.GetByName(command.PackingSize)!;
 
           var delivery = await factory.CreateDeliveryAsync(new DeliveryFactoryParameters(
                     command.PricingStrategy,
@@ -62,13 +60,14 @@ public class AddDeliveryHandler(
                     command.Discount,
                     command.ExtraCost,
                     command.Details,
-                    packingSize,
                     command.InsulatedBox,
                     command.ContractDate,
                     command.StartDate,
-                    command.NeedEstimate
-                    )
-               );
+                    command.NeedEstimate,
+                    command.DiscountReason,
+                    command.ExtraCostReason
+               )
+          );
 
           await transaction.CommitAsync(cancellationToken);
           return Result<Guid>.Success(delivery.Id);

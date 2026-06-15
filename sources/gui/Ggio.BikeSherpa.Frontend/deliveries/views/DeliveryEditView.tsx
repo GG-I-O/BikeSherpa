@@ -13,8 +13,7 @@ export default function DeliveryEditView() {
         getCustomerOptions,
         getCustomer,
         urgencies,
-        pricingStrategies,
-        packingSizes
+        pricingStrategies
     } = useDeliveryEditFormViewModel(deliveryId);
 
     return (
@@ -27,7 +26,6 @@ export default function DeliveryEditView() {
             getCustomer={getCustomer}
             urgencies={urgencies}
             pricingStrategies={pricingStrategies}
-            packingSizes={packingSizes}
             update
         />
     );

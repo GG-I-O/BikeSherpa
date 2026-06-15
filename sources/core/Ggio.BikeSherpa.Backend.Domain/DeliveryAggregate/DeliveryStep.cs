@@ -10,7 +10,9 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
 {
      // EF Core requires a parameterless constructor to create an entity instance because it can't create one with complex parameter types like Address and DeliveryZone.
      [UsedImplicitly]
-     private DeliveryStep() { }
+     private DeliveryStep()
+     {
+     }
 
      public DeliveryStep(StepType stepType, int order, Address stepAddress, string? comment = null)
      {
@@ -33,9 +35,11 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      public bool NotBilled { get; set; }
      public DateTimeOffset EstimatedDeliveryDate { get; set; }
      public DateTimeOffset? RealDeliveryDate { get; set; }
+     public required Delivery ParentDelivery { get; set; }
+
+     public required PackingSize PackingSize { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
-     public required Delivery ParentDelivery { get; set; }
 
      public void Update(
           StepType stepType,
@@ -46,7 +50,8 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           double distance,
           string? comment,
           bool notBilled,
-          DateTimeOffset estimatedDeliveryDate)
+          DateTimeOffset estimatedDeliveryDate,
+          PackingSize packingSize)
      {
           StepType = stepType;
           Order = order;
@@ -57,6 +62,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           Comment = comment;
           NotBilled = notBilled;
           EstimatedDeliveryDate = estimatedDeliveryDate;
+          PackingSize = packingSize;
      }
 
      public void UpdateEstimatedDeliveryDate(DateTimeOffset estimatedDeliveryDate)
@@ -64,7 +70,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           EstimatedDeliveryDate = estimatedDeliveryDate;
           RegisterDomainEvent(new DeliveryStepTimeChangeEvent(ParentDelivery.Id));
      }
-     
+
      public void AddAttachment(string filePath)
      {
           AttachmentFilePaths ??= [];

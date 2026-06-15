@@ -5,5 +5,5 @@ public record PackingSize(
      int Order,
      string Label,
      double TourPrice,
-     double Price
+     double SimplePrice
 );

@@ -199,6 +199,43 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delay", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Delays", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "StandardCost",
+                            Label = "Jour même",
+                            Price = 0.0
+                        },
+                        new
+                        {
+                            Id = "LastMinuteOrderExtraCost",
+                            Label = "Prioritaire",
+                            Price = 3.0
+                        },
+                        new
+                        {
+                            Id = "EarlyOrderDiscount",
+                            Label = "",
+                            Price = -2.0
+                        });
+                });
+
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery", b =>
                 {
                     b.Property<Guid>("Id")
@@ -229,18 +266,20 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.Property<double?>("Discount")
                         .HasColumnType("double precision");
 
+                    b.Property<string>("DiscountReason")
+                        .HasColumnType("text");
+
                     b.Property<double?>("ExtraCost")
                         .HasColumnType("double precision");
+
+                    b.Property<string>("ExtraCostReason")
+                        .HasColumnType("text");
 
                     b.Property<bool>("InsulatedBox")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("NeedEstimate")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("PackingSizeName")
-                        .IsRequired()
-                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("PricingStrategy")
                         .HasColumnType("integer");
@@ -263,8 +302,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PackingSizeName");
-
                     b.HasIndex("UrgencyName");
 
                     b.ToTable("Deliveries", (string)null);
@@ -276,6 +313,12 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<double>("SimplePrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("TourPrice")
+                        .HasColumnType("double precision");
+
                     b.HasKey("Name");
 
                     b.ToTable("DeliveryZones", (string)null);
@@ -283,19 +326,27 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Name = "Centre"
+                            Name = "Centre",
+                            SimplePrice = 1.0,
+                            TourPrice = 5.0
                         },
                         new
                         {
-                            Name = "Limitrophe"
+                            Name = "Limitrophe",
+                            SimplePrice = 2.5,
+                            TourPrice = 8.0
                         },
                         new
                         {
-                            Name = "Périphérie"
+                            Name = "Périphérie",
+                            SimplePrice = 5.5,
+                            TourPrice = 0.0
                         },
                         new
                         {
-                            Name = "Extérieur"
+                            Name = "Extérieur",
+                            SimplePrice = 11.0,
+                            TourPrice = 0.0
                         });
                 });
 
@@ -312,7 +363,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
-                    b.Property<double>("Price")
+                    b.Property<double>("SimplePrice")
                         .HasColumnType("double precision");
 
                     b.Property<double>("TourPrice")
@@ -328,7 +379,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "S",
                             Label = "S = jusqu'à 3kg / 45cm",
                             Order = 1,
-                            Price = 3.0,
+                            SimplePrice = 3.0,
                             TourPrice = 0.0
                         },
                         new
@@ -336,7 +387,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "M",
                             Label = "M = jusqu'à 10kg / 100cm",
                             Order = 2,
-                            Price = 5.0,
+                            SimplePrice = 5.0,
                             TourPrice = 2.0
                         },
                         new
@@ -344,7 +395,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "L",
                             Label = "L = jusqu'à 20kg / 120cm",
                             Order = 3,
-                            Price = 7.0,
+                            SimplePrice = 7.0,
                             TourPrice = 4.0
                         },
                         new
@@ -352,7 +403,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "XL",
                             Label = "XL = jusqu'à 30kg / 120cm",
                             Order = 4,
-                            Price = 9.0,
+                            SimplePrice = 9.0,
                             TourPrice = 6.0
                         },
                         new
@@ -360,7 +411,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "XXL",
                             Label = "XXL = jusqu'à 40kg (sur devis)",
                             Order = 5,
-                            Price = 11.0,
+                            SimplePrice = 11.0,
                             TourPrice = 8.0
                         },
                         new
@@ -368,7 +419,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "XXXL",
                             Label = "XXXL = jusqu'à 50kg (sur devis)",
                             Order = 6,
-                            Price = 13.0,
+                            SimplePrice = 13.0,
                             TourPrice = 10.0
                         },
                         new
@@ -376,7 +427,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             Name = "XXXXL",
                             Label = "XXXXL = jusqu'à 60kg (sur devis)",
                             Order = 7,
-                            Price = 15.0,
+                            SimplePrice = 15.0,
                             TourPrice = 12.0
                         });
                 });
@@ -494,6 +545,16 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         {
                             Key = "TOUR_DELIVERY_MAIL_SUBJECT",
                             Value = "Tour delivery Ready for Pickup"
+                        },
+                        new
+                        {
+                            Key = "EARLY_ORDER_LIMIT_IN_HOURS",
+                            Value = "18"
+                        },
+                        new
+                        {
+                            Key = "LAST_MINUTE_ORDER_LIMIT_IN_HOURS",
+                            Value = "2"
                         });
                 });
 
@@ -609,12 +670,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery", b =>
                 {
-                    b.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PackingSize", "PackingSize")
-                        .WithMany()
-                        .HasForeignKey("PackingSizeName")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Urgency", "Urgency")
                         .WithMany()
                         .HasForeignKey("UrgencyName")
@@ -659,6 +714,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                             b1.Property<int>("Order")
                                 .HasColumnType("integer");
 
+                            b1.Property<string>("PackingSizeName")
+                                .IsRequired()
+                                .HasColumnType("character varying(100)");
+
                             b1.Property<DateTimeOffset?>("RealDeliveryDate")
                                 .HasColumnType("timestamp with time zone");
 
@@ -676,12 +735,20 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.HasIndex("DeliveryId");
 
+                            b1.HasIndex("PackingSizeName");
+
                             b1.HasIndex("StepZoneName");
 
                             b1.ToTable("DeliverySteps", (string)null);
 
                             b1.WithOwner("ParentDelivery")
                                 .HasForeignKey("DeliveryId");
+
+                            b1.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PackingSize", "PackingSize")
+                                .WithMany()
+                                .HasForeignKey("PackingSizeName")
+                                .OnDelete(DeleteBehavior.Cascade)
+                                .IsRequired();
 
                             b1.HasOne("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.DeliveryZone", "StepZone")
                                 .WithMany()
@@ -734,6 +801,8 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                                         .HasForeignKey("DeliveryStepId");
                                 });
 
+                            b1.Navigation("PackingSize");
+
                             b1.Navigation("ParentDelivery");
 
                             b1.Navigation("StepAddress")
@@ -741,8 +810,6 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.Navigation("StepZone");
                         });
-
-                    b.Navigation("PackingSize");
 
                     b.Navigation("Steps");
 

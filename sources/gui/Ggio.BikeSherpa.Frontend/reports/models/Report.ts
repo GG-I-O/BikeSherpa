@@ -5,5 +5,6 @@ export type Report = {
     startDate: string;
     endDate: string;
     totalPrice: number;
+    totalPriceWithVat: number;
     deliveries: DeliveryReport[];
 }

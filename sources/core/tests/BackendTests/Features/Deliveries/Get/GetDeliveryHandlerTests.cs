@@ -13,10 +13,10 @@ namespace BackendTests.Features.Deliveries.Get;
 
 public class GetDeliveryHandlerTests
 {
-     private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
      private readonly Delivery _mockDelivery;
+     private readonly Mock<IReadRepository<Delivery>> _mockRepository = new();
 
      public GetDeliveryHandlerTests()
      {
@@ -33,7 +33,6 @@ public class GetDeliveryHandlerTests
           _mockDelivery.Id = guid;
           _mockDelivery.Code = "AAA";
           _mockDelivery.PricingStrategy = PricingStrategy.CustomStrategy;
-          _mockDelivery.PackingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
           var sut = CreateSut(_mockDelivery);
           var query = new GetDeliveryQuery(guid);
 
@@ -45,7 +44,6 @@ public class GetDeliveryHandlerTests
           result.Id.Should().Be(guid);
           result.Code.Should().Be("AAA");
           result.PricingStrategy.Should().Be(PricingStrategy.CustomStrategy);
-          result.PackingSize.Should().Be("Xl");
           VerifyRepositoryCalledOnce();
      }
 
@@ -83,8 +81,8 @@ public class GetDeliveryHandlerTests
      private void VerifyRepositoryCalledOnce()
      {
           _mockRepository.Verify(repo => repo.FirstOrDefaultAsync(
-               It.IsAny<ISpecification<Delivery>>(),
-               It.IsAny<CancellationToken>()),
+                    It.IsAny<ISpecification<Delivery>>(),
+                    It.IsAny<CancellationToken>()),
                Times.Once
           );
      }

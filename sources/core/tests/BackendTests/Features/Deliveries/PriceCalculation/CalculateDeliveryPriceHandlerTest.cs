@@ -3,7 +3,6 @@ using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.Repositories;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
@@ -34,6 +33,7 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Pickup)
                               .With(s => s.Order, 1)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     },
 
@@ -42,11 +42,11 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Dropoff)
                               .With(s => s.Order, 2)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     }
                ],
-               Urgency = urgency.Name,
-               PackingSize = packingSize.Name
+               Urgency = urgency.Name
           };
 
           var query = new CalculateDeliveryPriceQuery(deliveryCrud);
@@ -54,7 +54,7 @@ public class CalculateDeliveryPriceHandlerTest
 
           pricingStrategyServiceMock
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
-               .Returns(expectedPriceWithoutVat);
+               .ReturnsAsync(expectedPriceWithoutVat);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -83,19 +83,19 @@ public class CalculateDeliveryPriceHandlerTest
                     {
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Pickup)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
 
                     }
                ],
-               Urgency = urgency.Name,
-               PackingSize = packingSize.Name
+               Urgency = urgency.Name
           };
 
           var query = new CalculateDeliveryPriceQuery(deliveryCrud);
 
           pricingStrategyServiceMock
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
-               .Returns(0.0);
+               .ReturnsAsync(0.0);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -123,6 +123,7 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Pickup)
                               .With(s => s.Order, 1)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     },
                     new DeliveryStepDto
@@ -130,6 +131,7 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Dropoff)
                               .With(s => s.Order, 2)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     },
 
@@ -138,18 +140,18 @@ public class CalculateDeliveryPriceHandlerTest
                          Data = _fixture.Build<DeliveryStepCrud>()
                               .With(s => s.StepType, StepType.Dropoff)
                               .With(s => s.Order, 3)
+                              .With(s => s.PackingSize, packingSize.Name)
                               .Create()
                     }
                ],
-               Urgency = urgency.Name,
-               PackingSize = packingSize.Name
+               Urgency = urgency.Name
           };
 
           var query = new CalculateDeliveryPriceQuery(deliveryCrud);
 
           pricingStrategyServiceMock
                .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
-               .Returns(150.0);
+               .ReturnsAsync(150.0);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -164,6 +166,7 @@ public class CalculateDeliveryPriceHandlerTest
           pricingStrategyServiceMock = new Mock<IPricingStrategyService>();
           var urgencyMock = new Mock<IUrgencyRepository>();
           var packingSizeMock = new Mock<IPackingSizeRepository>();
+          var deliveryZoneRepositoryMock = new Mock<IDeliveryZoneRepository>();
           var vatServiceMock = new Mock<IVatService>();
           var itineraryService = new Mock<IItinerarySpi>();
           itineraryService.Setup(x => x.GetItineraryInfoAsync(It.IsAny<GeoPoint>(), It.IsAny<GeoPoint>(), It.IsAny<CancellationToken>()))
@@ -175,7 +178,8 @@ public class CalculateDeliveryPriceHandlerTest
           return new CalculateDeliveryPriceHandler(pricingStrategyServiceMock.Object,
                urgencyMock.Object,
                packingSizeMock.Object,
-               new CalculateDeliveryPriceQueryValidator(urgencyMock.Object, packingSizeMock.Object),
+               deliveryZoneRepositoryMock.Object,
+               new CalculateDeliveryPriceQueryValidator(urgencyMock.Object),
                itineraryService.Object,
                vatServiceMock.Object);
      }

@@ -14,17 +14,13 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
           builder.Property(d => d.Status).HasConversion<int>().IsRequired();
           builder.Property(d => d.Code).IsRequired();
           builder.Property(d => d.CustomerId).IsRequired();
-          
+
           builder.HasOne(d => d.Urgency).WithMany()
                .HasForeignKey("UrgencyName")
                .IsRequired();
+
           builder.Navigation(d => d.Urgency).AutoInclude();
-          
-          builder.HasOne(d => d.PackingSize).WithMany()
-               .HasForeignKey("PackingSizeName")
-               .IsRequired();
-          builder.Navigation(d => d.PackingSize).AutoInclude();
-          
+
           builder.Property(d => d.TotalPrice).IsRequired();
           builder.Property(d => d.CustomerReference).IsRequired();
           builder.Property(d => d.Details).IsRequired();
@@ -50,14 +46,21 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                          c => c.ToString(),
                          s => GeoPoint.TryParse(s)).IsRequired();
                });
+
                steps.HasOne(s => s.StepZone).WithMany()
                     .HasForeignKey("StepZoneName")
                     .IsRequired();
+
                steps.Navigation(s => s.StepZone).AutoInclude();
                steps.Property(s => s.Distance).IsRequired();
                steps.Property(s => s.EstimatedDeliveryDate).IsRequired();
                steps.Property(s => s.RealDeliveryDate);
                steps.Property(s => s.NotBilled).IsRequired();
+               steps.HasOne(d => d.PackingSize).WithMany()
+                    .HasForeignKey("PackingSizeName")
+                    .IsRequired();
+
+               steps.Navigation(d => d.PackingSize).AutoInclude();
                steps.ToTable("DeliverySteps");
           });
      }
