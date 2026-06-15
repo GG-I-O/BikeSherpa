@@ -32,6 +32,8 @@ export default class DeliveryEditFormViewModel extends AbstractFormViewModel {
                             name: step.contactName ?? '',
                             phone: step.contactPhone ?? null
                         },
+                        notBilled: step.notBilled,
+                        packingSize: step.packingSize,
                         comment: step.comment ?? null
                     }
                 }

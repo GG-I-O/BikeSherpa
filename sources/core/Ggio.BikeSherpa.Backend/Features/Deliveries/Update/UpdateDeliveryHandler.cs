@@ -108,7 +108,8 @@ public class UpdateDeliveryHandler(
                          StepAddress = step.StepAddress,
                          StepZone = deliveryZones.GetByAddress(step.StepAddress.City),
                          ParentDelivery = entity,
-                         PackingSize = packingSizeRepository.GetByName(step.PackingSize)!
+                         PackingSize = packingSizeRepository.GetByName(step.PackingSize)!,
+                         NotBilled = step.NotBilled
                     };
 
                     DeliveryStepCrudMapper.Map(step, deliveryStep);
