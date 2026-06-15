@@ -30,16 +30,16 @@ public class SimpleDeliveryStrategy(IDelayService delayService) : IPricingStrate
           if (deliveryStep.StepType == StepType.Pickup)
           {
                var dropSteps = delivery.Steps.Where(s => s.StepType == StepType.Dropoff).ToList();
-               
+
                var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
                var packingPrice = dropSteps.Sum(s => s.PackingSize.SimplePrice);
                var pickZonePrice = deliveryStep.StepZone.SimplePrice;
                var dropZonePrice = dropSteps.Sum(s => s.StepZone.SimplePrice);
+
                return delayPrice + packingPrice + pickZonePrice + dropZonePrice;
           }
-          else // StepType.Dropoff
-          {
-               return delivery.Urgency.PriceCoefficient * deliveryStep.Distance;
-          }
+
+          // StepType.Dropoff
+          return delivery.Urgency.PriceCoefficient * deliveryStep.Distance;
      }
 }

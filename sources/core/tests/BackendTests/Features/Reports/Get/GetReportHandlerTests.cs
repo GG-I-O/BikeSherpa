@@ -17,13 +17,13 @@ namespace BackendTests.Features.Reports.Get;
 
 public class GetReportHandlerTests
 {
-     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
-     private readonly Mock<IReadRepository<Delivery>> _deliveryRepositoryMock = new();
      private readonly Mock<IReadRepository<Customer>> _customerRepositoryMock = new();
+     private readonly Mock<IReadRepository<Delivery>> _deliveryRepositoryMock = new();
+     private readonly DateTimeOffset _endDate = new(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
+     private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private readonly Mock<IReportService> _reportServiceMock = new();
 
      private readonly DateTimeOffset _startDate = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
-     private readonly DateTimeOffset _endDate = new(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
 
      [Fact]
      public async Task Handle_ShouldReturnReport_WhenQueryIsValid()
@@ -58,7 +58,7 @@ public class GetReportHandlerTests
           result.Should().Be(expectedReport);
 
           _reportServiceMock.Verify(
-               s => s.GenerateReport(
+               s => s.GenerateReportAsync(
                     customer.Name,
                     _startDate,
                     _endDate,
@@ -140,7 +140,7 @@ public class GetReportHandlerTests
 
           // Assert
           _reportServiceMock.Verify(
-               s => s.GenerateReport(
+               s => s.GenerateReportAsync(
                     customer.Name,
                     query.From,
                     query.To,
@@ -172,7 +172,7 @@ public class GetReportHandlerTests
                Times.Never);
 
           _reportServiceMock.Verify(
-               s => s.GenerateReport(
+               s => s.GenerateReportAsync(
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
@@ -185,7 +185,7 @@ public class GetReportHandlerTests
      {
           // Arrange
           var query = new GetReportQuery(Guid.NewGuid(), _startDate, _endDate);
-          var sut = CreateSut(customer: null, [], _fixture.Create<Report>());
+          var sut = CreateSut(null, [], _fixture.Create<Report>());
 
           // Act
           var act = async () => await sut.Handle(query, CancellationToken.None);
@@ -207,7 +207,7 @@ public class GetReportHandlerTests
                Times.Never);
 
           _reportServiceMock.Verify(
-               s => s.GenerateReport(
+               s => s.GenerateReportAsync(
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
@@ -245,7 +245,7 @@ public class GetReportHandlerTests
                Times.Never);
 
           _reportServiceMock.Verify(
-               s => s.GenerateReport(
+               s => s.GenerateReportAsync(
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
@@ -278,7 +278,7 @@ public class GetReportHandlerTests
                .ReturnsAsync(deliveries);
 
           _reportServiceMock
-               .Setup(s => s.GenerateReport(
+               .Setup(s => s.GenerateReportAsync(
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),

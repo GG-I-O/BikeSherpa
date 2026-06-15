@@ -13,13 +13,13 @@ public class ReportServiceTests
 {
      private readonly static Urgency Urgency = new("Standard", 1, "Standard", 1, null, null, 12);
      private readonly DateTimeOffset _contractDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
+     private readonly Mock<IDelayService> _delayServiceMock = new();
      private readonly Fixture _fixture = new();
      private readonly Mock<IPricingStrategy> _pricingStrategyMock = new();
-     private readonly Mock<IDelayService> _delayServiceMock = new();
-     private readonly Mock<IVatService> _vatServiceMock = new();
 
      private readonly DateTimeOffset _startDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly ReportService _sut;
+     private readonly Mock<IVatService> _vatServiceMock = new();
 
      public ReportServiceTests()
      {
@@ -63,7 +63,7 @@ public class ReportServiceTests
           var to = new DateTimeOffset(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
 
           // Act
-          var report = await _sut.GenerateReport(customerName, from, to, []);
+          var report = await _sut.GenerateReportAsync(customerName, from, to, []);
 
           // Assert
           report.CustomerName.Should().Be(customerName);
@@ -81,7 +81,7 @@ public class ReportServiceTests
           var secondDelivery = MakeDelivery(code: "DEL-002", totalPrice: 27.25);
 
           // Act
-          var report = await _sut.GenerateReport(
+          var report = await _sut.GenerateReportAsync(
                "Customer",
                _startDate,
                _startDate.AddDays(1),
@@ -107,7 +107,7 @@ public class ReportServiceTests
           var delivery = MakeDelivery(totalPrice: null);
 
           // Act
-          var report = await _sut.GenerateReport("Customer", _startDate, _startDate.AddDays(1), [delivery]);
+          var report = await _sut.GenerateReportAsync("Customer", _startDate, _startDate.AddDays(1), [delivery]);
 
           // Assert
           report.TotalPrice.Should().Be(0);

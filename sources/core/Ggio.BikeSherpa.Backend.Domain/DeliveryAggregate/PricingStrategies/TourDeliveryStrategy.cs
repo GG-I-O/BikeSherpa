@@ -34,13 +34,14 @@ public class TourDeliveryStrategy(IDelayService delayService) : IPricingStrategy
           {
                var delayPrice = (await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Price;
                var pickZonePrice = deliveryStep.StepZone.TourPrice;
+
                return delayPrice + pickZonePrice;
           }
-          else // StepType.Dropoff
-          {
-               var packingPrice = deliveryStep.PackingSize.TourPrice;
-               var dropZonePrice = deliveryStep.StepZone.TourPrice;
-               return packingPrice + dropZonePrice;
-          }
+
+          // StepType.Dropoff
+          var packingPrice = deliveryStep.PackingSize.TourPrice;
+          var dropZonePrice = deliveryStep.StepZone.TourPrice;
+
+          return packingPrice + dropZonePrice;
      }
 }

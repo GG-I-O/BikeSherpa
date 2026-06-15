@@ -12,7 +12,7 @@ public class ReportService(
      IVatService vatService
 ) : IReportService
 {
-     public async Task<Report> GenerateReport(string customerName, DateTimeOffset startDate, DateTimeOffset endDate, List<Delivery> deliveries)
+     public async Task<Report> GenerateReportAsync(string customerName, DateTimeOffset startDate, DateTimeOffset endDate, List<Delivery> deliveries)
      {
           var report = new Report
           {
@@ -38,17 +38,13 @@ public class ReportService(
                var strategy = strategies.SingleOrDefault(s => s.ImplementedStrategy == delivery.PricingStrategy);
 
                if (strategy is null)
+               {
                     continue;
+               }
 
                if (strategy.ImplementedStrategy == PricingStrategy.CustomStrategy)
                {
-                    var stepReport = new DeliveryReportDetail
-                    {
-                         Description = "Prix fixe",
-                         Address = null,
-                         Price = delivery.TotalPrice ?? 0,
-                         Quantity = 1
-                    };
+                    var stepReport = GetCustomStrategyStepDetail(delivery);
 
                     deliveryReport.Details.Add(stepReport);
                }
@@ -61,36 +57,11 @@ public class ReportService(
 
                          if (strategy.ImplementedStrategy == PricingStrategy.SimpleDeliveryStrategy)
                          {
-                              if (deliveryStep.StepType == StepType.Pickup)
-                              {
-                                   var endStep = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Dropoff);
-                                   description += "Livraison ";
-                                   description += $"{(await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Label} ";
-                                   description += $"(Colis {endStep?.PackingSize.Name}) : ";
-                                   description += $"{deliveryStep.StepAddress.City} > ";
-                                   description += endStep?.StepAddress.City;
-                              }
-                              else // StepType.Dropoff
-                              {
-                                   description += "Transport ";
-                                   description += $"{delivery.Urgency.Name} / ";
-                                   description += $"{deliveryStep.Distance} km";
-                              }
+                              description = await GetSimpleDeliveryStepDescription(deliveryStep, delivery);
                          }
                          else if (strategy.ImplementedStrategy == PricingStrategy.TourDeliveryStrategy)
                          {
-                              if (deliveryStep.StepType == StepType.Pickup)
-                              {
-                                   description += "Ramassage ";
-                                   description += $"{(await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Label} ";
-                                   description += $"{deliveryStep.StepAddress.City} ";
-                              }
-                              else // StepType.Dropoff
-                              {
-                                   description += "Livraison ";
-                                   description += $"(Colis {deliveryStep.PackingSize.Name}) ";
-                                   description += $"{deliveryStep.StepAddress.City} ";
-                              }
+                              description = await GetTourDeliveryStepDescription(deliveryStep, delivery);
                          }
 
                          var stepReport = new DeliveryReportDetail
@@ -116,7 +87,7 @@ public class ReportService(
 
                          deliveryReport.Details.Add(discountReport);
                     }
-                    
+
                     if (delivery.ExtraCost != 0)
                     {
                          var discountReport = new DeliveryReportDetail
@@ -137,5 +108,61 @@ public class ReportService(
 
           report.TotalPriceWithVat = await vatService.GetPriceWithVatAsync(report.TotalPrice);
           return report;
+     }
+
+     private async Task<string> GetTourDeliveryStepDescription(DeliveryStep deliveryStep, Delivery delivery)
+     {
+          var description = "";
+
+          if (deliveryStep.StepType == StepType.Pickup)
+          {
+               description += "Ramassage ";
+               description += $"{(await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Label} ";
+               description += $"{deliveryStep.StepAddress.City} ";
+          }
+          else // StepType.Dropoff
+          {
+               description += "Livraison ";
+               description += $"(Colis {deliveryStep.PackingSize.Name}) ";
+               description += $"{deliveryStep.StepAddress.City} ";
+          }
+
+          return description;
+     }
+
+     private async Task<string> GetSimpleDeliveryStepDescription(DeliveryStep deliveryStep, Delivery delivery)
+     {
+          var description = "";
+          if (deliveryStep.StepType == StepType.Pickup)
+          {
+               var endStep = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Dropoff);
+               description += "Livraison ";
+               description += $"{(await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Label} ";
+               description += $"(Colis {endStep?.PackingSize.Name}) : ";
+               description += $"{deliveryStep.StepAddress.City} > ";
+               description += endStep?.StepAddress.City;
+          }
+          else // StepType.Dropoff
+          {
+               description += "Transport ";
+               description += $"{delivery.Urgency.Name} / ";
+               description += $"{deliveryStep.Distance} km";
+          }
+
+          return description;
+     }
+
+     private static DeliveryReportDetail GetCustomStrategyStepDetail(Delivery delivery)
+     {
+
+          var stepReport = new DeliveryReportDetail
+          {
+               Description = "Prix fixe",
+               Address = null,
+               Price = delivery.TotalPrice ?? 0,
+               Quantity = 1
+          };
+
+          return stepReport;
      }
 }

@@ -1,6 +1,7 @@
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
@@ -196,7 +197,8 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           bool notBilled,
           PackingSize packingSize,
           IDeliveryZoneRepository deliveryZones,
-          IItinerarySpi itineraryService)
+          IItinerarySpi itineraryService,
+          IPricingStrategyService pricingStrategyService)
      {
           var newStep = new DeliveryStep(
                stepType,
@@ -225,12 +227,13 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
 
           Steps.Add(newStep);
+          TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
+
           return newStep;
      }
 
-     public async Task DeleteStepAsync(
-          DeliveryStep removedStep,
-          IItinerarySpi itineraryService)
+     public async Task DeleteStepAsync(DeliveryStep removedStep,
+          IItinerarySpi itineraryService, IPricingStrategyService pricingStrategyService)
      {
           var nextStep = Steps.FirstOrDefault(s => s.Order == removedStep.Order + 1);
           var timeOffset = CalculateDeliveryTimeOffset(removedStep, nextStep);
@@ -238,6 +241,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           ReorderStepsOnDeletion();
           UpdateStepDeliveryTimeOnDelete(removedStep.Order, timeOffset);
           await RecalculateStepDistancesAsync(itineraryService);
+          TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(this);
      }
 
      private static TimeSpan CalculateDeliveryTimeOffset(DeliveryStep removedStep, DeliveryStep? nextStep) => nextStep is null ? TimeSpan.Zero : nextStep.EstimatedDeliveryDate - removedStep.EstimatedDeliveryDate;

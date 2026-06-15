@@ -5,6 +5,7 @@ using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Events;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Moq;
@@ -15,6 +16,7 @@ public class DeliveryTests
 {
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private readonly Mock<IItinerarySpi> _mockItineraryService = new();
+     private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
 
      private Delivery MakeSut()
      {
@@ -292,7 +294,7 @@ public class DeliveryTests
           var mockZoneRepo = new Mock<IDeliveryZoneRepository>();
           var mockItineraryService = new Mock<IItinerarySpi>();
           mockItineraryService.Setup(i => i.GetItineraryInfoAsync(It.IsAny<GeoPoint>(), It.IsAny<GeoPoint>(), It.IsAny<CancellationToken>()))
-              .ReturnsAsync(new ItineraryResult(10.0, 20.0));
+               .ReturnsAsync(new ItineraryResult(10.0, 20.0));
 
           // Act
           await delivery.AddStepAsync(
@@ -302,7 +304,8 @@ public class DeliveryTests
                false,
                new PackingSize("packing", 1, "label", 3, 10),
                mockZoneRepo.Object,
-               mockItineraryService.Object
+               mockItineraryService.Object,
+               _mockPricingStrategyService.Object
           );
 
           // Assert
@@ -325,7 +328,8 @@ public class DeliveryTests
                false,
                new PackingSize("packing", 1, "label", 3, 10),
                mockDeliveryZoneRepository.Object,
-               mockItineraryService.Object);
+               mockItineraryService.Object,
+               _mockPricingStrategyService.Object);
 
           // Assert
           step.StepType.Should().Be(StepType.Dropoff);
@@ -347,7 +351,8 @@ public class DeliveryTests
                false,
                new PackingSize("packing", 1, "label", 3, 10),
                mockDeliveryZoneRepository.Object,
-               mockItineraryService.Object);
+               mockItineraryService.Object,
+               _mockPricingStrategyService.Object);
 
           // Assert
           mockDeliveryZoneRepository.Verify(r => r.GetByAddress(address.City), Times.Once);
@@ -363,10 +368,10 @@ public class DeliveryTests
           delivery.Steps.Add(step);
           var mockItineraryService = new Mock<IItinerarySpi>();
           mockItineraryService.Setup(i => i.GetItineraryInfoAsync(It.IsAny<GeoPoint>(), It.IsAny<GeoPoint>(), It.IsAny<CancellationToken>()))
-              .ReturnsAsync(new ItineraryResult(10.0, 20.0));
+               .ReturnsAsync(new ItineraryResult(10.0, 20.0));
 
           // Act
-          await delivery.DeleteStepAsync(step, mockItineraryService.Object);
+          await delivery.DeleteStepAsync(step, mockItineraryService.Object, Mock.Of<IPricingStrategyService>());
 
           // Assert
           delivery.Steps.Should().BeEmpty();

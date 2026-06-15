@@ -42,7 +42,7 @@ public class GetReportHandler(
      public async ValueTask<Report> Handle(GetReportQuery query, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(query, cancellationToken);
-          
+
           var customer = await customerRepository.FirstOrDefaultAsync(new CustomerByIdSpecification(query.CustomerId), cancellationToken);
 
           var deliveries = await repository
@@ -55,7 +55,7 @@ public class GetReportHandler(
                     , cancellationToken
                );
 
-          return await service.GenerateReport(
+          return await service.GenerateReportAsync(
                customer!.Name,
                query.From,
                query.To,
