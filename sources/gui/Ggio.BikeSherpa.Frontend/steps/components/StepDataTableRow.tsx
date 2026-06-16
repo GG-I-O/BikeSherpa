@@ -80,6 +80,9 @@ export default function StepDataTableRow(
                 />
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
+                <Text numberOfLines={3}>{step.courierComment}</Text>
+            </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.minWidth150]}>
                 {step.attachmentFilePaths.map((filePath, index) =>
                     <Text
                         key={`${step.id}-${index}`}

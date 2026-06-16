@@ -50,7 +50,7 @@ public class ReportService(
                }
                else
                {
-                    delivery.Steps = delivery.Steps.OrderBy(s => s.Order).ToList();
+                    delivery.Steps = delivery.Steps.Where(s => !s.NotBilled).OrderBy(s => s.Order).ToList();
                     foreach (var deliveryStep in delivery.Steps)
                     {
                          var description = "";
@@ -75,6 +75,19 @@ public class ReportService(
                          deliveryReport.Details.Add(stepReport);
                     }
 
+                    if (delivery.ExtraCost != 0)
+                    {
+                         var discountReport = new DeliveryReportDetail
+                         {
+                              Description = $"Options {delivery.ExtraCostReason ?? ""}",
+                              Address = null,
+                              Price = delivery.ExtraCost ?? 0,
+                              Quantity = 1
+                         };
+
+                         deliveryReport.Details.Add(discountReport);
+                    }
+                    
                     if (delivery.Discount != 0)
                     {
                          var discountReport = new DeliveryReportDetail
@@ -88,18 +101,6 @@ public class ReportService(
                          deliveryReport.Details.Add(discountReport);
                     }
 
-                    if (delivery.ExtraCost != 0)
-                    {
-                         var discountReport = new DeliveryReportDetail
-                         {
-                              Description = $"Surcoût : {delivery.ExtraCostReason ?? ""}",
-                              Address = null,
-                              Price = delivery.ExtraCost ?? 0,
-                              Quantity = 1
-                         };
-
-                         deliveryReport.Details.Add(discountReport);
-                    }
                }
 
                report.Deliveries.Add(deliveryReport);
@@ -135,7 +136,8 @@ public class ReportService(
           var description = "";
           if (deliveryStep.StepType == StepType.Pickup)
           {
-               var endStep = delivery.Steps.SingleOrDefault(s => s.StepType == StepType.Dropoff);
+               var dropSteps = delivery.Steps.Where(s => s is { StepType: StepType.Dropoff, NotBilled: false }).ToList();
+               var endStep = dropSteps[0];
                description += "Livraison ";
                description += $"{(await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Label} ";
                description += $"(Colis {endStep?.PackingSize.Name}) : ";

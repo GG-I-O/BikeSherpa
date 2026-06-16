@@ -8,6 +8,7 @@ import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers"
 import IStepMapper from "@/steps/spi/IStepMapper";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
 import {DeliveryStatusEnum} from "@/deliveries/data/deliveryStatusEnum";
+import unknownConst from "@/deliveries/data/unknownConst";
 
 @injectable()
 export default class DeliveryMapper implements IDeliveryMapper {
@@ -46,12 +47,12 @@ export default class DeliveryMapper implements IDeliveryMapper {
             id: delivery.id,
             code: delivery.code,
             status: delivery.status as DeliveryStatusEnum,
-            customerName: this.customerServices.getCustomer$(delivery.customerId).get().name,
+            customerName: this.customerServices.getCustomer$(delivery.customerId).get()?.name ?? unknownConst,
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,
             startDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
             startTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
-            limitTime: !delivery.limitDate ? '???' : DateToolbox.getFormattedTimeFromISO(new Date(delivery.limitDate).toISOString()),
+            limitTime: !delivery.limitDate ? unknownConst : DateToolbox.getFormattedTimeFromISO(new Date(delivery.limitDate).toISOString()),
             steps: delivery.steps?.map((step) => (
                 this.stepMapper.StepToStepToDisplay(delivery, step)
             ))

@@ -77,6 +77,9 @@ export default function StepDataTableRowAssign(
                     mode="outlined"
                 />
             </DataTable.Cell>
+            <DataTable.Cell style={[style.column, style.minWidth150]}>
+                <Text numberOfLines={3}>{step.courierComment}</Text>
+            </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width90]}>
                 {step.deliveryDate}
             </DataTable.Cell>

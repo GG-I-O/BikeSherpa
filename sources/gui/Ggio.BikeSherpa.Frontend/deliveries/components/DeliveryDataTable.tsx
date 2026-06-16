@@ -31,6 +31,7 @@ export default function DeliveryDataTable({ deliveries, isDeliverySelected, isSt
                     <DataTable.Title style={[style.column]}>Client</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Nb étapes</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Prix</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width40]}>Com. Liv.</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Date</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Heure début</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Heure limite</DataTable.Title>
