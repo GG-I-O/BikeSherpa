@@ -1,5 +1,4 @@
 using FastEndpoints;
-using Ggio.BikeSherpa.Backend.Features.Reports.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
@@ -7,7 +6,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Reports.Courier;
 
 public class GetReportEndpoint(
      IMediator mediator
-) : Endpoint<GetReportRequest, Report>
+) : Endpoint<GetReportRequest>
 {
      public override void Configure()
      {
@@ -24,7 +23,7 @@ public class GetReportEndpoint(
                req.EndDate
           );
 
-          var reports = await mediator.Send(query, ct);
-          await Send.OkAsync(reports, ct);
+          var reportFile = await mediator.Send(query, ct);
+          await Send.BytesAsync(reportFile.Content, reportFile.FileName, reportFile.ContentType, cancellation: ct);
      }
 }

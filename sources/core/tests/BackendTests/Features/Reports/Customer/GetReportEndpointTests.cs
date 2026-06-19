@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 using Mediator;
 using Moq;
 
-namespace BackendTests.Features.Reports.Get;
+namespace BackendTests.Features.Reports.Customer;
 
 [UsedImplicitly]
 public class GetReportWebApplicationFactory() : TestWebApplicationFactory("read:reports", "read:reports");

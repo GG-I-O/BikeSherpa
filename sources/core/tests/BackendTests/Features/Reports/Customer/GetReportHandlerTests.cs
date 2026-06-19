@@ -3,7 +3,6 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
@@ -13,11 +12,11 @@ using Ggio.BikeSherpa.Backend.Features.Reports.Services;
 using Ggio.DddCore;
 using Moq;
 
-namespace BackendTests.Features.Reports.Get;
+namespace BackendTests.Features.Reports.Customer;
 
 public class GetReportHandlerTests
 {
-     private readonly Mock<IReadRepository<Customer>> _customerRepositoryMock = new();
+     private readonly Mock<IReadRepository<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>> _customerRepositoryMock = new();
      private readonly Mock<IReadRepository<Delivery>> _deliveryRepositoryMock = new();
      private readonly DateTimeOffset _endDate = new(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
@@ -31,7 +30,7 @@ public class GetReportHandlerTests
           // Arrange
           var customerId = Guid.NewGuid();
 
-          var customer = _fixture.Build<Customer>()
+          var customer = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>()
                .With(c => c.Id, customerId)
                .With(c => c.Name, "Customer Name")
                .Create();
@@ -72,7 +71,7 @@ public class GetReportHandlerTests
           // Arrange
           var customerId = Guid.NewGuid();
 
-          var customer = _fixture.Build<Customer>()
+          var customer = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>()
                .With(c => c.Id, customerId)
                .Create();
 
@@ -85,7 +84,7 @@ public class GetReportHandlerTests
           // Assert
           _customerRepositoryMock.Verify(
                r => r.FirstOrDefaultAsync(
-                    It.Is<ISpecification<Customer>>(s => s is CustomerByIdSpecification),
+                    It.Is<ISpecification<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>>(s => s is CustomerByIdSpecification),
                     It.IsAny<CancellationToken>()),
                Times.Exactly(2));
      }
@@ -96,7 +95,7 @@ public class GetReportHandlerTests
           // Arrange
           var customerId = Guid.NewGuid();
 
-          var customer = _fixture.Build<Customer>()
+          var customer = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>()
                .With(c => c.Id, customerId)
                .Create();
 
@@ -120,7 +119,7 @@ public class GetReportHandlerTests
           // Arrange
           var customerId = Guid.NewGuid();
 
-          var customer = _fixture.Build<Customer>()
+          var customer = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>()
                .With(c => c.Id, customerId)
                .With(c => c.Name, "Report Customer")
                .Create();
@@ -152,7 +151,7 @@ public class GetReportHandlerTests
      public async Task Handle_ShouldThrowValidationException_WhenCustomerIdIsEmpty()
      {
           // Arrange
-          var customer = _fixture.Build<Customer>()
+          var customer = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>()
                .With(c => c.Id, Guid.NewGuid())
                .Create();
 
@@ -196,7 +195,7 @@ public class GetReportHandlerTests
 
           _customerRepositoryMock.Verify(
                r => r.FirstOrDefaultAsync(
-                    It.Is<ISpecification<Customer>>(s => s is CustomerByIdSpecification),
+                    It.Is<ISpecification<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>>(s => s is CustomerByIdSpecification),
                     It.IsAny<CancellationToken>()),
                Times.Once);
 
@@ -221,7 +220,7 @@ public class GetReportHandlerTests
           // Arrange
           var customerId = Guid.NewGuid();
 
-          var customer = _fixture.Build<Customer>()
+          var customer = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>()
                .With(c => c.Id, customerId)
                .Create();
 
@@ -254,7 +253,7 @@ public class GetReportHandlerTests
      }
 
      private GetReportHandler CreateSut(
-          Customer? customer,
+          Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer? customer,
           List<Delivery> deliveries,
           Report report)
      {
@@ -264,9 +263,9 @@ public class GetReportHandlerTests
 
           _customerRepositoryMock
                .Setup(r => r.FirstOrDefaultAsync(
-                    It.IsAny<ISpecification<Customer>>(),
+                    It.IsAny<ISpecification<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync((ISpecification<Customer> specification, CancellationToken _) =>
+               .ReturnsAsync((ISpecification<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer> specification, CancellationToken _) =>
                     customer is not null && specification.IsSatisfiedBy(customer)
                          ? customer
                          : null);

@@ -1,9 +1,11 @@
+using Ardalis.Specification;
 using AutoFixture;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Reports.Services;
+using Ggio.DddCore;
 using Moq;
 using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 
@@ -16,6 +18,7 @@ public class ReportServiceTests
      private readonly Mock<IDelayService> _delayServiceMock = new();
      private readonly Fixture _fixture = new();
      private readonly Mock<IPricingStrategy> _pricingStrategyMock = new();
+     private readonly Mock<IReadRepository<Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier>> _courierRepositoryMock = new();
 
      private readonly DateTimeOffset _startDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly ReportService _sut;
@@ -27,7 +30,11 @@ public class ReportServiceTests
                .Setup(s => s.ImplementedStrategy)
                .Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
 
-          _sut = new ReportService([_pricingStrategyMock.Object], _delayServiceMock.Object, _vatServiceMock.Object);
+          _courierRepositoryMock
+               .Setup(s=>s.SingleOrDefaultAsync(It.IsAny<SingleResultSpecification<Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier>>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(_fixture.Create<Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier>());
+          
+          _sut = new ReportService([_pricingStrategyMock.Object], _delayServiceMock.Object, _vatServiceMock.Object, _courierRepositoryMock.Object);
      }
 
      private Delivery MakeDelivery(

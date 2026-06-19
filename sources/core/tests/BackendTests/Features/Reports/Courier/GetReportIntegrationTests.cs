@@ -1,7 +1,6 @@
 using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
@@ -14,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 
-namespace BackendTests.Features.Reports.Get;
+namespace BackendTests.Features.Reports.Courier;
 
 [Collection("Database integration tests")]
 [TestSubject(typeof(GetReportEndpoint))]
@@ -74,7 +73,7 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
           await dbContext.DeliveryZones.AddAsync(zone, TestContext.Current.CancellationToken);
           await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-          var customer = _fixture.Build<Customer>()
+          var customer = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>()
                .With(c => c.Name, "Report Customer")
                .With(c => c.Code, "C01")
                .With(c => c.Address, _fixture.Build<Address>()

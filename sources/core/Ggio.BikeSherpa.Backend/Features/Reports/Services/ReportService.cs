@@ -1,18 +1,23 @@
+using Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Reports.Model;
+using Ggio.DddCore;
 
 namespace Ggio.BikeSherpa.Backend.Features.Reports.Services;
 
 public class ReportService(
      IEnumerable<IPricingStrategy> strategies,
      IDelayService delayService,
-     IVatService vatService
-) : IReportService
+     IVatService vatService,
+     IReadRepository<Domain.CourierAggregate.Courier> couriersRepository) : IReportService
 {
-     public async Task<Report> GenerateDeliveryReportAsync(string customerName, DateTimeOffset startDate, DateTimeOffset endDate, List<Delivery> deliveries)
+     public async Task<Report> GenerateDeliveryReportAsync(string customerName,
+          DateTimeOffset startDate,
+          DateTimeOffset endDate,
+          List<Delivery> deliveries)
      {
           var report = new Report
           {
@@ -44,7 +49,7 @@ public class ReportService(
 
                if (strategy.ImplementedStrategy == PricingStrategy.CustomStrategy)
                {
-                    var stepReport = GetCustomStrategyStepDetail(delivery);
+                    var stepReport = await GetCustomStrategyStepDetail(delivery);
 
                     deliveryReport.Details.Add(stepReport);
                }
@@ -69,7 +74,8 @@ public class ReportService(
                               Description = description,
                               Address = deliveryStep.StepAddress,
                               Price = await strategy.GetStepPrice(delivery, deliveryStep),
-                              Quantity = 1
+                              Quantity = 1,
+                              CourierName = await GetCourierName(deliveryStep.CourierId)
                          };
 
                          deliveryReport.Details.Add(stepReport);
@@ -82,7 +88,8 @@ public class ReportService(
                               Description = $"Options {delivery.ExtraCostReason ?? ""}",
                               Address = null,
                               Price = delivery.ExtraCost ?? 0,
-                              Quantity = 1
+                              Quantity = 1,
+                              CourierName = null
                          };
 
                          deliveryReport.Details.Add(discountReport);
@@ -95,7 +102,8 @@ public class ReportService(
                               Description = $"Remise : {delivery.DiscountReason ?? ""}",
                               Address = null,
                               Price = -1 * (delivery.Discount ?? 0),
-                              Quantity = 1
+                              Quantity = 1,
+                              CourierName = null
                          };
 
                          deliveryReport.Details.Add(discountReport);
@@ -109,6 +117,17 @@ public class ReportService(
 
           report.TotalPriceWithVat = await vatService.GetPriceWithVatAsync(report.TotalPrice);
           return report;
+     }
+
+     private async Task<string> GetCourierName(Guid? courierId)
+     {
+          if (!courierId.HasValue)
+          {
+               return string.Empty;
+          }
+
+          var customer = await couriersRepository.SingleOrDefaultAsync(new CourierByIdSpecification(courierId.Value));
+          return customer == null ? string.Empty : customer.GetFullName();
      }
 
      private async Task<string> GetTourDeliveryStepDescription(DeliveryStep deliveryStep, Delivery delivery)
@@ -154,15 +173,19 @@ public class ReportService(
           return description;
      }
 
-     private static DeliveryReportDetail GetCustomStrategyStepDetail(Delivery delivery)
+     private async Task<DeliveryReportDetail> GetCustomStrategyStepDetail(Delivery delivery)
      {
+
+          var couriers = delivery.Steps.Select(s => s.CourierId).Distinct().ToList();
+          var couriersNames = couriers.Select(async c => await GetCourierName(c)).ToList();
 
           var stepReport = new DeliveryReportDetail
           {
                Description = "Prix fixe",
                Address = null,
                Price = delivery.TotalPrice ?? 0,
-               Quantity = 1
+               Quantity = 1,
+               CourierName = string.Join(" , ", couriersNames)
           };
 
           return stepReport;
