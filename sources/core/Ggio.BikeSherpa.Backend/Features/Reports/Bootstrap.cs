@@ -1,5 +1,5 @@
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Features.Reports.Get;
+using Ggio.BikeSherpa.Backend.Features.Reports.Customer;
 using Ggio.BikeSherpa.Backend.Features.Reports.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +13,7 @@ public static class Bootstrap
           {
                services.AddScoped<IReportService, ReportService>();
                services.AddScoped<IValidator<GetReportQuery>, GetReportQueryValidator>();
+               services.AddScoped<IValidator<Courier.GetReportQuery>, Courier.GetReportQueryValidator>();
                return services;
           }
      }

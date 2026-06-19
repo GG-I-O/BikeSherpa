@@ -12,7 +12,7 @@ public class ReportService(
      IVatService vatService
 ) : IReportService
 {
-     public async Task<Report> GenerateReportAsync(string customerName, DateTimeOffset startDate, DateTimeOffset endDate, List<Delivery> deliveries)
+     public async Task<Report> GenerateDeliveryReportAsync(string customerName, DateTimeOffset startDate, DateTimeOffset endDate, List<Delivery> deliveries)
      {
           var report = new Report
           {
@@ -87,7 +87,7 @@ public class ReportService(
 
                          deliveryReport.Details.Add(discountReport);
                     }
-                    
+
                     if (delivery.Discount != 0)
                     {
                          var discountReport = new DeliveryReportDetail

@@ -3,15 +3,15 @@ using Ggio.BikeSherpa.Backend.Features.Reports.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
-namespace Ggio.BikeSherpa.Backend.Features.Reports.Get;
+namespace Ggio.BikeSherpa.Backend.Features.Reports.Courier;
 
 public class GetReportEndpoint(
      IMediator mediator
-     ) : Endpoint<GetReportRequest, Report>
+) : Endpoint<GetReportRequest, Report>
 {
      public override void Configure()
      {
-          Get("/reports");
+          Get("/reports/courier/{courierId:guid}");
           Policies("read:reports");
           Description(x => x.WithTags("report"));
      }
@@ -19,7 +19,7 @@ public class GetReportEndpoint(
      public override async Task HandleAsync(GetReportRequest req, CancellationToken ct)
      {
           var query = new GetReportQuery(
-               req.CustomerId,
+               req.CourierId,
                req.StartDate,
                req.EndDate
           );

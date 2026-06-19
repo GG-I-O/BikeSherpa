@@ -13,4 +13,6 @@ public class Courier : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public required Address Address { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
+
+     public string GetFullName() => $"{FirstName} {LastName}";
 }

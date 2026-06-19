@@ -7,7 +7,7 @@ using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
-using Ggio.BikeSherpa.Backend.Features.Reports.Get;
+using Ggio.BikeSherpa.Backend.Features.Reports.Customer;
 using Ggio.BikeSherpa.Backend.Features.Reports.Model;
 using Ggio.BikeSherpa.Backend.Features.Reports.Services;
 using Ggio.DddCore;
@@ -58,7 +58,7 @@ public class GetReportHandlerTests
           result.Should().Be(expectedReport);
 
           _reportServiceMock.Verify(
-               s => s.GenerateReportAsync(
+               s => s.GenerateDeliveryReportAsync(
                     customer.Name,
                     _startDate,
                     _endDate,
@@ -140,7 +140,7 @@ public class GetReportHandlerTests
 
           // Assert
           _reportServiceMock.Verify(
-               s => s.GenerateReportAsync(
+               s => s.GenerateDeliveryReportAsync(
                     customer.Name,
                     query.From,
                     query.To,
@@ -172,7 +172,7 @@ public class GetReportHandlerTests
                Times.Never);
 
           _reportServiceMock.Verify(
-               s => s.GenerateReportAsync(
+               s => s.GenerateDeliveryReportAsync(
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
@@ -207,7 +207,7 @@ public class GetReportHandlerTests
                Times.Never);
 
           _reportServiceMock.Verify(
-               s => s.GenerateReportAsync(
+               s => s.GenerateDeliveryReportAsync(
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
@@ -245,7 +245,7 @@ public class GetReportHandlerTests
                Times.Never);
 
           _reportServiceMock.Verify(
-               s => s.GenerateReportAsync(
+               s => s.GenerateDeliveryReportAsync(
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
@@ -278,7 +278,7 @@ public class GetReportHandlerTests
                .ReturnsAsync(deliveries);
 
           _reportServiceMock
-               .Setup(s => s.GenerateReportAsync(
+               .Setup(s => s.GenerateDeliveryReportAsync(
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),

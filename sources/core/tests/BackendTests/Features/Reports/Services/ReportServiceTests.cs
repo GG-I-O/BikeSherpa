@@ -63,7 +63,7 @@ public class ReportServiceTests
           var to = new DateTimeOffset(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
 
           // Act
-          var report = await _sut.GenerateReportAsync(customerName, from, to, []);
+          var report = await _sut.GenerateDeliveryReportAsync(customerName, from, to, []);
 
           // Assert
           report.CustomerName.Should().Be(customerName);
@@ -81,7 +81,7 @@ public class ReportServiceTests
           var secondDelivery = MakeDelivery(code: "DEL-002", totalPrice: 27.25);
 
           // Act
-          var report = await _sut.GenerateReportAsync(
+          var report = await _sut.GenerateDeliveryReportAsync(
                "Customer",
                _startDate,
                _startDate.AddDays(1),
@@ -107,7 +107,7 @@ public class ReportServiceTests
           var delivery = MakeDelivery(totalPrice: null);
 
           // Act
-          var report = await _sut.GenerateReportAsync("Customer", _startDate, _startDate.AddDays(1), [delivery]);
+          var report = await _sut.GenerateDeliveryReportAsync("Customer", _startDate, _startDate.AddDays(1), [delivery]);
 
           // Assert
           report.TotalPrice.Should().Be(0);

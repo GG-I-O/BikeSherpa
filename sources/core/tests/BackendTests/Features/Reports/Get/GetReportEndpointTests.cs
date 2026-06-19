@@ -3,7 +3,7 @@ using System.Text.Json;
 using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
-using Ggio.BikeSherpa.Backend.Features.Reports.Get;
+using Ggio.BikeSherpa.Backend.Features.Reports.Customer;
 using Ggio.BikeSherpa.Backend.Features.Reports.Model;
 using JetBrains.Annotations;
 using Mediator;
@@ -18,15 +18,17 @@ public class GetReportEndpointTests(
      GetReportWebApplicationFactory factory,
      ITestContextAccessor testContextAccessor) : IClassFixture<GetReportWebApplicationFactory>
 {
-     private readonly HttpClient _client = factory.CreateClient();
-     private readonly Mock<IMediator> _mockMediator = factory.MockMediator;
-     private readonly Fixture _fixture = new();
      private readonly CancellationToken _cancellationToken = testContextAccessor.Current.CancellationToken;
+     private readonly HttpClient _client = factory.CreateClient();
+     private readonly Fixture _fixture = new();
+
      private readonly JsonSerializerOptions _jsonSerializerOptions = new()
      {
           PropertyNameCaseInsensitive = false,
           PropertyNamingPolicy = JsonNamingPolicy.CamelCase
      };
+
+     private readonly Mock<IMediator> _mockMediator = factory.MockMediator;
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenRequestIsValid()

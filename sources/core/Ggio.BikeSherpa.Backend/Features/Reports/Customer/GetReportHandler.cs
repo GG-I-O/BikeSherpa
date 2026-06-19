@@ -1,5 +1,4 @@
 using FluentValidation;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
@@ -8,7 +7,7 @@ using Ggio.BikeSherpa.Backend.Features.Reports.Services;
 using Ggio.DddCore;
 using Mediator;
 
-namespace Ggio.BikeSherpa.Backend.Features.Reports.Get;
+namespace Ggio.BikeSherpa.Backend.Features.Reports.Customer;
 
 public record GetReportQuery(
      Guid CustomerId,
@@ -18,7 +17,7 @@ public record GetReportQuery(
 
 public class GetReportQueryValidator : AbstractValidator<GetReportQuery>
 {
-     public GetReportQueryValidator(IReadRepository<Customer> customerRepository)
+     public GetReportQueryValidator(IReadRepository<Domain.CustomerAggregate.Customer> customerRepository)
      {
           RuleFor(x => x.CustomerId)
                .NotEmpty()
@@ -34,7 +33,7 @@ public class GetReportQueryValidator : AbstractValidator<GetReportQuery>
 
 public class GetReportHandler(
      IReadRepository<Delivery> repository,
-     IReadRepository<Customer> customerRepository,
+     IReadRepository<Domain.CustomerAggregate.Customer> customerRepository,
      IValidator<GetReportQuery> validator,
      IReportService service
 ) : IQueryHandler<GetReportQuery, Report>
@@ -55,7 +54,7 @@ public class GetReportHandler(
                     , cancellationToken
                );
 
-          return await service.GenerateReportAsync(
+          return await service.GenerateDeliveryReportAsync(
                customer!.Name,
                query.From,
                query.To,
