@@ -1,12 +1,10 @@
-using System.Text.Json;
 using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
-using Ggio.BikeSherpa.Backend.Features.Reports.Get;
+using Ggio.BikeSherpa.Backend.Features.Reports.Customer;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
@@ -15,18 +13,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 
-namespace BackendTests.Features.Reports.Get;
+namespace BackendTests.Features.Reports.Courier;
 
 [Collection("Database integration tests")]
 [TestSubject(typeof(GetReportEndpoint))]
 [Trait("Category", "Integration")]
 public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
-     private readonly WebApplicationFactory<Program> _factory;
-     private readonly Fixture _fixture = TestFixtureFactory.Create();
-
      private const string Scope = "read:reports";
      private const string UserEmail = "user@example.com";
+     private readonly WebApplicationFactory<Program> _factory;
+     private readonly Fixture _fixture = TestFixtureFactory.Create();
 
      public GetReportIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
@@ -64,7 +61,7 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
-          
+
           var startDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
           var endDate = new DateTimeOffset(2026, 1, 31, 23, 59, 59, TimeSpan.Zero);
 
@@ -76,7 +73,7 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
           await dbContext.DeliveryZones.AddAsync(zone, TestContext.Current.CancellationToken);
           await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-          var customer = _fixture.Build<Customer>()
+          var customer = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>()
                .With(c => c.Name, "Report Customer")
                .With(c => c.Code, "C01")
                .With(c => c.Address, _fixture.Build<Address>()
@@ -98,24 +95,27 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
                .With(d => d.CreatedAt, DateTimeOffset.UtcNow)
                .With(d => d.UpdatedAt, DateTimeOffset.UtcNow)
                .Create();
-          
+
           var address = _fixture.Build<Address>()
                .With(a => a.Postcode, "38000")
                .With(a => a.City, "Grenoble")
                .With(a => a.Complement, (string?)null)
                .Create();
-          var step = new DeliveryStep(StepType.Pickup, 1, address) {
-              PackingSize = packingSize,
-              StepZone = zone,
-              ParentDelivery = delivery,
-              StepAddress = address
+
+          var step = new DeliveryStep(StepType.Pickup, 1, address)
+          {
+               PackingSize = packingSize,
+               StepZone = zone,
+               ParentDelivery = delivery,
+               StepAddress = address
           };
+
           delivery.Steps = [step];
 
           await dbContext.Customers.AddAsync(customer, CancellationToken.None);
           await dbContext.Deliveries.AddAsync(delivery, CancellationToken.None);
           await dbContext.SaveChangesAsync(CancellationToken.None);
-          
+
           try
           {
                // Act

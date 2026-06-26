@@ -1,9 +1,11 @@
+using Ardalis.Specification;
 using AutoFixture;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Reports.Services;
+using Ggio.DddCore;
 using Moq;
 using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 
@@ -16,6 +18,7 @@ public class ReportServiceTests
      private readonly Mock<IDelayService> _delayServiceMock = new();
      private readonly Fixture _fixture = new();
      private readonly Mock<IPricingStrategy> _pricingStrategyMock = new();
+     private readonly Mock<IReadRepository<Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier>> _courierRepositoryMock = new();
 
      private readonly DateTimeOffset _startDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly ReportService _sut;
@@ -27,7 +30,11 @@ public class ReportServiceTests
                .Setup(s => s.ImplementedStrategy)
                .Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
 
-          _sut = new ReportService([_pricingStrategyMock.Object], _delayServiceMock.Object, _vatServiceMock.Object);
+          _courierRepositoryMock
+               .Setup(s=>s.SingleOrDefaultAsync(It.IsAny<SingleResultSpecification<Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier>>(), It.IsAny<CancellationToken>()))
+               .ReturnsAsync(_fixture.Create<Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier>());
+          
+          _sut = new ReportService([_pricingStrategyMock.Object], _delayServiceMock.Object, _vatServiceMock.Object, _courierRepositoryMock.Object);
      }
 
      private Delivery MakeDelivery(
@@ -63,7 +70,7 @@ public class ReportServiceTests
           var to = new DateTimeOffset(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
 
           // Act
-          var report = await _sut.GenerateReportAsync(customerName, from, to, []);
+          var report = await _sut.GenerateDeliveryReportAsync(customerName, from, to, []);
 
           // Assert
           report.CustomerName.Should().Be(customerName);
@@ -81,7 +88,7 @@ public class ReportServiceTests
           var secondDelivery = MakeDelivery(code: "DEL-002", totalPrice: 27.25);
 
           // Act
-          var report = await _sut.GenerateReportAsync(
+          var report = await _sut.GenerateDeliveryReportAsync(
                "Customer",
                _startDate,
                _startDate.AddDays(1),
@@ -107,7 +114,7 @@ public class ReportServiceTests
           var delivery = MakeDelivery(totalPrice: null);
 
           // Act
-          var report = await _sut.GenerateReportAsync("Customer", _startDate, _startDate.AddDays(1), [delivery]);
+          var report = await _sut.GenerateDeliveryReportAsync("Customer", _startDate, _startDate.AddDays(1), [delivery]);
 
           // Assert
           report.TotalPrice.Should().Be(0);

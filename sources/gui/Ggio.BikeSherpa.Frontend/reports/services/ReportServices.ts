@@ -1,24 +1,42 @@
-import {IReportServices} from "@/reports/spi/IReportServices";
-import {injectable} from "inversify";
-import {createApiClient} from "@/infra/openAPI/client";
+import { IReportServices } from "@/reports/spi/IReportServices";
+import { injectable } from "inversify";
+import { createApiClient } from "@/infra/openAPI/client";
 import axios from "axios";
-import {Report} from "@/reports/models/Report";
+import { Report } from "@/reports/models/Report";
 import DateToolbox from "@/services/DateToolbox";
+import * as Sharing from 'expo-sharing';
+import { File, Directory, Paths } from 'expo-file-system';
 
 @injectable()
 export default class ReportServices implements IReportServices {
-    private apiClient;
+    private readonly apiClient;
 
     public constructor() {
         this.apiClient = createApiClient(axios.defaults.baseURL || '', {
             axiosInstance: axios
         });
     }
-
-    public async getReport(customerId: string, startDate: string, endDate: string): Promise<Report> {
-        const data = await this.apiClient.GetReportEndpoint({
+    public async getCourierReportUrl(courierId: string, startDate: string, endDate: string): Promise<string> {
+       
+        return await this.apiClient.GetCourierReport({
+            params: {
+                courierId: courierId
+            },
             queries: {
-                customerId: customerId,
+                startDate: startDate,
+                endDate: endDate
+            }
+        });
+    }
+
+   
+
+    public async getCustomerReport(customerId: string, startDate: string, endDate: string): Promise<Report> {
+        const data = await this.apiClient.GetCustomerReport({
+            params: {
+                customerId: customerId
+            },
+            queries: {
                 startDate: startDate,
                 endDate: endDate
             }
@@ -46,7 +64,7 @@ export default class ReportServices implements IReportServices {
                         city: detail.address?.city ?? "",
                         complement: detail.address?.complement ?? "",
                         phone: detail.address?.phone ?? "",
-                        coordinates: detail.address?.coordinates ?? {longitude: 0, latitude: 0},
+                        coordinates: detail.address?.coordinates ?? { longitude: 0, latitude: 0 },
                         fullAddress: detail.address ? `${detail.address.name} - ${detail.address.streetInfo} ${detail.address.postcode} ${detail.address.city}` : ""
                     }
                 }))

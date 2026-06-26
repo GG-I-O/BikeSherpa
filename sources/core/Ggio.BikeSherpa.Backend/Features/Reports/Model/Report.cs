@@ -27,4 +27,6 @@ public record DeliveryReportDetail
      public Address? Address { get; set; }
      public required double Price { get; set; }
      public required int Quantity { get; set; }
+
+     public required string? CourierName { get; set; }
 }

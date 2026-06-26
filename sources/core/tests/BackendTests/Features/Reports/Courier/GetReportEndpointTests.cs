@@ -1,15 +1,14 @@
 using System.Net;
-using System.Text.Json;
 using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
-using Ggio.BikeSherpa.Backend.Features.Reports.Get;
-using Ggio.BikeSherpa.Backend.Features.Reports.Model;
+using Ggio.BikeSherpa.Backend.Features.Reports.Courier;
+using Ggio.BikeSherpa.Backend.Infrastructure.Storage;
 using JetBrains.Annotations;
 using Mediator;
 using Moq;
 
-namespace BackendTests.Features.Reports.Get;
+namespace BackendTests.Features.Reports.Courier;
 
 [UsedImplicitly]
 public class GetReportWebApplicationFactory() : TestWebApplicationFactory("read:reports", "read:reports");
@@ -18,15 +17,12 @@ public class GetReportEndpointTests(
      GetReportWebApplicationFactory factory,
      ITestContextAccessor testContextAccessor) : IClassFixture<GetReportWebApplicationFactory>
 {
-     private readonly HttpClient _client = factory.CreateClient();
-     private readonly Mock<IMediator> _mockMediator = factory.MockMediator;
-     private readonly Fixture _fixture = new();
      private readonly CancellationToken _cancellationToken = testContextAccessor.Current.CancellationToken;
-     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
-     {
-          PropertyNameCaseInsensitive = false,
-          PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-     };
+     private readonly HttpClient _client = factory.CreateClient();
+     private readonly Fixture _fixture = new();
+
+     private readonly Mock<IMediator> _mockMediator = factory.MockMediator;
+     private readonly Mock<IExportSaveService> _mockExportSaveService = factory.MockExportSaveService;
 
      [Fact]
      public async Task HandleAsync_ShouldCallMediatorAndSendResponse_WhenRequestIsValid()
@@ -34,15 +30,11 @@ public class GetReportEndpointTests(
           // Arrange
           _mockMediator.Reset();
 
-          var customerId = Guid.NewGuid();
+          var courierId = Guid.NewGuid();
           var startDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
           var endDate = new DateTimeOffset(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
 
-          var expectedReport = _fixture.Build<Report>()
-               .With(r => r.CustomerName, "Test Customer")
-               .With(r => r.StartDate, startDate)
-               .With(r => r.EndDate, endDate)
-               .With(r => r.TotalPrice, 42.50)
+          var expectedReport = _fixture.Build<ReportFile>()
                .Create();
 
           _mockMediator
@@ -50,10 +42,16 @@ public class GetReportEndpointTests(
                     It.IsAny<GetReportQuery>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(expectedReport);
+          
+          _mockExportSaveService.Setup(x=>x.SaveCourierReportAsync(It.IsAny<string>(),
+                    It.IsAny<byte[]>(), 
+                    It.IsAny<string>()
+                    , It.IsAny<CancellationToken>()))
+               .ReturnsAsync("The super path !");
 
           // Act
           var response = await _client.GetAsync(
-               $"/api/reports?customerId={customerId}&startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
+               $"/api/reports/courier/{courierId}?startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
                _cancellationToken);
 
           // Assert
@@ -62,19 +60,14 @@ public class GetReportEndpointTests(
           _mockMediator.Verify(
                m => m.Send(
                     It.Is<GetReportQuery>(q =>
-                         q.CustomerId == customerId &&
+                         q.CourierId == courierId &&
                          q.From == startDate &&
                          q.To == endDate),
                     It.IsAny<CancellationToken>()),
                Times.Once);
 
           var responseBody = await response.Content.ReadAsStringAsync(_cancellationToken);
-          var actualReport = JsonSerializer.Deserialize<JsonElement>(responseBody, _jsonSerializerOptions);
-
-          actualReport.GetProperty("customerName").GetString().Should().Be(expectedReport.CustomerName);
-          actualReport.GetProperty("startDate").GetDateTimeOffset().Should().Be(expectedReport.StartDate);
-          actualReport.GetProperty("endDate").GetDateTimeOffset().Should().Be(expectedReport.EndDate);
-          actualReport.GetProperty("totalPrice").GetDouble().Should().Be(expectedReport.TotalPrice);
+          responseBody.Should().Contain("The super path !");
      }
 
      [Fact]
@@ -83,7 +76,7 @@ public class GetReportEndpointTests(
           // Arrange
           _mockMediator.Reset();
 
-          var customerId = Guid.NewGuid();
+          var courrierId = Guid.NewGuid();
           var startDate = new DateTimeOffset(2026, 2, 1, 8, 30, 0, TimeSpan.Zero);
           var endDate = new DateTimeOffset(2026, 2, 28, 18, 0, 0, TimeSpan.Zero);
 
@@ -91,11 +84,11 @@ public class GetReportEndpointTests(
                .Setup(m => m.Send(
                     It.IsAny<GetReportQuery>(),
                     It.IsAny<CancellationToken>()))
-               .ReturnsAsync(_fixture.Create<Report>());
+               .ReturnsAsync(_fixture.Create<ReportFile>());
 
           // Act
           var response = await _client.GetAsync(
-               $"/api/reports?customerId={customerId}&startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
+               $"/api/reports/courier/{courrierId}?startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
                _cancellationToken);
 
           // Assert
@@ -104,7 +97,7 @@ public class GetReportEndpointTests(
           _mockMediator.Verify(
                m => m.Send(
                     It.Is<GetReportQuery>(q =>
-                         q.CustomerId == customerId &&
+                         q.CourierId == courrierId &&
                          q.From == startDate &&
                          q.To == endDate),
                     It.IsAny<CancellationToken>()),
