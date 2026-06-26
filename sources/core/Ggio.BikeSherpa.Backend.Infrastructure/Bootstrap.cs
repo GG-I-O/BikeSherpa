@@ -53,7 +53,8 @@ public static class Bootstrap
                services.AddScoped<IMailSender, MailSender>();
 
                services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
-               services.AddSingleton<IDeliveryStepAttachmentSaveService, StorageService>();
+               services.AddScoped<IDeliveryStepAttachmentSaveService, StorageService>();
+               services.AddScoped<IExportSaveService, StorageService>();
           }
      }
 }

@@ -64,16 +64,17 @@ public class GetReportHandler(
           );
 
           using var workbook = new XLWorkbook();
-          var worksheet = workbook.Worksheets.Add("Report");
+          var worksheet = workbook.Worksheets.Add("Rapport coursier");
 
           var currentRow = 1;
-          worksheet.Cell(currentRow, 1).Value = "Courier Name";
-          worksheet.Cell(currentRow, 2).Value = "Delivery Code";
-          worksheet.Cell(currentRow, 3).Value = "Delivery Date";
+          worksheet.Cell(currentRow, 1).Value = $"Rapport pour le coursier {courier.GetFullName()} du {query.From} au {query.To}";
+          worksheet.Cell(currentRow, 1).Value = "Nom du coursier";
+          worksheet.Cell(currentRow, 2).Value = "Code de livraison";
+          worksheet.Cell(currentRow, 3).Value = "Date de livraison";
           worksheet.Cell(currentRow, 4).Value = "Description";
-          worksheet.Cell(currentRow, 5).Value = "Price";
-          worksheet.Cell(currentRow, 6).Value = "Quantity";
-          worksheet.Cell(currentRow, 7).Value = "Address";
+          worksheet.Cell(currentRow, 5).Value = "Prix";
+          worksheet.Cell(currentRow, 6).Value = "Quantité";
+          worksheet.Cell(currentRow, 7).Value = "Adresse";
 
           foreach (var delivery in report.Deliveries)
           {

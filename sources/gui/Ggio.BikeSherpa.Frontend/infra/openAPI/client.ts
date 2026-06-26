@@ -31,6 +31,7 @@ const DeliveryReportDetail = z.object({
   address: Address.nullable(),
   price: z.number(),
   quantity: z.number().int(),
+  courierName: z.string().nullable(),
 });
 const DeliveryReport = z.object({
   deliveryCode: z.string(),
@@ -1215,14 +1216,51 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/reports",
-    alias: "GetReportEndpoint",
+    path: "/reports/courier/:courierId",
+    alias: "GetCourierReport",
+    tags: ["report"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "courierId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "startDate",
+        type: "Query",
+        schema: z.string().datetime({ offset: true }),
+      },
+      {
+        name: "endDate",
+        type: "Query",
+        schema: z.string().datetime({ offset: true }),
+      },
+    ],
+    response: z.string(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/reports/customer/:customerId",
+    alias: "GetCustomerReport",
     tags: ["report"],
     requestFormat: "json",
     parameters: [
       {
         name: "customerId",
-        type: "Query",
+        type: "Path",
         schema: z.string(),
       },
       {

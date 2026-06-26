@@ -55,7 +55,7 @@ public class GetReportEndpointTests(
 
           // Act
           var response = await _client.GetAsync(
-               $"/api/reports?customerId={customerId}&startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
+               $"/api/reports/customer/{customerId}?startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
                _cancellationToken);
 
           // Assert
@@ -97,7 +97,7 @@ public class GetReportEndpointTests(
 
           // Act
           var response = await _client.GetAsync(
-               $"/api/reports?customerId={customerId}&startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
+               $"/api/reports/customer/{customerId}?startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
                _cancellationToken);
 
           // Assert

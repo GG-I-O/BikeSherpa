@@ -1,3 +1,4 @@
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Logging;
@@ -5,8 +6,11 @@ using Microsoft.Extensions.Options;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Storage;
 
-public partial class StorageService : IDeliveryStepAttachmentSaveService
+public partial class StorageService : IDeliveryStepAttachmentSaveService , IExportSaveService
 {
+     private const string AttachementDirectory = "attachments";
+     private const string CourierReportDirectory = "courier-reports";
+     
      private readonly static SemaphoreSlim Lock = new(1);
      private readonly BlobServiceClient _blobServiceClient;
      private readonly ILogger<StorageService> _logger;
@@ -31,7 +35,15 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService
 
           var containerClient = _blobServiceClient.GetBlobContainerClient(_options.ContainerName);
           var extension = Path.GetExtension(fileName);
-          var blobName = $"{Guid.NewGuid().ToString()}{extension}";
+          var blobName = $"{AttachementDirectory}/{Guid.NewGuid().ToString()}{extension}";
+          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, cancellationToken, containerClient, blobName);
+
+          return blobClient.Uri.ToString();
+     }
+
+     private async Task<BlobClient> StoreBlobIntoStorage(Stream content, string fileName, string contentType, CancellationToken cancellationToken, BlobContainerClient containerClient, string blobName)
+     {
+
           var blobClient = containerClient.GetBlobClient(blobName);
 
           var uploadOptions = new BlobUploadOptions
@@ -47,8 +59,7 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService
           LogStoringNewBlobIntoStorage(blobName, fileName, contentType);
 
           await blobClient.UploadAsync(content, uploadOptions, cancellationToken);
-
-          return blobClient.Uri.ToString();
+          return blobClient;
      }
 
      private async Task EnsureContainerExistsAsync(CancellationToken cancellationToken)
@@ -67,6 +78,11 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService
                await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob, cancellationToken: cancellationToken);
                _containerChecked = true;
           }
+          catch (RequestFailedException ex) when (ex.ErrorCode == BlobErrorCode.ContainerAlreadyExists)
+          {
+               _logger.LogDebug(ex,"Container {ContainerName} already exists", _options.ContainerName);
+               _containerChecked = true;
+          }
           finally
           {
                Lock.Release();
@@ -78,4 +94,18 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService
 
      [LoggerMessage(LogLevel.Information, "Storing new Blob {BlobName} into storage from {FileName} of content type {ContentType}")]
      partial void LogStoringNewBlobIntoStorage(string blobName, string fileName, string contentType);
+
+     public async Task<string> SaveCourierReportAsync(string fileName, byte[] fileContent, string contentType,  CancellationToken cancellationToken )
+     {
+          await EnsureContainerExistsAsync(cancellationToken);
+
+          var containerClient = _blobServiceClient.GetBlobContainerClient(_options.ContainerName);
+          var extension = Path.GetExtension(fileName);
+          var blobName = $"{CourierReportDirectory}/{Guid.NewGuid().ToString()}{extension}";
+          using var content = new MemoryStream(fileContent);
+          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, cancellationToken, containerClient, blobName);
+
+          return blobClient.Uri.ToString();
+          
+     }
 }

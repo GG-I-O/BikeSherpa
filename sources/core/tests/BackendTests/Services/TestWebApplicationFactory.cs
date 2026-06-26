@@ -1,4 +1,5 @@
 ﻿using FastEndpoints;
+using Ggio.BikeSherpa.Backend.Infrastructure.Storage;
 using Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ namespace BackendTests.Services;
 public abstract class TestWebApplicationFactory(string policyName = "", string scope = "", string? email = null, Action<IServiceCollection>? serviceBuilder = null) : WebApplicationFactory<Program>
 {
      public Mock<IMediator> MockMediator { get; } = new();
+     public Mock<IExportSaveService> MockExportSaveService { get; } = new();
 
      private string PolicyName { get; } = policyName;
      private string Scope { get; } = scope;
@@ -30,6 +32,7 @@ public abstract class TestWebApplicationFactory(string policyName = "", string s
                });
 
                services.AddSingleton(MockMediator.Object);
+               services.AddSingleton(MockExportSaveService.Object);
 
                services
                     .AddAuthentication("Test")
