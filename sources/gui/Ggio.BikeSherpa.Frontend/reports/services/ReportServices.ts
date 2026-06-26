@@ -4,8 +4,6 @@ import { createApiClient } from "@/infra/openAPI/client";
 import axios from "axios";
 import { Report } from "@/reports/models/Report";
 import DateToolbox from "@/services/DateToolbox";
-import * as Sharing from 'expo-sharing';
-import { File, Directory, Paths } from 'expo-file-system';
 
 @injectable()
 export default class ReportServices implements IReportServices {
@@ -29,7 +27,18 @@ export default class ReportServices implements IReportServices {
         });
     }
 
-   
+   public async getCustomeReportExportUrl(customerId: string, startDate : string, endDate : string)
+    {
+        return await this.apiClient.ExportCustomerReport({
+            params: {
+                customerId: customerId
+            },
+            queries: {
+                from: startDate,
+                to: endDate
+            }
+        })
+    }
 
     public async getCustomerReport(customerId: string, startDate: string, endDate: string): Promise<Report> {
         const data = await this.apiClient.GetCustomerReport({

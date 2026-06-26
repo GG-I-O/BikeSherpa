@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -10,6 +11,7 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
 {
      private const string AttachementDirectory = "attachments";
      private const string CourierReportDirectory = "courier-reports";
+     private const string CustomerReportDirectory = "customer-reports";
      
      private readonly static SemaphoreSlim Lock = new(1);
      private readonly BlobServiceClient _blobServiceClient;
@@ -51,7 +53,7 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
                HttpHeaders = new BlobHttpHeaders { ContentType = contentType },
                Metadata = new Dictionary<string, string>
                {
-                    { "FileName", fileName },
+                    { "FileName", RemoveNonAscii(fileName) },
                     { "ContentType", contentType }
                }
           };
@@ -60,6 +62,13 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
 
           await blobClient.UploadAsync(content, uploadOptions, cancellationToken);
           return blobClient;
+     }
+     public static string RemoveNonAscii(string input)
+     {
+          if (string.IsNullOrEmpty(input)) return input;
+    
+          // [^\x00-\x7F] matches any character that is NOT in the ASCII range
+          return Regex.Replace(input, @"[^\x00-\x7F]", string.Empty);
      }
 
      private async Task EnsureContainerExistsAsync(CancellationToken cancellationToken)
@@ -107,5 +116,18 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
 
           return blobClient.Uri.ToString();
           
+     }
+
+     public async Task<string> SaveCustomerReportAsync(string fileName, byte[] fileContent, string contentType, CancellationToken cancellationToken)
+     {
+          await EnsureContainerExistsAsync(cancellationToken);
+
+          var containerClient = _blobServiceClient.GetBlobContainerClient(_options.ContainerName);
+          var extension = Path.GetExtension(fileName);
+          var blobName = $"{CustomerReportDirectory}/{Guid.NewGuid().ToString()}{extension}";
+          using var content = new MemoryStream(fileContent);
+          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, cancellationToken, containerClient, blobName);
+
+          return blobClient.Uri.ToString();
      }
 }

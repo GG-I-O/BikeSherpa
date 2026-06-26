@@ -25,4 +25,10 @@ export default class ReportViewModel {
         return path;
     }
 
+    public getCustomerReportExportUrl = async (startDateFilter: Date, endDateFilter: Date, customerFilter?: string): Promise<string | null> => {
+        if (!this.reportServices || !customerFilter) return null;
+
+        return await this.reportServices.getCustomeReportExportUrl(customerFilter, startDateFilter.toISOString(), endDateFilter.toISOString());
+    }
+
 }

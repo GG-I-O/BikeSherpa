@@ -36,6 +36,8 @@ export default function useReportViewModel() {
     const [courierFilter, setCourierFilter] = useState<string | undefined>();
     const [couriersOptions, setCourierOptions] = useState<{ label: string, value: string }[]>([]);
 
+    const [customerReportExportUrl, setCustomerReportExportUrl] = useState<string | null>(null);
+
     const reportTypeValues = [{
         label: 'Client', value: 'Client'
     },
@@ -49,6 +51,9 @@ export default function useReportViewModel() {
         return observe(() => {
             viewModel.getCustomerReport(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
                 .then(report => setReport(report));
+
+            viewModel.getCustomerReportExportUrl(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
+                .then(url => setCustomerReportExportUrl(url));
 
             let customerList: { label: string, value: string }[] = [];
             customerList.push(...defaultDropdownOption);
@@ -99,6 +104,7 @@ export default function useReportViewModel() {
         courierFilter,
         setCourierFilter,
         couriersOptions,
-        courierReportPath
+        courierReportPath,
+        customerReportExportUrl
     };
 }

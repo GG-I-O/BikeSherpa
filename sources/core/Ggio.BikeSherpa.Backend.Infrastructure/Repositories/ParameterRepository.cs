@@ -1,3 +1,7 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Domain.Spi;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
@@ -21,6 +25,8 @@ public class ParameterRepository(BackendDbContext dbContext) : IParameterReposit
 
      public const string EarlyOrderLimitInHours = "EARLY_ORDER_LIMIT_IN_HOURS";
      public const string LastMinuteOrderLimitInHours = "LAST_MINUTE_ORDER_LIMIT_IN_HOURS";
+     
+     public const string StackHolderInfo = "STACK_HOLDER_INFO";
 
      public async ValueTask<double> GetVatRateAsync()
      {
@@ -51,4 +57,15 @@ public class ParameterRepository(BackendDbContext dbContext) : IParameterReposit
           int.Parse((await dbContext.Parameters.FindAsync(EarlyOrderLimitInHours))!.Value);
      public async ValueTask<int> GetLastMinuteOrderLimitInHoursAsync() =>
           int.Parse((await dbContext.Parameters.FindAsync(LastMinuteOrderLimitInHours))!.Value);
+
+     public async ValueTask<StackHolderInfo> GetStackHolderInfoAsync()
+     {
+          var json = (await dbContext.Parameters.FindAsync(StackHolderInfo))!.Value;
+          if (string.IsNullOrWhiteSpace(json))
+          {
+               throw new InvalidOperationException("Stack holder info is not set");
+          }
+
+          return JsonSerializer.Deserialize<StackHolderInfo>(json)!;
+     }
 }

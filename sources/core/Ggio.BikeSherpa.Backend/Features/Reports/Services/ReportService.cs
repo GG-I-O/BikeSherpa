@@ -85,7 +85,7 @@ public class ReportService(
                     {
                          var discountReport = new DeliveryReportDetail
                          {
-                              Description = $"Options {delivery.ExtraCostReason ?? ""}",
+                              Description = $"{delivery.ExtraCostReason ?? ""}",
                               Address = null,
                               Price = delivery.ExtraCost ?? 0,
                               Quantity = 1,

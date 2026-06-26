@@ -1288,6 +1288,43 @@ const endpoints = makeApi([
       },
     ],
   },
+  {
+    method: "get",
+    path: "/reports/customer/:customerId/export",
+    alias: "ExportCustomerReport",
+    tags: ["report"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "customerId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "from",
+        type: "Query",
+        schema: z.string().datetime({ offset: true }),
+      },
+      {
+        name: "to",
+        type: "Query",
+        schema: z.string().datetime({ offset: true }),
+      },
+    ],
+    response: z.string(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
 ]);
 
 export const api = new Zodios(endpoints);

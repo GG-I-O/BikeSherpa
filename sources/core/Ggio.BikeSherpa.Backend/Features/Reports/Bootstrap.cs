@@ -13,6 +13,7 @@ public static class Bootstrap
           {
                services.AddScoped<IReportService, ReportService>();
                services.AddScoped<IValidator<GetReportQuery>, GetReportQueryValidator>();
+               services.AddScoped<IValidator<ExportReportCommand>, ExportReportCommandValidator>();
                services.AddScoped<IValidator<Courier.GetReportQuery>, Courier.GetReportQueryValidator>();
                return services;
           }
