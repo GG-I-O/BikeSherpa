@@ -28,6 +28,8 @@ import StepBootstrapper from "@/steps/bootstrapper/StepBootstrapper";
 import ReportBootstrapper from "@/reports/bootstrapper/ReportBootstrapper";
 import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
 import DropdownOptionsService from "@/services/DropdownOptionsService";
+import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
+import ColorService from "@/services/ColorService";
 
 export default class IOCContainerBootstrapper {
     public static init() {
@@ -58,6 +60,8 @@ export default class IOCContainerBootstrapper {
         IOCContainerBootstrapper.bindCustomerBackendClientFacade();
 
         IOCContainerBootstrapper.bindCourierBackendClientFacade();
+
+        IOCContainerBootstrapper.bindColorService();
 
         DeliveryBootstrapper.init(IOCContainer);
         
@@ -129,5 +133,9 @@ export default class IOCContainerBootstrapper {
 
     private static bindCourierBackendClientFacade() {
         IOCContainer.bind<IBackendClient<Courier>>(ServicesIdentifiers.CourierBackendClientFacade).to(CourierBackendClientFacade).inSingletonScope();
+    }
+
+    private static bindColorService() {
+        IOCContainer.bind<IColorServiceSpi>(ServicesIdentifiers.ColorService).to(ColorService).inSingletonScope();
     }
 }
