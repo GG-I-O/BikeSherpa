@@ -81,9 +81,9 @@ export default function ReportView() {
                 }}
             />
         </ScrollView>
-        {!viewModel.customerFilter ? (
+        {!viewModel.customerFilter && !viewModel.courierReportPath  ? (
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                <Text>Selectionne une période et un client pour voir le rapport</Text>
+                <Text style={{ color : "orange" }}>Sélectionne une période et un client pour voir le rapport</Text>
             </View>
         ) : (
             <ReportDetail
@@ -99,6 +99,18 @@ export default function ReportView() {
                      Télécharger le rapport du coursier
                 </Text>
                
+            </View>
+        )}
+
+        {viewModel.reportType === 'Client' && viewModel.customerReportExportUrl && viewModel.report && (
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 16, marginBottom: 16 }}>
+                <Button
+                    mode="contained"
+                    onPress={() => Linking.openURL(viewModel.customerReportExportUrl!)}
+                    icon="download"
+                >
+                    Exporter le rapport client
+                </Button>
             </View>
         )}
     </>

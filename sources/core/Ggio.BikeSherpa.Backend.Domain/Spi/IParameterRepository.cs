@@ -1,3 +1,5 @@
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
+
 namespace Ggio.BikeSherpa.Backend.Domain.Spi;
 
 public interface IParameterRepository
@@ -33,4 +35,7 @@ public interface IParameterRepository
      
      ValueTask<int> GetEarlyOrderLimitInHoursAsync();
      ValueTask<int> GetLastMinuteOrderLimitInHoursAsync();
+     
+     ValueTask<StackHolderInfo> GetStackHolderInfoAsync();
+     
 }

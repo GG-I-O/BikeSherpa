@@ -37,6 +37,7 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
         <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
         <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="8.3.2" />
+        <PackageReference Include="QuestPDF" Version="2024.12.3" />
     </ItemGroup>
 
     <ItemGroup>
