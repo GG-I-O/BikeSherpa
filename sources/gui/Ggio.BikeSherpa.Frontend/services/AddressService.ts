@@ -8,7 +8,7 @@ import { Linking, Platform } from "react-native";
 @injectable()
 export default class AddressService implements IAddressService {
 
-    private logger: ILogger;
+    private readonly logger: ILogger;
 
     constructor(
         @inject(ServicesIdentifiers.Logger) logger: ILogger

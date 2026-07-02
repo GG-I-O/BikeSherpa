@@ -7,6 +7,9 @@ import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import DeliveryStatusButton from "@/deliveries/components/DeliveryStatusButton";
 import {Icon} from "react-native-paper/src";
+import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
+import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
 type Props = {
     delivery: DeliveryToDisplay,
@@ -24,6 +27,16 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
     const theme = useTheme();
     const style = datatableStyle;
     const [showSteps, setShowSteps] = useState<boolean>(false);
+    const colorService = IOCContainer.get<IColorServiceSpi>(ServicesIdentifiers.ColorService);
+
+    const getBackgroundColor = () => {
+        if (isSelected) return theme.colors.primary;
+        if (!delivery.code) return theme.colors.background;
+        
+        const color = colorService.stringToColor(delivery.code);
+        // Add some transparency to the color so it's not too aggressive
+        return color + '20'; // 20 is around 12% opacity
+    };
 
     return (
         <>
@@ -32,7 +45,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     if (onPress) return onPress(delivery);
                     setShowSteps(!showSteps);
                 }}
-                style={{ backgroundColor: isSelected ? theme.colors.primary : theme.colors.background }}
+                style={{ backgroundColor: getBackgroundColor() }}
             >
                 <DataTable.Cell style={[style.column, style.width50]}>
                     <DeliveryStatusButton deliveryId={delivery.id} status={delivery.status} />

@@ -7,6 +7,9 @@ import {View} from "react-native";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import useStepDataTableRowViewModel from "@/steps/viewModel/useStepDataTableRowViewModel";
 import {Icon} from "react-native-paper/src";
+import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
+import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
 type Props = {
     step: StepToDisplay,
@@ -25,13 +28,22 @@ export default function StepDataTableRowAssign(
         canChangeDate = false,
         isFirst = false,
         isLast = false
-    }: Props) {
+    }: Readonly<Props>) {
     const theme = useTheme();
     const style = datatableStyle;
 
     const [isTimePickerOpen, setIsTimePickerOpen] = useState(false); // Disable onRowPress if we're picking time
 
     const viewModel = useStepDataTableRowViewModel(step);
+    const colorService = IOCContainer.get<IColorServiceSpi>(ServicesIdentifiers.ColorService);
+
+    const getBackgroundColor = () => {
+        if (isSelected) return theme.colors.primary;
+        if (!step.deliveryCode) return theme.colors.background;
+
+        const color = colorService.stringToColor(step.deliveryCode);
+        return color + '20';
+    };
 
     return (
         <DataTable.Row
@@ -39,7 +51,7 @@ export default function StepDataTableRowAssign(
                 if (isTimePickerOpen) return;
                 if (onPress) onPress(step);
             }}
-            style={{backgroundColor: isSelected ? theme.colors.primary : theme.colors.background}}
+            style={{backgroundColor: getBackgroundColor()}}
         >
             <DataTable.Cell style={[style.column, style.width40]}>
                 <View style={{flexDirection: "column", gap: 0}}>
