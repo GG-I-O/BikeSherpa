@@ -3,6 +3,9 @@ import datatableStyle from "@/style/datatableStyle";
 import StepDataTableRowAssign from "./StepDataTableRowAssign";
 import {ScrollView} from "react-native";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
+import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
+import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
 type Props = {
     steps: StepToDisplay[],
@@ -22,12 +25,27 @@ export default function StepDataTableAssign(
     }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
+    const colorService = IOCContainer.get<IColorServiceSpi>(ServicesIdentifiers.ColorService);
+
+    const getHeaderBackgroundColor = () => {
+        if (steps.length === 0) return theme.colors.background;
+
+        // Check if all steps share the same delivery code
+        const firstStepCode = steps[0].deliveryCode;
+        if (!firstStepCode) return theme.colors.background;
+
+        const allSame = steps.every(s => s.deliveryCode === firstStepCode);
+        if (!allSame) return theme.colors.background;
+
+        const color = colorService.stringToColor(firstStepCode);
+        return color + '20';
+    };
 
     return (
         <ScrollView>
             <DataTable style={{backgroundColor: theme.colors.background}}>
                 {showHeader ? (
-                    <DataTable.Header>
+                    <DataTable.Header style={{backgroundColor: getHeaderBackgroundColor()}}>
                         <DataTable.Title style={[style.column, style.width40]}>Ordre</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width110]}>Code</DataTable.Title>

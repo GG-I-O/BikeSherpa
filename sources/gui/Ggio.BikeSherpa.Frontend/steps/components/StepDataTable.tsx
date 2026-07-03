@@ -2,6 +2,9 @@ import { DataTable, useTheme } from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
 import StepDataTableRow from "./StepDataTableRow";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
+import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
+import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
 type Props = {
     steps: StepToDisplay[],
@@ -14,11 +17,21 @@ type Props = {
 export default function StepDataTable({ steps, isStepSelected, onRowPress, canChangeDate = false, showHeader = false }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
+    const colorService = IOCContainer.get<IColorServiceSpi>(ServicesIdentifiers.ColorService);
+
+    const getHeaderBackgroundColor = () => {
+        if (steps.length === 0) return theme.colors.background;
+        const firstStepCode = steps[0].deliveryCode;
+        if (!firstStepCode) return theme.colors.background;
+
+        const color = colorService.stringToColor(firstStepCode);
+        return color + '20';
+    };
 
     return (
         <DataTable style={{ backgroundColor: theme.colors.background }}>
             {showHeader && (
-                <DataTable.Header>
+                <DataTable.Header style={{ backgroundColor: getHeaderBackgroundColor() }}>
                     { canChangeDate && (
                         <DataTable.Title style={[style.column, style.width40]}>Ordre</DataTable.Title>
                     )}
