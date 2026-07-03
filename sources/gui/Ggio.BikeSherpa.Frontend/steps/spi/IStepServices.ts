@@ -13,7 +13,7 @@ export interface IStepServices {
     updateComment(stepId: string, comment: string): void;
     updateCourierComment(stepId: string, comment: string): void;
     
-    completeStep(stepId: string, complete: boolean): void;
+    completeStep(stepId: string, complete: boolean, completionDate: Date | null): void;
     
     addAttachment(stepId: string, file: UploadableFile): void;
 }

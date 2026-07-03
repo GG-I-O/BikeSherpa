@@ -8,13 +8,13 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
-[UsedImplicitly]
-public record UpdateDeliveryStepCompletionRequest(bool Completed);
+
 
 public record UpdateDeliveryStepCompletionCommand(
      Guid DeliveryId,
      Guid StepId,
-     bool Completed
+     bool Completed,
+     DateTimeOffset? CompletionDate = null
 ) : ICommand<Result>;
 
 [UsedImplicitly]
@@ -44,7 +44,7 @@ public class UpdateDeliveryStepCompletionHandler(
                return Result.NotFound();
           }
 
-          delivery.UpdateStepCompletion(command.StepId, command.Completed);
+          delivery.CompleteStep(command.StepId, command.Completed, command.CompletionDate);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();

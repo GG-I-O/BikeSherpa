@@ -113,6 +113,7 @@ const DeliveryDto = z.object({
 });
 const UpdateDeliveryStepCompletionRequest = z.object({
   completed: z.boolean(),
+  completionDate: z.string().datetime({ offset: true }).nullable(),
 });
 const UpdateDeliveryStepCourierRequest = z.object({ courierId: z.string() });
 const UpdateDeliveryStepOrderRequest = z.object({
@@ -1033,7 +1034,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: z.object({ completed: z.boolean() }),
+        schema: UpdateDeliveryStepCompletionRequest,
       },
       {
         name: "deliveryId",
