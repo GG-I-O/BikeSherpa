@@ -40,14 +40,7 @@ public class ReportService(
                     Details = []
                };
 
-               var strategy = strategies.SingleOrDefault(s => s.ImplementedStrategy == delivery.PricingStrategy);
-
-               if (strategy is null)
-               {
-                    continue;
-               }
-
-               if (strategy.ImplementedStrategy == PricingStrategy.CustomStrategy)
+               if (delivery.PricingStrategy == PricingStrategy.CustomStrategy)
                {
                     var stepReport = await GetCustomStrategyStepDetail(delivery);
 
@@ -55,16 +48,22 @@ public class ReportService(
                }
                else
                {
+                    var pricingStrategy = strategies.SingleOrDefault(s => s.ImplementedStrategy == delivery.PricingStrategy);
+                    if (pricingStrategy is null)
+                    {
+                         continue;
+                    }
+     
                     delivery.Steps = delivery.Steps.Where(s => !s.NotBilled).OrderBy(s => s.Order).ToList();
                     foreach (var deliveryStep in delivery.Steps)
                     {
                          var description = "";
 
-                         if (strategy.ImplementedStrategy == PricingStrategy.SimpleDeliveryStrategy)
+                         if (pricingStrategy.ImplementedStrategy == PricingStrategy.SimpleDeliveryStrategy)
                          {
                               description = await GetSimpleDeliveryStepDescription(deliveryStep, delivery);
                          }
-                         else if (strategy.ImplementedStrategy == PricingStrategy.TourDeliveryStrategy)
+                         else if (pricingStrategy.ImplementedStrategy == PricingStrategy.TourDeliveryStrategy)
                          {
                               description = await GetTourDeliveryStepDescription(deliveryStep, delivery);
                          }
@@ -73,7 +72,7 @@ public class ReportService(
                          {
                               Description = description,
                               Address = deliveryStep.StepAddress,
-                              Price = await strategy.GetStepPrice(delivery, deliveryStep),
+                              Price = await pricingStrategy.GetStepPrice(delivery, deliveryStep),
                               Quantity = 1,
                               CourierName = await GetCourierName(deliveryStep.CourierId)
                          };
