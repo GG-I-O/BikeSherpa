@@ -14,7 +14,8 @@ KEY_ALIAS="release"
 KEYSTORE_PATH="android/app/$KEYSTORE_FILE"
 GRADLE_PROPERTIES="android/gradle.properties"
 BUILD_GRADLE="android/app/build.gradle"
-ANDROID_HOME="$HOME/Android/Sdk"
+# Use environment variable if set, otherwise default to $HOME/Android/Sdk
+ANDROID_HOME="${ANDROID_HOME:-$HOME/Android/Sdk}"
 
 echo -e "$HOME"
 
@@ -169,8 +170,13 @@ else
     echo -e "${GREEN}Keystore found${NC}\n"
 fi
 
-# Specify android sdk folder
-echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+# Specify android sdk folder if not already specified in local.properties
+if [ ! -f "android/local.properties" ] || ! grep -q "sdk.dir" "android/local.properties"; then
+    echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+    echo -e "${GREEN}Created android/local.properties with sdk.dir=$ANDROID_HOME${NC}"
+else
+    echo -e "${GREEN}Using existing android/local.properties${NC}"
+fi
 
 # Check and update build.gradle if needed
 BUILD_GRADLE="android/app/build.gradle"
