@@ -1,7 +1,7 @@
 {
     "expo": {
-        "name": "Ggio.BikeSherpa.Frontend",
-        "slug": "GgioBikeSherpaFrontend",
+        "name": "BikeSherpa",
+        "slug": "BikeSherpa Mobile App",
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
