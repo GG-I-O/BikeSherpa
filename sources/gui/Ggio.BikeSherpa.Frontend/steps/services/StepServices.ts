@@ -281,7 +281,7 @@ export default class StepServices implements IStepServices {
         observables.step$!.courierComment.set(comment);
     }
     
-    public completeStep(stepId: string, complete: boolean) {
+    public completeStep(stepId: string, complete: boolean, completionDate : Date | null) {
         const observables = this.getDeliveryFromStep(stepId);
         if (!observables.delivery$) {
             this.logger.error(`CompleteStep : Parent delivery not found for step ${stepId}`);

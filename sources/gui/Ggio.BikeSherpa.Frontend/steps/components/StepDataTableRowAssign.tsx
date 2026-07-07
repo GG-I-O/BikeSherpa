@@ -1,6 +1,6 @@
-import {DataTable, IconButton, Text, TextInput, useTheme} from "react-native-paper";
+import {Button, DataTable, IconButton, Text, TextInput, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import React, {useState} from "react";
+import React, {useCallback, useState} from "react";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import TimePickerInput from "@/components/general/TimePickerInput";
 import {View} from "react-native";
@@ -10,6 +10,8 @@ import {Icon} from "react-native-paper/src";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import {DatePickerModal, TimePickerModal} from "react-native-paper-dates";
+import {SafeAreaProvider} from "react-native-safe-area-context";
 
 type Props = {
     step: StepToDisplay,
@@ -33,6 +35,9 @@ export default function StepDataTableRowAssign(
     const style = datatableStyle;
 
     const [isTimePickerOpen, setIsTimePickerOpen] = useState(false); // Disable onRowPress if we're picking time
+    const [isCompletionDatePickerOpen, setIsCompletionDatePickerOpen] = useState(false);
+    const [isCompletionTimePickerOpen, setIsCompletionTimePickerOpen] = useState(false);
+    const [completionDate, setCompletionDate] = useState<Date | undefined>(new Date());
 
     const viewModel = useStepDataTableRowViewModel(step);
     const colorService = IOCContainer.get<IColorServiceSpi>(ServicesIdentifiers.ColorService);
@@ -45,8 +50,25 @@ export default function StepDataTableRowAssign(
         return color + '20';
     };
 
+    const onConfirmDatePicker = useCallback((params: { date: Date | undefined }) => {
+        setIsCompletionDatePickerOpen(false);
+        if (params.date) {
+            setCompletionDate(params.date);
+            setIsCompletionTimePickerOpen(true);
+        }
+    }, []);
+
+    const onConfirmTimePicker = useCallback(({hours, minutes}: { hours: number, minutes: number }) => {
+        setIsCompletionTimePickerOpen(false);
+        const finalDate = completionDate ? new Date(completionDate) : new Date();
+        finalDate.setHours(hours);
+        finalDate.setMinutes(minutes);
+        viewModel.completeStep(step.id, finalDate);
+    }, [completionDate, step.id, viewModel]);
+
     return (
-        <DataTable.Row
+        <SafeAreaProvider>
+            <DataTable.Row
             onPress={() => {
                 if (isTimePickerOpen) return;
                 if (onPress) onPress(step);
@@ -124,11 +146,36 @@ export default function StepDataTableRowAssign(
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width40]}>
                 {
-                    step.completed && (
+                    step.completed ? (
                         <Icon source="check-circle-outline" size={28} color={theme.colors.onBackground}/>
+                    ) : (
+                        <Button
+                            mode="contained"
+                            onPress={() => setIsCompletionDatePickerOpen(true)}
+                            compact
+                        >
+                            Valider
+                        </Button>
                     )
                 }
             </DataTable.Cell>
+            <DatePickerModal
+                locale="fr"
+                mode="single"
+                visible={isCompletionDatePickerOpen}
+                onDismiss={() => setIsCompletionDatePickerOpen(false)}
+                date={completionDate}
+                onConfirm={onConfirmDatePicker}
+            />
+            <TimePickerModal
+                locale="fr"
+                visible={isCompletionTimePickerOpen}
+                onDismiss={() => setIsCompletionTimePickerOpen(false)}
+                onConfirm={onConfirmTimePicker}
+                hours={new Date().getHours()}
+                minutes={new Date().getMinutes()}
+            />
         </DataTable.Row>
+    </SafeAreaProvider>
     );
 }

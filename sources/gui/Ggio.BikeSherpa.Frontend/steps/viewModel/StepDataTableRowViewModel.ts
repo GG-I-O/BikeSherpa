@@ -28,4 +28,8 @@ export default class StepDataTableRowViewModel {
     public updateComment = (stepId: string, comment: string): void => {
         this.stepServices.updateComment(stepId, comment);
     }
+
+    public completeStep = (stepId: string, completionDate: Date): void => {
+        this.stepServices.completeStep(stepId, true, completionDate);
+    }
 }

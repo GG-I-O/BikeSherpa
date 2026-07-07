@@ -166,7 +166,7 @@ public class DeliveryTests
           delivery.Validate();
 
           // Act
-          delivery.UpdateStepCompletion(step.Id, true);
+          delivery.CompleteStep(step.Id, true);
 
           // Assert
           step.Completed.Should().BeTrue();
@@ -183,7 +183,7 @@ public class DeliveryTests
           delivery.Validate();
 
           // Act
-          delivery.UpdateStepCompletion(step.Id, false);
+          delivery.CompleteStep(step.Id, false);
 
           // Assert
           step.Completed.Should().BeFalse();
@@ -199,7 +199,7 @@ public class DeliveryTests
           delivery.Validate();
 
           // Act
-          delivery.UpdateStepCompletion(pickup.Id, true);
+          delivery.CompleteStep(pickup.Id, true);
 
           // Assert
           delivery.Status.Should().Be(DeliveryStatus.Started);
@@ -214,7 +214,7 @@ public class DeliveryTests
           delivery.Steps.Add(pickup);
 
           // Act
-          var act = () => delivery.UpdateStepCompletion(pickup.Id, true);
+          var act = () => delivery.CompleteStep(pickup.Id, true);
 
           // Assert
           act.Should().Throw<InvalidOperationException>();
@@ -229,10 +229,10 @@ public class DeliveryTests
           var dropOff = CreateDropOffStep();
           delivery.Steps.AddRange([pickup, dropOff]);
           delivery.Validate();
-          delivery.UpdateStepCompletion(pickup.Id, true); // Starts delivery
+          delivery.CompleteStep(pickup.Id, true); // Starts delivery
 
           // Act
-          delivery.UpdateStepCompletion(dropOff.Id, true);
+          delivery.CompleteStep(dropOff.Id, true);
 
           // Assert
           delivery.Status.Should().Be(DeliveryStatus.Completed);
@@ -248,7 +248,7 @@ public class DeliveryTests
           delivery.Status = DeliveryStatus.Completed;
 
           // Act
-          var act = () => delivery.UpdateStepCompletion(step.Id, true);
+          var act = () => delivery.CompleteStep(step.Id, true);
 
           // Assert
           act.Should().Throw<InvalidOperationException>();
@@ -264,7 +264,7 @@ public class DeliveryTests
           delivery.Status = DeliveryStatus.Cancelled;
 
           // Act
-          var act = () => delivery.UpdateStepCompletion(step.Id, true);
+          var act = () => delivery.CompleteStep(step.Id, true);
 
           // Assert
           act.Should().Throw<InvalidOperationException>();
@@ -699,7 +699,7 @@ public class DeliveryTests
           delivery.Validate();
 
           // Act
-          delivery.UpdateStepCompletion(pickup.Id, true);
+          delivery.CompleteStep(pickup.Id, true);
 
           // Assert
           delivery.DomainEvents.Should().ContainSingle(e => e is DeliveryStartedEvent);
@@ -717,7 +717,7 @@ public class DeliveryTests
 
 
           // Act
-          delivery.UpdateStepCompletion(dropOff.Id, true);
+          delivery.CompleteStep(dropOff.Id, true);
 
           // Assert
           delivery.DomainEvents.Should().ContainSingle(e => e is DeliveryCompletedEvent);

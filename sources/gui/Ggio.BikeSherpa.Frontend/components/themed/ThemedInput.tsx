@@ -44,12 +44,19 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
     const onChange = (value: string) => {
         if (isNumeric) {
             const cleaned = value.replace(/[^0-9.]/g, '');
+
             if (cleaned === '' || cleaned === '.') {
-                field.onChange(0);
-            } else {
-                const parsed = parseFloat(cleaned);
-                field.onChange(isNaN(parsed) ? 0 : parsed);
+                field.onChange('');
+                return;
             }
+
+            if (cleaned.endsWith('.')) {
+                field.onChange(cleaned);
+                return;
+            }
+
+            const parsed = parseFloat(cleaned);
+            field.onChange(isNaN(parsed) ? '' : parsed);
         } else if (isAnArray)
             field.onChange([value]);
         else

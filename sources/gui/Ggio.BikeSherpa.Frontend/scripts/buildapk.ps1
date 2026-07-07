@@ -145,6 +145,19 @@ MYAPP_RELEASE_KEY_PASSWORD=$pwd1
     Write-Host "[OK] Keystore found`n" -ForegroundColor Green
 }
 
+# Specify android sdk folder if not already specified in local.properties
+$LOCAL_PROPERTIES = "android\local.properties"
+if (-not (Test-Path $LOCAL_PROPERTIES) -or -not (Get-Content $LOCAL_PROPERTIES | Select-String "sdk.dir")) {
+    $SDK_PATH = $env:ANDROID_HOME
+    if (-not $SDK_PATH) {
+        $SDK_PATH = "$env:LOCALAPPDATA\Android\Sdk"
+    }
+    "sdk.dir=$SDK_PATH" | Set-Content $LOCAL_PROPERTIES
+    Write-Host "[OK] Created android\local.properties with sdk.dir=$SDK_PATH" -ForegroundColor Green
+} else {
+    Write-Host "[OK] Using existing android\local.properties" -ForegroundColor Green
+}
+
 # Check and update build.gradle if needed
 $BUILD_GRADLE = "android\app\build.gradle"
 $buildGradleContent = Get-Content $BUILD_GRADLE -Raw

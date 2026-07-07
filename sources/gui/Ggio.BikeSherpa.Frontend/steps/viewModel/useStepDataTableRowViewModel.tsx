@@ -25,6 +25,7 @@ export default function useStepDataTableRowViewModel(step: StepToDisplay) {
         updateStepTimeForADay: viewModel.updateStepTimeForADay,
         reorderStepForADay: viewModel.reorderStepForADay,
         updateComment: viewModel.updateComment,
+        completeStep: viewModel.completeStep,
         splitTime,
         comment,
         setComment

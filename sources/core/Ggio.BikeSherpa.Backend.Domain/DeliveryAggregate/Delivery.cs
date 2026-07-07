@@ -176,7 +176,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     public void UpdateStepCompletion(Guid stepId, bool completed)
+     public void CompleteStep(Guid stepId, bool completed, DateTimeOffset? completionDate = null)
      {
           CheckDeliveryHasBeenValidated();
 
@@ -184,7 +184,14 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           existingStep.Completed = completed;
           if (completed)
           {
-               existingStep.RealDeliveryDate = DateTimeOffset.UtcNow;
+               if (completionDate is not null)
+               {
+                    existingStep.RealDeliveryDate = completionDate;
+               }
+               else
+               {
+                    existingStep.RealDeliveryDate = DateTimeOffset.UtcNow;
+               }
           }
 
           UpdateStatus();

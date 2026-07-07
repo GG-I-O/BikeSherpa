@@ -73,7 +73,8 @@ export default function usePublicDeliveryDetailsFormViewModel(
     // Minutes options
     const minutesOptions = useMemo<DropdownOptions[]>(() => {
         const options: DropdownOptions[] = [];
-        for (let i = 0; i < 60; i += 15) {
+        const step = parseInt(process.env.EXPO_PUBLIC_DELIVERY_MINUTES_STEP ?? "15");
+        for (let i = 0; i < 60; i += step) {
             options.push({label: i.toString(), value: i.toString()});
         }
         return options;
