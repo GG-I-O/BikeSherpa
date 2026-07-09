@@ -15,7 +15,7 @@ registerTranslation('fr', fr);
 AppBootstrapper.init();
 
 function AppStack() {
-    const {user, getCredentials} = useAuth0();
+    const {user, getCredentials, error} = useAuth0();
 
     const loggedIn = user !== null && user !== undefined;
 
@@ -25,6 +25,18 @@ function AppStack() {
         userService.setCurrentUser(user);
         authService.setCredentialMethod(getCredentials);
     }, [userService, authService, user, getCredentials]);
+
+    let logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
+    logger = logger.extend("AppStack");
+    useEffect(() => {
+        if (error) {
+            logger.error('useAuth0 error ', {
+                name: error.name,
+                message: error.message,
+                nativeStackAndroid: (error as any)?.userInfo?.nativeStackAndroid,
+            });
+        }
+    }, [error]);
 
     return (
         <Stack>
