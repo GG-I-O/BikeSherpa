@@ -8,6 +8,14 @@ export default class AuthService implements IAuthService {
     private getCredentials?: (scope?: string | undefined, minTtl?: number | undefined, parameters?: Record<string, unknown> | undefined, forceRefresh?: boolean) => Promise<Credentials>
     private readonly audience = process.env.EXPO_PUBLIC_AUTH_AUDIENCE;
     private readonly scope = process.env.EXPO_PUBLIC_AUTH_SCOPE;
+    private logger: ILogger;
+
+    public contructor(
+        @inject(ServicesIdentifiers.Logger) logger: ILogger
+    ) {
+        this.logger = logger;
+        this.logger = this.logger.extend("AuthService");
+    }
 
     public setCredentialMethod(method: (params: any) => Promise<any>): void {
         this.getCredentials = method;
@@ -20,6 +28,11 @@ export default class AuthService implements IAuthService {
             const credentials = await this.getCredentials(this.scope, undefined, {audience: this.audience});
             return credentials.accessToken;
         } catch (e) {
+            this.logger.error('getToken error ', {
+                name: e?.name,
+                message: e?.message,
+                nativeStackAndroid: (e as any)?.userInfo?.nativeStackAndroid,
+            });
             return null;
         }
     }
