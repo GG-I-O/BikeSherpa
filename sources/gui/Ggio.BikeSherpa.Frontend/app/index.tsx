@@ -9,6 +9,8 @@ export default function Login() {
     const scope = process.env.EXPO_PUBLIC_AUTH_SCOPE;
     const theme = useTheme();
 
+    let logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
+    logger = logger.extend("Login");
     const onLogin = useCallback(async () => {
         try {
             if (audience)
@@ -17,7 +19,11 @@ export default function Login() {
                     scope
                 });
         } catch (e) {
-            console.error(e);
+            logger.error('authorize error ', {
+                name: e?.name,
+                message: e?.message,
+                nativeStackAndroid: (e as any)?.userInfo?.nativeStackAndroid,
+            });
         }
     }, [authorize, audience, scope]);
 
