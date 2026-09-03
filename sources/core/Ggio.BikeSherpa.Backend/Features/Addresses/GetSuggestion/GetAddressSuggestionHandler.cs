@@ -19,7 +19,9 @@ public class GetAddressSuggestionHandler(PlacesClient placesClient) : IQueryHand
           var response = await placesClient.SearchTextAsync(
                new SearchTextRequest
                {
-                    TextQuery = query.Address
+                    TextQuery = query.Address,
+                    LanguageCode = "fr",
+                    MaxResultCount = 5
                },
                callSettings
           );
@@ -29,7 +31,7 @@ public class GetAddressSuggestionHandler(PlacesClient placesClient) : IQueryHand
           [
                .. addresses.Select(suggestion => new AddressCrud()
                {
-                    Name = suggestion.DisplayName.Text,
+                    Name = suggestion.DisplayName.Text != suggestion.PostalAddress.AddressLines[0] ? suggestion.DisplayName.Text : "",
                     StreetInfo = suggestion.PostalAddress.AddressLines[0],
                     City = suggestion.PostalAddress.Locality,
                     Coordinates = new GeoPoint(suggestion.Location.Longitude, suggestion.Location.Latitude),
