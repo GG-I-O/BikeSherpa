@@ -233,6 +233,21 @@ export const schemas = {
 
 const endpoints = makeApi([
   {
+    method: "get",
+    path: "/address/suggest/:query",
+    alias: "GetAddressSuggestionEndpoint",
+    tags: ["address"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "query",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.array(AddressCrud),
+  },
+  {
     method: "post",
     path: "/courier",
     alias: "AddCourierEndpoint",
