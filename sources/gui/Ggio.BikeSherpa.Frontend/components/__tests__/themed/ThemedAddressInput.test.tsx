@@ -8,7 +8,7 @@ import {createRandomAddress} from '@/fixtures/address-fixtures';
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 
 const mockAddresses: Address[] = faker.helpers.multiple(
-    () => createRandomAddress(faker.company.name()),
+    () => createRandomAddress(faker.company.name(), faker.phone.number()),
     {count: 3}
 );
 
@@ -201,12 +201,18 @@ describe("ThemedAddressInput (integration)", () => {
         await flushAsync();
 
         await waitFor(() => {
-            expect(mockAddressService.fetchAddress).toHaveBeenCalled();
+            expect(mockAddressService.fetchAddress).toHaveBeenCalledWith(
+                "Rue test"
+            );
         });
 
-        const itemText = await screen.findByText(mockAddresses[1].fullAddress);
+        const buttons = screen.getAllByTestId(
+            "themedSuggestiveInputSuggestionButton"
+        );
 
-        await user.press(itemText);
+        expect(buttons).toHaveLength(3);
+
+        await user.press(buttons[1]);
 
         expect(mockField.onChange).toHaveBeenCalledWith(mockAddresses[1]);
     });
@@ -228,13 +234,27 @@ describe("ThemedAddressInput (integration)", () => {
 
         await flushAsync();
 
-        const itemText = await screen.findByText(mockAddresses[0].fullAddress);
+        await waitFor(() => {
+            expect(
+                screen.getByTestId(
+                    "themedSuggestiveInputSuggestionsList"
+                )
+            ).toBeOnTheScreen();
+        });
 
-        await user.press(itemText);
+        const buttons = screen.getAllByTestId(
+            "themedSuggestiveInputSuggestionButton"
+        );
+
+        expect(buttons).toHaveLength(3);
+
+        await user.press(buttons[0]);
 
         await waitFor(() => {
             expect(
-                screen.queryByTestId("themedSuggestiveInputSuggestionsList")
+                screen.queryByTestId(
+                    "themedSuggestiveInputSuggestionsList"
+                )
             ).toBeNull();
         });
     });
