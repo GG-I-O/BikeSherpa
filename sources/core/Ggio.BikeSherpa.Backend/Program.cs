@@ -15,6 +15,8 @@ using Ggio.BikeSherpa.Backend.Services.Notification;
 using Ggio.DddCore;
 using Ggio.DddCore.Infrastructure;
 using Ggio.DddCore.Infrastructure.Persistence;
+using Google.Api.Gax.Grpc.Rest;
+using Google.Maps.Places.V1;
 using Mediator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -161,6 +163,12 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
      builder.Services.AddHttpLogging();
 }
 
+// Google Places API
+builder.Services.AddSingleton<PlacesClient>(_ => new PlacesClientBuilder
+{
+     ApiKey = builder.Configuration["GoogleAPIKey"] ?? "",
+     GrpcAdapter = RestGrpcAdapter.Default
+}.Build());
 
 var app = builder.Build();
 app.MapHub<ResourceNotificationHub>("/hubs/notifications");
