@@ -38,7 +38,7 @@ const ThemedAddressInput = <T extends FieldValues = FieldValues>(
             placeholder={placeholder}
             error={error}
             fetchSuggestions={(q) => addressService.fetchAddress(q)}
-            getOptionLabel={(a) => a.fullAddress}
+            getOptionLabel={(a) => (a.name != "" ? a.name + " " : "") + a.fullAddress}
             getOptionValue={(a) => a}
             getLabelFromValue={a => a.fullAddress}
             labelAsTitle={labelAsTitle}

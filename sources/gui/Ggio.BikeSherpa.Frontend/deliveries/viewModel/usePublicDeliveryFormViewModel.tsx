@@ -55,11 +55,8 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 email: customer?.email ?? '',
                 phoneNumber: customer ? null : '',
                 address: {
-                    name: customer?.name ?? '',
-                    streetInfo: '',
-                    complement: '',
-                    postcode: '',
-                    city: '',
+                    ...emptyAddress,
+                    name: customer?.name ?? ''
                 }
             },
             steps: [

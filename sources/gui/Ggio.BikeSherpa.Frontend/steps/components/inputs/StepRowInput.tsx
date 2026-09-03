@@ -1,8 +1,8 @@
 import {DataTable, IconButton} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import {Control, FieldError, FieldErrors} from "react-hook-form";
+import {Control, FieldError, FieldErrors, useFormContext, useWatch} from "react-hook-form";
 import StepTypeInput from "@/steps/components/inputs/StepTypeInput";
-import React from "react";
+import React, {useEffect} from "react";
 import ThemedInput from "@/components/themed/ThemedInput";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";
@@ -21,8 +21,27 @@ type Props = {
 }
 
 export default function StepRowInput({control, errors, name, index, deleteRow, moveRow, listLength}: Props) {
-    const { packingSizes } = useDropdown();
-    
+    const {packingSizes} = useDropdown();
+
+    const address = useWatch({
+        control,
+        name: `${name}.${index}.stepAddress`
+    });
+    const contactName = useWatch({
+        control,
+        name: `${name}.${index}.contactName`
+    })
+    const {setValue} = useFormContext();
+
+    useEffect(() => {
+        if (address?.name && contactName === "")
+            setValue(
+                `${name}.${index}.contactName`,
+                address.name,
+                {shouldValidate: true}
+            );
+    }, [address?.name, setValue]);
+
     return (
         <DataTable.Row style={{padding: 0}}>
             <DataTable.Cell style={[datatableStyle.column, datatableStyle.width130]}>
