@@ -58,14 +58,13 @@ export default function useReportViewModel() {
             let customerList: { label: string, value: string }[] = [];
             customerList.push(...defaultDropdownOption);
 
-            Object.values(customerStore$.peek()).forEach(customer => {
-                customer ? customerList.push({ label: customer.code + " - " + customer.name, value: customer.id }) : {};
-            }
+            Object.values(customerStore$.peek()).forEach(customer => 
+                customer ? customerList.push({ label: customer.code + " - " + customer.name, value: customer.id }) : {}
             );
             setCustomersOptions(customerList);
 
         });
-    }, [customerStore$, setReport, setCustomersOptions, startDateFilter, endDateFilter, customerFilter]);
+    }, [customerStore$, setReport, setCustomersOptions, startDateFilter, endDateFilter, customerFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         // For courier management
@@ -86,7 +85,7 @@ export default function useReportViewModel() {
             });
         }
 
-    }, [courierStore$, setCourierOptions, setCourierReportPath, startDateFilter, endDateFilter, courierFilter]);
+    }, [courierStore$, setCourierOptions, setCourierReportPath, startDateFilter, endDateFilter, courierFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return {
         report,

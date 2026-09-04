@@ -40,7 +40,7 @@ export default function StepRowInput({control, errors, name, index, deleteRow, m
                 address.name,
                 {shouldValidate: true}
             );
-    }, [address?.name, setValue]);
+    }, [address?.name, setValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <DataTable.Row style={{padding: 0}}>

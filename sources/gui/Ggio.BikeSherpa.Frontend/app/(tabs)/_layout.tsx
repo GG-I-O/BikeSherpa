@@ -1,4 +1,3 @@
-import {useTheme} from 'react-native-paper';
 import {IAuthService} from "@/spi/AuthSPI";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";

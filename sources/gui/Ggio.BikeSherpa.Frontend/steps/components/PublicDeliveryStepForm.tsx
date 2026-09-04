@@ -46,7 +46,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                 coordinates: {longitude: 0, latitude: 0}
             }
         });
-    }, [append]);
+    }, [append, props.packingSizes]);
 
     return (
         <View style={{gap: 16, width: "100%"}}>

@@ -47,9 +47,9 @@ export default function StepDetailView() {
                     <Button
                         buttonColor={viewModel.step.completed ? theme.colors.errorContainer : theme.colors.background}
                         mode="outlined"
-                        onPress={() => {
+                        onPress={() => 
                             viewModel.step?.completed ? viewModel.cancelStep() : viewModel.completeStep()
-                        }}
+                        }
                     >
                         <Text>{viewModel.step.completed ? "Annuler" : "Valider"}</Text>
                     </Button>
@@ -90,7 +90,7 @@ export default function StepDetailView() {
                     >
                         <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
                             <Icon source="phone" size={24} color={theme.colors.onBackground}/>
-                            <Text>{viewModel.step!.address.phone != "" ? viewModel.step!.address.phone : unassignedPhoneNumber}</Text>
+                            <Text>{viewModel.step!.address.phone !== "" ? viewModel.step!.address.phone : unassignedPhoneNumber}</Text>
                         </View>
                     </Button>
                 </View>

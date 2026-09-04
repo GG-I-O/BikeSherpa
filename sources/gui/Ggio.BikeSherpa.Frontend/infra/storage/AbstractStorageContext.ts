@@ -7,7 +7,7 @@ import {syncedCrud} from "@legendapp/state/sync-plugins/crud";
 import * as Network from 'expo-network';
 import {inject} from "inversify";
 import {ResourceNotification, ResourceOperation} from "../notification/Notification";
-import {HateoasLinks, hateoasRel, Link} from "@/models/HateoasLink";
+import {HateoasLinks, Link} from "@/models/HateoasLink";
 import Storable from "@/models/Storable";
 import ServerError from "@/models/ServerError";
 import {EventRegister} from 'react-native-event-listeners';

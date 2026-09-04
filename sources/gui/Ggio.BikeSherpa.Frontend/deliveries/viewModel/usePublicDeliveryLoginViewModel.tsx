@@ -28,7 +28,7 @@ export default function usePublicDeliveryLoginViewModel() {
             publicDeliveryStore$.isAnonymous.set(false);
             navigate("/newDelivery/form");
         }
-    }, [publicCustomer])
+    }, [publicCustomer, setIsLoadingModalVisible])
 
     const {
         control,

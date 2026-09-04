@@ -23,9 +23,9 @@ export default function DeliveryDetailView({canEdit = false}: Props) {
     useEffect(() => {
         if (!deliveryId) return;
 
-        if (!delivery || deliveryId != delivery.id)
+        if (!delivery || deliveryId !== delivery.id)
             setDelivery(viewModel.getDelivery(deliveryId));
-    }, [deliveryId, viewModel]);
+    }, [deliveryId, viewModel]); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!delivery)
         return (

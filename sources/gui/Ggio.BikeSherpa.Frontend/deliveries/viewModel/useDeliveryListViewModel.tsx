@@ -63,7 +63,7 @@ export default function useDeliveryListViewModel() {
             setCouriers(courierList);
         });
 
-    }, [deliveryStore$, courierStore$, setDeliveries, setSteps, dateFilter, datePicker, courierFilter, packingSizes]);
+    }, [deliveryStore$, courierStore$, setDeliveries, setSteps, dateFilter, datePicker, courierFilter, packingSizes]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return {
         deliveries,

@@ -5,7 +5,6 @@ import { ILogger } from "@/spi/LogsSPI";
 import { Container } from "inversify";
 import AddressService from "../AddressService";
 import { createApiClient } from "@/infra/openAPI/client";
-import axios from "axios";
 
 jest.mock("@/infra/openAPI/client", () => ({
     createApiClient: jest.fn()
