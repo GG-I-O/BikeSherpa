@@ -16,6 +16,7 @@ public class DeliveryFactoryTests
 {
      private readonly static Guid CustomerId = Guid.NewGuid();
      private readonly static string CustomerCode = "T01";
+     private readonly static string CustomerReference = "T01Ref";
      private readonly static Urgency Urgency = new("urgency", 1, "urgency", 1, null, null, 12);
      private readonly static DateTimeOffset ContractDate = new(2026, 1, 15, 10, 0, 0, TimeSpan.Zero);
      private readonly static DateTimeOffset StartDate = new(2026, 1, 14, 10, 0, 0, TimeSpan.Zero);
@@ -65,6 +66,7 @@ public class DeliveryFactoryTests
      private Task<Delivery> CreateDefault(
           PricingStrategy strategy = PricingStrategy.SimpleDeliveryStrategy,
           Guid? customerId = null,
+          string? customerReference = null,
           Urgency? urgency = null,
           double? totalPrice = null,
           double? discount = null,
@@ -76,6 +78,7 @@ public class DeliveryFactoryTests
           _sut.CreateDeliveryAsync(new DeliveryFactoryParameters(
                     strategy,
                     customerId ?? CustomerId,
+                    customerReference ?? "",
                     urgency ?? Urgency,
                     totalPrice,
                     discount,
@@ -100,6 +103,7 @@ public class DeliveryFactoryTests
           var delivery = await CreateDefault(
                PricingStrategy.TourDeliveryStrategy,
                CustomerId,
+               CustomerReference,
                discount: 5.0,
                details: details,
                insulatedBox: true,
@@ -110,6 +114,7 @@ public class DeliveryFactoryTests
           delivery.PricingStrategy.Should().Be(PricingStrategy.TourDeliveryStrategy);
           delivery.Code.Should().Be("60114-T01-2");
           delivery.CustomerId.Should().Be(CustomerId);
+          delivery.CustomerReference.Should().Be(CustomerReference);
           delivery.Urgency.Should().Be(Urgency);
           delivery.TotalPrice.Should().Be(55);
           delivery.Discount.Should().Be(5.0);

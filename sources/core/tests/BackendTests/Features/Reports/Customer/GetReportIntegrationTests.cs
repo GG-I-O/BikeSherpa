@@ -125,7 +125,7 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
 
                // Assert
                report.Deliveries.Should().HaveCount(1);
-               report.Deliveries[0].DeliveryCode.Should().Be(delivery.Code);
+               report.Deliveries[0].DeliveryLabel.Should().Be($"Livraison n° {delivery.Code} le {delivery.StartDate.Day:D2}/{delivery.StartDate.Month:D2}{(!string.IsNullOrEmpty(delivery.CustomerReference) ? $" - Ref client : {delivery.CustomerReference}" : "")}");
                report.Deliveries[0].DeliveryPrice.Should().Be(42.50);
           }
           finally

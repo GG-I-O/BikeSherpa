@@ -112,6 +112,7 @@ public class AddDeliveryByCustomerEndpoint(
                var createDeliveryCommand = new AddDeliveryCommand(
                     req.Delivery.PricingStrategy,
                     customerId,
+                    req.Delivery.CustomerReference,
                     req.Delivery.Urgency,
                     req.Delivery.TotalPrice,
                     req.Delivery.Discount,

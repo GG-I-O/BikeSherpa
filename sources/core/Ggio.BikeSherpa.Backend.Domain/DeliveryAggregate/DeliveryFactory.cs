@@ -11,6 +11,7 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 public record DeliveryFactoryParameters(
      PricingStrategy PricingStrategy,
      Guid CustomerId,
+     string? CustomerReference,
      Urgency Urgency,
      double? TotalPrice,
      double? Discount,
@@ -43,6 +44,7 @@ public class DeliveryFactory(
                PricingStrategy = parameters.PricingStrategy,
                Code = "",
                CustomerId = parameters.CustomerId,
+               CustomerReference = parameters.CustomerReference,
                Urgency = parameters.Urgency,
                TotalPrice = parameters.TotalPrice,
                Discount = parameters.Discount,
@@ -61,8 +63,6 @@ public class DeliveryFactory(
 
           if (customer is not null)
           {
-               delivery.GenerateReportId(customer);
-
                delivery.GenerateCode(customer, 0);
                var splitCode = delivery.Code.Split('-');
                var codeStart = $"{splitCode[0]}-{splitCode[1]}";

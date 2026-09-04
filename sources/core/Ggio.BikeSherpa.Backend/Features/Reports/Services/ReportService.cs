@@ -33,8 +33,7 @@ public class ReportService(
           {
                var deliveryReport = new DeliveryReport
                {
-                    DeliveryCode = delivery.Code,
-                    DeliveryDate = delivery.StartDate,
+                    DeliveryLabel = delivery.DeliveryLabel,
                     DeliveryPrice = delivery.TotalPrice ?? 0,
                     DeliveryPriceWithVat = await vatService.GetPriceWithVatAsync(delivery.TotalPrice ?? 0),
                     Details = []

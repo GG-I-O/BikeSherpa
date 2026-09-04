@@ -12,6 +12,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 public record AddDeliveryCommand(
      PricingStrategy PricingStrategy,
      Guid CustomerId,
+     string? CustomerReference,
      string Urgency,
      double? TotalPrice,
      double? Discount,
@@ -55,6 +56,7 @@ public class AddDeliveryHandler(
           var delivery = await factory.CreateDeliveryAsync(new DeliveryFactoryParameters(
                     command.PricingStrategy,
                     command.CustomerId,
+                    command.CustomerReference,
                     urgency,
                     command.TotalPrice,
                     command.Discount,
