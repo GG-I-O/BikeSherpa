@@ -67,7 +67,7 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                });
           
           // PUT /delivery/{deliveryId}/step/{stepId}/complete
-          if (canWriteStep)
+          if (canWriteStep || canWriteDelivery)
                links.Add(new Link
                {
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<UpdateDeliveryStepCompletionEndpoint>(), routeValues),
