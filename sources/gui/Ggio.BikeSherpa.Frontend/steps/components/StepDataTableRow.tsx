@@ -1,6 +1,6 @@
-import {DataTable, IconButton, Text, TextInput, useTheme} from "react-native-paper";
+import {Button, DataTable, IconButton, Text, TextInput, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import React, {useState} from "react";
+import React, {useCallback, useState} from "react";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import TimePickerInput from "@/components/general/TimePickerInput";
 import {Icon} from "react-native-paper/src";
@@ -11,6 +11,7 @@ import AppStyle from "@/constants/AppStyle";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import {DatePickerModal, TimePickerModal} from "react-native-paper-dates";
 
 type Props = {
     step: StepToDisplay,
@@ -44,6 +45,26 @@ export default function StepDataTableRow(
         const color = colorService.stringToColor(step.deliveryCode);
         return color + '20';
     };
+
+    const [isCompletionDatePickerOpen, setIsCompletionDatePickerOpen] = useState(false);
+    const [isCompletionTimePickerOpen, setIsCompletionTimePickerOpen] = useState(false);
+    const [completionDate, setCompletionDate] = useState<Date | undefined>(new Date());
+
+    const onConfirmDatePicker = useCallback((params: { date: Date | undefined }) => {
+        setIsCompletionDatePickerOpen(false);
+        if (params.date) {
+            setCompletionDate(params.date);
+            setIsCompletionTimePickerOpen(true);
+        }
+    }, []);
+
+    const onConfirmTimePicker = useCallback(({hours, minutes}: { hours: number, minutes: number }) => {
+        setIsCompletionTimePickerOpen(false);
+        const finalDate = completionDate ? new Date(completionDate) : new Date();
+        finalDate.setHours(hours);
+        finalDate.setMinutes(minutes);
+        viewModel.completeStep(step.id, finalDate);
+    }, [completionDate, step.id, viewModel]);
 
     return (
         <DataTable.Row
@@ -123,13 +144,37 @@ export default function StepDataTableRow(
                     )
                 }
             </DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width40]}>
+            <DataTable.Cell style={[style.column, style.width60, {justifyContent: 'center'}]}>
                 {
-                    step.completed && (
+                    step.completed ? (
                         <Icon source="check-circle-outline" size={28} color={theme.colors.onBackground}/>
+                    ) : (
+                        <Button
+                            mode="contained"
+                            onPress={() => setIsCompletionDatePickerOpen(true)}
+                            compact
+                        >
+                            Valider
+                        </Button>
                     )
                 }
             </DataTable.Cell>
+            <DatePickerModal
+                locale="fr"
+                mode="single"
+                visible={isCompletionDatePickerOpen}
+                onDismiss={() => setIsCompletionDatePickerOpen(false)}
+                date={completionDate}
+                onConfirm={onConfirmDatePicker}
+            />
+            <TimePickerModal
+                locale="fr"
+                visible={isCompletionTimePickerOpen}
+                onDismiss={() => setIsCompletionTimePickerOpen(false)}
+                onConfirm={onConfirmTimePicker}
+                hours={new Date().getHours()}
+                minutes={new Date().getMinutes()}
+            />
         </DataTable.Row>
     );
 }
