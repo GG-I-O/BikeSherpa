@@ -99,11 +99,11 @@ public class ReportServiceTests
           report.Deliveries.Should().HaveCount(2);
 
           report.Deliveries[0].DeliveryLabel.Should().Contain(firstDelivery.Code);
-          report.Deliveries[0].DeliveryLabel.Should().Contain($"{firstDelivery.StartDate.Day}/{firstDelivery.StartDate.Month}");
+          report.Deliveries[0].DeliveryLabel.Should().Contain($"{firstDelivery.StartDate.Day:D2}/{firstDelivery.StartDate.Month:D2}");
           report.Deliveries[0].DeliveryPrice.Should().Be(12.50);
 
           report.Deliveries[1].DeliveryLabel.Should().Contain(secondDelivery.Code);
-          report.Deliveries[1].DeliveryLabel.Should().Contain($"{secondDelivery.StartDate.Day}/{secondDelivery.StartDate.Month}");
+          report.Deliveries[1].DeliveryLabel.Should().Contain($"{secondDelivery.StartDate.Day:D2}/{secondDelivery.StartDate.Month:D2}");
           report.Deliveries[1].DeliveryPrice.Should().Be(27.25);
      }
 

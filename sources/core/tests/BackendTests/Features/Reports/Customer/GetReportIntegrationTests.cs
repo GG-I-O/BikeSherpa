@@ -125,7 +125,7 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
 
                // Assert
                report.Deliveries.Should().HaveCount(1);
-               report.Deliveries[0].DeliveryLabel.Should().Be($"Livraison n° {delivery.Code} le {delivery.StartDate.Day}/{delivery.StartDate.Month} à partir de {delivery.StartDate.Hour}:{delivery.StartDate.Minute} {(delivery.CustomerReference != "" ? $"Ref client : {delivery.CustomerReference}" : "")}");
+               report.Deliveries[0].DeliveryLabel.Should().Be($"Livraison n° {delivery.Code} le {delivery.StartDate.Day:D2}/{delivery.StartDate.Month:D2} à partir de {delivery.StartDate.Hour:D2}:{delivery.StartDate.Minute:D2} {(delivery.CustomerReference != "" ? $"Ref client : {delivery.CustomerReference}" : "")}");
                report.Deliveries[0].DeliveryPrice.Should().Be(42.50);
           }
           finally
