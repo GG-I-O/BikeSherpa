@@ -14,7 +14,7 @@ public class UpdateDeliveryStepCompletionEndpoint(IMediator mediator) : Endpoint
      public override void Configure()
      {
           Put("/delivery/{deliveryId:guid}/step/{stepId:guid}/complete");
-          Policies("write:myDeliveries", "write:deliveries");
+          Policies("CanValidateStep");
           Description(x => x.WithTags("delivery"));
      }
 

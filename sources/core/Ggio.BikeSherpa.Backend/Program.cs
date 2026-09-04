@@ -108,6 +108,19 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
           options.AddPolicy("read:myDeliveries", policy => policy.RequireClaim(scopeName, "read:myDeliveries"));
           options.AddPolicy("write:myDeliveries", policy => policy.RequireClaim(scopeName, "write:myDeliveries"));
           options.AddPolicy("read:reports", policy => policy.RequireClaim(scopeName, "read:reports"));
+          
+          options.AddPolicy("CanValidateStep", policy =>
+          {
+               policy.RequireAuthenticatedUser();
+               policy.RequireAssertion(context =>
+               {
+                    var scopes = context.User.FindAll("scope")
+                         .SelectMany(c => c.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+
+                    return scopes.Contains("write:myDeliveries") ||
+                           scopes.Contains("write:deliveries");
+               });
+          });
      });
 
      builder.Services.AddAuth0ApiAuthentication(options =>
