@@ -43,7 +43,7 @@ export default function StepDataTable({ steps, isStepSelected, onRowPress, canCh
                     <DataTable.Title style={[style.column, style.minWidth150]}>Pièces jointes</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width60]}>Livreur</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
-                    <DataTable.Title style={[style.column, style.width40]}>Finis</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width60]}>Finis</DataTable.Title>
                 </DataTable.Header>
             )}
 
