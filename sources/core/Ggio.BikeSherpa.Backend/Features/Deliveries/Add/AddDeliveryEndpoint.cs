@@ -21,7 +21,7 @@ public class AddDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud, Ad
           var command = new AddDeliveryCommand(
                req.PricingStrategy,
                req.CustomerId,
-               req.CustomerReference ?? "",
+               req.CustomerReference,
                req.Urgency,
                req.TotalPrice,
                req.Discount,

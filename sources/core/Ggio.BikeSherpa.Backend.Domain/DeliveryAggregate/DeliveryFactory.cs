@@ -11,7 +11,7 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 public record DeliveryFactoryParameters(
      PricingStrategy PricingStrategy,
      Guid CustomerId,
-     string CustomerReference,
+     string? CustomerReference,
      Urgency Urgency,
      double? TotalPrice,
      double? Discount,

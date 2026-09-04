@@ -12,7 +12,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 public record AddDeliveryCommand(
      PricingStrategy PricingStrategy,
      Guid CustomerId,
-     string CustomerReference,
+     string? CustomerReference,
      string Urgency,
      double? TotalPrice,
      double? Discount,
