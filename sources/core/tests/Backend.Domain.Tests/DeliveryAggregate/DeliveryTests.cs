@@ -63,36 +63,6 @@ public class DeliveryTests
      }
 
      [Fact]
-     public void GenerateReportId_ReturnsIdStartingWithCustomerCode()
-     {
-          // Arrange
-          var delivery = MakeSut();
-          var customer = _fixture.Create<Customer>();
-
-          // Act
-          delivery.GenerateReportId(customer);
-
-          // Assert
-          delivery.CustomerReference.Should().StartWith($"{customer.Code}-");
-     }
-
-     [Fact]
-     public void GenerateReportId_TimestampPartHasExpectedLength()
-     {
-          // Arrange
-          var delivery = MakeSut();
-          var customer = _fixture.Create<Customer>();
-          customer.Code = "TEST";
-
-          // Act
-          delivery.GenerateReportId(customer);
-
-          // Assert
-          var timestamp = delivery.CustomerReference![("TEST".Length + 1)..];
-          timestamp.Should().HaveLength(14);
-     }
-
-     [Fact]
      public async Task ReorderSteps_ReordersAllStepsSettingCorrectOrderForMovedStep()
      {
           // Arrange

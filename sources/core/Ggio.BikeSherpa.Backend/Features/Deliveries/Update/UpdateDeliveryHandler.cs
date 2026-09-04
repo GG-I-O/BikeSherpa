@@ -18,6 +18,7 @@ public record UpdateDeliveryCommand(
      DeliveryStatus Status,
      string Code,
      Guid CustomerId,
+     string CustomerReference,
      string Urgency,
      double? TotalPrice,
      double? Discount,
@@ -83,6 +84,7 @@ public class UpdateDeliveryHandler(
           entity.Status = command.Status;
           entity.Code = command.Code;
           entity.CustomerId = command.CustomerId;
+          entity.CustomerReference = command.CustomerReference;
           entity.Urgency = urgency;
           entity.TotalPrice = command.TotalPrice;
           entity.Discount = command.Discount;

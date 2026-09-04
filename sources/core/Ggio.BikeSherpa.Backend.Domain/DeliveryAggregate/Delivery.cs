@@ -38,11 +38,6 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
 
-     public void GenerateReportId(Customer customer)
-     {
-          CustomerReference = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
-     }
-
      public void GenerateCode(Customer customer, int increment)
      {
 

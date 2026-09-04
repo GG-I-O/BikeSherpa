@@ -23,6 +23,7 @@ public class UpdateDeliveryEndpoint(IMediator mediator) : Endpoint<DeliveryCrud>
                req.Status,
                req.Code,
                req.CustomerId,
+               req.CustomerReference ?? "",
                req.Urgency,
                req.TotalPrice,
                req.Discount,
