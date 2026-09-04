@@ -29,6 +29,7 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
             code: delivery.code,
             status: delivery.status,
             customerId: customerServices.getCustomer$(delivery.customerId).get().id,
+            customerReference: delivery.customerReference ?? "",
             pricingStrategy: delivery.pricingStrategy,
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,

@@ -59,6 +59,15 @@ export default function DeliveryForm<T extends FieldValues>(props: DeliveryFormP
                         } : undefined
                 }
             />
+            <ThemedInput
+                testID="deliveryFormCustomerReferenceInput"
+                control={control}
+                name="customerReference"
+                error={errors.customerReference as FieldError | undefined}
+                label="Référence client"
+                placeholder=""
+                required
+            />
             <ThemedDropdownInput
                 testID="deliveryFormPricingStrategyInput"
                 control={control}
