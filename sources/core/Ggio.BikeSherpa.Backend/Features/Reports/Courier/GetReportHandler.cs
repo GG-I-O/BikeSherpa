@@ -69,12 +69,11 @@ public class GetReportHandler(
           var currentRow = 1;
           worksheet.Cell(currentRow, 1).Value = $"Rapport pour le coursier {courier.GetFullName()} du {query.From} au {query.To}";
           worksheet.Cell(currentRow, 1).Value = "Nom du coursier";
-          worksheet.Cell(currentRow, 2).Value = "Code de livraison";
-          worksheet.Cell(currentRow, 3).Value = "Date de livraison";
-          worksheet.Cell(currentRow, 4).Value = "Description";
-          worksheet.Cell(currentRow, 5).Value = "Prix";
-          worksheet.Cell(currentRow, 6).Value = "Quantité";
-          worksheet.Cell(currentRow, 7).Value = "Adresse";
+          worksheet.Cell(currentRow, 2).Value = "Livraison";
+          worksheet.Cell(currentRow, 3).Value = "Description";
+          worksheet.Cell(currentRow, 4).Value = "Prix";
+          worksheet.Cell(currentRow, 5).Value = "Quantité";
+          worksheet.Cell(currentRow, 6).Value = "Adresse";
 
           foreach (var delivery in report.Deliveries)
           {
@@ -82,12 +81,11 @@ public class GetReportHandler(
                {
                     currentRow++;
                     worksheet.Cell(currentRow, 1).Value = detail.CourierName;
-                    worksheet.Cell(currentRow, 2).Value = delivery.DeliveryCode;
-                    worksheet.Cell(currentRow, 3).Value = delivery.DeliveryDate.DateTime;
-                    worksheet.Cell(currentRow, 4).Value = detail.Description;
-                    worksheet.Cell(currentRow, 5).Value = detail.Price;
-                    worksheet.Cell(currentRow, 6).Value = detail.Quantity;
-                    worksheet.Cell(currentRow, 7).Value = detail.Address?.ToString() ?? string.Empty;
+                    worksheet.Cell(currentRow, 2).Value = delivery.DeliveryLabel;
+                    worksheet.Cell(currentRow, 3).Value = detail.Description;
+                    worksheet.Cell(currentRow, 4).Value = detail.Price;
+                    worksheet.Cell(currentRow, 5).Value = detail.Quantity;
+                    worksheet.Cell(currentRow, 6).Value = detail.Address?.ToString() ?? string.Empty;
                }
           }
 

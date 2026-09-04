@@ -33,8 +33,7 @@ public class ReportService(
           {
                var deliveryReport = new DeliveryReport
                {
-                    DeliveryCode = delivery.Code,
-                    DeliveryDate = delivery.StartDate,
+                    DeliveryLabel = $"Livraison n° {delivery.Code} le {delivery.StartDate.Day:D2}/{delivery.StartDate.Month:D2} à partir de {delivery.StartDate.Hour:D2}:{delivery.StartDate.Minute:D2}{(delivery.CustomerReference != "" ? $" -- Ref client : {delivery.CustomerReference}" : "")}",
                     DeliveryPrice = delivery.TotalPrice ?? 0,
                     DeliveryPriceWithVat = await vatService.GetPriceWithVatAsync(delivery.TotalPrice ?? 0),
                     Details = []

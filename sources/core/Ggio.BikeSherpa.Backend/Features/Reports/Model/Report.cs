@@ -14,8 +14,7 @@ public record Report
 
 public record DeliveryReport
 {
-     public required string DeliveryCode { get; set; }
-     public required DateTimeOffset DeliveryDate { get; set; }
+     public required string DeliveryLabel { get; set; }
      public required double DeliveryPrice { get; set; }
      public required double DeliveryPriceWithVat { get; set; }
      public required List<DeliveryReportDetail> Details { get; set; }

@@ -62,10 +62,9 @@ public class CustomerReportDocument(Report report, StackHolderInfo stackHolderIn
 
                          foreach (var delivery in report.Deliveries)
                          {
-                              table.Cell().Text(delivery.DeliveryDate.ToString("dd/MM/yyyy"));
                               table.Cell().Column(c =>
                               {
-                                   c.Item().Text($"Livraison n° : {delivery.DeliveryCode}").Bold();
+                                   c.Item().Text(delivery.DeliveryLabel).Bold();
                                    foreach (var detail in delivery.Details)
                                    {
                                         c.Item().Text($"{detail.Description}").FontSize(9);

@@ -58,9 +58,7 @@ export default class ReportServices implements IReportServices {
             totalPrice: data.totalPrice,
             totalPriceWithVat: data.totalPriceWithVat,
             deliveries: data.deliveries.map(delivery => ({
-                deliveryCode: delivery.deliveryCode,
-                deliveryDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.deliveryDate).toISOString()),
-                deliveryTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.deliveryDate).toISOString()),
+                deliveryLabel: delivery.deliveryLabel,
                 deliveryPrice: delivery.deliveryPrice,
                 deliveryPriceWithVat: delivery.deliveryPriceWithVat,
                 details: delivery.details.map(detail => ({
