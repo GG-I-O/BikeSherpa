@@ -161,7 +161,6 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
      builder.Services.AddHttpLogging();
 }
 
-
 var app = builder.Build();
 app.MapHub<ResourceNotificationHub>("/hubs/notifications");
 
@@ -170,7 +169,6 @@ app.UseHttpsRedirection();
 app.UsePathBase("/api");
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 if (!app.Environment.IsEnvironment("IntegrationTest") && !app.Environment.IsProduction())
 {

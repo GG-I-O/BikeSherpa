@@ -26,7 +26,7 @@ export default function useStepDetailViewModel(stepId: string) {
             setStep(viewModel.getStep(stepId));
         });
 
-    }, [deliveryStore$, stepId]);
+    }, [deliveryStore$, stepId]); // eslint-disable-line
 
     const [courierComment, setCourierComment] = useState<string>('');
     useEffect(() => {

@@ -17,12 +17,7 @@ export function useNewDeliveryFormViewModel() {
 
     const { urgencies, pricingStrategies } = useDropdown();
 
-    const {
-        control,
-        handleSubmit,
-        formState: {errors},
-        reset
-    } = useForm<DeliveryFormValues>({
+    const form = useForm<DeliveryFormValues>({
         defaultValues: {
             code: '',
             status: 0,
@@ -43,10 +38,16 @@ export function useNewDeliveryFormViewModel() {
         resolver: zodResolver(viewModel.getDeliverySchema())
     });
 
-    viewModel.setResetCallback(reset);
+    const {
+        handleSubmit,
+        formState: {errors},
+        reset
+    } = form;
+
+        viewModel.setResetCallback(reset);
 
     return {
-        control,
+        form,
         handleSubmit: handleSubmit(
             (data) => {
                 viewModel.onSubmit(data);

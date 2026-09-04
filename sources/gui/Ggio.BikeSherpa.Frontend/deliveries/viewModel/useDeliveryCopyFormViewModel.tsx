@@ -20,11 +20,7 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
 
     const delivery: Delivery = deliveryServices.getDelivery$(deliveryId).get();
 
-    const {
-        control,
-        handleSubmit,
-        formState: {errors}
-    } = useForm<DeliveryFormValues>({
+    const form = useForm<DeliveryFormValues>({
         defaultValues: {
             code: delivery.code,
             status: delivery.status,
@@ -49,8 +45,13 @@ export function useDeliveryCopyFormViewModel(deliveryId: string) {
         resolver: zodResolver(viewModel.getDeliverySchema())
     });
 
+    const {
+        handleSubmit,
+        formState: {errors}
+    } = form;
+
     return {
-        control,
+        form,
         handleSubmit: handleSubmit(
             (data) => {
                 viewModel.onSubmit(data);

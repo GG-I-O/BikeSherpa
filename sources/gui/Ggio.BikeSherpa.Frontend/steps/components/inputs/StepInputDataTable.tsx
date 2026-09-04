@@ -1,7 +1,7 @@
 import {Button, DataTable, Text, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
 import StepRowInput from "./StepRowInput";
-import {Control, FieldError, FieldErrors, useFieldArray} from "react-hook-form";
+import {Control, FieldErrors, useFieldArray} from "react-hook-form";
 import {Dimensions, View} from "react-native";
 
 type Props = {

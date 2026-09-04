@@ -19,7 +19,7 @@ export default class AuthService implements IAuthService {
         try {
             const credentials = await this.getCredentials(this.scope, undefined, {audience: this.audience});
             return credentials.accessToken;
-        } catch (e) {
+        } catch (e) { // eslint-disable-line @typescript-eslint/no-unused-vars
             return null;
         }
     }

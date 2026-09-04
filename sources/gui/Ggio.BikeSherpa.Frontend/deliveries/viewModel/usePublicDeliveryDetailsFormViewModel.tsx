@@ -22,7 +22,7 @@ export default function usePublicDeliveryDetailsFormViewModel(
     // Stable service instance
     const viewModel = useMemo(
         () => new PublicDeliveryDetailsFormViewModel(publicDeliveryService),
-        []
+        [publicDeliveryService]
     );
 
     const {setIsLoadingModalVisible} = usePublicDeliveryModal();
@@ -115,7 +115,7 @@ export default function usePublicDeliveryDetailsFormViewModel(
             corrected.setMinutes(0);
             setStartDate(corrected.toISOString());
         }        
-    }, [possibleUrgencies, hoursOptions, workHours]); // Do not add dependencies that the linter asks, it's intentional
+    }, [possibleUrgencies, hoursOptions, workHours]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return {
         urgencies: possibleUrgencies,

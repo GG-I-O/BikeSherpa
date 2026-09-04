@@ -2,7 +2,6 @@ import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifier
 import Courier from "../models/Courier";
 import { ICourierService } from "@/spi/CourierSPI";
 import { inject } from "inversify";
-import * as zod from "zod";
 import {courierFormBaseSchema, CourierFormValues} from "./zod/courierFormBaseSchema";
 
 export default class EditCourierFormViewModel {

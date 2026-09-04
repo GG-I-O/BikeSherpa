@@ -26,13 +26,13 @@ export default function useMyDeliveriesViewModel() {
     
     useEffect(() => {
         viewModel.loadMyDeliveries(datePicker ?? new Date());
-    }, [datePicker]);
+    }, [datePicker]); // eslint-disable-line react-hooks/exhaustive-deps
     
     useEffect(() => {
         return observe(() => {
             setSteps(viewModel.getSteps());
         });
-    }, [deliveryStore$, courierStore$, packingSizes, setSteps]);
+    }, [deliveryStore$, courierStore$, packingSizes, setSteps]); // eslint-disable-line react-hooks/exhaustive-deps
     
     return {
         steps,

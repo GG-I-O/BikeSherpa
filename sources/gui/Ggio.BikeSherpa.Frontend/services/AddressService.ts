@@ -4,16 +4,22 @@ import { IAddressService } from "@/spi/AddressSPI";
 import { ILogger } from "@/spi/LogsSPI";
 import { inject, injectable } from "inversify";
 import { Linking, Platform } from "react-native";
+import {createApiClient} from "@/infra/openAPI/client";
+import axios from "axios";
 
 @injectable()
 export default class AddressService implements IAddressService {
-
     private readonly logger: ILogger;
+    private readonly apiClient;
 
     constructor(
         @inject(ServicesIdentifiers.Logger) logger: ILogger
     ) {
         this.logger = logger;
+        
+        this.apiClient = createApiClient(axios.defaults.baseURL || '', {
+            axiosInstance: axios
+        });
     }
 
     public openAddressInMaps(address: string) {
@@ -41,26 +47,25 @@ export default class AddressService implements IAddressService {
 
     public async fetchAddress(text: string): Promise<Address[] | null> {
         try {
-            const response = await fetch(`https://data.geopf.fr/geocodage/search/?q=${text}&limit=5`);
-            if (response.status !== 200) {
-                this.logger.error("Aucune adresse trouvée");
-                return null;
-            }
-            const data = await response.json();
-            return data.features.map((feature: any) => {
+            const response = await this.apiClient.GetAddressSuggestionEndpoint({
+                params: {query: text}
+            });
+            
+            return response.map(suggestedAddress => {
                 const address: Address = {
-                    name: "",
+                    name: suggestedAddress.name,
                     phone: "",
-                    fullAddress: feature.properties.label,
-                    streetInfo: feature.properties.name,
+                    fullAddress: "",
+                    streetInfo: suggestedAddress.streetInfo,
                     complement: null,
-                    postcode: feature.properties.postcode,
-                    city: feature.properties.city,
+                    postcode: suggestedAddress.postcode,
+                    city: suggestedAddress.city,
                     coordinates: {
-                        longitude: Number(feature.geometry.coordinates[0]),
-                        latitude: Number(feature.geometry.coordinates[1])
+                        longitude: Number(suggestedAddress.coordinates.longitude),
+                        latitude: Number(suggestedAddress.coordinates.latitude)
                     }
                 }
+                address.fullAddress = `${address.streetInfo} ${address.postcode} ${address.city}`;
                 return address;
             })
         } catch (error) {

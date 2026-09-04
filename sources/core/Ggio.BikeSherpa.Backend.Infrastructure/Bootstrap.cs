@@ -5,6 +5,7 @@ using Ggio.BikeSherpa.Backend.Infrastructure.Interceptors;
 using Ggio.BikeSherpa.Backend.Infrastructure.Mail;
 using Ggio.BikeSherpa.Backend.Infrastructure.Repositories;
 using Ggio.BikeSherpa.Backend.Infrastructure.Storage;
+using Ggio.BikeSherpa.Backend.Infrastructure.SuggestionService;
 using Ggio.DddCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +14,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Refit;
+using Google.Api.Gax.Grpc.Rest;
+using Google.Maps.Places.V1;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure;
 
@@ -55,6 +58,15 @@ public static class Bootstrap
                services.Configure<BlobStorageOptions>(configuration.GetSection(BlobStorageOptions.SectionName));
                services.AddScoped<IDeliveryStepAttachmentSaveService, StorageService>();
                services.AddScoped<IExportSaveService, StorageService>();
+               
+               // Google Places API
+               services.AddSingleton<PlacesClient>(_ => new PlacesClientBuilder
+               {
+                    ApiKey = configuration["GoogleAPIKey"] ?? "",
+                    GrpcAdapter = RestGrpcAdapter.Default
+               }.Build());
+
+               services.AddScoped<IAddressSuggestionService, AddressSuggestionService>();
           }
      }
 }

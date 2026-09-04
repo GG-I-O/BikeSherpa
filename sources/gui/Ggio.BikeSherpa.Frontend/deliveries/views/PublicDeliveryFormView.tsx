@@ -6,7 +6,7 @@ import React from "react";
 import PublicDeliveryErrorModal from "@/deliveries/components/PublicDeliveryErrorModal";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 import {useTheme} from "react-native-paper";
-import {ScrollView, View} from "react-native";
+import {ScrollView} from "react-native";
 
 export default function PublicDeliveryFormView() {
     const theme = useTheme();

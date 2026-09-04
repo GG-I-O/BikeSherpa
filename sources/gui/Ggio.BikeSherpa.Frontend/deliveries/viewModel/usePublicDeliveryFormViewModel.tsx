@@ -55,11 +55,8 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 email: customer?.email ?? '',
                 phoneNumber: customer ? null : '',
                 address: {
-                    name: customer?.name ?? '',
-                    streetInfo: '',
-                    complement: '',
-                    postcode: '',
-                    city: '',
+                    ...emptyAddress,
+                    name: customer?.name ?? ''
                 }
             },
             steps: [
@@ -132,7 +129,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 break;
             }
         }
-    }, [customerType]);
+    }, [customerType, emptyAddress, getValues, setValue]);
 
     // Keep infos updated for hided field depending on customer type
     const customerField = useWatch({control, name: "customer"});
@@ -147,21 +144,21 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 setValue("steps.1.contactPhone", customerField.phoneNumber ?? "");
                 break;
         }
-    }, [customerField.name, customerField.phoneNumber]);
+    }, [customerField.name, customerField.phoneNumber, customerType, setValue]);
 
     const senderStepAddress = useWatch({control, name: "steps.0.stepAddress"});
     useEffect(() => {
         if (customerType === PublicDeliveryCustomerTypeEnum.Sender) {
             setValue("customer.address", senderStepAddress);
         }
-    }, [senderStepAddress]);
+    }, [senderStepAddress, customerType, setValue]);
 
     const receiverStepAddress = useWatch({control, name: "steps.1.stepAddress"});
     useEffect(() => {
         if (customerType === PublicDeliveryCustomerTypeEnum.Receiver) {
             setValue("customer.address", receiverStepAddress);
         }
-    }, [receiverStepAddress]);
+    }, [receiverStepAddress, customerType, setValue]);
 
     // Trigger estimated price calculation with debounce
     const stepAddresses = useWatch({control, name: "steps"});
@@ -217,7 +214,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
     ) {
         // Limit dropdown
         packingSizes = packingSizes.slice(1);
-        
+
         // Change step packing if the option is not available anymore
         stepPackings.forEach((packing, index) => {
             if (packingSizes.find(ps => ps.value === packing) === undefined)
