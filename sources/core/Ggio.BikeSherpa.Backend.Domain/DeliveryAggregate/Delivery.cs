@@ -37,11 +37,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      public bool NeedEstimate { get; set; }
      public DateTimeOffset CreatedAt { get; set; }
      public DateTimeOffset UpdatedAt { get; set; }
-
-     public void GenerateReportId(Customer customer)
-     {
-          CustomerReference = $"{customer.Code}-{DateTime.UtcNow:yyyyMMddHHmmss}";
-     }
+     
+     public string DeliveryLabel =>
+          $"Livraison n° {Code} le {StartDate.Day:D2}/{StartDate.Month:D2}{(!string.IsNullOrEmpty(CustomerReference) ? $" - Ref client : {CustomerReference}" : "")}";
 
      public void GenerateCode(Customer customer, int increment)
      {

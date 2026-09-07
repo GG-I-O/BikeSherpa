@@ -22,6 +22,7 @@ export function useNewDeliveryFormViewModel() {
             code: '',
             status: 0,
             customerId: '',
+            customerReference: '',
             pricingStrategy: pricingStrategies.length > 0 ? parseInt(pricingStrategies[0].value) : 0,
             urgency: urgencies.length > 0 ? urgencies[0].value : 'Standard',
             totalPrice: 0,

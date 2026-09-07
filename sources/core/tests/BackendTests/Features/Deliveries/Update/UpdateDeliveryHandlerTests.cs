@@ -108,7 +108,6 @@ public class UpdateDeliveryHandlerTests
                .With(c => c.Steps, commandSteps)
                .With(c => c.TotalPrice, 100)
                .With(c => c.Discount, 10)
-               .With(c => c.ReportId, "REPORT-001")
                .With(c => c.Details, ["detail-1", "detail-2"])
                .Create();
 
@@ -182,7 +181,6 @@ public class UpdateDeliveryHandlerTests
           _delivery.Urgency.Should().Be(Urgency);
           _delivery.TotalPrice.Should().Be(123.45);
           _delivery.Discount.Should().Be(_command.Discount);
-          _delivery.CustomerReference.Should().Be(_command.ReportId);
           _delivery.Details.Should().BeEquivalentTo(_command.Details);
           _delivery.InsulatedBox.Should().Be(_command.InsulatedBox);
           _delivery.ContractDate.Should().Be(_command.ContractDate);

@@ -34,8 +34,7 @@ const DeliveryReportDetail = z.object({
   courierName: z.string().nullable(),
 });
 const DeliveryReport = z.object({
-  deliveryCode: z.string(),
-  deliveryDate: z.string().datetime({ offset: true }),
+  deliveryLabel: z.string(),
   deliveryPrice: z.number(),
   deliveryPriceWithVat: z.number(),
   details: z.array(DeliveryReportDetail),

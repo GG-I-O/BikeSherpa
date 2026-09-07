@@ -16,12 +16,12 @@ export default function ReportDataTableRow({report}: Props) {
     return (
         <View style={{marginBottom: 32}}>
             <DataTable.Row
-                key={report.deliveryCode}
+                key={report.deliveryLabel}
                 testID="ReportDataTableRow"
                 style={{backgroundColor: theme.colors.background}}
             >
                 <DataTable.Cell style={[style.column]} textStyle={AppStyle.textStyle.h3}>
-                    {`${report.deliveryCode} - ${report.deliveryDate} - ${report.deliveryTime}`}
+                    {report.deliveryLabel}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width80]} textStyle={AppStyle.textStyle.h3}>
                     {`${report.deliveryPrice} €`}
@@ -29,7 +29,7 @@ export default function ReportDataTableRow({report}: Props) {
             </DataTable.Row>
 
             {report.details.map((detail, index) => (
-                <View key={`${report.deliveryCode}-${index}`} style={{marginLeft: 32}}>
+                <View key={`${report.deliveryLabel}-${index}`} style={{marginLeft: 32}}>
                     <DataTable.Row
                         testID="ReportDataTableDetailRow"
                         style={[style.smallHeight, {backgroundColor: theme.colors.background}]}
@@ -44,7 +44,7 @@ export default function ReportDataTableRow({report}: Props) {
 
                     {!!detail.address?.fullAddress && detail.address.fullAddress !== "" && (
                         <DataTable.Row
-                            key={`${report.deliveryCode}-${index}-address`}
+                            key={`${report.deliveryLabel}-${index}-address`}
                             style={[style.smallHeight, {backgroundColor: theme.colors.background}]}
                         >
                             <Text style={{marginLeft: 86}}>{detail.address.fullAddress}</Text>

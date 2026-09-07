@@ -35,7 +35,6 @@ public class AddDeliveryStepHandlerTest
                .With(d => d.Steps, [])
                .Create();
 
-          _mockDelivery.GenerateReportId(mockCustomer);
           _mockPricingStrategyService.Setup(s => s.CalculateDeliveryPriceWithoutVat(_mockDelivery))
                .ReturnsAsync(10.0);
           _mockDelivery.TotalPrice = 10.0;

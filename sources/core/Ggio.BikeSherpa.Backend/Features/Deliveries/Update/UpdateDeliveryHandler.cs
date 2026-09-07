@@ -18,11 +18,11 @@ public record UpdateDeliveryCommand(
      DeliveryStatus Status,
      string Code,
      Guid CustomerId,
+     string? CustomerReference,
      string Urgency,
      double? TotalPrice,
      double? Discount,
      double? ExtraCost,
-     string ReportId,
      List<DeliveryStepCrud> Steps,
      string[] Details,
      bool InsulatedBox,
@@ -83,11 +83,11 @@ public class UpdateDeliveryHandler(
           entity.Status = command.Status;
           entity.Code = command.Code;
           entity.CustomerId = command.CustomerId;
+          entity.CustomerReference = command.CustomerReference;
           entity.Urgency = urgency;
           entity.TotalPrice = command.TotalPrice;
           entity.Discount = command.Discount;
           entity.ExtraCost = command.ExtraCost;
-          entity.CustomerReference = command.ReportId;
           entity.Details = command.Details;
           entity.InsulatedBox = command.InsulatedBox;
           entity.ContractDate = command.ContractDate;

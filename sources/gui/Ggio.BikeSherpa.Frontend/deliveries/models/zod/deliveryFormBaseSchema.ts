@@ -14,6 +14,9 @@ const deliveryFormBaseSchema = zod
         customerId: zod
             .string()
             .trim(),
+        customerReference: zod
+            .string()
+            .trim(),
         pricingStrategy: zod
             .number()
             .int("Type invalide")
