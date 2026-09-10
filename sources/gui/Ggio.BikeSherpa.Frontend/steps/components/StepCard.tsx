@@ -27,26 +27,26 @@ export default function StepCard({ step, onPress, isSelected = false }: Props) {
             <Card
                 style={{
                     backgroundColor: isSelected ? theme.colors.primary : theme.colors.background,
-                    width: screenWidth >= 280 ? 250 : 'auto'
+                    width: screenWidth >= 350 ? 300 : 'auto'
                 }}
                 onPress={() => {
                     if (onPress) onPress(step);
                 }}
             >
                 <Card.Content>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <DeliveryTypeIcon type={step.type} />
                         <Text>{step.deliveryCode}</Text>
                         <Text style={{ fontWeight: "bold"}}>{step.estimatedTime}</Text>
                     </View>
                     <Divider />
                     <Pressable
-                        style={{ justifyContent: 'space-evenly', marginInline: 16, marginTop: 8, maxWidth: '80%' }}
+                        style={{ justifyContent: 'space-evenly', marginInline: 8, marginTop: 4 }}
                         onPress={() => {
                             setIsModalVisible(true);
                         }}
                     >
-                        <Text>{step.address.name}</Text>
+                        <Text style={{textAlign: 'right', fontStyle: 'italic', marginLeft: 24}} numberOfLines={1}>{step.address.name}</Text>
                         <Text>{step.address.streetInfo}</Text>
                         <Text>{`${step.address.postcode} ${step.address.city}`}</Text>
                     </Pressable>
