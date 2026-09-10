@@ -1,0 +1,42 @@
+import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
+import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
+import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
+import {useEffect, useState} from "react";
+import {observe} from "@legendapp/state";
+import {StepToDisplay} from "@/steps/models/StepToDisplay";
+import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
+import {ICourierService} from "@/spi/CourierSPI";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import useDropdown from "@/hooks/useDropdown";
+import UnassignedDeliveriesViewModel from "@/steps/viewModel/UnassignedDeliveriesViewModel";
+
+export default function useUnassignedDeliveriesViewModel() {
+    const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
+    const courierServices = IOCContainer.get<ICourierService>(ServicesIdentifiers.CourierServices);
+    const deliveryMapper = IOCContainer.get<IDeliveryMapper>(DeliveryServiceIdentifier.Mapper);
+    const viewModel = new UnassignedDeliveriesViewModel(deliveryServices, deliveryMapper);
+
+    const deliveryStore$ = deliveryServices.getDeliveryList$();
+    const courierStore$ = courierServices.getCourierList$();
+
+    const { packingSizes } = useDropdown();
+    
+    const [steps, setSteps] = useState<StepToDisplay[]>([]);
+    const [datePicker, setDatePicker] = useState<Date|undefined>(new Date());
+    
+    useEffect(() => {
+        viewModel.loadDeliveries(datePicker ?? new Date());
+    }, [datePicker]); // eslint-disable-line react-hooks/exhaustive-deps
+    
+    useEffect(() => {
+        return observe(() => {
+            setSteps(viewModel.getSteps());
+        });
+    }, [deliveryStore$, courierStore$, packingSizes, setSteps]); // eslint-disable-line react-hooks/exhaustive-deps
+    
+    return {
+        steps,
+        datePicker,
+        setDatePicker
+    }
+}

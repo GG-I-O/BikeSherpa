@@ -5,6 +5,7 @@ export interface IDeliveryServices {
     getDeliveryList$(): Observable<Record<string, Delivery>>;
     getDelivery$(deliveryId: string): Observable<Delivery>;
     loadMyDeliveries(date: string | null): void;
+    loadUnassignedDeliveries(date: string | null): void;
     createDelivery(delivery: Delivery): void;
     updateDelivery(delivery: Delivery): void;
     deleteDelivery(deliveryId: string): void;

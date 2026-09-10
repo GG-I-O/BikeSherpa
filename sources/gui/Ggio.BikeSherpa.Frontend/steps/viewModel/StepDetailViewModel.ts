@@ -50,7 +50,7 @@ export default class StepDetailViewModel {
     }
 
     public stepComplete = (stepId: string, complete: boolean) => {
-        this.stepServices.completeStep(stepId, complete);
+        this.stepServices.completeStep(stepId, complete, new Date());
     }
 
     public addAttachment = (stepId: string, file: UploadableFile) => {

@@ -47,6 +47,7 @@ export default function TabLayout() {
 
     const courierItems = [
         {href: '/(tabs)/myDeliveries', title: 'Mes courses', icon: 'bicycle-cargo'},
+        {href: '/(tabs)/unassignedDeliveries', title: 'Non assignées', icon: 'account-question'},
         {href: '/(tabs)/profile', title: 'Profil', icon: 'account'},
     ];
 
