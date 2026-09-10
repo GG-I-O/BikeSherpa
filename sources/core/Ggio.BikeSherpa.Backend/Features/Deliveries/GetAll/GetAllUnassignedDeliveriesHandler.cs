@@ -1,4 +1,3 @@
-using Ardalis.Result;
 using Ggio.BikeSherpa.Backend.Domain.CourierAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
@@ -10,30 +9,24 @@ using Facet.Extensions;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 
-public record GetAllDailyDeliveriesQuery(
-     string UserEmail,
+public record GetAllUnassignedDeliveriesQuery(
      DateTimeOffset Date
 ) : IQuery<GetAllDailyDeliveriesResult>;
 
-public class GetAllDailyDeliveriesHandler(
-     IReadRepository<Courier> courierRepository,
+public class GetAllUnassignedDeliveriesHandler(
      IReadRepository<Delivery> deliveryRepository
-     ): IQueryHandler<GetAllDailyDeliveriesQuery, GetAllDailyDeliveriesResult>
+     ): IQueryHandler<GetAllUnassignedDeliveriesQuery, GetAllDailyDeliveriesResult>
 {
      
-     public async ValueTask<GetAllDailyDeliveriesResult> Handle(GetAllDailyDeliveriesQuery request, CancellationToken cancellationToken)
+     public async ValueTask<GetAllDailyDeliveriesResult> Handle(GetAllUnassignedDeliveriesQuery request, CancellationToken cancellationToken)
      {
-          var courier = await courierRepository.FirstOrDefaultAsync(new CourierByEmailSpecification(request.UserEmail), cancellationToken);
-          if (courier is null)
-               return new GetAllDailyDeliveriesResult.CourierNotFound();
-          
           var deliveries = (await deliveryRepository
-               .ListAsync(new DeliveryStepByCourierAndDate(courier.Id, request.Date), cancellationToken))
+               .ListAsync(new DeliveryStepByCourierAndDate(null, request.Date), cancellationToken))
                .SelectFacets<Delivery, DeliveryCrud>()
                .Select(delivery => delivery with
                {
                     Steps = delivery.Steps
-                         .Where(s => s.Data.CourierId == courier.Id &&
+                         .Where(s => s.Data.CourierId == null &&
                                      s.Data.EstimatedDeliveryDate.Date == request.Date.Date)
                          .OrderBy(s => s.Data.EstimatedDeliveryDate)
                          .ToList()

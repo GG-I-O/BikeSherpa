@@ -12,11 +12,11 @@ using Moq;
 namespace BackendTests.Features.Deliveries.GetAll;
 
 [UsedImplicitly]
-public class GetAllDailyStepsWebApplicationFactory() : TestWebApplicationFactory("read:myDeliveries", "read:myDeliveries", "mockEmail@mail.com");
+public class GetAllUnassignedStepsWebApplicationFactory() : TestWebApplicationFactory("read:myDeliveries", "read:myDeliveries", "mockEmail@mail.com");
 
-public class GetAllDailyDeliveriesEndpointTests(
-     GetAllDailyStepsWebApplicationFactory factory,
-     ITestContextAccessor testContextAccessor) : IClassFixture<GetAllDailyStepsWebApplicationFactory>
+public class GetAllUnassignedDeliveriesEndpointTests(
+     GetAllUnassignedStepsWebApplicationFactory factory,
+     ITestContextAccessor testContextAccessor) : IClassFixture<GetAllUnassignedStepsWebApplicationFactory>
 {
      private readonly HttpClient _client = factory.CreateClient();
      private readonly Mock<IMediator> _mockMediator = factory.MockMediator;
@@ -38,19 +38,19 @@ public class GetAllDailyDeliveriesEndpointTests(
 
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<GetAllDailyDeliveriesQuery>(),
+                    It.IsAny<GetAllUnassignedDeliveriesQuery>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new GetAllDailyDeliveriesResult.Success(expectedDeliveries));
 
           // Act
-          var response = await _client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", _cancellationToken);
+          var response = await _client.GetAsync($"/api/deliveries/unassignedDeliveries/{date:O}", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);
 
           _mockMediator.Verify(
                m => m.Send(
-                    It.Is<GetAllDailyDeliveriesQuery>(q => q.Date == date),
+                    It.Is<GetAllUnassignedDeliveriesQuery>(q => q.Date == date),
                     It.IsAny<CancellationToken>()),
                Times.Once);
 
@@ -69,19 +69,19 @@ public class GetAllDailyDeliveriesEndpointTests(
 
           _mockMediator
                .Setup(m => m.Send(
-                    It.IsAny<GetAllDailyDeliveriesQuery>(),
+                    It.IsAny<GetAllUnassignedDeliveriesQuery>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new GetAllDailyDeliveriesResult.Success([]));
 
           // Act
-          var response = await _client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", _cancellationToken);
+          var response = await _client.GetAsync($"/api/deliveries/unassignedDeliveries/{date:O}", _cancellationToken);
 
           // Assert
           response.StatusCode.Should().Be(HttpStatusCode.OK);
 
           _mockMediator.Verify(
                m => m.Send(
-                    It.Is<GetAllDailyDeliveriesQuery>(q => q.Date == date),
+                    It.Is<GetAllUnassignedDeliveriesQuery>(q => q.Date == date),
                     It.IsAny<CancellationToken>()),
                Times.Once);
 
@@ -89,32 +89,5 @@ public class GetAllDailyDeliveriesEndpointTests(
           var responseArray = JsonSerializer.Deserialize<JsonElement>(responseBody, _jsonSerializerOptions);
 
           responseArray.GetArrayLength().Should().Be(0);
-     }
-
-     [Fact]
-     public async Task HandleAsync_ShouldThrowUnauthorizedAccessException_WhenMediatorReturnsUnauthorized()
-     {
-          // Arrange
-          _mockMediator.Reset();
-          var date = new DateTimeOffset(2026, 5, 12, 0, 0, 0, TimeSpan.Zero);
-
-          _mockMediator
-               .Setup(m => m.Send(
-                    It.IsAny<GetAllDailyDeliveriesQuery>(),
-                    It.IsAny<CancellationToken>()))
-               .ReturnsAsync(new GetAllDailyDeliveriesResult.CourierNotFound());
-
-          // Act
-          var act = async () => await _client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", _cancellationToken);
-
-          // Assert
-          await act.Should().ThrowAsync<UnauthorizedAccessException>()
-               .WithMessage("User unauthorized");
-
-          _mockMediator.Verify(
-               m => m.Send(
-                    It.IsAny<GetAllDailyDeliveriesQuery>(),
-                    It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 }

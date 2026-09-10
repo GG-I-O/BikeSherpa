@@ -4,7 +4,7 @@ namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 
 public class DeliveryStepByCourierAndDate: Specification<Delivery>
 {
-     public DeliveryStepByCourierAndDate(Guid courierId, DateTimeOffset date)
+     public DeliveryStepByCourierAndDate(Guid? courierId, DateTimeOffset date)
      {
           Query
                .Include(x => x.Steps)
