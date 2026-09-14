@@ -22,6 +22,7 @@ export const hateoasRel = {
     stepCourier: {
         post: "postCourier",
         delete: "deleteCourier",
+        assignMyself: "assignMyself"
     },
     stepOrder: {
         put: "putOrder"

@@ -104,6 +104,7 @@ const DeliveryCrud = z.object({
   needEstimate: z.boolean(),
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
+  deliveryLabel: z.string(),
   id: z.string(),
 });
 const DeliveryDto = z.object({
@@ -641,8 +642,8 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/deliveries/dailyDeliveries/:date",
-    alias: "GetAllDailyDeliveriesEndpoint",
+    path: "/deliveries/myDeliveries/:date",
+    alias: "GetAllMyDeliveriesEndpoint",
     tags: ["delivery"],
     requestFormat: "json",
     parameters: [
@@ -680,6 +681,33 @@ const endpoints = makeApi([
       },
     ],
     response: CalculateDeliveryPriceResult,
+  },
+  {
+    method: "get",
+    path: "/deliveries/unassignedDeliveries/:date",
+    alias: "GetAllUnassignedDeliveriesEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "date",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.array(DeliveryDto),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
   },
   {
     method: "post",
@@ -1163,6 +1191,38 @@ const endpoints = makeApi([
       },
       {
         name: "courierId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "put",
+    path: "/delivery/:deliveryId/step/:stepId/courier/myself",
+    alias: "UpdateDeliveryStepCourierMyselfEndpoint",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "stepId",
         type: "Path",
         schema: z.string(),
       },

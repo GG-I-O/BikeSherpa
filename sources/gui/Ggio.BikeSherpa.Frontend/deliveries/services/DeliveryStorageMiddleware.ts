@@ -30,21 +30,19 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
 
     public setDateForGetAllMyDeliveries(date: string | null) {
         this.dateForGetAllMyDeliveries = date;
+        this.dateForGetAllUnassignedDeliveries = null;
     }
     public setDateForGetAllUnassignedDeliveries(date: string | null) {
+        this.dateForGetAllMyDeliveries = null;
         this.dateForGetAllUnassignedDeliveries = date;
     }
 
     public async getAll(date?: string): Promise<Delivery[]> {
         if (this.dateForGetAllMyDeliveries) {
-            const date = this.dateForGetAllMyDeliveries;
-            this.dateForGetAllMyDeliveries = null;
-            return await this.customClientFacade.GetAllMyDeliveriesEndpoint(date); 
+            return await this.customClientFacade.GetAllMyDeliveriesEndpoint(this.dateForGetAllMyDeliveries);
         }
         if (this.dateForGetAllUnassignedDeliveries) {
-            const date = this.dateForGetAllUnassignedDeliveries;
-            this.dateForGetAllUnassignedDeliveries = null;
-            return await this.customClientFacade.GetAllUnassignedDeliveriesEndpoint(date);
+            return await this.customClientFacade.GetAllUnassignedDeliveriesEndpoint(this.dateForGetAllUnassignedDeliveries);
         }
         return await this.backendClientFacade.GetAllEndpoint(date);
     }
@@ -116,6 +114,9 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                     break;
                 case deliveryStepOperationAction.deleteCourier:
                     await this.customClientFacade.DeleteStepCourierEndpoint(step);
+                    break;
+                case deliveryStepOperationAction.assignMyself:
+                    await this.customClientFacade.PutStepAssignMyself(step);
                     break;
                 case deliveryStepOperationAction.putOrder:
                     await this.customClientFacade.PutStepOrderEndpoint(step, step.order >= 0 ? 1 : -1);

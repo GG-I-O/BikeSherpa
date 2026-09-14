@@ -30,7 +30,7 @@ export function UnassignedDeliveriesView() {
                 steps={viewModel.steps}
                 onCardPress={
                     (step) => navigate({
-                        pathname: '/(tabs)/myDeliveries/[stepId]',
+                        pathname: '/(tabs)/unassignedDeliveries/[stepId]',
                         params: { stepId: step.id }
                     })
                 }

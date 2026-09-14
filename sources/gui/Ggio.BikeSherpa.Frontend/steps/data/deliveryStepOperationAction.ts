@@ -5,6 +5,7 @@ const deliveryStepOperationAction = {
     patchCourierComment: "patchCourierComment",
     postCourier: "postCourier",
     deleteCourier: "deleteCourier",
+    assignMyself: "assignMyself",
     putOrder: "putOrder",
     putTime: "putTime",
     putComplete: "putComplete",

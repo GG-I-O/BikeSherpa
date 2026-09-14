@@ -1,5 +1,5 @@
-import StepDetailView from "@/steps/views/StepDetailView";
+import UnassignedStepDetailView from "@/steps/views/UnassignedStepDetailView";
 
 export default function UnassignedDeliveryStepDetails() {
-    return <StepDetailView />
+    return <UnassignedStepDetailView />
 }
