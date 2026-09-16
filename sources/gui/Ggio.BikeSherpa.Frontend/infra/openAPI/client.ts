@@ -362,6 +362,21 @@ const endpoints = makeApi([
   },
   {
     method: "get",
+    path: "/courier/myself",
+    alias: "GetCourierMyselfEndpoint",
+    tags: ["courier"],
+    requestFormat: "json",
+    response: CourierDto,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "get",
     path: "/couriers/:lastSync",
     alias: "GetAllCouriersEndpoint",
     tags: ["courier"],

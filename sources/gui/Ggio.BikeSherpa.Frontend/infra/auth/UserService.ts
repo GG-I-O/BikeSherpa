@@ -1,6 +1,8 @@
-import { IUserService, UserLogInfo } from '@/spi/AuthSPI';
-import { injectable } from 'inversify';
-import { User } from 'react-native-auth0';
+import {IUserService, UserLogInfo} from '@/spi/AuthSPI';
+import {injectable} from 'inversify';
+import {User} from 'react-native-auth0';
+import {createApiClient} from "@/infra/openAPI/client";
+import axios from "axios";
 
 /**
  * Singleton used for IOC
@@ -8,6 +10,14 @@ import { User } from 'react-native-auth0';
 @injectable()
 export class UserService implements IUserService {
     private currentUser: User | null = null;
+    private currentUserLogInfo: UserLogInfo | null = null;
+    private apiClient;
+
+    constructor() {
+        this.apiClient = createApiClient(axios.defaults.baseURL || '', {
+            axiosInstance: axios
+        });
+    }
 
     /**
      * Set the current authenticated user
@@ -25,13 +35,30 @@ export class UserService implements IUserService {
         return this.currentUser;
     }
 
+    public setUserLogInfo(isDispatcher: boolean): void {
+        if (!isDispatcher) {
+            if (this.currentUser !== null) {
+                try {
+                    // if user is courier, it will give the profile    
+                    this.apiClient.GetCourierMyselfEndpoint().then(
+                        (courier) => {
+                            this.currentUserLogInfo = {
+                                id: courier.data.id
+                            }
+                        }
+                    )
+                } catch (e) {
+                    // if user is not courier, it will give a 404
+                }
+            }
+        }
+    }
+
     /**
      * Get the current authenticated user for logger
      * @returns UserLogInfo if logged in, null if logged out
      */
     getUserLogInfo(): UserLogInfo | null {
-        return this.currentUser as UserLogInfo;
+        return this.currentUserLogInfo;
     }
-
-    
 }
