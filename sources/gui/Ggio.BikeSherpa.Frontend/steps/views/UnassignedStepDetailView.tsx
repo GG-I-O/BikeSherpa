@@ -3,6 +3,7 @@ import {Button, Text, useTheme} from "react-native-paper";
 import React, {useState} from "react";
 import useUnassignedStepDetailViewModel from "@/steps/viewModel/useUnassignedStepDetailViewModel";
 import StepDetailView from "@/steps/views/StepDetailView";
+import {View} from "react-native";
 
 export default function UnassignedStepDetailView() {
     const theme = useTheme();
@@ -16,19 +17,20 @@ export default function UnassignedStepDetailView() {
     return (
         <>
             {!pressed &&
-                <Button
-                    buttonColor={theme.colors.background}
-                    style={{marginInline: 8}}
-                    mode="outlined"
-                    onPress={() => {
-                        setPressed(true);
-                        viewModel.assignMyself(stepId);
-                    }}
-                >
-                    <Text>M'assigner</Text>
-                </Button>
+                <View style={{width: '100%', backgroundColor: theme.colors.background, paddingInline: 8}}>
+                    <Button
+                        buttonColor={theme.colors.background}
+                        mode="outlined"
+                        onPress={() => {
+                            setPressed(true);
+                            viewModel.assignMyself(stepId);
+                        }}
+                    >
+                        <Text>Prendre la course</Text>
+                    </Button>
+                </View>
             }
-            <StepDetailView />
+            <StepDetailView/>
         </>
     );
 }
