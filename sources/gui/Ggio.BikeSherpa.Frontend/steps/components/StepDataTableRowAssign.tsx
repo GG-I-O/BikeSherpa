@@ -71,6 +71,24 @@ export default function StepDataTableRowAssign(
                         />
                     </View>
                 </DataTable.Cell>
+                <DataTable.Cell style={[style.column, style.width60]}>
+                    {
+                        !canChangeDate ? (
+                            <Text>{step.estimatedTime}</Text>
+                        ) : (
+                            <TimePickerInput
+                                hours={parseInt(viewModel.splitTime[0]) ?? 0}
+                                minutes={parseInt(viewModel.splitTime[1]) ?? 0}
+                                onOpen={() => setIsTimePickerOpen(true)}
+                                onClose={() => setIsTimePickerOpen(false)}
+                                onConfirm={({hours, minutes}: {
+                                    hours: number;
+                                    minutes: number;
+                                }): void => viewModel.updateStepTimeForADay(step.id, hours, minutes)}
+                            />
+                        )
+                    }
+                </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width40]}>
                     <DeliveryTypeIcon type={step.type}/>
                 </DataTable.Cell>
@@ -105,24 +123,6 @@ export default function StepDataTableRowAssign(
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width60]}>
                     <Text style={{textAlign: 'center', width: '100%'}}>{step.courierCode}</Text>
-                </DataTable.Cell>
-                <DataTable.Cell style={[style.column, style.width60]}>
-                    {
-                        !canChangeDate ? (
-                            <Text>{step.estimatedTime}</Text>
-                        ) : (
-                            <TimePickerInput
-                                hours={parseInt(viewModel.splitTime[0]) ?? 0}
-                                minutes={parseInt(viewModel.splitTime[1]) ?? 0}
-                                onOpen={() => setIsTimePickerOpen(true)}
-                                onClose={() => setIsTimePickerOpen(false)}
-                                onConfirm={({hours, minutes}: {
-                                    hours: number;
-                                    minutes: number;
-                                }): void => viewModel.updateStepTimeForADay(step.id, hours, minutes)}
-                            />
-                        )
-                    }
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width40]}>
                     {

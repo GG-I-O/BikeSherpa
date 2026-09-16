@@ -35,6 +35,7 @@ export default function StepDataTable({ steps, isStepSelected, onRowPress, canCh
                     { canChangeDate && (
                         <DataTable.Title style={[style.column, style.width40]}>Ordre</DataTable.Title>
                     )}
+                    <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
                     <DataTable.Title style={[style.column, style.minWidth150]}>Adresse</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width60]}>Colisage</DataTable.Title>
@@ -42,7 +43,6 @@ export default function StepDataTable({ steps, isStepSelected, onRowPress, canCh
                     <DataTable.Title style={[style.column, style.minWidth150]}>Comm Livreur</DataTable.Title>
                     <DataTable.Title style={[style.column, style.minWidth150]}>Pièces jointes</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width60]}>Livreur</DataTable.Title>
-                    <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width60]}>Finis</DataTable.Title>
                 </DataTable.Header>
             )}

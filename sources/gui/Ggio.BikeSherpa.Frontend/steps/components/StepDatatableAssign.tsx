@@ -47,6 +47,7 @@ export default function StepDataTableAssign(
                 {showHeader ? (
                     <DataTable.Header style={{backgroundColor: getHeaderBackgroundColor()}}>
                         <DataTable.Title style={[style.column, style.width40]}>Ordre</DataTable.Title>
+                        <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width110]}>Code</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width180]}>Adresse</DataTable.Title>
@@ -57,7 +58,6 @@ export default function StepDataTableAssign(
                         <DataTable.Title style={[style.column, style.width60]}>Heure début</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width60]}>Heure limite</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width60]}>Livreur</DataTable.Title>
-                        <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width40]}>Finis</DataTable.Title>
                     </DataTable.Header>
                 ) : (
