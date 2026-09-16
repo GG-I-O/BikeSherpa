@@ -1,8 +1,10 @@
 import {IUserService, UserLogInfo} from '@/spi/AuthSPI';
-import {injectable} from 'inversify';
+import {inject, injectable} from 'inversify';
 import {User} from 'react-native-auth0';
 import {createApiClient} from "@/infra/openAPI/client";
 import axios from "axios";
+import {ILogger} from "@/spi/LogsSPI";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
 /**
  * Singleton used for IOC
@@ -12,8 +14,13 @@ export class UserService implements IUserService {
     private currentUser: User | null = null;
     private currentUserLogInfo: UserLogInfo | null = null;
     private apiClient;
+    private logger: ILogger;
 
-    constructor() {
+    constructor(
+        @inject(ServicesIdentifiers.Logger) logger: ILogger,
+    ) {
+        this.logger = logger;
+        this.logger = this.logger.extend("UserService");
         this.apiClient = createApiClient(axios.defaults.baseURL || '', {
             axiosInstance: axios
         });
@@ -48,7 +55,7 @@ export class UserService implements IUserService {
                         }
                     )
                 } catch (e) {
-                    // if user is not courier, it will give a 404
+                    this.logger.error(`Error while fetching Courier Infos : ${e}`)
                 }
             }
         }
