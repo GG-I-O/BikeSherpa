@@ -2,7 +2,8 @@ import Delivery from "@/deliveries/models/Delivery";
 import UploadableFile from "@/models/UploadableFile";
 
 export interface IDeliveryStorageMiddleware {
-    setGetAllDateForDailyDeliveries(date: string | null): void;
+    setDateForGetAllMyDeliveries(date: string | null): void;
+    setDateForGetAllUnassignedDeliveries(date: string | null): void;
     getAll(date?: string): Promise<Delivery[]>;
     
     addUpdateDeliveryState(deliveryId: string, state: string): void;

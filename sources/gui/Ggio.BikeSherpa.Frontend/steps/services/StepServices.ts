@@ -227,6 +227,33 @@ export default class StepServices implements IStepServices {
         observables.step$!.courierId.set(null);
     }
 
+    public assignMyself(stepId: string, courierId: string) {
+        const observables = this.getDeliveryFromStep(stepId);
+        if (!observables.delivery$) {
+            this.logger.error(`AssignMyself : Parent delivery not found for step ${stepId}`);
+            return;
+        }
+        if (!observables.step$) {
+            this.logger.error(`AssignMyself: Step ${stepId} not found in delivery ${observables.delivery$.peek().id}`);
+            return;
+        }
+
+        // Test if the user got the rights to do this action
+        const step = observables.step$.get();
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.stepCourier.assignMyself)) {
+            this.logger.error(`Cannot assign myself for step ${stepId}`);
+            return
+        }
+
+        this.deliveryStorageMiddleware.addUpdateStepState(
+            observables.delivery$.peek().id,
+            observables.step$.peek().id,
+            deliveryStepOperationAction.assignMyself
+        );
+
+        observables.step$!.courierId.set(courierId);
+    }
+
     public updateComment(stepId: string, comment: string): void {
         const observables = this.getDeliveryFromStep(stepId);
         if (!observables.delivery$) {

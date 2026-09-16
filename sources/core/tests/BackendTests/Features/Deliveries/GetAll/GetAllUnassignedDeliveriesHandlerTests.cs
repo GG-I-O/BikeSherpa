@@ -3,7 +3,6 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.CourierAggregate;
-using Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
@@ -12,7 +11,7 @@ using Moq;
 
 namespace BackendTests.Features.Deliveries.GetAll;
 
-public class GetAllDailyDeliveriesHandlerTests
+public class GetAllUnassignedDeliveriesHandlerTests
 {
      private readonly Mock<IReadRepository<Courier>> _mockCourierRepository = new();
      private readonly Mock<IReadRepository<Delivery>> _mockDeliveryRepository = new();
@@ -21,7 +20,7 @@ public class GetAllDailyDeliveriesHandlerTests
      private readonly Courier _mockCourier;
      private readonly Delivery _mockDelivery;
 
-     public GetAllDailyDeliveriesHandlerTests()
+     public GetAllUnassignedDeliveriesHandlerTests()
      {
           _mockCourier = _fixture.Create<Courier>();
 
@@ -31,7 +30,7 @@ public class GetAllDailyDeliveriesHandlerTests
      }
 
      [Fact]
-     public async Task Handle_ShouldReturnDailySteps_WhenCourierExistsAndDeliveriesExist()
+     public async Task Handle_ShouldReturnDailySteps_WhenUnassignedDeliveriesExist()
      {
           // Arrange
           var date = new DateTimeOffset(2026, 5, 12, 0, 0, 0, TimeSpan.Zero);
@@ -39,13 +38,13 @@ public class GetAllDailyDeliveriesHandlerTests
 
           var stepA = _fixture.Build<DeliveryStep>()
                .With(s => s.ParentDelivery, _mockDelivery)
-               .With(s => s.CourierId, _mockCourier.Id)
+               .With(s => s.CourierId, (Guid?)null)
                .With(s => s.EstimatedDeliveryDate, date.AddHours(10))
                .Create();
 
           var stepB = _fixture.Build<DeliveryStep>()
                .With(s => s.ParentDelivery, _mockDelivery)
-               .With(s => s.CourierId, _mockCourier.Id)
+               .With(s => s.CourierId, (Guid?)null)
                .With(s => s.EstimatedDeliveryDate, date.AddHours(8))
                .Create();
 
@@ -57,13 +56,14 @@ public class GetAllDailyDeliveriesHandlerTests
 
           var stepForAnotherCourier = _fixture.Build<DeliveryStep>()
                .With(s => s.ParentDelivery, _mockDelivery)
+               .With(s => s.CourierId, _mockCourier.Id)
                .With(s => s.EstimatedDeliveryDate, date.AddHours(9))
                .Create();
 
           _mockDelivery.Steps = [stepA, stepB, stepForAnotherDate, stepForAnotherCourier];
 
-          var sut = CreateSut(_mockCourier, [_mockDelivery]);
-          var query = new GetAllDailyDeliveriesQuery(_mockCourier.Email, date);
+          var sut = CreateSut([_mockDelivery]);
+          var query = new GetAllUnassignedDeliveriesQuery(date);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -80,32 +80,7 @@ public class GetAllDailyDeliveriesHandlerTests
           delivery.Steps.Should().HaveCount(2);
           delivery.Steps.Select(s => s.Data.Id).Should().Equal(stepB.Id, stepA.Id);
 
-          VerifyCourierRepositoryCalledOnce();
           VerifyDeliveryRepositoryCalledOnce();
-     }
-
-     [Fact]
-     public async Task Handle_ShouldReturnUnauthorized_WhenCourierDoesNotExist()
-     {
-          // Arrange
-          var date = new DateTimeOffset(2026, 5, 12, 0, 0, 0, TimeSpan.Zero);
-          var sut = CreateSut(null, []);
-          var query = new GetAllDailyDeliveriesQuery("missing.courier@example.com", date);
-
-          // Act
-          var result = await sut.Handle(query, CancellationToken.None);
-
-          // Assert
-          result.Should().NotBeNull();
-          result.Should().BeOfType<GetAllDailyDeliveriesResult.CourierNotFound>();
-
-          VerifyCourierRepositoryCalledOnce();
-
-          _mockDeliveryRepository.Verify(
-               repo => repo.ListAsync(
-                    It.IsAny<ISpecification<Delivery>>(),
-                    It.IsAny<CancellationToken>()),
-               Times.Never);
      }
 
      [Fact]
@@ -113,8 +88,8 @@ public class GetAllDailyDeliveriesHandlerTests
      {
           // Arrange
           var date = new DateTimeOffset(2026, 5, 12, 0, 0, 0, TimeSpan.Zero);
-          var sut = CreateSut(_mockCourier, []);
-          var query = new GetAllDailyDeliveriesQuery(_mockCourier.Email, date);
+          var sut = CreateSut([]);
+          var query = new GetAllUnassignedDeliveriesQuery(date);
 
           // Act
           var result = await sut.Handle(query, CancellationToken.None);
@@ -126,36 +101,19 @@ public class GetAllDailyDeliveriesHandlerTests
           var success = (GetAllDailyDeliveriesResult.Success)result;
           success.Deliveries.Should().BeEmpty();
 
-          VerifyCourierRepositoryCalledOnce();
           VerifyDeliveryRepositoryCalledOnce();
      }
 
-     private GetAllDailyDeliveriesHandler CreateSut(Courier? courier, List<Delivery> deliveries)
+     private GetAllUnassignedDeliveriesHandler CreateSut(List<Delivery> deliveries)
      {
-          _mockCourierRepository
-               .Setup(repo => repo.FirstOrDefaultAsync(
-                    It.Is<ISpecification<Courier>>(s => s is CourierByEmailSpecification),
-                    It.IsAny<CancellationToken>()))
-               .ReturnsAsync(courier);
-
           _mockDeliveryRepository
                .Setup(repo => repo.ListAsync(
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryStepByCourierAndDate),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(deliveries);
 
-          return new GetAllDailyDeliveriesHandler(
-               _mockCourierRepository.Object,
+          return new GetAllUnassignedDeliveriesHandler(
                _mockDeliveryRepository.Object);
-     }
-
-     private void VerifyCourierRepositoryCalledOnce()
-     {
-          _mockCourierRepository.Verify(
-               repo => repo.FirstOrDefaultAsync(
-                    It.IsAny<ISpecification<Courier>>(),
-                    It.IsAny<CancellationToken>()),
-               Times.Once);
      }
 
      private void VerifyDeliveryRepositoryCalledOnce()

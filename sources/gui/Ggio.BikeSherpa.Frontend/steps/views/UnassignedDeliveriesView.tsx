@@ -3,15 +3,15 @@ import React from "react";
 import { View } from "react-native";
 import StepCardList from "../components/StepCardList";
 import { useTheme } from "react-native-paper";
-import useMyDeliveriesViewModel from "@/steps/viewModel/useMyDeliveriesViewModel";
 import {DatePickerInput} from "react-native-paper-dates";
+import useUnassignedDeliveriesViewModel from "@/steps/viewModel/useUnassignedDeliveriesViewModel";
 import {stepDatePickerStore$} from "@/steps/store/StepDatePickerStore";
-import {useValue} from "@legendapp/state/react";
+import { useValue } from "@legendapp/state/react";
 
-export function MyDeliveriesView() {
+export function UnassignedDeliveriesView() {
     const theme = useTheme();
 
-    const viewModel = useMyDeliveriesViewModel();
+    const viewModel = useUnassignedDeliveriesViewModel();
 
     const selectedDate = useValue(stepDatePickerStore$.date);
 
@@ -34,7 +34,7 @@ export function MyDeliveriesView() {
                 steps={viewModel.steps}
                 onCardPress={
                     (step) => navigate({
-                        pathname: '/(tabs)/myDeliveries/[stepId]',
+                        pathname: '/(tabs)/unassignedDeliveries/[stepId]',
                         params: { stepId: step.id }
                     })
                 }

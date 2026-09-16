@@ -171,8 +171,20 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         );
     }
     
-    public async GetAllDailyDeliveriesEndpoint(date: string): Promise<Delivery[]> {
-        const data = await this.apiClient.GetAllDailyDeliveriesEndpoint({
+    public async GetAllMyDeliveriesEndpoint(date: string): Promise<Delivery[]> {
+        const data = await this.apiClient.GetAllMyDeliveriesEndpoint({
+            params: {date: date}
+        });
+
+        const deliveries = data.map((deliveryDto: { data: DeliveryCrud, links: Link[] | null }) => {
+            return this.deliveryMapper.DeliveryDtoToDelivery(deliveryDto);
+        });
+
+        return deliveries || [];
+    }
+    
+    public async GetAllUnassignedDeliveriesEndpoint(date: string): Promise<Delivery[]> {
+        const data = await this.apiClient.GetAllUnassignedDeliveriesEndpoint({
             params: {date: date}
         });
 
@@ -229,6 +241,19 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             throw new Error(`Step link for '${hateoasRel.stepCourier.delete}' not found`);
 
         await axios.delete(
+            link.href
+        );
+    }
+
+    public async PutStepAssignMyself(step: Step): Promise<void> {
+        if (!step.links)
+            throw new Error(`Step links empty`);
+
+        const link = step.links.find(link => link.rel === hateoasRel.stepCourier.assignMyself);
+        if (!link)
+            throw new Error(`Step link for '${hateoasRel.stepCourier.assignMyself}' not found`);
+
+        await axios.put(
             link.href
         );
     }

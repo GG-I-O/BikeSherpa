@@ -49,6 +49,14 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                     Rel = "deleteCourier",
                     Method = "DELETE" 
                });
+          
+          // Put /delivery{deliveryId}/step/{stepId}/courier/myself
+          if (canWriteStep)
+               links.Add(new Link {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<UpdateDeliveryStepCourierMyselfEndpoint>(), routeValues),
+                    Rel = "assignMyself",
+                    Method = "PUT" 
+               });
 
           // PUT /delivery/{deliveryId}/step/{stepId}/changeOrder
           if (canWriteDelivery)

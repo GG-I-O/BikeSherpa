@@ -6,7 +6,7 @@ import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
 import {StepDisplayForCourier} from "@/steps/models/StepDisplayForCourier";
 import {DeliveryDisplayForCourier} from "@/deliveries/models/DeliveryDisplayForCourier";
 
-export default class MyDeliveriesViewModel {
+export default class UnassignedDeliveriesViewModel {
     private readonly deliveryServices: IDeliveryServices;
     private readonly deliveryMapper: IDeliveryMapper;
 
@@ -18,9 +18,9 @@ export default class MyDeliveriesViewModel {
         this.deliveryMapper = deliveryMapper;
     }
     
-    public loadMyDeliveries = (date: Date): void => {
+    public loadDeliveries = (date: Date): void => {
         const rawDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0));
-        this.deliveryServices.loadMyDeliveries(rawDate.toISOString());
+        this.deliveryServices.loadUnassignedDeliveries(rawDate.toISOString());
     }
 
     public getSteps = (): StepDisplayForCourier[] => {

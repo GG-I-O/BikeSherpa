@@ -14,7 +14,8 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
     private backendClientFacade: IBackendClient<Delivery>;
     private customClientFacade: IDeliveryCustomBackendClientFacade;
 
-    private getAllDailyDeliveriesDate: string | null = null;
+    private dateForGetAllMyDeliveries: string | null = null;
+    private dateForGetAllUnassignedDeliveries: string | null = null;
     private updateDeliveryState: { deliveryId: string, state: string }[] = [];
     private updateStepState: { deliveryId: string, stepId: string, state: string }[] = [];
     private attachmentUploadQueue: { stepId: string, file: UploadableFile }[] = [];
@@ -27,15 +28,23 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
         this.customClientFacade = customClientFacade;
     }
 
-    public setGetAllDateForDailyDeliveries(date: string | null) {
-        this.getAllDailyDeliveriesDate = date;
+    public setDateForGetAllMyDeliveries(date: string | null) {
+        this.dateForGetAllMyDeliveries = date;
+        this.dateForGetAllUnassignedDeliveries = null;
+    }
+    public setDateForGetAllUnassignedDeliveries(date: string | null) {
+        this.dateForGetAllMyDeliveries = null;
+        this.dateForGetAllUnassignedDeliveries = date;
     }
 
     public async getAll(date?: string): Promise<Delivery[]> {
-        if (!this.getAllDailyDeliveriesDate)
-            return await this.backendClientFacade.GetAllEndpoint(date);
-        else
-            return await this.customClientFacade.GetAllDailyDeliveriesEndpoint(this.getAllDailyDeliveriesDate);
+        if (this.dateForGetAllMyDeliveries) {
+            return await this.customClientFacade.GetAllMyDeliveriesEndpoint(this.dateForGetAllMyDeliveries);
+        }
+        if (this.dateForGetAllUnassignedDeliveries) {
+            return await this.customClientFacade.GetAllUnassignedDeliveriesEndpoint(this.dateForGetAllUnassignedDeliveries);
+        }
+        return await this.backendClientFacade.GetAllEndpoint(date);
     }
 
     public addUpdateStepState(deliveryId: string, stepId: string, state: string): void {
@@ -105,6 +114,9 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                     break;
                 case deliveryStepOperationAction.deleteCourier:
                     await this.customClientFacade.DeleteStepCourierEndpoint(step);
+                    break;
+                case deliveryStepOperationAction.assignMyself:
+                    await this.customClientFacade.PutStepAssignMyself(step);
                     break;
                 case deliveryStepOperationAction.putOrder:
                     await this.customClientFacade.PutStepOrderEndpoint(step, step.order >= 0 ? 1 : -1);

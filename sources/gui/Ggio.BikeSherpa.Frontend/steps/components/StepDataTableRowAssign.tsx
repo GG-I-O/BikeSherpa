@@ -1,6 +1,6 @@
-import {Button, DataTable, IconButton, Text, TextInput, useTheme} from "react-native-paper";
+import { DataTable, IconButton, Text, TextInput, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import React, {useCallback, useState} from "react";
+import React, {useState} from "react";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";
 import TimePickerInput from "@/components/general/TimePickerInput";
 import {View} from "react-native";
@@ -10,7 +10,6 @@ import {Icon} from "react-native-paper/src";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
-import {DatePickerModal, TimePickerModal} from "react-native-paper-dates";
 import {SafeAreaProvider} from "react-native-safe-area-context";
 
 type Props = {

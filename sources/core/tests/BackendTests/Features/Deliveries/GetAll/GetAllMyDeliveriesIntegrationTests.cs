@@ -17,9 +17,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BackendTests.Features.Deliveries.GetAll;
 
 [Collection("Database integration tests")]
-[TestSubject(typeof(GetAllDailyDeliveriesEndpoint))]
+[TestSubject(typeof(GetAllMyDeliveriesEndpoint))]
 [Trait("Category", "Integration")]
-public class GetAllDailyDeliveriesIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
+public class GetAllMyDeliveriesIntegrationTests : IClassFixture<IntegrationTestWebApplicationFactory>
 {
      private readonly WebApplicationFactory<Program> _factory;
      private readonly Fixture _fixture = TestFixtureFactory.Create();
@@ -27,7 +27,7 @@ public class GetAllDailyDeliveriesIntegrationTests : IClassFixture<IntegrationTe
      private const string Scope = "read:myDeliveries";
      private const string UserEmail = "courier@example.com";
 
-     public GetAllDailyDeliveriesIntegrationTests(IntegrationTestWebApplicationFactory factory)
+     public GetAllMyDeliveriesIntegrationTests(IntegrationTestWebApplicationFactory factory)
      {
           _factory = factory.WithWebHostBuilder(builder =>
                {
@@ -134,7 +134,7 @@ public class GetAllDailyDeliveriesIntegrationTests : IClassFixture<IntegrationTe
           try
           {
                // Act
-               var response = await client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", CancellationToken.None);
+               var response = await client.GetAsync($"/api/deliveries/myDeliveries/{date:O}", CancellationToken.None);
 
                // Assert
                response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -180,7 +180,7 @@ public class GetAllDailyDeliveriesIntegrationTests : IClassFixture<IntegrationTe
           try
           {
                // Act
-               var act = async () => await client.GetAsync($"/api/deliveries/dailyDeliveries/{date:O}", CancellationToken.None);
+               var act = async () => await client.GetAsync($"/api/deliveries/myDeliveries/{date:O}", CancellationToken.None);
 
                // Assert
                await act.Should().ThrowAsync<UnauthorizedAccessException>()

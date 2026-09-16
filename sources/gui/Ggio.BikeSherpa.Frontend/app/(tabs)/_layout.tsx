@@ -1,4 +1,4 @@
-import {IAuthService} from "@/spi/AuthSPI";
+import {IAuthService, IUserService} from "@/spi/AuthSPI";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {useEffect, useState} from "react";
@@ -11,6 +11,7 @@ export default function TabLayout() {
     const [authError, setAuthError] = useState(false);
 
     const authService = IOCContainer.get<IAuthService>(ServicesIdentifiers.AuthService);
+    const userService = IOCContainer.get<IUserService>(ServicesIdentifiers.UserService);
     const {clearSession} = useAuth0();
 
     useEffect(() => {
@@ -21,6 +22,12 @@ export default function TabLayout() {
                 setAuthError(true);
             })
     }, [authService, setUserIsDispatcher]);
+    
+    useEffect(() => {
+        if (userIsDispatcher !== null) {
+            userService.setUserLogInfo(userIsDispatcher);
+        }
+    }, [userIsDispatcher, userService])
 
     useEffect(() => {
         if (!authError) return;
@@ -47,6 +54,7 @@ export default function TabLayout() {
 
     const courierItems = [
         {href: '/(tabs)/myDeliveries', title: 'Mes courses', icon: 'bicycle-cargo'},
+        {href: '/(tabs)/unassignedDeliveries', title: 'Non assignées', icon: 'account-question'},
         {href: '/(tabs)/profile', title: 'Profil', icon: 'account'},
     ];
 

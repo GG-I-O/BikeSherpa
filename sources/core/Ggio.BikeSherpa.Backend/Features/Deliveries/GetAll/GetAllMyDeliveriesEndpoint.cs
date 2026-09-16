@@ -1,15 +1,13 @@
 using System.Security.Claims;
-using Ardalis.Result;
 using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Services;
-using Ggio.BikeSherpa.Backend.Model;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.GetAll;
 
-public class GetAllDailyDeliveriesEndpoint(
+public class GetAllMyDeliveriesEndpoint(
      IMediator mediator,
      IDeliveryLinks deliveryLinks,
      IDeliveryStepLinks deliveryStepLinks
@@ -17,7 +15,7 @@ public class GetAllDailyDeliveriesEndpoint(
 {
      public override void Configure()
      {
-          Get("/deliveries/dailyDeliveries/{date}");
+          Get("/deliveries/myDeliveries/{date}");
           Policies("read:myDeliveries");
           Description(x => x.WithTags("delivery"));
      }
@@ -31,7 +29,7 @@ public class GetAllDailyDeliveriesEndpoint(
           {
                throw new ArgumentException("Invalid date format");
           }
-          var query = new GetAllDailyDeliveriesQuery(
+          var query = new GetAllMyDeliveriesQuery(
                UserEmail: userEmail!,
                Date: DateTimeOffset.Parse(date)
           );

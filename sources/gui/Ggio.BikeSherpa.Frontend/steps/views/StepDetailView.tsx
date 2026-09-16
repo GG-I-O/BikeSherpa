@@ -74,9 +74,9 @@ export default function StepDetailView() {
                 gap: 32
             }}>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8}}>
-                    <View style={{flexDirection: 'row', alignItems: 'center', marginInline: 8, gap: 32}}>
+                    <View style={{flexDirection: 'row', alignItems: 'center', marginInline: 8, gap: 16, width: '100%'}}>
                         <DeliveryTypeIcon type={viewModel.step.type}/>
-                        <View>
+                        <View style={{flexWrap: 'wrap', width: '80%'}}>
                             <Text style={AppStyle.textStyle.h3}>{viewModel.step.address.name}</Text>
                             <Text>{viewModel.step.address.streetInfo}</Text>
                             {viewModel.step.address.complement && <Text>{viewModel.step.address.complement}</Text>}

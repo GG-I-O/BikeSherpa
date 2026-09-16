@@ -9,6 +9,7 @@ export interface IStepServices {
     
     assignCourier(stepId: string, courierId: string): void;
     unassignCourier(stepId: string): void;
+    assignMyself(stepId: string, courierId: string): void;
     
     updateComment(stepId: string, comment: string): void;
     updateCourierComment(stepId: string, comment: string): void;
