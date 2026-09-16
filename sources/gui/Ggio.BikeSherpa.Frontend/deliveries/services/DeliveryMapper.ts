@@ -50,6 +50,7 @@ export default class DeliveryMapper implements IDeliveryMapper {
             customerName: this.customerServices.getCustomer$(delivery.customerId).get()?.name ?? unknownConst,
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,
+            deliveryInfo: delivery.details[0],
             startDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
             startTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
             limitTime: !delivery.limitDate ? unknownConst : DateToolbox.getFormattedTimeFromISO(new Date(delivery.limitDate).toISOString()),

@@ -107,6 +107,7 @@ export default function StepDataTableRow(
             <DataTable.Cell style={[style.column, style.width60]}>{step.packing}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <TextInput
+                    style={{width: '100%'}}
                     value={viewModel.comment}
                     onChangeText={viewModel.setComment}
                     mode="outlined"
