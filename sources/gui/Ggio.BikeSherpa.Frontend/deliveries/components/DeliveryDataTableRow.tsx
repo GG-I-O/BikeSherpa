@@ -1,4 +1,4 @@
-import { DataTable, IconButton, useTheme } from "react-native-paper";
+import {DataTable, IconButton, Text, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
 import { View } from "react-native";
 import { useState } from "react";
@@ -49,16 +49,18 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                 <DataTable.Cell style={[style.column, style.width50]}>
                     <DeliveryStatusButton deliveryId={delivery.id} status={delivery.status} />
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column]}>
+                <DataTable.Cell style={[style.column, style.width180]}>
                     {delivery.code}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
-                    {delivery.customerName}
+                    <Text numberOfLines={2}>
+                        {delivery.deliveryInfo}
+                    </Text>
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column]}>
+                <DataTable.Cell style={[style.column, style.width60]}>
                     {delivery.steps.length}
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column]}>
+                <DataTable.Cell style={[style.column, style.width100]}>
                     {delivery.totalPrice}€
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width40]}>
@@ -66,13 +68,13 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                         <Icon size={20} source="flag" color={theme.colors.error}/>
                     )}
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column]}>
+                <DataTable.Cell style={[style.column, style.width130]}>
                     {delivery.startDate}
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column,]}>
+                <DataTable.Cell style={[style.column, style.width80]}>
                     {delivery.startTime}
                 </DataTable.Cell>
-                <DataTable.Cell style={[style.column]}>
+                <DataTable.Cell style={[style.column, style.width80]}>
                     {delivery.limitTime}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width180]}>

@@ -27,14 +27,14 @@ export default function DeliveryDataTable({ deliveries, isDeliverySelected, isSt
             <DataTable style={{ backgroundColor: theme.colors.background }}>
                 <DataTable.Header>
                     <DataTable.Title style={[style.column, style.width50]}>Status</DataTable.Title>
-                    <DataTable.Title style={[style.column]}>Code</DataTable.Title>
-                    <DataTable.Title style={[style.column]}>Client</DataTable.Title>
-                    <DataTable.Title style={[style.column]}>Nb étapes</DataTable.Title>
-                    <DataTable.Title style={[style.column]}>Prix</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width180]}>Code</DataTable.Title>
+                    <DataTable.Title style={[style.column]}>Infos de la course</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width60]}>Nb étapes</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width100]}>Prix</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width40]}>Com. Liv.</DataTable.Title>
-                    <DataTable.Title style={[style.column]}>Date</DataTable.Title>
-                    <DataTable.Title style={[style.column]}>Heure début</DataTable.Title>
-                    <DataTable.Title style={[style.column]}>Heure limite</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width130]}>Date</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width80]}>Heure début</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width80]}>Heure limite</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width180]}>Actions</DataTable.Title>
                 </DataTable.Header>
 
