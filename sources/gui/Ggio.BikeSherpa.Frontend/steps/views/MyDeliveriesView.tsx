@@ -5,11 +5,15 @@ import StepCardList from "../components/StepCardList";
 import { useTheme } from "react-native-paper";
 import useMyDeliveriesViewModel from "@/steps/viewModel/useMyDeliveriesViewModel";
 import {DatePickerInput} from "react-native-paper-dates";
+import {stepDatePickerStore$} from "@/steps/store/StepDatePickerStore";
+import {useValue} from "@legendapp/state/react";
 
 export function MyDeliveriesView() {
     const theme = useTheme();
 
     const viewModel = useMyDeliveriesViewModel();
+
+    const selectedDate = useValue(stepDatePickerStore$.date);
 
     return (
         <>
@@ -22,8 +26,8 @@ export function MyDeliveriesView() {
                 <DatePickerInput
                     locale={"fr"}
                     inputMode={"start"}
-                    onChange={(date: Date | undefined): void => viewModel.setDatePicker(date)}
-                    value={viewModel.datePicker}
+                    onChange={(date: Date | undefined): void => stepDatePickerStore$.date.set(date)}
+                    value={selectedDate}
                 />
             </View>
             <StepCardList

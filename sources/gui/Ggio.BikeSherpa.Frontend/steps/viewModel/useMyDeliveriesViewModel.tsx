@@ -7,6 +7,7 @@ import {observe} from "@legendapp/state";
 import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
 import useDropdown from "@/hooks/useDropdown";
 import {StepDisplayForCourier} from "@/steps/models/StepDisplayForCourier";
+import {stepDatePickerStore$} from "@/steps/store/StepDatePickerStore";
 
 export default function useMyDeliveriesViewModel() {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -15,24 +16,23 @@ export default function useMyDeliveriesViewModel() {
 
     const deliveryStore$ = deliveryServices.getDeliveryList$();
 
-    const { packingSizes } = useDropdown();
-    
+    const {packingSizes} = useDropdown();
+
     const [steps, setSteps] = useState<StepDisplayForCourier[]>([]);
-    const [datePicker, setDatePicker] = useState<Date|undefined>(new Date());
-    
+
     useEffect(() => {
-        viewModel.loadMyDeliveries(datePicker ?? new Date());
-    }, [datePicker]); // eslint-disable-line react-hooks/exhaustive-deps
-    
+        return stepDatePickerStore$.date.onChange(({value}) => {
+            viewModel.loadMyDeliveries(value ?? new Date());
+        }, {initial: true});
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
     useEffect(() => {
         return observe(() => {
             setSteps(viewModel.getSteps());
         });
     }, [deliveryStore$, packingSizes, setSteps]); // eslint-disable-line react-hooks/exhaustive-deps
-    
+
     return {
-        steps,
-        datePicker,
-        setDatePicker
+        steps
     }
 }
