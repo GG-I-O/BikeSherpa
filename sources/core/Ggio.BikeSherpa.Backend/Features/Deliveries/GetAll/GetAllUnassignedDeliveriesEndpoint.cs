@@ -22,8 +22,6 @@ public class GetAllUnassignedDeliveriesEndpoint(
 
      public override async Task HandleAsync(CancellationToken ct)
      {
-          var userEmail = HttpContext.User.FindFirstValue(ClaimTypes.Email);
-          
           var date = Route<string>("date", isRequired: true);
           if (date is null || !DateTimeOffset.TryParse(date, out _))
           {
@@ -57,12 +55,6 @@ public class GetAllUnassignedDeliveriesEndpoint(
                     deliveryDtoList.Add(deliveryDto);
                }
                await Send.OkAsync(deliveryDtoList, cancellation: ct);
-               return;
-          }
-
-          if (result is GetAllDailyDeliveriesResult.CourierNotFound)
-          {
-               throw new UnauthorizedAccessException("User unauthorized");
           }
      }
 }
