@@ -34,8 +34,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
         if (!delivery.code) return theme.colors.background;
         
         const color = colorService.stringToColor(delivery.code);
-        // Add some transparency to the color so it's not too aggressive
-        return color + '20'; // 20 is around 12% opacity
+        return theme.dark ? color.dark : color.light;
     };
 
     return (
