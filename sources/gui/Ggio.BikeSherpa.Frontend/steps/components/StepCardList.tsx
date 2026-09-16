@@ -1,11 +1,11 @@
 import ThemedCardList from "@/components/themed/ThemedCardList";
 import StepCard from "@/steps/components/StepCard";
 import { Dimensions, StyleProp, ViewStyle } from "react-native";
-import {StepToDisplay} from "@/steps/models/StepToDisplay";
+import {StepDisplayForCourier} from "@/steps/models/StepDisplayForCourier";
 
 type Props = {
-    steps: StepToDisplay[],
-    onCardPress?: (step: StepToDisplay) => void,
+    steps: StepDisplayForCourier[],
+    onCardPress?: (step: StepDisplayForCourier) => void,
     style?: StyleProp<ViewStyle>
 }
 
@@ -17,11 +17,11 @@ export default function StepCardList({ steps, onCardPress, style }: Props) {
         <ThemedCardList
             data={steps}
             card={({ item }) => {
-                const step = item as StepToDisplay;
+                const step = item as StepDisplayForCourier;
                 return (
                     <StepCard
                         step={step}
-                        onPress={(step: StepToDisplay) => onCardPress ? onCardPress(step) : undefined}
+                        onPress={(step: StepDisplayForCourier) => onCardPress ? onCardPress(step) : undefined}
                     />
                 );
             }}

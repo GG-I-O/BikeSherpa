@@ -45,4 +45,28 @@ export default class StepMapper implements IStepMapper {
             attachmentFilePaths: step.attachmentFilePaths ?? [],
         }
     }
+
+    public StepToStepDisplayForCourier = (delivery: Delivery, step: Step)=> {
+        return {
+            id: step.id,
+            deliveryId: delivery.id,
+            deliveryCode: delivery.code,
+            deliveryLimitDate: !delivery.limitDate ? unassignedCourierDisplay : DateToolbox.getFormattedTimeFromISO(new Date(delivery.limitDate).toISOString()),
+            type: step.stepType,
+            order: step.order,
+            completed: step.completed,
+            address: step.stepAddress,
+            comment: step.comment ?? '',
+            courierComment: step.courierComment ?? '',
+            packing: this.dropdownOptionsService.GetPackingLabel(step.packingSize),
+            deliveryDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
+            deliveryTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
+            estimatedIsoDate: step.estimatedDeliveryDate,
+            estimatedDate: DateToolbox.getFormattedDateFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
+            estimatedTime: DateToolbox.getFormattedTimeFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
+            distance: Math.round(step.distance * 100) / 100,
+            notBilled: step.notBilled,
+            attachmentFilePaths: step.attachmentFilePaths ?? [],
+        }
+    }
 }

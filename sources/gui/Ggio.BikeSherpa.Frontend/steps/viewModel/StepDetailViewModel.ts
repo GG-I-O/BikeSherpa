@@ -1,13 +1,13 @@
 import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import {inject} from "inversify";
-import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import Delivery from "@/deliveries/models/Delivery";
 import {Step} from "@/steps/models/Step";
 import IStepMapper from "@/steps/spi/IStepMapper";
 import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier";
 import {IStepServices} from "@/steps/spi/IStepServices";
 import UploadableFile from "@/models/UploadableFile";
+import {StepDisplayForCourier} from "@/steps/models/StepDisplayForCourier";
 
 export default class StepDetailViewModel {
     private readonly deliveryServices: IDeliveryServices;
@@ -24,7 +24,7 @@ export default class StepDetailViewModel {
         this.stepMapper = stepMapper;
     }
 
-    public getStep = (stepId: string): StepToDisplay | undefined => {
+    public getStep = (stepId: string): StepDisplayForCourier | undefined => {
         if (!this.deliveryServices)
             return undefined;
 
@@ -42,7 +42,7 @@ export default class StepDetailViewModel {
         if (!delivery || !step)
             return undefined;
 
-        return this.stepMapper.StepToStepToDisplay(delivery, step);
+        return this.stepMapper.StepToStepDisplayForCourier(delivery, step);
     }
 
     public updateCourierComment = (stepId: string, comment: string) => {

@@ -5,12 +5,12 @@ import {useState} from "react";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IAddressService} from "@/spi/AddressSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
-import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import {Icon} from "react-native-paper/src";
+import {StepDisplayForCourier} from "@/steps/models/StepDisplayForCourier";
 
 type Props = {
-    step: StepToDisplay,
-    onPress?: (step: StepToDisplay) => void,
+    step: StepDisplayForCourier,
+    onPress?: (step: StepDisplayForCourier) => void,
     isSelected?: boolean
 }
 

@@ -227,7 +227,7 @@ export default class StepServices implements IStepServices {
         observables.step$!.courierId.set(null);
     }
 
-    public assignMyself(stepId: string) {
+    public assignMyself(stepId: string, courierId: string) {
         const observables = this.getDeliveryFromStep(stepId);
         if (!observables.delivery$) {
             this.logger.error(`AssignMyself : Parent delivery not found for step ${stepId}`);
@@ -251,7 +251,7 @@ export default class StepServices implements IStepServices {
             deliveryStepOperationAction.assignMyself
         );
 
-        observables.step$!.courierComment.set("Assigné par le livreur");
+        observables.step$!.courierId.set(courierId);
     }
 
     public updateComment(stepId: string, comment: string): void {

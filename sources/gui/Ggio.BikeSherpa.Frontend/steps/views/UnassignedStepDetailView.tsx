@@ -4,6 +4,7 @@ import React, {useState} from "react";
 import useUnassignedStepDetailViewModel from "@/steps/viewModel/useUnassignedStepDetailViewModel";
 import StepDetailView from "@/steps/views/StepDetailView";
 import {View} from "react-native";
+import {navigate} from "expo-router/build/global-state/routing";
 
 export default function UnassignedStepDetailView() {
     const theme = useTheme();
@@ -24,6 +25,9 @@ export default function UnassignedStepDetailView() {
                         onPress={() => {
                             setPressed(true);
                             viewModel.assignMyself(stepId);
+                            navigate({
+                                pathname: '/(tabs)/unassignedDeliveries'
+                            });
                         }}
                     >
                         <Text>Prendre la course</Text>

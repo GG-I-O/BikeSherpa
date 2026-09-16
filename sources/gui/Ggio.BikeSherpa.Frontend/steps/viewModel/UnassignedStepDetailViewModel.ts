@@ -6,12 +6,12 @@ export default class UnassignedStepDetailViewModel {
     private readonly stepServices: IStepServices;
 
     constructor(
-        @inject(StepServiceIdentifier.Services) stepServices: IStepServices
+        @inject(StepServiceIdentifier.Services) stepServices: IStepServices,
     ) {
         this.stepServices = stepServices;
     }
 
-    public assignMyself = (stepId: string) => {
-        this.stepServices.assignMyself(stepId);
+    public assignCourier = (stepId: string, courierId: string) => {
+        this.stepServices.assignMyself(stepId, courierId);
     }
 }

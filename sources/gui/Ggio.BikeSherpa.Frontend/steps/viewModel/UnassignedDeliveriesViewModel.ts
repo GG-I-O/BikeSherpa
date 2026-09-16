@@ -2,9 +2,9 @@ import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import {inject} from "inversify";
 import Delivery from "@/deliveries/models/Delivery";
-import {StepToDisplay} from "@/steps/models/StepToDisplay";
-import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
+import {StepDisplayForCourier} from "@/steps/models/StepDisplayForCourier";
+import {DeliveryDisplayForCourier} from "@/deliveries/models/DeliveryDisplayForCourier";
 
 export default class UnassignedDeliveriesViewModel {
     private readonly deliveryServices: IDeliveryServices;
@@ -23,11 +23,11 @@ export default class UnassignedDeliveriesViewModel {
         this.deliveryServices.loadUnassignedDeliveries(rawDate.toISOString());
     }
 
-    public getSteps = (): StepToDisplay[] => {
+    public getSteps = (): StepDisplayForCourier[] => {
         const deliveries: Delivery[] = Object.values(this.deliveryServices.getDeliveryList$().get());
 
-        const deliveriesToDisplay: DeliveryToDisplay[] = deliveries.map((delivery) => {
-            return this.deliveryMapper.DeliveryToDeliveryToDisplay(delivery);
+        const deliveriesToDisplay: DeliveryDisplayForCourier[] = deliveries.map((delivery) => {
+            return this.deliveryMapper.DeliveryToDeliveryDisplayForCourier(delivery);
         });
         
         return deliveriesToDisplay.flatMap(delivery => delivery.steps).sort((stepA, stepB) => {

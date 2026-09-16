@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import {StepToDisplay} from "@/steps/models/StepToDisplay";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
@@ -10,6 +9,7 @@ import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier"
 import {IStepServices} from "@/steps/spi/IStepServices";
 import {useDebounce} from "@/hooks/useDebounce";
 import UploadableFile from "@/models/UploadableFile";
+import {StepDisplayForCourier} from "@/steps/models/StepDisplayForCourier";
 
 export default function useStepDetailViewModel(stepId: string) {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -19,7 +19,7 @@ export default function useStepDetailViewModel(stepId: string) {
 
     const deliveryStore$ = deliveryServices.getDeliveryList$();
     
-    const [step, setStep] = useState<StepToDisplay>();
+    const [step, setStep] = useState<StepDisplayForCourier>();
 
     useEffect(() => {
         return observe(() => {
