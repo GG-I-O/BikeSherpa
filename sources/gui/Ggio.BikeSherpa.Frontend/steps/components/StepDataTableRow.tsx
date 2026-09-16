@@ -92,7 +92,24 @@ export default function StepDataTableRow(
                     </View>
                 </DataTable.Cell>
             )}
-
+            <DataTable.Cell style={[style.column, style.width60]}>
+                {
+                    !canChangeDate ? (
+                        <Text>{step.estimatedTime}</Text>
+                    ) : (
+                        <TimePickerInput
+                            hours={parseInt(viewModel.splitTime[0]) ?? 0}
+                            minutes={parseInt(viewModel.splitTime[1]) ?? 0}
+                            onOpen={() => setIsTimePickerOpen(true)}
+                            onClose={() => setIsTimePickerOpen(false)}
+                            onConfirm={({hours, minutes}: {
+                                hours: number;
+                                minutes: number;
+                            }): void => viewModel.updateStepTime(step.id, hours, minutes)}
+                        />
+                    )
+                }
+            </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width40]}>
                 <DeliveryTypeIcon type={step.type}/>
             </DataTable.Cell>
@@ -126,24 +143,6 @@ export default function StepDataTableRow(
                 )}
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>{step.courierCode}</DataTable.Cell>
-            <DataTable.Cell style={[style.column, style.width60]}>
-                {
-                    !canChangeDate ? (
-                        <Text>{step.estimatedTime}</Text>
-                    ) : (
-                        <TimePickerInput
-                            hours={parseInt(viewModel.splitTime[0]) ?? 0}
-                            minutes={parseInt(viewModel.splitTime[1]) ?? 0}
-                            onOpen={() => setIsTimePickerOpen(true)}
-                            onClose={() => setIsTimePickerOpen(false)}
-                            onConfirm={({hours, minutes}: {
-                                hours: number;
-                                minutes: number;
-                            }): void => viewModel.updateStepTime(step.id, hours, minutes)}
-                        />
-                    )
-                }
-            </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60, {justifyContent: 'center'}]}>
                 {
                     step.completed ? (
