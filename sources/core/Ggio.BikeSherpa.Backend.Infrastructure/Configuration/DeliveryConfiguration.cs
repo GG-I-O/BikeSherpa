@@ -41,6 +41,8 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                          attachment.Property(a => a.Path);
                          attachment.Property(a => a.DomainType);
                     });
+
+               steps.Navigation(s => s.AttachmentFiles).AutoInclude();
                steps.OwnsOne(s => s.StepAddress, address =>
                {
                     address.Property(a => a.Name).HasMaxLength(200).IsRequired();

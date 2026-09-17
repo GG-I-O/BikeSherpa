@@ -56,7 +56,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Couriers");
+                    b.ToTable("Couriers", (string)null);
                 });
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer", b =>
@@ -98,7 +98,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.City", b =>
@@ -603,7 +603,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.HasKey("CourierId");
 
-                            b1.ToTable("Couriers");
+                            b1.ToTable("Couriers", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("CourierId");
@@ -654,7 +654,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                             b1.HasKey("CustomerId");
 
-                            b1.ToTable("Customers");
+                            b1.ToTable("Customers", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("CustomerId");
@@ -757,6 +757,38 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                                 .OnDelete(DeleteBehavior.Cascade)
                                 .IsRequired();
 
+                            b1.OwnsMany("Ggio.BikeSherpa.Backend.Domain.SharedKernel.AttachmentFile", "AttachmentFiles", b2 =>
+                                {
+                                    b2.Property<Guid>("DeliveryStepId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<int>("Id")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("integer");
+
+                                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b2.Property<int>("Id"));
+
+                                    b2.Property<string>("DomainType")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Path")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.HasKey("DeliveryStepId", "Id");
+
+                                    b2.ToTable("DeliveryStepAttachmentFiles", null, t =>
+                                        {
+                                            t.Property("DomainType");
+
+                                            t.Property("Path");
+                                        });
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("DeliveryStepId");
+                                });
+
                             b1.OwnsOne("Ggio.BikeSherpa.Backend.Domain.SharedKernel.Address", "StepAddress", b2 =>
                                 {
                                     b2.Property<Guid>("DeliveryStepId")
@@ -796,39 +828,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
 
                                     b2.HasKey("DeliveryStepId");
 
-                                    b2.ToTable("DeliverySteps");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("DeliveryStepId");
-                                });
-
-                            b1.OwnsMany("Ggio.BikeSherpa.Backend.Domain.SharedKernel.AttachmentFile", "AttachmentFiles", b2 =>
-                                {
-                                    b2.Property<Guid>("DeliveryStepId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("integer");
-
-                                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("DomainType")
-                                        .IsRequired()
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("Path")
-                                        .IsRequired()
-                                        .HasColumnType("text");
-
-                                    b2.HasKey("DeliveryStepId", "Id");
-
-                                    b2.ToTable("DeliveryStepAttachmentFiles", null, t =>
-                                        {
-                                            t.Property("DomainType");
-
-                                            t.Property("Path");
-                                        });
+                                    b2.ToTable("DeliverySteps", (string)null);
 
                                     b2.WithOwner()
                                         .HasForeignKey("DeliveryStepId");

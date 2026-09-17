@@ -1,6 +1,5 @@
 using Facet;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 
