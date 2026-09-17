@@ -1,6 +1,5 @@
 import AppBootstrapper from "@/bootstrapper/AppBootstrapper";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
-import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import AppSnackbarView from "@/snackbar/views/AppSnackbarView";
 import {IAuthService, IUserService} from "@/spi/AuthSPI";
 import {Stack} from "expo-router";
@@ -9,6 +8,7 @@ import {Platform} from "react-native";
 import {Auth0Provider, useAuth0} from "react-native-auth0";
 import {PaperProvider} from "react-native-paper";
 import {fr, registerTranslation} from "react-native-paper-dates";
+import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
 
 registerTranslation('fr', fr);
 
@@ -19,8 +19,8 @@ function AppStack() {
 
     const loggedIn = user !== null && user !== undefined;
 
-    const userService = IOCContainer.get<IUserService>(ServicesIdentifiers.UserService);
-    const authService = IOCContainer.get<IAuthService>(ServicesIdentifiers.AuthService);
+    const userService = IOCContainer.get<IUserService>(AuthServiceIdentifier.UserService);
+    const authService = IOCContainer.get<IAuthService>(AuthServiceIdentifier.AuthService);
     useEffect(() => {
         userService.setCurrentUser(user);
         authService.setCredentialMethod(getCredentials);

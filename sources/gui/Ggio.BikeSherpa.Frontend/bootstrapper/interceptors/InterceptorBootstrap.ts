@@ -4,6 +4,7 @@ import { ServicesIdentifiers } from '@/bootstrapper/constants/ServicesIdentifier
 import { ILogger } from '@/spi/LogsSPI';
 import AuthInterceptor from '@/infra/auth/AuthInterceptor';
 import { IAuthService } from '@/spi/AuthSPI';
+import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
 
 export default class InterceptorBootstrap {
 
@@ -30,7 +31,7 @@ export default class InterceptorBootstrap {
         );
 
         // Authentification interceptor
-        const authService = IOCContainer.get<IAuthService>(ServicesIdentifiers.AuthService);
+        const authService = IOCContainer.get<IAuthService>(AuthServiceIdentifier.AuthService);
         const authInterceptor = new AuthInterceptor(this.logger, authService);
         authInterceptor.intercept();
     }

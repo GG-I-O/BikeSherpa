@@ -5,13 +5,10 @@ import { INotificationService, IStorageContext } from "@/spi/StorageSPI";
 import { Platform } from "react-native";
 import { IOCContainer } from "./constants/IOCContainer";
 import { ServicesIdentifiers } from "./constants/ServicesIdentifiers";
-import { IAuthService, IUserService } from "@/spi/AuthSPI";
-import { UserService } from "@/infra/auth/UserService";
 import AppLogger from "@/infra/logger/services/AppLogger";
 import { IAddressService } from "@/spi/AddressSPI";
 import AddressService from "@/services/AddressService";
 import { NotificationService } from "@/infra/notification/NotificationService";
-import AuthService from "@/infra/auth/AuthService";
 import { ICustomerService } from "@/spi/CustomerSPI";
 import CustomerServices from "@/customers/services/CustomerServices";
 import { IAppSnackbarService } from "@/spi/AppSnackbarSPI";
@@ -30,13 +27,10 @@ import {IDropdownOptionsService} from "@/spi/IDropdownOptionsService";
 import DropdownOptionsService from "@/services/DropdownOptionsService";
 import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
 import ColorService from "@/services/ColorService";
+import AuthBootstrapper from "@/infra/auth/bootstrapper/AuthBootstrapper";
 
 export default class IOCContainerBootstrapper {
     public static init() {
-
-        IOCContainerBootstrapper.bindUserService();
-
-        IOCContainerBootstrapper.bindAuthService();
 
         IOCContainerBootstrapper.bindLogger();
 
@@ -62,20 +56,14 @@ export default class IOCContainerBootstrapper {
         IOCContainerBootstrapper.bindCourierBackendClientFacade();
 
         IOCContainerBootstrapper.bindColorService();
+        
+        AuthBootstrapper.init(IOCContainer);
 
         DeliveryBootstrapper.init(IOCContainer);
         
         StepBootstrapper.init(IOCContainer);
         
         ReportBootstrapper.init(IOCContainer);
-    }
-
-    private static bindUserService() {
-        IOCContainer.bind<IUserService>(ServicesIdentifiers.UserService).to(UserService).inSingletonScope();
-    }
-
-    private static bindAuthService() {
-        IOCContainer.bind<IAuthService>(ServicesIdentifiers.AuthService).to(AuthService).inSingletonScope();
     }
 
     private static bindLogger() {

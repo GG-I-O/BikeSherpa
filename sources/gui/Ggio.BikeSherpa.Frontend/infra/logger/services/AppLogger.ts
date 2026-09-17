@@ -2,18 +2,19 @@ import { consoleTransport, logger } from "react-native-logs";
 import { createLokiTransport } from "../options/LokiTransporter";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
 import { ILogger, ILoggerConfig } from "@/spi/LogsSPI";
-import { IUserService } from "@/spi/AuthSPI";
 import { inject, injectable } from "inversify";
-import {useAuth0} from "react-native-auth0";
+import {IUsernameService} from "@/spi/AuthSPI";
+import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
 
 @injectable()
 export default class AppLogger implements ILogger {
     private logger: any;
 
     public constructor(
-        @inject(ServicesIdentifiers.LoggerConfig) config: ILoggerConfig
+        @inject(ServicesIdentifiers.LoggerConfig) config: ILoggerConfig,
+        @inject(AuthServiceIdentifier.UsernameService) usernameService: IUsernameService
     ) {        
-        const username = useAuth0().user?.name;
+        const username = usernameService.getUsername();
 
         // Create Loki transport with batching for better performance
         const lokiTransport = createLokiTransport({
