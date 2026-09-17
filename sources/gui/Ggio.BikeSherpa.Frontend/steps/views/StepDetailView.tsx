@@ -11,6 +11,10 @@ import Signature from "@/steps/components/attachmentFile/Signature";
 import Photo from "@/steps/components/attachmentFile/Photo";
 import Document from "@/steps/components/attachmentFile/Document";
 import unassignedPhoneNumber from "@/steps/data/unassignedPhoneNumber";
+import {attachmentDomainTypes} from "@/models/AttachmentFile";
+import ThemedSignatureIcon from "@/components/themed/ThemedSignatureIcon";
+import ThemedPhotoIcon from "@/components/themed/ThemedPhotoIcon";
+import ThemedDocumentIcon from "@/components/themed/ThemedDocumentIcon";
 
 export default function StepDetailView() {
     const theme = useTheme();
@@ -47,7 +51,7 @@ export default function StepDetailView() {
                     <Button
                         buttonColor={viewModel.step.completed ? theme.colors.errorContainer : theme.colors.background}
                         mode="outlined"
-                        onPress={() => 
+                        onPress={() =>
                             viewModel.step?.completed ? viewModel.cancelStep() : viewModel.completeStep()
                         }
                     >
@@ -73,7 +77,13 @@ export default function StepDetailView() {
                 width: '100%',
                 gap: 32
             }}>
-                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8}}>
+                <View style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: 8
+                }}>
                     <View style={{flexDirection: 'row', alignItems: 'center', marginInline: 8, gap: 16, width: '100%'}}>
                         <DeliveryTypeIcon type={viewModel.step.type}/>
                         <View style={{flexWrap: 'wrap', width: '80%'}}>
@@ -111,13 +121,13 @@ export default function StepDetailView() {
                 </View>
                 <View style={{width: "100%"}}>
                     <Text style={{textAlign: 'center'}}>Infos de livraison</Text>
-                    <Divider style={{width: '50%', margin: 'auto'}} />
+                    <Divider style={{width: '50%', margin: 'auto'}}/>
                     <Text style={[AppStyle.textStyle.h3, {textAlign: 'center'}]}>{viewModel.step.comment}</Text>
                 </View>
 
                 <View style={{width: "100%"}}>
                     <Text style={{textAlign: 'center'}}>Colisage</Text>
-                    <Divider style={{width: '50%', margin: 'auto'}} />
+                    <Divider style={{width: '50%', margin: 'auto'}}/>
                     <Text style={[AppStyle.textStyle.h3, {textAlign: 'center'}]}>{viewModel.step.packing}</Text>
                 </View>
 
@@ -133,16 +143,27 @@ export default function StepDetailView() {
 
                 <View style={{width: "100%", marginBottom: 64}}>
                     <Text style={{textAlign: 'center'}}>Pièces jointes</Text>
-                    <Divider style={{width: '50%', margin: 'auto'}} />
-                    {viewModel.step.attachmentFilePaths.map((filePath, index) =>
-                        <Text
-                            key={`${viewModel.step!.id}-${index}`}
-                            style={{textAlign: 'center', marginTop: 16}}
-                            onPress={() => Linking.openURL(filePath)}
-                        >
-                            {filePath}
-                        </Text>
-                    )}
+                    <Divider style={{width: '50%', margin: 'auto'}}/>
+                    <View style={{flexDirection: "row", width: "100%", justifyContent: "center", marginTop: 8}}>
+                        {viewModel.step.attachmentFiles.map((file, index) =>
+                            <Button
+                                key={`${viewModel.step?.id}-${index}`}
+                                mode={"outlined"}
+                                onPress={() => Linking.openURL(file.path)}
+                            >
+                                {file.domainType === attachmentDomainTypes.signature &&
+                                    <ThemedSignatureIcon/>
+                                }
+                                {file.domainType === attachmentDomainTypes.photo &&
+                                    <ThemedPhotoIcon/>
+                                }
+                                {file.domainType === attachmentDomainTypes.document &&
+                                    <ThemedDocumentIcon/>
+                                }
+                            </Button>
+                        )}
+                    </View>
+
                 </View>
             </View>
         </ScrollView>

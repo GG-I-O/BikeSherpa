@@ -3,6 +3,7 @@ import * as Crypto from 'expo-crypto';
 import InputStep from './InputStep';
 import Storable from '@/models/Storable';
 import { HateoasLinks, Link } from '@/models/HateoasLink';
+import {AttachmentFile} from "@/models/AttachmentFile";
 
 export class Step extends InputStep implements Storable, HateoasLinks {
     // Storable
@@ -24,7 +25,7 @@ export class Step extends InputStep implements Storable, HateoasLinks {
         comment: string,
         courierComment: string,
         notBilled: boolean,
-        attachmentFilePaths: string[],
+        attachmentFiles: AttachmentFile[] | null,
         estimatedDeliveryDate: string,
         realDeliveryDate: string
     ) {
@@ -40,7 +41,7 @@ export class Step extends InputStep implements Storable, HateoasLinks {
             comment,
             courierComment,
             notBilled,
-            attachmentFilePaths,
+            attachmentFiles,
             estimatedDeliveryDate,
             realDeliveryDate
         );

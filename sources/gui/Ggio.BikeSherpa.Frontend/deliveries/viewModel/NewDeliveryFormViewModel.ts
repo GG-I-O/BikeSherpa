@@ -26,7 +26,7 @@ export default class NewDeliveryFormViewModel extends AbstractFormViewModel {
                     comment: step.comment ?? null,
                     courierComment: step.courierComment ?? null,
                     distance: 0,
-                    attachmentFilePaths: [],
+                    attachmentFiles: [],
                     realDeliveryDate: null,
                     estimatedDeliveryDate: delivery.startDate,
                     stepAddress: {

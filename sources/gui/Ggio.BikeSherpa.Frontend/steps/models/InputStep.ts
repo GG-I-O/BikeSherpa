@@ -1,4 +1,5 @@
 import {Address} from "@/models/Address";
+import {AttachmentFile} from "@/models/AttachmentFile";
 
 export default class InputStep {
     public stepType: number;
@@ -12,7 +13,7 @@ export default class InputStep {
     public comment: string | null;
     public courierComment: string | null;
     public notBilled: boolean;
-    public attachmentFilePaths: string[] | null;
+    public attachmentFiles: AttachmentFile[] | null;
     public estimatedDeliveryDate: string;
     public realDeliveryDate: string | null;
 
@@ -28,7 +29,7 @@ export default class InputStep {
         comment: string | null,
         courierComment: string | null,
         notBilled: boolean,
-        attachmentFilePaths: string[] | null,
+        attachmentFiles: AttachmentFile[] | null,
         estimatedDeliveryDate: string,
         realDeliveryDate: string
     ) {
@@ -43,7 +44,7 @@ export default class InputStep {
         this.comment = comment;
         this.courierComment = courierComment;
         this.notBilled = notBilled;
-        this.attachmentFilePaths = attachmentFilePaths;
+        this.attachmentFiles = attachmentFiles;
         this.estimatedDeliveryDate = estimatedDeliveryDate;
         this.realDeliveryDate = realDeliveryDate;
     }

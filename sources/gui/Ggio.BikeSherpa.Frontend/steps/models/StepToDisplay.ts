@@ -1,4 +1,5 @@
 import {Address} from "@/models/Address";
+import {AttachmentFile} from "@/models/AttachmentFile";
 
 export interface StepToDisplay { 
     id: string;
@@ -20,5 +21,5 @@ export interface StepToDisplay {
     estimatedTime: string;
     distance: number;
     notBilled: boolean;
-    attachmentFilePaths: string[];
+    attachmentFiles: AttachmentFile[];
 }
