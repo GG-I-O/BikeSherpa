@@ -104,7 +104,6 @@ const DeliveryCrud = z.object({
   needEstimate: z.boolean(),
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
-  deliveryLabel: z.string(),
   id: z.string(),
 });
 const DeliveryDto = z.object({

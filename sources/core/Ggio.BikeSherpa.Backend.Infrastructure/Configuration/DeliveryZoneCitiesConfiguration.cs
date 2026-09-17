@@ -18,7 +18,7 @@ public class DeliveryZoneCitiesConfiguration : IEntityTypeConfiguration<City>
                new { DeliveryZoneName = "Limitrophe", Name = "Fontaine" },
                new { DeliveryZoneName = "Limitrophe", Name = "La Tronche" },
                new { DeliveryZoneName = "Limitrophe", Name = "Poisat" },
-               new { DeliveryZoneName = "Limitrophe", Name = "Saint-Martin-d’Hères" },
+               new { DeliveryZoneName = "Limitrophe", Name = "Saint-Martin-d'Hères" },
                new { DeliveryZoneName = "Limitrophe", Name = "Saint-Martin-le-Vinoux" },
                new { DeliveryZoneName = "Limitrophe", Name = "Seyssinet-Pariset" },
                new { DeliveryZoneName = "Limitrophe", Name = "Seyssins" },
