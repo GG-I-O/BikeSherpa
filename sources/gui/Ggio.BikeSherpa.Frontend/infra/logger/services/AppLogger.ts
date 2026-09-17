@@ -23,7 +23,7 @@ export default class AppLogger implements ILogger {
                 app: config.app,
                 env: config.env,
                 platform: config.platform,
-                user: username ?? 'anonymous'
+                user: username
             },
             batching: {
                 enabled: true,
