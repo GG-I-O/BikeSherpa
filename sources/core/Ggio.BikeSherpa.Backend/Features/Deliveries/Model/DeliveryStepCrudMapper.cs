@@ -18,7 +18,7 @@ public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, D
           target.Completed = source.Completed;
           target.Distance = source.Distance;
           target.CourierId = source.CourierId;
-          target.AttachmentFilePaths = source.AttachmentFilePaths;
+          target.AttachmentFiles = source.AttachmentFiles;
           target.EstimatedDeliveryDate = source.EstimatedDeliveryDate;
           target.RealDeliveryDate = source.RealDeliveryDate;
           target.CreatedAt = source.CreatedAt;
@@ -39,7 +39,7 @@ public class DeliveryStepCrudMapper : IFacetMapConfiguration<DeliveryStepCrud, D
                Distance = source.Distance,
                CourierId = source.CourierId,
                CourierComment = null,
-               AttachmentFilePaths = source.AttachmentFilePaths,
+               AttachmentFiles = source.AttachmentFiles,
                NotBilled = false,
                EstimatedDeliveryDate = source.EstimatedDeliveryDate,
                RealDeliveryDate = source.RealDeliveryDate,

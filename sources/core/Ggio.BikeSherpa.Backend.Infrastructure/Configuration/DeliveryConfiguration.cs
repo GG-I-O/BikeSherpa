@@ -35,6 +35,12 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();
                steps.Property(s => s.Order).IsRequired();
                steps.Property(s => s.Completed).IsRequired();
+               steps.OwnsMany(s => s.AttachmentFiles)
+                    .ToTable("DeliveryStepAttachmentFiles", attachment =>
+                    {
+                         attachment.Property(a => a.Path);
+                         attachment.Property(a => a.DomainType);
+                    });
                steps.OwnsOne(s => s.StepAddress, address =>
                {
                     address.Property(a => a.Name).HasMaxLength(200).IsRequired();

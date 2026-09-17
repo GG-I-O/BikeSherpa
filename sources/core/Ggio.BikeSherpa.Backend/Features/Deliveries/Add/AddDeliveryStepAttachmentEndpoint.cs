@@ -28,7 +28,8 @@ public class AddDeliveryStepAttachmentEndpoint(
           var command = new AddDeliveryStepAttachmentCommand(
                req.DeliveryId,
                req.StepId,
-               req.File
+               req.File,
+               req.DomainType
           );
 
           var result = await mediator.Send(command, ct);

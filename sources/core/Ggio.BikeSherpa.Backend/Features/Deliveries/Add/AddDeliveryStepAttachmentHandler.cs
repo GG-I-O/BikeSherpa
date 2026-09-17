@@ -11,7 +11,8 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 public record AddDeliveryStepAttachmentCommand(
      Guid DeliveryId,
      Guid StepId,
-     IFormFile File
+     IFormFile File,
+     string DomainType
 ) : ICommand<Result>;
 
 public class AddDeliveryStepAttachmentHandler(
@@ -36,9 +37,9 @@ public class AddDeliveryStepAttachmentHandler(
 
           await using var stream = command.File.OpenReadStream();
 
-          var url = await attachmentSaveService.StoreFileAsync(stream, command.File.FileName, command.File.ContentType, cancellationToken);
+          var url = await attachmentSaveService.StoreFileAsync(stream, command.File.FileName, command.File.ContentType, command.DomainType, cancellationToken);
 
-          step.AddAttachment(url);
+          step.AddAttachment(url, command.DomainType);
 
           await transaction.CommitAsync(cancellationToken);
           return Result.Success();
