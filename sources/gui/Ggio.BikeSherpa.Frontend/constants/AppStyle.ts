@@ -19,6 +19,9 @@ export default class AppStyle {
         },
         h3: {
             fontSize: 20
+        },
+        h4: {
+            fontSize: 16
         }
     })
 }

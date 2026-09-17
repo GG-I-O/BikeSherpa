@@ -114,8 +114,8 @@ export default function StepDataTableRow(
                 <DeliveryTypeIcon type={step.type}/>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
-                <View>
-                    <Text style={AppStyle.textStyle.h3}>{step.address.name}</Text>
+                <View style={{width: '100%'}}>
+                    <Text numberOfLines={1} style={[{overflow: 'hidden'}, AppStyle.textStyle.h4]}>{step.address.name}</Text>
                     <Text>{step.address.streetInfo}</Text>
                     {step.address.complement && <Text>{step.address.complement}</Text>}
                     <Text>{`${step.address.postcode} ${step.address.city}`}</Text>
