@@ -4,17 +4,16 @@ import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifier
 import { ILogger, ILoggerConfig } from "@/spi/LogsSPI";
 import { IUserService } from "@/spi/AuthSPI";
 import { inject, injectable } from "inversify";
+import {useAuth0} from "react-native-auth0";
 
 @injectable()
 export default class AppLogger implements ILogger {
     private logger: any;
-    private userService: IUserService;
 
     public constructor(
-        @inject(ServicesIdentifiers.UserService) userService: IUserService,
         @inject(ServicesIdentifiers.LoggerConfig) config: ILoggerConfig
-    ) {
-        this.userService = userService;
+    ) {        
+        const username = useAuth0().user?.name;
 
         // Create Loki transport with batching for better performance
         const lokiTransport = createLokiTransport({
@@ -23,10 +22,7 @@ export default class AppLogger implements ILogger {
                 app: config.app,
                 env: config.env,
                 platform: config.platform,
-                user: () => {
-                    const user = this.userService.getUserLogInfo();
-                    return user?.name ? user.name : 'anonymous';
-                }
+                user: username ?? 'anonymous'
             },
             batching: {
                 enabled: true,
