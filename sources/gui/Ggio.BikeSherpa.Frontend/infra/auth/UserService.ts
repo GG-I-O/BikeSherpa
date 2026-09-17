@@ -1,10 +1,11 @@
-import {IUserService, UserLogInfo} from '@/spi/AuthSPI';
+import {IUsernameService, IUserService, UserLogInfo} from '@/spi/AuthSPI';
 import {inject, injectable} from 'inversify';
 import {User} from 'react-native-auth0';
 import {createApiClient} from "@/infra/openAPI/client";
 import axios from "axios";
 import {ILogger} from "@/spi/LogsSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
 
 /**
  * Singleton used for IOC
@@ -15,10 +16,13 @@ export class UserService implements IUserService {
     private currentUserLogInfo: UserLogInfo | null = null;
     private apiClient;
     private logger: ILogger;
+    private usernameService : IUsernameService;
 
     constructor(
         @inject(ServicesIdentifiers.Logger) logger: ILogger,
+        @inject(AuthServiceIdentifier.UsernameService) usernameService: IUsernameService
     ) {
+        this.usernameService = usernameService;
         this.logger = logger;
         this.logger = this.logger.extend("UserService");
         this.apiClient = createApiClient(axios.defaults.baseURL || '', {
@@ -32,6 +36,7 @@ export class UserService implements IUserService {
      */
     public setCurrentUser(user: User | null): void {
         this.currentUser = user;
+        this.usernameService.setUsername(this.currentUser?.name ?? 'anonymous')
     }
 
     /**

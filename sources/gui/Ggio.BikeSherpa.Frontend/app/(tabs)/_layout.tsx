@@ -1,17 +1,17 @@
 import {IAuthService, IUserService} from "@/spi/AuthSPI";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
-import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {useEffect, useState} from "react";
 import {useAuth0} from "react-native-auth0";
 import {BottomNavBar} from "@/components/general/BottomNavBar";
 import {Stack} from "expo-router";
+import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
 
 export default function TabLayout() {
     const [userIsDispatcher, setUserIsDispatcher] = useState<boolean | null>(null);
     const [authError, setAuthError] = useState(false);
 
-    const authService = IOCContainer.get<IAuthService>(ServicesIdentifiers.AuthService);
-    const userService = IOCContainer.get<IUserService>(ServicesIdentifiers.UserService);
+    const authService = IOCContainer.get<IAuthService>(AuthServiceIdentifier.AuthService);
+    const userService = IOCContainer.get<IUserService>(AuthServiceIdentifier.UserService);
     const {clearSession} = useAuth0();
 
     useEffect(() => {

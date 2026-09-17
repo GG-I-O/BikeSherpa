@@ -16,3 +16,8 @@ export interface IAuthService {
     getToken: () => Promise<string | null>;
     isDispatcher: () => Promise<boolean>;
 }
+
+export interface IUsernameService {
+    setUsername: (username: string) => void;
+    getUsername: () => string;
+}

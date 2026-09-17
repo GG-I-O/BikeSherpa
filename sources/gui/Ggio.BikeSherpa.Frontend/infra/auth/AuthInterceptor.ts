@@ -3,6 +3,7 @@ import { IAuthService } from "@/spi/AuthSPI";
 import { ILogger } from "@/spi/LogsSPI";
 import axios from "axios";
 import { inject } from "inversify";
+import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
 
 export default class AuthInterceptor {
     private logger: ILogger;
@@ -10,7 +11,7 @@ export default class AuthInterceptor {
 
     public constructor(
         @inject(ServicesIdentifiers.Logger) logger: ILogger,
-        @inject(ServicesIdentifiers.AuthService) authService: IAuthService
+        @inject(AuthServiceIdentifier.AuthService) authService: IAuthService
     ) {
         this.logger = logger.extend("AuthInterceptor");
         this.authService = authService;
