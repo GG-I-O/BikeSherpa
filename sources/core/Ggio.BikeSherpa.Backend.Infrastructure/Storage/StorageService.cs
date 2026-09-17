@@ -9,7 +9,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Storage;
 
 public partial class StorageService : IDeliveryStepAttachmentSaveService , IExportSaveService
 {
-     private const string AttachementDirectory = "attachments";
+     private const string AttachmentDirectory = "attachments";
      private const string CourierReportDirectory = "courier-reports";
      private const string CustomerReportDirectory = "customer-reports";
      
@@ -31,19 +31,19 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
           _blobServiceClient = blobServiceClient;
      }
 
-     public async Task<string> StoreFileAsync(Stream content, string fileName, string contentType, CancellationToken cancellationToken = default)
+     public async Task<string> StoreFileAsync(Stream content, string fileName, string contentType, string domainType, CancellationToken cancellationToken = default)
      {
           await EnsureContainerExistsAsync(cancellationToken);
 
           var containerClient = _blobServiceClient.GetBlobContainerClient(_options.ContainerName);
           var extension = Path.GetExtension(fileName);
-          var blobName = $"{AttachementDirectory}/{Guid.NewGuid().ToString()}{extension}";
-          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, cancellationToken, containerClient, blobName);
+          var blobName = $"{AttachmentDirectory}/{Guid.NewGuid().ToString()}{extension}";
+          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, domainType, cancellationToken, containerClient, blobName);
 
           return blobClient.Uri.ToString();
      }
 
-     private async Task<BlobClient> StoreBlobIntoStorage(Stream content, string fileName, string contentType, CancellationToken cancellationToken, BlobContainerClient containerClient, string blobName)
+     private async Task<BlobClient> StoreBlobIntoStorage(Stream content, string fileName, string contentType, string domainType, CancellationToken cancellationToken, BlobContainerClient containerClient, string blobName)
      {
 
           var blobClient = containerClient.GetBlobClient(blobName);
@@ -54,7 +54,8 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
                Metadata = new Dictionary<string, string>
                {
                     { "FileName", RemoveNonAscii(fileName) },
-                    { "ContentType", contentType }
+                    { "ContentType", contentType },
+                    { "DomainType", domainType}
                }
           };
 
@@ -63,7 +64,7 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
           await blobClient.UploadAsync(content, uploadOptions, cancellationToken);
           return blobClient;
      }
-     public static string RemoveNonAscii(string input)
+     private static string RemoveNonAscii(string input)
      {
           if (string.IsNullOrEmpty(input)) return input;
     
@@ -112,7 +113,7 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
           var extension = Path.GetExtension(fileName);
           var blobName = $"{CourierReportDirectory}/{Guid.NewGuid().ToString()}{extension}";
           using var content = new MemoryStream(fileContent);
-          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, cancellationToken, containerClient, blobName);
+          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, "CourierReport", cancellationToken, containerClient, blobName);
 
           return blobClient.Uri.ToString();
           
@@ -126,7 +127,7 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
           var extension = Path.GetExtension(fileName);
           var blobName = $"{CustomerReportDirectory}/{Guid.NewGuid().ToString()}{extension}";
           using var content = new MemoryStream(fileContent);
-          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, cancellationToken, containerClient, blobName);
+          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, "CustomerReport", cancellationToken, containerClient, blobName);
 
           return blobClient.Uri.ToString();
      }

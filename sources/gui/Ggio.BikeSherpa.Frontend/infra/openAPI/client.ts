@@ -48,6 +48,7 @@ const Report = z.object({
   deliveries: z.array(DeliveryReport),
 });
 const StepType = z.union([z.literal(0), z.literal(1)]);
+const AttachmentFile = z.object({ path: z.string(), domainType: z.string() });
 const DeliveryStepCrud = z.object({
   packingSize: z.string(),
   stepZone: z.string(),
@@ -59,7 +60,7 @@ const DeliveryStepCrud = z.object({
   courierId: z.string().nullable(),
   comment: z.string().nullable(),
   courierComment: z.string().nullable(),
-  attachmentFilePaths: z.array(z.string()).nullable(),
+  attachmentFiles: z.array(AttachmentFile).nullable(),
   notBilled: z.boolean(),
   estimatedDeliveryDate: z.string().datetime({ offset: true }),
   realDeliveryDate: z.string().datetime({ offset: true }).nullable(),
@@ -164,7 +165,10 @@ const AddDeliveryByCustomerRequest = z.object({
   delivery: DeliveryCrud,
 });
 const AddResultOfGuid = z.object({ id: z.string() });
-const AttachmentRequest = z.object({ file: z.instanceof(File) });
+const AttachmentRequest = z.object({
+  file: z.instanceof(File),
+  domainType: z.string(),
+});
 const CustomerDto = z.object({
   data: CustomerCrud,
   links: z.array(Link).nullable(),
@@ -202,6 +206,7 @@ export const schemas = {
   DeliveryReport,
   Report,
   StepType,
+  AttachmentFile,
   DeliveryStepCrud,
   Link,
   DeliveryStepDto,
@@ -974,7 +979,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: z.object({ file: z.instanceof(File) }),
+        schema: AttachmentRequest,
       },
       {
         name: "deliveryId",

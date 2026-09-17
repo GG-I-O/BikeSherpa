@@ -1,6 +1,5 @@
 using Facet;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
-using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 
@@ -8,5 +7,5 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 public partial record DeliveryStepCrud
 {
      public string PackingSize { get; set; } = string.Empty;
-     public string StepZone { get; set; }
+     public string StepZone { get; set; } = string.Empty;
 }

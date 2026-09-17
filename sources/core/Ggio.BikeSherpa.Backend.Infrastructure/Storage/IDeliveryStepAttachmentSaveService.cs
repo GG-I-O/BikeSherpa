@@ -6,5 +6,6 @@ public interface IDeliveryStepAttachmentSaveService
           Stream content,
           string fileName,
           string contentType,
+          string domainType,
           CancellationToken cancellationToken = default);
 }

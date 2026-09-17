@@ -12,6 +12,10 @@ import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {DatePickerModal, TimePickerModal} from "react-native-paper-dates";
+import {attachmentDomainTypes} from "@/models/AttachmentFile";
+import ThemedPhotoIcon from "@/components/themed/ThemedPhotoIcon";
+import ThemedSignatureIcon from "@/components/themed/ThemedSignatureIcon";
+import ThemedDocumentIcon from "@/components/themed/ThemedDocumentIcon";
 
 type Props = {
     step: StepToDisplay,
@@ -31,7 +35,6 @@ export default function StepDataTableRow(
     }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
-
 
     const [isTimePickerOpen, setIsTimePickerOpen] = useState(false); // Disable onRowPress if we're picking time
 
@@ -115,7 +118,8 @@ export default function StepDataTableRow(
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <View style={{width: '100%'}}>
-                    <Text numberOfLines={1} style={[{overflow: 'hidden'}, AppStyle.textStyle.h4]}>{step.address.name}</Text>
+                    <Text numberOfLines={1}
+                          style={[{overflow: 'hidden'}, AppStyle.textStyle.h4]}>{step.address.name}</Text>
                     <Text>{step.address.streetInfo}</Text>
                     {step.address.complement && <Text>{step.address.complement}</Text>}
                     <Text>{`${step.address.postcode} ${step.address.city}`}</Text>
@@ -134,14 +138,24 @@ export default function StepDataTableRow(
                 <Text numberOfLines={3}>{step.courierComment}</Text>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
-                {step.attachmentFilePaths.map((filePath, index) =>
-                    <Text
+                <View style={{flexDirection: "row", width: "100%"}}>
+                {step.attachmentFiles.map((file, index) =>
+                    <Button
                         key={`${step.id}-${index}`}
-                        onPress={() => Linking.openURL(filePath)}
+                        onPress={() => Linking.openURL(file.path)}
                     >
-                        {filePath}
-                    </Text>
+                        {file.domainType === attachmentDomainTypes.signature &&
+                            <ThemedSignatureIcon/>
+                        }
+                        {file.domainType === attachmentDomainTypes.photo &&
+                            <ThemedPhotoIcon/>
+                        }
+                        {file.domainType === attachmentDomainTypes.document &&
+                            <ThemedDocumentIcon/>
+                        }
+                    </Button>
                 )}
+                </View>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>{step.courierCode}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60, {justifyContent: 'center'}]}>

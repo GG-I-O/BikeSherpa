@@ -12,4 +12,6 @@ public class AttachmentRequest
      public Guid StepId { get; set; }
      
      public required IFormFile File { get; set; }
+     
+     public required string DomainType { get; set; }
 }

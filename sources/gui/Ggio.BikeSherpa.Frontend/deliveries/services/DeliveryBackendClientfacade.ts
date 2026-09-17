@@ -323,6 +323,9 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             {
                 headers: {
                     'Content-Type': 'multipart/form-data'
+                },
+                params: {
+                    domainType: file.domainType
                 }
             }
         )

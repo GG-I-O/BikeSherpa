@@ -71,7 +71,7 @@ public class StorageServiceTest
           var contentType = "image/jpeg";
 
           // Act
-          var result = await sut.StoreFileAsync(content, fileName, contentType, TestContext.Current.CancellationToken);
+          var result = await sut.StoreFileAsync(content, fileName, contentType, "test", TestContext.Current.CancellationToken);
 
           // Assert
           result.Should().NotBeNullOrEmpty();
@@ -93,7 +93,7 @@ public class StorageServiceTest
           var contentType = "image/png";
 
           // Act
-          await sut.StoreFileAsync(content, fileName, contentType, CancellationToken.None);
+          await sut.StoreFileAsync(content, fileName, contentType, "test", CancellationToken.None);
 
           // Assert
           blobClientMock.Verify(
@@ -119,7 +119,7 @@ public class StorageServiceTest
           const string contentType = "application/pdf";
 
           // Act
-          await sut.StoreFileAsync(content, fileName, contentType, TestContext.Current.CancellationToken);
+          await sut.StoreFileAsync(content, fileName, contentType, "test", TestContext.Current.CancellationToken);
 
           // Assert
           blobClientMock.Verify(
@@ -147,7 +147,7 @@ public class StorageServiceTest
           const string contentType = "image/jpeg";
 
           // Act
-          await sut.StoreFileAsync(content, fileName, contentType, TestContext.Current.CancellationToken);
+          await sut.StoreFileAsync(content, fileName, contentType, "test", TestContext.Current.CancellationToken);
 
           // Assert
           blobClientMock.Verify(
@@ -182,7 +182,7 @@ public class StorageServiceTest
           var content = new MemoryStream(fixture.CreateMany<byte>(32).ToArray());
 
           // Act
-          await sut.StoreFileAsync(content, fixture.Create<string>() + ".jpg", "image/jpeg", TestContext.Current.CancellationToken);
+          await sut.StoreFileAsync(content, fixture.Create<string>() + ".jpg", "image/jpeg", "test", TestContext.Current.CancellationToken);
 
           // Assert
           blobServiceClientMock.Verify(
@@ -203,7 +203,7 @@ public class StorageServiceTest
           var content = new MemoryStream(fixture.CreateMany<byte>(32).ToArray());
 
           // Act
-          await sut.StoreFileAsync(content, fixture.Create<string>() + ".jpg", "image/jpeg", TestContext.Current.CancellationToken);
+          await sut.StoreFileAsync(content, fixture.Create<string>() + ".jpg", "image/jpeg", "test", TestContext.Current.CancellationToken);
 
           // Assert
           blobContainerClientMock.Verify(
@@ -232,7 +232,7 @@ public class StorageServiceTest
           var content = new MemoryStream(fixture.CreateMany<byte>(32).ToArray());
 
           // Act
-          var act = async () => await sut.StoreFileAsync(content, fixture.Create<string>() + ".jpg", "image/jpeg");
+          var act = async () => await sut.StoreFileAsync(content, fixture.Create<string>() + ".jpg", "test", "image/jpeg");
 
           // Assert
           await act.Should().ThrowAsync<RequestFailedException>();
@@ -252,7 +252,7 @@ public class StorageServiceTest
           const string fileName = "my-photo.jpeg";
 
           // Act
-          await sut.StoreFileAsync(content, fileName, "image/jpeg", TestContext.Current.CancellationToken);
+          await sut.StoreFileAsync(content, fileName, "image/jpeg", "test", TestContext.Current.CancellationToken);
 
           // Assert
           blobContainerClientMock.Verify(
@@ -283,8 +283,8 @@ public class StorageServiceTest
           var content2 = new MemoryStream(fixture.CreateMany<byte>(32).ToArray());
 
           // Act
-          await sut.StoreFileAsync(content1, "file1.jpg", "image/jpeg", TestContext.Current.CancellationToken);
-          await sut.StoreFileAsync(content2, "file2.jpg", "image/jpeg", TestContext.Current.CancellationToken);
+          await sut.StoreFileAsync(content1, "file1.jpg", "image/jpeg", "test", TestContext.Current.CancellationToken);
+          await sut.StoreFileAsync(content2, "file2.jpg", "image/jpeg", "test", TestContext.Current.CancellationToken);
 
           // Assert
           capturedBlobNames.Should().HaveCount(2);

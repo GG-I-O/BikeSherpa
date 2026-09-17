@@ -31,7 +31,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      public Guid? CourierId { get; set; }
      public string? Comment { get; set; }
      public string? CourierComment { get; set; }
-     public string[]? AttachmentFilePaths { get; set; }
+     public List<AttachmentFile>? AttachmentFiles { get; set; }
      public bool NotBilled { get; set; }
      public DateTimeOffset EstimatedDeliveryDate { get; set; }
      public DateTimeOffset? RealDeliveryDate { get; set; }
@@ -71,9 +71,16 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
           RegisterDomainEvent(new DeliveryStepTimeChangeEvent(ParentDelivery.Id));
      }
 
-     public void AddAttachment(string filePath)
+     public void AddAttachment(string filePath, string domainType)
      {
-          AttachmentFilePaths ??= [];
-          AttachmentFilePaths = AttachmentFilePaths.Append(filePath).ToArray();
+          AttachmentFiles ??= [];
+          AttachmentFiles =
+          [
+               .. AttachmentFiles, new AttachmentFile
+               {
+                    Path = filePath,
+                    DomainType = domainType
+               }
+          ];
      }
 }
