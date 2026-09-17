@@ -26,14 +26,23 @@ public class AddressSuggestionService(PlacesClient placesClient) : IAddressSugge
           var addresses = response.Places.ToList();
           List<Address> formattedAddresses =
           [
-               .. addresses.Select(suggestion => new Address()
-               {
-                    Name = suggestion.DisplayName.Text != suggestion.PostalAddress.AddressLines[0] ? suggestion.DisplayName.Text : "",
-                    StreetInfo = suggestion.PostalAddress.AddressLines[0],
-                    City = suggestion.PostalAddress.Locality,
-                    Coordinates = new GeoPoint(suggestion.Location.Longitude, suggestion.Location.Latitude),
-                    Postcode = suggestion.PostalAddress.PostalCode
-               })
+               .. addresses
+                    .Where(suggestion => suggestion.PostalAddress is not null
+                                         && suggestion.PostalAddress.AddressLines.Count > 0)
+                    .Select(suggestion =>
+                    {
+                         var streetInfo = suggestion.PostalAddress.AddressLines[0];
+                         var displayName = suggestion.DisplayName?.Text ?? "";
+
+                         return new Address
+                         {
+                              Name = displayName != streetInfo ? displayName : "",
+                              StreetInfo = streetInfo,
+                              City = suggestion.PostalAddress.Locality,
+                              Coordinates = new GeoPoint(suggestion.Location.Longitude, suggestion.Location.Latitude),
+                              Postcode = suggestion.PostalAddress.PostalCode
+                         };
+                    })
           ];
 
           return formattedAddresses;
