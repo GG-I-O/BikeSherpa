@@ -7,5 +7,5 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 public partial record DeliveryStepCrud
 {
      public string PackingSize { get; set; } = string.Empty;
-     public string StepZone { get; set; }
+     public string StepZone { get; set; } = string.Empty;
 }
