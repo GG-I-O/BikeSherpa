@@ -13,7 +13,7 @@ export default class AttachmentFileService {
 
         formData.append(fieldName, {
             uri: file.uri,
-            type: file.type,
+            type: file.mimeType,
             name: file.name
         } as unknown as Blob);
     }

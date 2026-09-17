@@ -1,11 +1,11 @@
 import React, {useRef, useState} from 'react';
 import {Modal, View, StyleSheet, Image} from 'react-native';
 import SignatureCanvas, {SignatureViewRef} from 'react-native-signature-canvas';
-import {Icon} from "react-native-paper/src";
 import {Button, TextInput, useTheme} from "react-native-paper";
 import {File, Paths} from "expo-file-system";
 import UploadableFile from "@/models/UploadableFile";
 import formStyle from "@/style/formStyle";
+import ThemedSignatureIcon from "@/components/themed/ThemedSignatureIcon";
 
 type Props = {
     deliveryCode: string;
@@ -40,8 +40,9 @@ export default function Signature(props: Props) {
 
         props.onSignature({
             uri: signatureFile.uri,
-            type: mimeType,
-            name
+            mimeType: mimeType,
+            name,
+            domainType: 'signature'
         });
 
         setIsLoading(false);
@@ -77,7 +78,7 @@ export default function Signature(props: Props) {
                 mode="outlined"
                 onPress={() => setShow(true)}
             >
-                <Icon source="draw-pen" size={24} color={theme.colors.onBackground}/>
+                <ThemedSignatureIcon />
             </Button>
             <Modal
                 animationType="slide"

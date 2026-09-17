@@ -1,8 +1,8 @@
 import {Button, useTheme} from "react-native-paper";
 import * as DocumentPicker from "expo-document-picker";
-import {Icon} from "react-native-paper/src";
 import React from "react";
 import UploadableFile from "@/models/UploadableFile";
+import ThemedDocumentIcon from "@/components/themed/ThemedDocumentIcon";
 
 type Props = {
     deliveryCode: string;
@@ -24,8 +24,9 @@ export default function Document(props: Props) {
                     : "";
                 props.onDocument({
                     uri: result.assets[0].uri,
-                    type: result.assets[0].mimeType ?? "application/octet-stream",
+                    mimeType: result.assets[0].mimeType ?? "application/octet-stream",
                     name: `document_${props.deliveryCode}_${Date.now()}${extension}`,
+                    domainType: 'document'
                 });
             }
         })
@@ -35,7 +36,7 @@ export default function Document(props: Props) {
             mode="outlined"
             onPress={() => selectFile()}
         >
-            <Icon source="file" size={24} color={theme.colors.onBackground}/>
+            <ThemedDocumentIcon />
         </Button>
     );
 }

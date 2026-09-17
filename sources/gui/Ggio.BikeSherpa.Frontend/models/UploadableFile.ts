@@ -1,7 +1,8 @@
 type UploadableFile = {
     uri: string;
     name: string;
-    type: string;
+    mimeType: string;
+    domainType: string;
 }
 
 export default UploadableFile;
