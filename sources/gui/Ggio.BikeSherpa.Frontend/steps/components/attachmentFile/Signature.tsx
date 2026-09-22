@@ -86,7 +86,7 @@ export default function Signature(props: Props) {
                 visible={show}
                 onRequestClose={handleClose}
             >
-                <View style={styles.modalContent}>
+                <View style={[styles.modalContent, {backgroundColor: theme.colors.background}]}>
                     <View style={styles.preview}>
                         {signature && (
                             <Image
