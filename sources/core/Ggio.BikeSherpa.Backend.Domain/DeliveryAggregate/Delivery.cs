@@ -224,7 +224,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           if (Steps.Count >= 1)
           {
                var previousStep = Steps.Where(s => s.Order == newStep.Order - 1);
-               newStep.EstimatedDeliveryDate = previousStep.Single().EstimatedDeliveryDate + TimeSpan.FromMinutes(15);
+               newStep.EstimatedDeliveryDate = previousStep.Single().EstimatedDeliveryDate + TimeSpan.FromMinutes(10);
           }
           else
           {
