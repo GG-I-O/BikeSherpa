@@ -4,13 +4,15 @@ import AppSnackbarView from "@/snackbar/views/AppSnackbarView";
 import {IAuthService, IUserService} from "@/spi/AuthSPI";
 import {Stack} from "expo-router";
 import {useEffect} from "react";
-import {Platform} from "react-native";
 import {Auth0Provider, useAuth0} from "react-native-auth0";
 import {PaperProvider} from "react-native-paper";
 import {fr, registerTranslation} from "react-native-paper-dates";
 import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import {ILogger} from "@/spi/LogsSPI";
+import {use$} from "@legendapp/state/react";
+import Auth0ProviderOptions from "@/infra/auth/Auth0ProviderOptions";
+import {authFallbackStore$} from "@/infra/auth/store/authFallbackStore";
 
 registerTranslation('fr', fr);
 
@@ -56,14 +58,11 @@ function AppStack() {
 }
 
 export default function RootLayout() {
-    const authDomain = process.env.EXPO_PUBLIC_AUTH_DOMAIN;
-
-    let authClient = Platform.OS === "android" ?
-        process.env.EXPO_PUBLIC_AUTH_ANDROID_CLIENT :
-        process.env.EXPO_PUBLIC_AUTH_WEB_CLIENT;
+    const dpopDisabled = use$(authFallbackStore$.dpopDisabled);
+    const authOptions = Auth0ProviderOptions.getAuth0ProviderOptions(!dpopDisabled);
 
     return (
-        <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
+        <Auth0Provider key={dpopDisabled ? "no-dpop" : "dpop"} {...authOptions}>
             <PaperProvider>
                 <AppStack/>
                 <AppSnackbarView/>

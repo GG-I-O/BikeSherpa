@@ -5,6 +5,7 @@ import { Button, Text, Card, ActivityIndicator, useTheme } from "react-native-pa
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {ILogger} from "@/spi/LogsSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import {authFallbackStore$} from "@/infra/auth/store/authFallbackStore";
 
 export default function Login() {
     const { authorize, error, isLoading } = useAuth0();
@@ -23,10 +24,16 @@ export default function Login() {
                     scope
                 });
         } catch (e) {
-            logger.error('authorize error ', {
-                name: "Login",
-                message: e
-            });
+            const error = e as Error;
+            const isDpopKeystoreFailure =
+                error?.message?.includes('DPoP key pair') ||
+                error?.message?.includes('SecureCredentialsManager');
+
+            logger.error('authorize error ', { name: 'Login', message: e });
+
+            if (isDpopKeystoreFailure) {
+                authFallbackStore$.dpopDisabled.set(true);
+            }
         }
     }, [authorize, audience, scope]);
 
