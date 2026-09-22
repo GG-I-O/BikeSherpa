@@ -9,22 +9,38 @@ import {Auth0Provider, useAuth0} from "react-native-auth0";
 import {PaperProvider} from "react-native-paper";
 import {fr, registerTranslation} from "react-native-paper-dates";
 import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import {ILogger} from "@/spi/LogsSPI";
 
 registerTranslation('fr', fr);
 
 AppBootstrapper.init();
 
 function AppStack() {
-    const {user, getCredentials} = useAuth0();
+    const {user, getCredentials, error} = useAuth0();
 
     const loggedIn = user !== null && user !== undefined;
 
     const userService = IOCContainer.get<IUserService>(AuthServiceIdentifier.UserService);
     const authService = IOCContainer.get<IAuthService>(AuthServiceIdentifier.AuthService);
+    
+    let logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
+    logger = logger.extend("AppStack");
+    
     useEffect(() => {
         userService.setCurrentUser(user);
         authService.setCredentialMethod(getCredentials);
     }, [userService, authService, user, getCredentials]);
+
+    useEffect(() => {
+        if (error) {
+            logger.error('useAuth0 error ', {
+                name: error.name,
+                message: error.message,
+                nativeStackAndroid: (error as any)?.userInfo?.nativeStackAndroid,
+            });
+        }
+    }, [error]);
 
     return (
         <Stack>

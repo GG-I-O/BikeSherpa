@@ -1,13 +1,23 @@
 import {IAuthService} from "@/spi/AuthSPI";
-import {injectable} from "inversify";
+import {inject, injectable} from "inversify";
 import {Credentials} from "react-native-auth0/lib/typescript/src/core/models";
 import DispatcherRole from "@/infra/auth/dispatcherRole";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import {ILogger} from "@/spi/LogsSPI";
 
 @injectable()
 export default class AuthService implements IAuthService {
     private getCredentials?: (scope?: string | undefined, minTtl?: number | undefined, parameters?: Record<string, unknown> | undefined, forceRefresh?: boolean) => Promise<Credentials>
     private readonly audience = process.env.EXPO_PUBLIC_AUTH_AUDIENCE;
     private readonly scope = process.env.EXPO_PUBLIC_AUTH_SCOPE;
+    private logger: ILogger;
+
+    public constructor(
+        @inject(ServicesIdentifiers.Logger) logger: ILogger
+    ) {
+        this.logger = logger;
+        this.logger = this.logger.extend("AuthService");
+    }
 
     public setCredentialMethod(method: (params: any) => Promise<any>): void {
         this.getCredentials = method;
@@ -19,7 +29,11 @@ export default class AuthService implements IAuthService {
         try {
             const credentials = await this.getCredentials(this.scope, undefined, {audience: this.audience});
             return credentials.accessToken;
-        } catch (e) { // eslint-disable-line @typescript-eslint/no-unused-vars
+        } catch (e) {
+            this.logger.error('getToken error ', {
+                name: "AuthService.getToken",
+                message: e
+            });
             return null;
         }
     }

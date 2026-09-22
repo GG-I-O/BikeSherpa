@@ -2,12 +2,18 @@ import { useCallback } from "react";
 import { StyleSheet, View, Image } from "react-native";
 import { useAuth0 } from "react-native-auth0";
 import { Button, Text, Card, ActivityIndicator, useTheme } from "react-native-paper";
+import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
+import {ILogger} from "@/spi/LogsSPI";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
 export default function Login() {
     const { authorize, error, isLoading } = useAuth0();
     const audience = process.env.EXPO_PUBLIC_AUTH_AUDIENCE;
     const scope = process.env.EXPO_PUBLIC_AUTH_SCOPE;
     const theme = useTheme();
+
+    let logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger);
+    logger = logger.extend("Login");
 
     const onLogin = useCallback(async () => {
         try {
@@ -17,7 +23,10 @@ export default function Login() {
                     scope
                 });
         } catch (e) {
-            console.error(e);
+            logger.error('authorize error ', {
+                name: "Login",
+                message: e
+            });
         }
     }, [authorize, audience, scope]);
 
