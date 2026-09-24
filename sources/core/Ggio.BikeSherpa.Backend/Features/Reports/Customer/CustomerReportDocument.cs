@@ -46,7 +46,6 @@ public class CustomerReportDocument(Report report, StackHolderInfo stackHolderIn
                     {
                          table.ColumnsDefinition(columns =>
                          {
-                              columns.ConstantColumn(80);
                               columns.RelativeColumn();
                               columns.ConstantColumn(80);
                               columns.ConstantColumn(80);
@@ -54,30 +53,30 @@ public class CustomerReportDocument(Report report, StackHolderInfo stackHolderIn
 
                          table.Header(header =>
                          {
-                              header.Cell().Text("Date").Bold();
-                              header.Cell().Text("Détails").Bold();
+                              header.Cell().Text("Description").Bold();
                               header.Cell().AlignRight().Text("Prix HT").Bold();
                               header.Cell().AlignRight().Text("Prix TTC").Bold();
                          });
 
                          foreach (var delivery in report.Deliveries)
                          {
-                              table.Cell().Column(c =>
+                              table.Cell().Text(delivery.DeliveryLabel).Bold();
+                              table.Cell().AlignRight().Text($"{delivery.DeliveryPrice:N2} €");
+                              table.Cell().AlignRight().Text($"{delivery.DeliveryPriceWithVat:N2} €");
+
+                              foreach (var detail in delivery.Details)
                               {
-                                   c.Item().Text(delivery.DeliveryLabel).Bold();
-                                   foreach (var detail in delivery.Details)
+                                   table.Cell().Column(c =>
                                    {
                                         c.Item().Text($"{detail.Description}").FontSize(9);
                                         if (detail.Address != null)
                                         {
                                              c.Item().PaddingLeft(10).Text(detail.Address.GetFullAddress()).FontSize(8).Italic();
                                         }
-                                        c.Item().Text($"{detail.Price:N2} € HT").FontSize(9);
-                                   }
-                              });
-
-                              table.Cell().AlignRight().Text($"{delivery.DeliveryPrice:N2} €");
-                              table.Cell().AlignRight().Text($"{delivery.DeliveryPriceWithVat:N2} €");
+                                   });
+                                   table.Cell().AlignRight().Text($"{detail.Price:N2} €").FontSize(9);
+                                   table.Cell().Text("");
+                              }
                          }
                     });
 
