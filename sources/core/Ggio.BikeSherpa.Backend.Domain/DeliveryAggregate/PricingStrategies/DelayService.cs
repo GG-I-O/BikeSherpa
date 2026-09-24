@@ -11,8 +11,10 @@ public interface IDelayService
 
 public class DelayService(IDelayRepository delayRepository, IParameterRepository parameterRepository) : IDelayService
 {
-     private readonly Lazy<ValueTask<int>> _earlyOrderLimitInHours = new(parameterRepository.GetEarlyOrderLimitInHoursAsync);
-     private readonly Lazy<ValueTask<int>> _lastMinuteOrderLimitInHours = new(parameterRepository.GetLastMinuteOrderLimitInHoursAsync);
+     private readonly Lazy<Task<int>> _earlyOrderLimitInHours = 
+          new(() => parameterRepository.GetEarlyOrderLimitInHoursAsync().AsTask());
+     private readonly Lazy<Task<int>> _lastMinuteOrderLimitInHours = 
+          new(() => parameterRepository.GetLastMinuteOrderLimitInHoursAsync().AsTask());
      
      public double CalculateDelayInHours(DateTimeOffset startDate, DateTimeOffset contractDate) => (startDate - contractDate).TotalHours;
 

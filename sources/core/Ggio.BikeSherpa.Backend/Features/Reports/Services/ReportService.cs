@@ -157,9 +157,9 @@ public class ReportService(
                var endStep = dropSteps[0];
                description += "Livraison ";
                description += $"{(await delayService.CalculateDelay(delivery.StartDate, delivery.ContractDate)).Label} ";
-               description += $"(Colis {endStep?.PackingSize.Name}) : ";
+               description += $"(Colis {endStep.PackingSize.Name}) : ";
                description += $"{deliveryStep.StepAddress.City} > ";
-               description += endStep?.StepAddress.City;
+               description += endStep.StepAddress.City;
           }
           else // StepType.Dropoff
           {
@@ -174,8 +174,13 @@ public class ReportService(
      private async Task<DeliveryReportDetail> GetCustomStrategyStepDetail(Delivery delivery)
      {
 
-          var couriers = delivery.Steps.Select(s => s.CourierId).Distinct().ToList();
-          var couriersNames = couriers.Select(async c => await GetCourierName(c)).ToList();
+          var courierIds = delivery.Steps.Select(s => s.CourierId).Distinct().ToList();
+          var couriersNames = new List<string>();
+          foreach (var id in courierIds)
+          {
+               var name = await GetCourierName(id);
+               if (!string.IsNullOrEmpty(name)) couriersNames.Add(name);
+          }
 
           var stepReport = new DeliveryReportDetail
           {
