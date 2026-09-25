@@ -47,6 +47,7 @@ export default function useStepDetailViewModel(stepId: string) {
         setCourierComment,
         completeStep: () => viewModel.stepComplete(stepId, true),
         cancelStep: () => viewModel.stepComplete(stepId, false),
-        addAttachment: (file: UploadableFile) => viewModel.addAttachment(stepId, file)
+        addAttachment: (file: UploadableFile) => viewModel.addAttachment(stepId, file),
+        addSignature: (signature: UploadableFile, receiver: string) => viewModel.addSignature(stepId, signature, receiver)
     }
 }

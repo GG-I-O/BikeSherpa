@@ -9,7 +9,8 @@ const deliveryStepOperationAction = {
     putOrder: "putOrder",
     putTime: "putTime",
     putComplete: "putComplete",
-    postAttachment: "postAttachment"
+    postAttachment: "postAttachment",
+    postSignature: "postSignature"
 }
 
 export default deliveryStepOperationAction;

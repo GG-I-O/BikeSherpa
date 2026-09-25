@@ -34,6 +34,7 @@ export const hateoasRel = {
         put: "putComplete"
     },
     stepAttachment: {
-        post: "postAttachment"
+        post: "postAttachment",
+        signature: "postSignature"
     }
 }

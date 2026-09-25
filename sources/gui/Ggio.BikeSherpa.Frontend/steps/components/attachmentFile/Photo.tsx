@@ -3,6 +3,7 @@ import React from "react";
 import * as ImagePicker from 'expo-image-picker';
 import UploadableFile from "@/models/UploadableFile";
 import ThemedPhotoIcon from "@/components/themed/ThemedPhotoIcon";
+import {attachmentDomainTypes} from "@/models/AttachmentFile";
 
 type Props = {
     deliveryCode: string;
@@ -25,7 +26,7 @@ export default function Photo(props: Props) {
                     uri: result.assets[0].uri,
                     mimeType: 'image/png',
                     name: `photo_${props.deliveryCode}_${Date.now()}.png`,
-                    domainType: 'photo'
+                    domainType: attachmentDomainTypes.photo
                 });
             }
         })

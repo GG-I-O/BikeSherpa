@@ -14,6 +14,8 @@ import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
 import DeliveryMapper from "@/deliveries/services/DeliveryMapper";
 import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import PublicDeliveryService from "@/deliveries/services/PublicDeliveryService";
+import ProofOfDeliveryService from "@/deliveries/services/ProofOfDeliveryService";
+import {IProofOfDeliveryService} from "@/deliveries/spi/IProofOfDeliveryService";
 
 export default class DeliveryBootstrapper {
     public static init(IOCContainer: Container) {
@@ -33,5 +35,8 @@ export default class DeliveryBootstrapper {
         
         // StorageMiddleware
         IOCContainer.bind<IDeliveryStorageMiddleware>(DeliveryServiceIdentifier.StorageMiddleware).to(DeliveryStorageMiddleware).inSingletonScope();
+        
+        // ProofOfDeliveryService
+        IOCContainer.bind<IProofOfDeliveryService>(DeliveryServiceIdentifier.ProofOfDeliveryService).to(ProofOfDeliveryService).inSingletonScope();
     }
 }

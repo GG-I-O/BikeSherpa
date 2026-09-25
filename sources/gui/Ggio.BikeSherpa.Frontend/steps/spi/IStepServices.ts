@@ -17,4 +17,5 @@ export interface IStepServices {
     completeStep(stepId: string, complete: boolean, completionDate: Date | null): void;
     
     addAttachment(stepId: string, file: UploadableFile): void;
+    addSignature(stepId: string, file: UploadableFile, receiver: string): void;
 }

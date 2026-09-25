@@ -3,6 +3,7 @@ import * as DocumentPicker from "expo-document-picker";
 import React from "react";
 import UploadableFile from "@/models/UploadableFile";
 import ThemedDocumentIcon from "@/components/themed/ThemedDocumentIcon";
+import {attachmentDomainTypes} from "@/models/AttachmentFile";
 
 type Props = {
     deliveryCode: string;
@@ -26,7 +27,7 @@ export default function Document(props: Props) {
                     uri: result.assets[0].uri,
                     mimeType: result.assets[0].mimeType ?? "application/octet-stream",
                     name: `document_${props.deliveryCode}_${Date.now()}${extension}`,
-                    domainType: 'document'
+                    domainType: attachmentDomainTypes.document
                 });
             }
         })

@@ -6,10 +6,11 @@ import {File, Paths} from "expo-file-system";
 import UploadableFile from "@/models/UploadableFile";
 import formStyle from "@/style/formStyle";
 import ThemedSignatureIcon from "@/components/themed/ThemedSignatureIcon";
+import {attachmentDomainTypes} from "@/models/AttachmentFile";
 
 type Props = {
     deliveryCode: string;
-    onSignature: (file: UploadableFile) => void;
+    onSignature: (file: UploadableFile, receiver: string) => void;
 }
 
 export default function Signature(props: Props) {
@@ -19,7 +20,7 @@ export default function Signature(props: Props) {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [show, setShow] = useState<boolean>(false);
     const ref = useRef<SignatureViewRef | null>(null);
-    
+
     const [signatureName, setSignatureName] = useState<string>("");
 
     const handleSignature = (signature: string) => {
@@ -42,8 +43,8 @@ export default function Signature(props: Props) {
             uri: signatureFile.uri,
             mimeType: mimeType,
             name,
-            domainType: 'signature'
-        });
+            domainType: attachmentDomainTypes.signature
+        }, signatureName);
 
         setIsLoading(false);
         setShow(false);
@@ -78,7 +79,7 @@ export default function Signature(props: Props) {
                 mode="outlined"
                 onPress={() => setShow(true)}
             >
-                <ThemedSignatureIcon />
+                <ThemedSignatureIcon/>
             </Button>
             <Modal
                 animationType="slide"

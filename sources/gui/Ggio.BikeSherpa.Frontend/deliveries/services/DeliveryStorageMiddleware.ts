@@ -19,6 +19,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
     private updateDeliveryState: { deliveryId: string, state: string }[] = [];
     private updateStepState: { deliveryId: string, stepId: string, state: string }[] = [];
     private attachmentUploadQueue: { stepId: string, file: UploadableFile }[] = [];
+    private signatureUploadQueue: { stepId: string, signature: UploadableFile, receiver: string }[] = [];
 
     constructor(
         @inject(DeliveryServiceIdentifier.BackendClientFacade) backendClientFacade: IBackendClient<Delivery>,
@@ -32,6 +33,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
         this.dateForGetAllMyDeliveries = date;
         this.dateForGetAllUnassignedDeliveries = null;
     }
+
     public setDateForGetAllUnassignedDeliveries(date: string | null) {
         this.dateForGetAllMyDeliveries = null;
         this.dateForGetAllUnassignedDeliveries = date;
@@ -59,9 +61,13 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
         this.attachmentUploadQueue.push({stepId, file});
     }
 
+    public addSignatureToUploadQueue(stepId: string, signature: UploadableFile, receiver: string) {
+        this.signatureUploadQueue.push({stepId, signature, receiver});
+    }
+
     public async update(delivery: Delivery): Promise<void> {
         let completeUpdate: boolean = true;
-        
+
         // Call an endpoint for every update to do on step in updateStepState
         for (let i = 0; i < this.updateStepState.length; i++) {
             if (this.updateStepState[i].deliveryId !== delivery.id)
@@ -133,6 +139,13 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                             await this.customClientFacade.PostAttachmentEndpoint(step, this.attachmentUploadQueue[i].file);
                     }
                     this.attachmentUploadQueue = this.attachmentUploadQueue.filter(file => file.stepId !== step.id);
+                    break;
+                case deliveryStepOperationAction.postSignature:
+                    for (let i = 0; i < this.signatureUploadQueue.length; i++) {
+                        if (this.signatureUploadQueue[i].stepId === step.id)
+                            await this.customClientFacade.PostSignatureEndpoint(step, this.signatureUploadQueue[i].signature, this.signatureUploadQueue[i].receiver);
+                    }
+                    this.signatureUploadQueue = this.signatureUploadQueue.filter(file => file.stepId !== step.id);
                     break;
                 default:
                     throw new Error(`Unsupported update action: ${this.updateStepState[i].state}`);

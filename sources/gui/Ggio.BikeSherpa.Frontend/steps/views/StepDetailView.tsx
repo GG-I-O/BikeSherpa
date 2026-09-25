@@ -36,7 +36,7 @@ export default function StepDetailView() {
                 <View style={{gap: 8, flexDirection: 'row'}}>
                     <Signature
                         deliveryCode={viewModel.step.deliveryCode}
-                        onSignature={(file) => viewModel.addAttachment(file)}
+                        onSignature={(signature, receiver) => viewModel.addSignature(signature, receiver)}
                     />
                     <Photo
                         deliveryCode={viewModel.step.deliveryCode}

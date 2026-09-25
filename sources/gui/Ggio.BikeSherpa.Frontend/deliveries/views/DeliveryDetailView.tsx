@@ -1,6 +1,6 @@
 import {useLocalSearchParams} from "expo-router";
 import {useEffect, useState} from "react";
-import {View} from "react-native";
+import {Linking, View} from "react-native";
 import {Button, Divider, Text, useTheme} from "react-native-paper";
 import AppStyle from "@/constants/AppStyle";
 import {navigate} from "expo-router/build/global-state/routing";
@@ -70,6 +70,20 @@ export default function DeliveryDetailView({canEdit = false}: Props) {
                     <Text style={AppStyle.textStyle.h3}>{delivery.code}</Text>
                     <Text style={AppStyle.textStyle.h3}>{delivery.customerName}</Text>
                 </View>
+                <Button mode={"outlined"} onPress={() => viewModel.exportProofOfDelivery(deliveryId)}>
+                    Envoyer une preuve de livraison
+                </Button>
+                {viewModel.proofOfDeliveryLink &&
+                    <View style={{flexDirection: 'row', gap: 4, width: '100%'}}>
+                        <Text>preuve de livraison exporté :</Text>
+                        <Button
+                            mode={"outlined"}
+                            onPress={() => Linking.openURL(viewModel.proofOfDeliveryLink!)}
+                        >
+                            viewModel.proofOfDeliveryLink
+                        </Button>
+                    </View>
+                }
                 <Text style={AppStyle.textStyle.h3}>{delivery.startDate}</Text>
                 <Text style={AppStyle.textStyle.h3}>{delivery.startTime}</Text>
                 <Divider/>

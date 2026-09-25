@@ -11,6 +11,7 @@ import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddl
 import {hateoasRel} from "@/models/HateoasLink";
 import UploadableFile from "@/models/UploadableFile";
 import deliveryStepOperationAction from "@/steps/data/deliveryStepOperationAction";
+import {attachmentDomainTypes} from "@/models/AttachmentFile";
 
 @injectable()
 export default class StepServices implements IStepServices {
@@ -363,7 +364,40 @@ export default class StepServices implements IStepServices {
             observables.step$.peek().id,
             deliveryStepOperationAction.postAttachment
         );
+        
+        observables.step$!.attachmentFiles.set([...step.attachmentFiles ?? [], {path: file.uri, domainType: file.domainType}]);
+    }
 
-        observables.step$!.attachmentFilePaths.set([...step.attachmentFilePaths ?? [], file.uri]);
+    public addSignature(stepId: string, file: UploadableFile, receiver: string): void {
+        const observables = this.getDeliveryFromStep(stepId);
+        if (!observables.delivery$) {
+            this.logger.error(`AddSignature : Parent delivery not found for step ${stepId}`);
+            return;
+        }
+        if (!observables.step$) {
+            this.logger.error(`AddSignature: Step ${stepId} not found in delivery ${observables.delivery$.peek().id}`);
+            return;
+        }
+
+        // Test if the user got the rights to do this action
+        const step = observables.step$.get();
+        if (!step.links || !step.links.some((link) => link.rel === hateoasRel.stepAttachment.signature)) {
+            this.logger.error(`Cannot post signature for step ${stepId}`);
+            return
+        }
+
+        this.deliveryStorageMiddleware.addSignatureToUploadQueue(
+            stepId,
+            file,
+            receiver
+        );
+
+        this.deliveryStorageMiddleware.addUpdateStepState(
+            observables.delivery$.peek().id,
+            observables.step$.peek().id,
+            deliveryStepOperationAction.postSignature
+        );
+
+        observables.step$!.attachmentFiles.set([...step.attachmentFiles ?? [], {path: file.uri, domainType: file.domainType}]);
     }
 }

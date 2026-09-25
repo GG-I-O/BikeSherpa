@@ -55,6 +55,7 @@ const DeliveryStepCrud = z.object({
   stepType: StepType,
   order: z.number().int(),
   completed: z.boolean(),
+  receiver: z.string().nullable(),
   stepAddress: Address,
   distance: z.number(),
   courierId: z.string().nullable(),
@@ -169,6 +170,11 @@ const AttachmentRequest = z.object({
   file: z.instanceof(File),
   domainType: z.string(),
 });
+const SignatureRequest = z.object({
+  signature: z.instanceof(File),
+  domainType: z.string(),
+  receiver: z.string(),
+});
 const CustomerDto = z.object({
   data: CustomerCrud,
   links: z.array(Link).nullable(),
@@ -228,6 +234,7 @@ export const schemas = {
   AddDeliveryByCustomerRequest,
   AddResultOfGuid,
   AttachmentRequest,
+  SignatureRequest,
   CustomerDto,
   CheckCustomerResponse,
   ProblemDetails,
@@ -869,6 +876,33 @@ const endpoints = makeApi([
     ],
   },
   {
+    method: "get",
+    path: "/delivery/:deliveryId/proofOfDelivery",
+    alias: "ExportProofOfDelivery",
+    tags: ["delivery"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.string(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
     method: "post",
     path: "/delivery/:deliveryId/step",
     alias: "AddDeliveryStepEndpoint",
@@ -1256,6 +1290,48 @@ const endpoints = makeApi([
       {
         status: 403,
         description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
+  {
+    method: "post",
+    path: "/delivery/:deliveryId/step/:stepId/signature",
+    alias: "AddDeliveryStepSignatureEndpoint",
+    tags: ["delivery"],
+    requestFormat: "form-data",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: SignatureRequest,
+      },
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+      {
+        name: "stepId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+      {
+        status: 404,
+        description: `Not Found`,
         schema: z.void(),
       },
     ],

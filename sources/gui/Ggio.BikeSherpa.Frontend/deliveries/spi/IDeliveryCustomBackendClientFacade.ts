@@ -17,4 +17,5 @@ export interface IDeliveryCustomBackendClientFacade {
     PutStepTimeEndpoint(step: Step): Promise<void>;
     PutStepCompletionEndpoint(step: Step): Promise<void>;
     PostAttachmentEndpoint(step: Step, attachment: UploadableFile): Promise<void>;
+    PostSignatureEndpoint(step: Step, attachment: UploadableFile, receiver: string): Promise<void>;
 }
