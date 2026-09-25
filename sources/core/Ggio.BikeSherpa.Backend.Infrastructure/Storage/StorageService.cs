@@ -12,6 +12,7 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
      private const string AttachmentDirectory = "attachments";
      private const string CourierReportDirectory = "courier-reports";
      private const string CustomerReportDirectory = "customer-reports";
+     private const string ProofOfDeliveryDirectory = "proof-of-delivery";
      
      private readonly static SemaphoreSlim Lock = new(1);
      private readonly BlobServiceClient _blobServiceClient;
@@ -128,6 +129,19 @@ public partial class StorageService : IDeliveryStepAttachmentSaveService , IExpo
           var blobName = $"{CustomerReportDirectory}/{Guid.NewGuid().ToString()}{extension}";
           using var content = new MemoryStream(fileContent);
           var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, "CustomerReport", cancellationToken, containerClient, blobName);
+
+          return blobClient.Uri.ToString();
+     }
+
+     public async Task<string> SaveProofOfDeliveryAsync(string fileName, byte[] fileContent, string contentType, CancellationToken cancellationToken)
+     {
+          await EnsureContainerExistsAsync(cancellationToken);
+
+          var containerClient = _blobServiceClient.GetBlobContainerClient(_options.ContainerName);
+          var extension = Path.GetExtension(fileName);
+          var blobName = $"{ProofOfDeliveryDirectory}/{Guid.NewGuid().ToString()}{extension}";
+          using var content = new MemoryStream(fileContent);
+          var blobClient = await StoreBlobIntoStorage(content, fileName, contentType, "ProofOfDelivery", cancellationToken, containerClient, blobName);
 
           return blobClient.Uri.ToString();
      }

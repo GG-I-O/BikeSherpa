@@ -25,6 +25,7 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
      public StepType StepType { get; set; }
      public int Order { get; set; }
      public bool Completed { get; set; }
+     public string? Receiver { get; set; }
      public required Address StepAddress { get; set; }
      public required DeliveryZone StepZone { get; set; }
      public double Distance { get; set; }
@@ -82,5 +83,11 @@ public class DeliveryStep : EntityBase<Guid>, IAuditEntity
                     DomainType = domainType
                }
           ];
+     }
+
+     public void AddSignature(string filePath, string domainType, string receiver)
+     {
+          Receiver = receiver;
+          AddAttachment(filePath, domainType);
      }
 }

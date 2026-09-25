@@ -92,6 +92,15 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                     Method = "POST"
                });
           
+          // POST /delivery{deliveryId}/step/{stepId}/signature
+          if (canWriteStep)
+               links.Add(new Link
+               {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<AddDeliveryStepSignatureEndpoint>(), routeValues),
+                    Rel = "postSignature",
+                    Method = "POST"
+               });
+          
           return links;
      }
 }
