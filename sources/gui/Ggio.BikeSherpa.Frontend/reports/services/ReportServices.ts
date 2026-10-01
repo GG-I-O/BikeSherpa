@@ -27,7 +27,7 @@ export default class ReportServices implements IReportServices {
         });
     }
 
-   public async getCustomeReportExportUrl(customerId: string, startDate : string, endDate : string)
+   public async getCustomerReportExportUrl(customerId: string, startDate : string, endDate : string)
     {
         return await this.apiClient.ExportCustomerReport({
             params: {
