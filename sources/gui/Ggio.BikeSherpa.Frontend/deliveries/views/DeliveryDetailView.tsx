@@ -80,7 +80,7 @@ export default function DeliveryDetailView({canEdit = false}: Props) {
                             mode={"outlined"}
                             onPress={() => Linking.openURL(viewModel.proofOfDeliveryLink!)}
                         >
-                            viewModel.proofOfDeliveryLink
+                            {viewModel.proofOfDeliveryLink}
                         </Button>
                     </View>
                 }
