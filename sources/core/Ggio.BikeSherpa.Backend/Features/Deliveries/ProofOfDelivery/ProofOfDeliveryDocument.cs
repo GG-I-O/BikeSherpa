@@ -45,8 +45,6 @@ public class ProofOfDeliveryDocument(Model.ProofOfDelivery delivery, StackHolder
                               columns.ConstantColumn(80);
                          });
 
-                         table.Header(header => { header.Cell().Text("Description").Bold(); });
-
                          table.Cell().Text(delivery.DeliveryLabel).Bold();
                          table.Cell().Text("");
 
@@ -59,20 +57,20 @@ public class ProofOfDeliveryDocument(Model.ProofOfDelivery delivery, StackHolder
                                         c.Item().PaddingLeft(10).Text(step.Address.GetFullAddress()).FontSize(10).Italic();
                                    }
 
-                                   if (step.Receiver != null)
+                                   if (!string.IsNullOrEmpty(step.Receiver))
                                    {
-                                        c.Item().Text($"Réceptionné par {step.Receiver}");
+                                        c.Item().Text($"Réceptionné par {step.Receiver}").FontSize(10);
                                    }
 
                                    foreach (var attachment in step.AttachmentFiles)
                                    {
-                                        c.Item().Text($"{attachment.DomainType} : {attachment.Path}");
+                                        c.Item().Text($"{attachment.DomainType} : {attachment.Path}").FontSize(8);
                                    }
                               });
 
                               if (step.DeliveryDate != null)
                               {
-                                   table.Cell().Text($"Heure de passage {step.DeliveryDate.Value.Hour:00}:{step.DeliveryDate.Value.Minute:00}").FontSize(10);
+                                   table.Cell().Text($"Heure de passage {step.DeliveryDate.Value.LocalDateTime.Hour:00}:{step.DeliveryDate.Value.LocalDateTime.Minute:00}").FontSize(10);
                               }
                          }
                     });
