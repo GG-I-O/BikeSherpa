@@ -10,6 +10,7 @@ import {Icon} from "react-native-paper/src";
 import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
 import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import unassignedCourierDisplay from "@/deliveries/data/unassignedCourierDisplay";
 
 type Props = {
     delivery: DeliveryToDisplay,
@@ -56,6 +57,12 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     <Text numberOfLines={2}>
                         {delivery.deliveryInfo}
                     </Text>
+                </DataTable.Cell>
+                <DataTable.Cell style={[style.column, style.width60]}>
+                    {
+                        delivery.steps.find((step) => step.courierCode === unassignedCourierDisplay) ? unassignedCourierDisplay :
+                        [...new Set(delivery.steps.map((step) => step.courierCode))].toString()
+                    }
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width60]}>
                     {delivery.steps.length}

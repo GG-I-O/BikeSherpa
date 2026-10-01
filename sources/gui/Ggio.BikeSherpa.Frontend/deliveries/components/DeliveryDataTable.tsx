@@ -29,6 +29,7 @@ export default function DeliveryDataTable({ deliveries, isDeliverySelected, isSt
                     <DataTable.Title style={[style.column, style.width50]}>Status</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width180]}>Code</DataTable.Title>
                     <DataTable.Title style={[style.column]}>Infos de la course</DataTable.Title>
+                    <DataTable.Title style={[style.column, style.width60]}>Livreurs</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width60]}>Nb étapes</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width100]}>Prix</DataTable.Title>
                     <DataTable.Title style={[style.column, style.width40]}>Com. Liv.</DataTable.Title>
