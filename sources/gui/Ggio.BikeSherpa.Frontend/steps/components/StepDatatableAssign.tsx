@@ -25,27 +25,12 @@ export default function StepDataTableAssign(
     }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
-    const colorService = IOCContainer.get<IColorServiceSpi>(ServicesIdentifiers.ColorService);
-
-    const getHeaderBackgroundColor = () => {
-        if (steps.length === 0) return theme.colors.background;
-
-        // Check if all steps share the same delivery code
-        const firstStepCode = steps[0].deliveryCode;
-        if (!firstStepCode) return theme.colors.background;
-
-        const allSame = steps.every(s => s.deliveryCode === firstStepCode);
-        if (!allSame) return theme.colors.background;
-
-        const color = colorService.stringToColor(firstStepCode);
-        return color + '20';
-    };
 
     return (
         <ScrollView>
             <DataTable style={{backgroundColor: theme.colors.background}}>
                 {showHeader ? (
-                    <DataTable.Header style={{backgroundColor: getHeaderBackgroundColor()}}>
+                    <DataTable.Header>
                         <DataTable.Title style={[style.column, style.width40]}>Ordre</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width60]}>Heure</DataTable.Title>
                         <DataTable.Title style={[style.column, style.width40]}>Type</DataTable.Title>
