@@ -2,6 +2,7 @@ import {inject} from "inversify";
 import {ReportServiceIdentifier} from "@/reports/bootstrapper/ReportServiceIdentifier";
 import {IReportServices} from "@/reports/spi/IReportServices";
 import {Report} from "@/reports/models/Report";
+
 export default class ReportViewModel {
     private readonly reportServices: IReportServices;
 
@@ -20,15 +21,12 @@ export default class ReportViewModel {
     public getCourierReport = async (startDateFilter: Date, endDateFilter: Date, courierFilter?: string): Promise<string | null> => {
         if (!this.reportServices || !courierFilter) return null;
 
-        const path = await this.reportServices.getCourierReportUrl(courierFilter, startDateFilter.toISOString(), endDateFilter.toISOString());
-
-        return path;
+        return await this.reportServices.getCourierReportUrl(courierFilter, startDateFilter.toISOString(), endDateFilter.toISOString());
     }
 
     public getCustomerReportExportUrl = async (startDateFilter: Date, endDateFilter: Date, customerFilter?: string): Promise<string | null> => {
         if (!this.reportServices || !customerFilter) return null;
 
-        return await this.reportServices.getCustomeReportExportUrl(customerFilter, startDateFilter.toISOString(), endDateFilter.toISOString());
+        return await this.reportServices.getCustomerReportExportUrl(customerFilter, startDateFilter.toISOString(), endDateFilter.toISOString());
     }
-
 }

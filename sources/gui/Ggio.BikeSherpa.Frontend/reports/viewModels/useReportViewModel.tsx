@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {useCallback, useEffect, useState} from "react";
 import { IOCContainer } from "@/bootstrapper/constants/IOCContainer";
 import { observe } from "@legendapp/state";
 import { ServicesIdentifiers } from "@/bootstrapper/constants/ServicesIdentifiers";
@@ -52,9 +52,6 @@ export default function useReportViewModel() {
             viewModel.getCustomerReport(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
                 .then(report => setReport(report));
 
-            viewModel.getCustomerReportExportUrl(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
-                .then(url => setCustomerReportExportUrl(url));
-
             let customerList: { label: string, value: string }[] = [];
             customerList.push(...defaultDropdownOption);
 
@@ -84,9 +81,13 @@ export default function useReportViewModel() {
                 }
             });
         }
-
     }, [courierStore$, setCourierOptions, setCourierReportPath, startDateFilter, endDateFilter, courierFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const exportCustomerReport = useCallback(() => {
+        viewModel.getCustomerReportExportUrl(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
+            .then(url => setCustomerReportExportUrl(url));
+    }, [setCustomerReportExportUrl, startDateFilter, endDateFilter, customerFilter])
+    
     return {
         report,
         setReport,
@@ -104,6 +105,7 @@ export default function useReportViewModel() {
         setCourierFilter,
         couriersOptions,
         courierReportPath,
+        exportCustomerReport,
         customerReportExportUrl
     };
 }
