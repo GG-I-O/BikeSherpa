@@ -301,7 +301,8 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         await axios.put(
             link.href,
             {
-                completed: step.completed
+                completed: step.completed,
+                completionDate: step.realDeliveryDate
             }
         )
     }

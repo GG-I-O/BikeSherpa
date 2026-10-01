@@ -11,7 +11,6 @@ import {IDeliveryStorageMiddleware} from "@/deliveries/spi/IDeliveryStorageMiddl
 import {hateoasRel} from "@/models/HateoasLink";
 import UploadableFile from "@/models/UploadableFile";
 import deliveryStepOperationAction from "@/steps/data/deliveryStepOperationAction";
-import {attachmentDomainTypes} from "@/models/AttachmentFile";
 
 @injectable()
 export default class StepServices implements IStepServices {
@@ -333,6 +332,7 @@ export default class StepServices implements IStepServices {
             deliveryStepOperationAction.putComplete
         );
 
+        observables.step$!.realDeliveryDate.set(completionDate!.toISOString());
         observables.step$!.completed.set(complete);
     }
 
