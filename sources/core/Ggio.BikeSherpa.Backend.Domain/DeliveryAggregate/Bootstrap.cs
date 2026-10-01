@@ -16,6 +16,7 @@ public static class Bootstrap
                services.AddScoped<IPricingStrategyService, PricingStrategyService>();
                services.AddScoped<IPricingStrategy, SimpleDeliveryStrategy>();
                services.AddScoped<IPricingStrategy, TourDeliveryStrategy>();
+               services.AddScoped<IPricingStrategy, CustomDeliveryStrategy>();
                services.AddScoped<IDeliveryChangeTimeService, DeliveryChangeTimeService>();
                services.AddScoped<IDelayService, DelayService>();
                return services;

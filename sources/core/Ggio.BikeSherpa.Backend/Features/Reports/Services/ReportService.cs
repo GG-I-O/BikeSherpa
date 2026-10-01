@@ -39,75 +39,80 @@ public class ReportService(
                     Details = []
                };
 
-               if (delivery.PricingStrategy == PricingStrategy.CustomStrategy)
+               var pricingStrategy = strategies.SingleOrDefault(s => s.ImplementedStrategy == delivery.PricingStrategy);
+               if (pricingStrategy is null)
                {
-                    var stepReport = await GetCustomStrategyStepDetail(delivery);
+                    continue;
+               }
+
+               delivery.Steps = delivery.Steps.Where(s => !s.NotBilled).OrderBy(s => s.Order).ToList();
+               foreach (var deliveryStep in delivery.Steps)
+               {
+                    var description = "";
+
+                    if (pricingStrategy.ImplementedStrategy == PricingStrategy.SimpleDeliveryStrategy)
+                    {
+                         description = await GetSimpleDeliveryStepDescription(deliveryStep, delivery);
+                    }
+                    else // PricingStrategy.TourDeliveryStrategy || PricingStrategy.CustomStrategy
+                    {
+                         description = await GetTourDeliveryStepDescription(deliveryStep, delivery);
+                    }
+
+                    var stepReport = new DeliveryReportDetail
+                    {
+                         Description = description,
+                         Address = deliveryStep.StepAddress,
+                         Price = await pricingStrategy.GetStepPrice(delivery, deliveryStep),
+                         Quantity = 1,
+                         CourierName = await GetCourierName(deliveryStep.CourierId)
+                    };
 
                     deliveryReport.Details.Add(stepReport);
                }
-               else
+
+               if (pricingStrategy.ImplementedStrategy == PricingStrategy.CustomStrategy)
                {
-                    var pricingStrategy = strategies.SingleOrDefault(s => s.ImplementedStrategy == delivery.PricingStrategy);
-                    if (pricingStrategy is null)
+                    var fixedPriceReport = new DeliveryReportDetail
                     {
-                         continue;
-                    }
-     
-                    delivery.Steps = delivery.Steps.Where(s => !s.NotBilled).OrderBy(s => s.Order).ToList();
-                    foreach (var deliveryStep in delivery.Steps)
-                    {
-                         var description = "";
+                         Description = "Prix fixe",
+                         Address = null,
+                         Price = (delivery.TotalPrice ?? 0) + (delivery.Discount ?? 0) - (delivery.ExtraCost ?? 0),
+                         Quantity = 1,
+                         CourierName = null
+                    };
 
-                         if (pricingStrategy.ImplementedStrategy == PricingStrategy.SimpleDeliveryStrategy)
-                         {
-                              description = await GetSimpleDeliveryStepDescription(deliveryStep, delivery);
-                         }
-                         else if (pricingStrategy.ImplementedStrategy == PricingStrategy.TourDeliveryStrategy)
-                         {
-                              description = await GetTourDeliveryStepDescription(deliveryStep, delivery);
-                         }
-
-                         var stepReport = new DeliveryReportDetail
-                         {
-                              Description = description,
-                              Address = deliveryStep.StepAddress,
-                              Price = await pricingStrategy.GetStepPrice(delivery, deliveryStep),
-                              Quantity = 1,
-                              CourierName = await GetCourierName(deliveryStep.CourierId)
-                         };
-
-                         deliveryReport.Details.Add(stepReport);
-                    }
-
-                    if (delivery.ExtraCost != 0)
-                    {
-                         var discountReport = new DeliveryReportDetail
-                         {
-                              Description = $"{delivery.ExtraCostReason ?? ""}",
-                              Address = null,
-                              Price = delivery.ExtraCost ?? 0,
-                              Quantity = 1,
-                              CourierName = null
-                         };
-
-                         deliveryReport.Details.Add(discountReport);
-                    }
-
-                    if (delivery.Discount != 0)
-                    {
-                         var discountReport = new DeliveryReportDetail
-                         {
-                              Description = $"Remise : {delivery.DiscountReason ?? ""}",
-                              Address = null,
-                              Price = -1 * (delivery.Discount ?? 0),
-                              Quantity = 1,
-                              CourierName = null
-                         };
-
-                         deliveryReport.Details.Add(discountReport);
-                    }
-
+                    deliveryReport.Details.Add(fixedPriceReport);
                }
+
+               if (delivery.ExtraCost != 0)
+               {
+                    var extraCostReport = new DeliveryReportDetail
+                    {
+                         Description = $"{delivery.ExtraCostReason ?? ""}",
+                         Address = null,
+                         Price = delivery.ExtraCost ?? 0,
+                         Quantity = 1,
+                         CourierName = null
+                    };
+
+                    deliveryReport.Details.Add(extraCostReport);
+               }
+
+               if (delivery.Discount != 0)
+               {
+                    var discountReport = new DeliveryReportDetail
+                    {
+                         Description = $"Remise : {delivery.DiscountReason ?? ""}",
+                         Address = null,
+                         Price = -1 * (delivery.Discount ?? 0),
+                         Quantity = 1,
+                         CourierName = null
+                    };
+
+                    deliveryReport.Details.Add(discountReport);
+               }
+
 
                report.Deliveries.Add(deliveryReport);
                report.TotalPrice += deliveryReport.DeliveryPrice;
@@ -169,28 +174,5 @@ public class ReportService(
           }
 
           return description;
-     }
-
-     private async Task<DeliveryReportDetail> GetCustomStrategyStepDetail(Delivery delivery)
-     {
-
-          var courierIds = delivery.Steps.Select(s => s.CourierId).Distinct().ToList();
-          var couriersNames = new List<string>();
-          foreach (var id in courierIds)
-          {
-               var name = await GetCourierName(id);
-               if (!string.IsNullOrEmpty(name)) couriersNames.Add(name);
-          }
-
-          var stepReport = new DeliveryReportDetail
-          {
-               Description = "Prix fixe",
-               Address = null,
-               Price = delivery.TotalPrice ?? 0,
-               Quantity = 1,
-               CourierName = string.Join(" , ", couriersNames)
-          };
-
-          return stepReport;
      }
 }
