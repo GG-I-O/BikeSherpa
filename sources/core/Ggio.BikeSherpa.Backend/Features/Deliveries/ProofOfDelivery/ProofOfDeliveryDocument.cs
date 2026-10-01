@@ -54,7 +54,7 @@ public class ProofOfDeliveryDocument(Model.ProofOfDelivery delivery, StackHolder
                               {
                                    if (step.Address != null)
                                    {
-                                        c.Item().PaddingLeft(10).Text(step.Address.GetFullAddress()).FontSize(10).Italic();
+                                        c.Item().PaddingLeft(10).PaddingTop(10).Text(step.Address.GetFullAddress()).FontSize(10).Italic();
                                    }
 
                                    if (!string.IsNullOrEmpty(step.Receiver))
