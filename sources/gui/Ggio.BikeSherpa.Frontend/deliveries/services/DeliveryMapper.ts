@@ -10,6 +10,7 @@ import {StepServiceIdentifier} from "@/steps/bootstrapper/StepServiceIdentifier"
 import {DeliveryStatusEnum} from "@/deliveries/data/deliveryStatusEnum";
 import unknownConst from "@/deliveries/data/unknownConst";
 import {DeliveryDisplayForCourier} from "@/deliveries/models/DeliveryDisplayForCourier";
+import {attachmentDomainTypes} from "@/models/AttachmentFile";
 
 @injectable()
 export default class DeliveryMapper implements IDeliveryMapper {
@@ -36,7 +37,13 @@ export default class DeliveryMapper implements IDeliveryMapper {
                         ...step.data.stepAddress,
                         fullAddress: `${step.data.stepAddress.streetInfo} ${step.data.stepAddress.postcode} ${step.data.stepAddress.city}`,
                     },
-                    links: step.links ?? []
+                    links: step.links ?? [],
+                    attachmentFiles: !step.data.attachmentFiles ? [] : step.data.attachmentFiles.map((file) => {
+                        return {
+                            path: file.path,
+                            domainType: file.domainType as attachmentDomainTypes
+                        };
+                    })
                 }
             })),
             links: deliveryDto.links ?? []
