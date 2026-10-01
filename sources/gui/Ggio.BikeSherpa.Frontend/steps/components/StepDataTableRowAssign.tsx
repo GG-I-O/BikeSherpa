@@ -42,7 +42,7 @@ export default function StepDataTableRowAssign(
         if (!step.deliveryCode) return theme.colors.background;
 
         const color = colorService.stringToColor(step.deliveryCode);
-        return color + '20';
+        return theme.dark ? color.dark : color.light;
     };
 
     return (
