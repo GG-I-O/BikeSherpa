@@ -38,7 +38,7 @@ export default function ReportDataTableRow({report}: Props) {
                             {detail.description}
                         </DataTable.Cell>
                         <DataTable.Cell style={[style.column, style.width80]} textStyle={{width: '100%'}}>
-                            {`${detail.price} €`}
+                            {detail.price !== 0 ? `${detail.price} €` : ''}
                         </DataTable.Cell>
                     </DataTable.Row>
 
