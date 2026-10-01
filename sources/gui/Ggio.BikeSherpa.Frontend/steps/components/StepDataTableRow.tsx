@@ -139,29 +139,32 @@ export default function StepDataTableRow(
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <View style={{flexDirection: "row", width: "100%"}}>
-                {step.attachmentFiles.map((file, index) =>
-                    <Button
-                        key={`${step.id}-${index}`}
-                        onPress={() => Linking.openURL(file.path)}
-                    >
-                        {file.domainType === attachmentDomainTypes.signature &&
-                            <ThemedSignatureIcon/>
-                        }
-                        {file.domainType === attachmentDomainTypes.photo &&
-                            <ThemedPhotoIcon/>
-                        }
-                        {file.domainType === attachmentDomainTypes.document &&
-                            <ThemedDocumentIcon/>
-                        }
-                    </Button>
-                )}
+                    {step.attachmentFiles.map((file, index) =>
+                        <Button
+                            key={`${step.id}-${index}`}
+                            onPress={() => Linking.openURL(file.path)}
+                        >
+                            {file.domainType === attachmentDomainTypes.signature &&
+                                <ThemedSignatureIcon/>
+                            }
+                            {file.domainType === attachmentDomainTypes.photo &&
+                                <ThemedPhotoIcon/>
+                            }
+                            {file.domainType === attachmentDomainTypes.document &&
+                                <ThemedDocumentIcon/>
+                            }
+                        </Button>
+                    )}
                 </View>
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60]}>{step.courierCode}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.width60, {justifyContent: 'center'}]}>
                 {
                     step.completed ? (
-                        <Icon source="check-circle-outline" size={28} color={theme.colors.onBackground}/>
+                        <>
+                            <Icon source="check-circle-outline" size={28} color={theme.colors.onBackground}/>
+                            <Text>{step.realDeliveryTime!}</Text>
+                        </>
                     ) : (
                         <Button
                             mode="contained"

@@ -15,10 +15,11 @@ export interface StepToDisplay {
     courierComment: string;
     packing: string;
     deliveryDate: string;
-    deliveryTime: string;
+    deliveryTime?: string;
     estimatedIsoDate: string;
     estimatedDate: string;
     estimatedTime: string;
+    realDeliveryTime: string;
     distance: number;
     notBilled: boolean;
     attachmentFiles: AttachmentFile[];
