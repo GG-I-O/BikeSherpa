@@ -39,24 +39,24 @@ public class ProofOfDeliveryDocument(Model.ProofOfDelivery delivery, StackHolder
 
                     col.Item().PaddingTop(1, Unit.Centimetre).Table(table =>
                     {
-                         table.ColumnsDefinition(columns => { columns.RelativeColumn(); });
+                         table.ColumnsDefinition(columns =>
+                         {
+                              columns.RelativeColumn();
+                              columns.ConstantColumn(80);
+                         });
 
                          table.Header(header => { header.Cell().Text("Description").Bold(); });
 
                          table.Cell().Text(delivery.DeliveryLabel).Bold();
+                         table.Cell().Text("");
 
-                         table.Cell().Column(c =>
+                         foreach (var step in delivery.Steps)
                          {
-                              foreach (var step in delivery.Steps)
+                              table.Cell().Column(c =>
                               {
                                    if (step.Address != null)
                                    {
-                                        c.Item().PaddingLeft(10).Text(step.Address.GetFullAddress()).FontSize(8).Italic();
-                                   }
-
-                                   if (step.DeliveryDate != null)
-                                   {
-                                        c.Item().Text($"Heure de passage : {step.DeliveryDate.Value.Hour}:{step.DeliveryDate.Value.Minute}").FontSize(9);
+                                        c.Item().PaddingLeft(10).Text(step.Address.GetFullAddress()).FontSize(10).Italic();
                                    }
 
                                    if (step.Receiver != null)
@@ -68,8 +68,13 @@ public class ProofOfDeliveryDocument(Model.ProofOfDelivery delivery, StackHolder
                                    {
                                         c.Item().Text($"{attachment.DomainType} : {attachment.Path}");
                                    }
+                              });
+
+                              if (step.DeliveryDate != null)
+                              {
+                                   table.Cell().Text($"Heure de passage {step.DeliveryDate.Value.Hour:00}:{step.DeliveryDate.Value.Minute:00}").FontSize(10);
                               }
-                         });
+                         }
                     });
                });
 
