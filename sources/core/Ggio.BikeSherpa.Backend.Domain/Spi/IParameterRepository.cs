@@ -38,4 +38,5 @@ public interface IParameterRepository
      
      ValueTask<StackHolderInfo> GetStackHolderInfoAsync();
      
+     ValueTask<int> GetTimeGapBetweenStepsInMinutesAsync();
 }
