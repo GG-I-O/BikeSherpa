@@ -140,7 +140,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
                     }
                     this.attachmentUploadQueue = this.attachmentUploadQueue.filter(file => file.stepId !== step.id);
                     break;
-                case deliveryStepOperationAction.postSignature:
+                case deliveryStepOperationAction.putSignature:
                     for (let i = 0; i < this.signatureUploadQueue.length; i++) {
                         if (this.signatureUploadQueue[i].stepId === step.id)
                             await this.customClientFacade.PostSignatureEndpoint(step, this.signatureUploadQueue[i].signature, this.signatureUploadQueue[i].receiver);

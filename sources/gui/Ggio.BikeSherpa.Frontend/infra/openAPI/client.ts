@@ -123,6 +123,11 @@ const UpdateDeliveryStepOrderRequest = z.object({
 const UpdateDeliveryStepTimeRequest = z.object({
   date: z.string().datetime({ offset: true }),
 });
+const SignDeliveryStepRequest = z.object({
+  signature: z.instanceof(File),
+  domainType: z.string(),
+  receiver: z.string(),
+});
 const CalculateDeliveryPriceResult = z.object({
   price: z.number(),
   priceWithVat: z.number(),
@@ -169,11 +174,6 @@ const AddResultOfGuid = z.object({ id: z.string() });
 const AttachmentRequest = z.object({
   file: z.instanceof(File),
   domainType: z.string(),
-});
-const SignatureRequest = z.object({
-  signature: z.instanceof(File),
-  domainType: z.string(),
-  receiver: z.string(),
 });
 const CustomerDto = z.object({
   data: CustomerCrud,
@@ -223,6 +223,7 @@ export const schemas = {
   UpdateDeliveryStepCourierRequest,
   UpdateDeliveryStepOrderRequest,
   UpdateDeliveryStepTimeRequest,
+  SignDeliveryStepRequest,
   CalculateDeliveryPriceResult,
   OperationBase,
   Operation,
@@ -234,7 +235,6 @@ export const schemas = {
   AddDeliveryByCustomerRequest,
   AddResultOfGuid,
   AttachmentRequest,
-  SignatureRequest,
   CustomerDto,
   CheckCustomerResponse,
   ProblemDetails,
@@ -1295,16 +1295,16 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "post",
-    path: "/delivery/:deliveryId/step/:stepId/signature",
-    alias: "AddDeliveryStepSignatureEndpoint",
+    method: "put",
+    path: "/delivery/:deliveryId/step/:stepId/sign",
+    alias: "SignDeliveryStepEndpoint",
     tags: ["delivery"],
     requestFormat: "form-data",
     parameters: [
       {
         name: "body",
         type: "Body",
-        schema: SignatureRequest,
+        schema: SignDeliveryStepRequest,
       },
       {
         name: "deliveryId",

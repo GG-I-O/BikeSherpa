@@ -382,7 +382,7 @@ export default class StepServices implements IStepServices {
         // Test if the user got the rights to do this action
         const step = observables.step$.get();
         if (!step.links || !step.links.some((link) => link.rel === hateoasRel.stepAttachment.signature)) {
-            this.logger.error(`Cannot post signature for step ${stepId}`);
+            this.logger.error(`Cannot put signature for step ${stepId}`);
             return
         }
 
@@ -395,7 +395,7 @@ export default class StepServices implements IStepServices {
         this.deliveryStorageMiddleware.addUpdateStepState(
             observables.delivery$.peek().id,
             observables.step$.peek().id,
-            deliveryStepOperationAction.postSignature
+            deliveryStepOperationAction.putSignature
         );
 
         observables.step$!.attachmentFiles.set([...step.attachmentFiles ?? [], {path: file.uri, domainType: file.domainType}]);

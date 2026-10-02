@@ -35,6 +35,6 @@ export const hateoasRel = {
     },
     stepAttachment: {
         post: "postAttachment",
-        signature: "postSignature"
+        signature: "putSignDeliveryStep"
     }
 }
