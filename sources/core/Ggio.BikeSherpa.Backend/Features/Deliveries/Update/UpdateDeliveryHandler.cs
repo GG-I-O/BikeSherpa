@@ -5,6 +5,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
+using Ggio.BikeSherpa.Backend.Domain.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Ggio.DddCore;
@@ -61,6 +62,7 @@ public class UpdateDeliveryHandler(
      IReadRepository<Delivery> repository,
      IUrgencyRepository urgencyRepository,
      IPackingSizeRepository packingSizeRepository,
+     IParameterRepository parameterRepository,
      IValidator<UpdateDeliveryCommand> validator,
      IApplicationTransaction transaction,
      IDeliveryZoneRepository deliveryZones,
@@ -117,7 +119,9 @@ public class UpdateDeliveryHandler(
                })
                .ToList();
 
-          await entity.UpdateStepsAsync(steps, deliveryZones, itineraryService);
+          var timeGap = await parameterRepository.GetTimeGapBetweenStepsInMinutesAsync();
+
+          await entity.UpdateStepsAsync(steps, timeGap, deliveryZones, itineraryService);
 
           entity.TotalPrice = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(entity);
           await transaction.CommitAsync(cancellationToken);

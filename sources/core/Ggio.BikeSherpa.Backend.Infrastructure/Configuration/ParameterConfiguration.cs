@@ -69,6 +69,11 @@ public class ParameterConfiguration : IEntityTypeConfiguration<Parameter>
                {
                     Key = ParameterRepository.StackHolderInfo,
                     Value = JsonConvert.SerializeObject(new StackHolderInfo("Compagnie", "contact@company.com", "phone", "address", "the company"))
+               },
+               new
+               {
+                    Key = ParameterRepository.TimeGapBetweenStepsInMinutes,
+                    Value = "10"
                }
           );
      }

@@ -26,6 +26,8 @@ public class ParameterRepository(BackendDbContext dbContext) : IParameterReposit
      
      public const string StackHolderInfo = "STACK_HOLDER_INFO";
 
+     public const string TimeGapBetweenStepsInMinutes = "TIME_GAP_BETWEEN_STEPS_IN_MINUTES";
+
      public async ValueTask<double> GetVatRateAsync()
      {
           return Convert.ToDouble((await dbContext.Parameters.FindAsync(VatRateKey))!.Value);
@@ -66,4 +68,7 @@ public class ParameterRepository(BackendDbContext dbContext) : IParameterReposit
 
           return JsonSerializer.Deserialize<StackHolderInfo>(json)!;
      }
+     
+     public async ValueTask<int> GetTimeGapBetweenStepsInMinutesAsync() =>
+          int.Parse((await dbContext.Parameters.FindAsync(TimeGapBetweenStepsInMinutes))!.Value);
 }

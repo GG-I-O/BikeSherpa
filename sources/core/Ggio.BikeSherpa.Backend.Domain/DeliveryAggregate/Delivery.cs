@@ -201,6 +201,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           string? comment,
           bool notBilled,
           PackingSize packingSize,
+          int timeGapBetweenStepsInMinutes,
           IDeliveryZoneRepository deliveryZones,
           IItinerarySpi itineraryService,
           IPricingStrategyService pricingStrategyService)
@@ -224,7 +225,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           if (Steps.Count >= 1)
           {
                var previousStep = Steps.Where(s => s.Order == newStep.Order - 1);
-               newStep.EstimatedDeliveryDate = previousStep.Single().EstimatedDeliveryDate + TimeSpan.FromMinutes(15);
+               newStep.EstimatedDeliveryDate = previousStep.Single().EstimatedDeliveryDate + TimeSpan.FromMinutes(timeGapBetweenStepsInMinutes);
           }
           else
           {
@@ -259,7 +260,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           }
      }
 
-     public async Task UpdateStepsAsync(List<DeliveryStep> steps,
+     public async Task UpdateStepsAsync(
+          List<DeliveryStep> steps,
+          int timeGapBetweenStepsInMinutes,
           IDeliveryZoneRepository deliveryZones,
           IItinerarySpi itineraryService)
      {
@@ -307,7 +310,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
                }
                else
                {
-                    steps[index].EstimatedDeliveryDate = steps[index - 1].EstimatedDeliveryDate + TimeSpan.FromMinutes(15);
+                    steps[index].EstimatedDeliveryDate = steps[index - 1].EstimatedDeliveryDate + TimeSpan.FromMinutes(timeGapBetweenStepsInMinutes);
                }
 
           }

@@ -2,11 +2,11 @@ using Ardalis.Specification;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AwesomeAssertions;
-using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
+using Ggio.BikeSherpa.Backend.Domain.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 using Ggio.DddCore;
 using JetBrains.Annotations;
@@ -27,10 +27,10 @@ public class AddDeliveryStepHandlerTest
      private readonly Mock<IPackingSizeRepository> _mockPackingSizeRepository = new();
      private readonly Mock<IPricingStrategyService> _mockPricingStrategyService = new();
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
+     private readonly Mock<IParameterRepository> _mockParameterRepository = new();
 
      public AddDeliveryStepHandlerTest()
      {
-          var mockCustomer = _fixture.Create<Customer>();
           _mockDelivery = _fixture.Build<Delivery>()
                .With(d => d.Steps, [])
                .Create();
@@ -48,6 +48,8 @@ public class AddDeliveryStepHandlerTest
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryByIdSpecification),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(_mockDelivery);
+
+          _mockParameterRepository.Setup(x => x.GetTimeGapBetweenStepsInMinutesAsync()).ReturnsAsync(10);
      }
 
      private AddDeliveryStepHandler CreateSut()
@@ -58,6 +60,7 @@ public class AddDeliveryStepHandlerTest
                _mockTransaction.Object,
                _mockDeliveryRepository.Object,
                _mockDeliveryZoneRepository.Object,
+               _mockParameterRepository.Object,
                _mockPricingStrategyService.Object,
                _mockItineraryApi.Object,
                _mockPackingSizeRepository.Object
