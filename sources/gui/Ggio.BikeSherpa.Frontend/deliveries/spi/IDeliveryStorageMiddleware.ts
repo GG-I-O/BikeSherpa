@@ -9,5 +9,6 @@ export interface IDeliveryStorageMiddleware {
     addUpdateDeliveryState(deliveryId: string, state: string): void;
     addUpdateStepState(deliveryId: string, stepId: string, state: string): void;
     addAttachmentToUploadQueue(stepId: string, file: UploadableFile): void;
+    addSignatureToUploadQueue(stepId: string, signature: UploadableFile, receiver: string): void;
     update(delivery: Delivery): Promise<void>;
 }

@@ -56,4 +56,7 @@ export default class StepDetailViewModel {
     public addAttachment = (stepId: string, file: UploadableFile) => {
         this.stepServices.addAttachment(stepId, file);
     }
+    public addSignature = (stepId: string, signature: UploadableFile, receiver: string) => {
+        this.stepServices.addSignature(stepId, signature, receiver);
+    }
 }

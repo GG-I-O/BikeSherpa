@@ -5,5 +5,6 @@ public interface IExportSaveService
      public Task<string> SaveCourierReportAsync(string fileName, byte[] fileContent, string contentType, CancellationToken cancellationToken);
      
      public Task<string> SaveCustomerReportAsync(string fileName, byte[] fileContent, string contentType, CancellationToken cancellationToken);
-     
+
+     public Task<string> SaveProofOfDeliveryAsync(string fileName, byte[] fileContent, string contentType, CancellationToken cancellationToken);
 }

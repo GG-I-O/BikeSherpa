@@ -301,7 +301,8 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         await axios.put(
             link.href,
             {
-                completed: step.completed
+                completed: step.completed,
+                completionDate: step.realDeliveryDate
             }
         )
     }
@@ -326,6 +327,32 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
                 },
                 params: {
                     domainType: file.domainType
+                }
+            }
+        )
+    }
+
+    public async PutSignatureEndpoint(step: Step, file: UploadableFile, receiver: string): Promise<void> {
+        if (!step.links)
+            throw new Error(`Step links empty`);
+
+        const link = step.links.find(link => link.rel === hateoasRel.stepAttachment.signature);
+        if (!link)
+            throw new Error(`Step link for '${hateoasRel.stepAttachment.signature}' not found`);
+
+        const formData = new FormData();
+        await AttachmentFileService.appendFileToFormData(formData, 'file', file);
+
+        await axios.put(
+            link.href,
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                params: {
+                    domainType: file.domainType,
+                    receiver: receiver
                 }
             }
         )

@@ -35,6 +35,7 @@ public class DeliveryConfiguration : IEntityTypeConfiguration<Delivery>
                steps.Property(s => s.StepType).HasConversion<int>().IsRequired();
                steps.Property(s => s.Order).IsRequired();
                steps.Property(s => s.Completed).IsRequired();
+               steps.Property(s => s.Receiver);
                steps.OwnsMany(s => s.AttachmentFiles)
                     .ToTable("DeliveryStepAttachmentFiles", attachment =>
                     {
