@@ -10,6 +10,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
+using Ggio.BikeSherpa.Backend.Domain.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Model;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 using Ggio.DddCore;
@@ -34,6 +35,7 @@ public class UpdateDeliveryHandlerTests
      private readonly Mock<IApplicationTransaction> _mockTransaction = new();
      private readonly Mock<IUrgencyRepository> _mockUrgencyRepository = new();
      private readonly Mock<IValidator<UpdateDeliveryCommand>> _mockValidator = new();
+     private readonly Mock<IParameterRepository> _mockParameterRepository = new();
 
      public UpdateDeliveryHandlerTests()
      {
@@ -116,12 +118,15 @@ public class UpdateDeliveryHandlerTests
                     It.Is<ISpecification<Delivery>>(s => s is DeliveryByIdSpecification),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(_delivery);
+          
+          _mockParameterRepository.Setup(x => x.GetTimeGapBetweenStepsInMinutesAsync()).ReturnsAsync(10);
      }
 
      private UpdateDeliveryHandler CreateSut() => new(
           _mockDeliveryRepository.Object,
           _mockUrgencyRepository.Object,
           _mockPackingSizeRepository.Object,
+          _mockParameterRepository.Object,
           _mockValidator.Object,
           _mockTransaction.Object,
           _mockDeliveryZoneRepository.Object,
@@ -221,7 +226,7 @@ public class UpdateDeliveryHandlerTests
                else
                {
                     actualStep.EstimatedDeliveryDate.Should().Be(
-                         _delivery.Steps[index - 1].EstimatedDeliveryDate + TimeSpan.FromMinutes(15));
+                         _delivery.Steps[index - 1].EstimatedDeliveryDate + TimeSpan.FromMinutes(10));
                }
           }
      }

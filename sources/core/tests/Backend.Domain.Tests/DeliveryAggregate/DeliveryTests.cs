@@ -265,6 +265,7 @@ public class DeliveryTests
           var mockItineraryService = new Mock<IItinerarySpi>();
           mockItineraryService.Setup(i => i.GetItineraryInfoAsync(It.IsAny<GeoPoint>(), It.IsAny<GeoPoint>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ItineraryResult(10.0, 20.0));
+          
 
           // Act
           await delivery.AddStepAsync(
@@ -273,6 +274,7 @@ public class DeliveryTests
                "CommentPickup",
                false,
                new PackingSize("packing", 1, "label", 3, 10),
+               10,
                mockZoneRepo.Object,
                mockItineraryService.Object,
                _mockPricingStrategyService.Object
@@ -297,6 +299,7 @@ public class DeliveryTests
                "Comment Drop off",
                false,
                new PackingSize("packing", 1, "label", 3, 10),
+               10,
                mockDeliveryZoneRepository.Object,
                mockItineraryService.Object,
                _mockPricingStrategyService.Object);
@@ -320,6 +323,7 @@ public class DeliveryTests
                "CommentPickup",
                false,
                new PackingSize("packing", 1, "label", 3, 10),
+               10,
                mockDeliveryZoneRepository.Object,
                mockItineraryService.Object,
                _mockPricingStrategyService.Object);
@@ -356,7 +360,7 @@ public class DeliveryTests
           var newStep = CreatePickupStep();
 
           // Act
-          await delivery.UpdateStepsAsync([newStep], mockDeliveryZoneRepository.Object, mockItineraryService.Object);
+          await delivery.UpdateStepsAsync([newStep], 10, mockDeliveryZoneRepository.Object, mockItineraryService.Object);
 
           // Assert
           delivery.Steps.Should().ContainSingle(s => s.StepType == newStep.StepType && s.StepAddress == newStep.StepAddress);
@@ -389,6 +393,7 @@ public class DeliveryTests
 
           await delivery.UpdateStepsAsync(
                [updatedStep],
+               10,
                mockDeliveryZoneRepository.Object,
                mockItineraryService.Object
           );
@@ -437,6 +442,7 @@ public class DeliveryTests
           // Act
           await delivery.UpdateStepsAsync(
                [incomingExistingStep, newStep],
+               10,
                mockDeliveryZoneRepository.Object,
                mockItineraryService.Object);
 
@@ -475,13 +481,13 @@ public class DeliveryTests
           step3.Order = 97;
 
           // Act
-          await delivery.UpdateStepsAsync([step1, step2, step3], mockDeliveryZoneRepository.Object, mockItineraryService.Object);
+          await delivery.UpdateStepsAsync([step1, step2, step3], 10, mockDeliveryZoneRepository.Object, mockItineraryService.Object);
 
           // Assert
           delivery.Steps.Select(s => s.Order).Should().Equal(1, 2, 3);
           delivery.Steps[0].Distance.Should().Be(0);
-          delivery.Steps[1].EstimatedDeliveryDate.Should().Be(delivery.Steps[0].EstimatedDeliveryDate.AddMinutes(15));
-          delivery.Steps[2].EstimatedDeliveryDate.Should().Be(delivery.Steps[1].EstimatedDeliveryDate.AddMinutes(15));
+          delivery.Steps[1].EstimatedDeliveryDate.Should().Be(delivery.Steps[0].EstimatedDeliveryDate.AddMinutes(10));
+          delivery.Steps[2].EstimatedDeliveryDate.Should().Be(delivery.Steps[1].EstimatedDeliveryDate.AddMinutes(10));
      }
 
      [Fact]
@@ -495,7 +501,7 @@ public class DeliveryTests
           delivery.Steps.AddRange([stepToKeep, stepToRemove]);
 
           // Act
-          await delivery.UpdateStepsAsync([stepToKeep], mockDeliveryZoneRepository.Object, mockItineraryService.Object);
+          await delivery.UpdateStepsAsync([stepToKeep], 10, mockDeliveryZoneRepository.Object, mockItineraryService.Object);
 
           // Assert
           delivery.Steps.Should().HaveCount(1);
@@ -512,7 +518,7 @@ public class DeliveryTests
           delivery.Steps.AddRange([CreatePickupStep(), CreatePickupStep()]);
 
           // Act
-          await delivery.UpdateStepsAsync([], mockDeliveryZoneRepository.Object, mockItineraryService.Object);
+          await delivery.UpdateStepsAsync([], 10, mockDeliveryZoneRepository.Object, mockItineraryService.Object);
 
           // Assert
           delivery.Steps.Should().BeEmpty();

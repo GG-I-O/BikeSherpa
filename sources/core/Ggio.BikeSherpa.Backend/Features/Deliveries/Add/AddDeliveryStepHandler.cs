@@ -6,6 +6,7 @@ using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Services.PricingStrategy;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
+using Ggio.BikeSherpa.Backend.Domain.Spi;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Validators;
 using Ggio.DddCore;
 using JetBrains.Annotations;
@@ -39,6 +40,7 @@ public class AddDeliveryStepHandler(
      IApplicationTransaction transaction,
      IReadRepository<Delivery> deliveryRepository,
      IDeliveryZoneRepository deliveryZones,
+     IParameterRepository parameterRepository,
      IPricingStrategyService pricingStrategyService,
      IItinerarySpi itineraryService,
      IPackingSizeRepository packingSizeRepository
@@ -55,11 +57,14 @@ public class AddDeliveryStepHandler(
                return Result<Guid>.NotFound();
           }
 
+          var timeGap = await parameterRepository.GetTimeGapBetweenStepsInMinutesAsync();
+
           var deliveryStep = await delivery.AddStepAsync(command.StepType,
                command.StepAddress,
                command.Comment,
                command.NotBilled,
                packingSizeRepository.GetByName(command.PackingSize)!,
+               timeGap,
                deliveryZones,
                itineraryService,
                pricingStrategyService);
