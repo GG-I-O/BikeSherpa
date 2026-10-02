@@ -332,7 +332,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         )
     }
 
-    public async PostSignatureEndpoint(step: Step, file: UploadableFile, receiver: string): Promise<void> {
+    public async PutSignatureEndpoint(step: Step, file: UploadableFile, receiver: string): Promise<void> {
         if (!step.links)
             throw new Error(`Step links empty`);
 
@@ -343,7 +343,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         const formData = new FormData();
         await AttachmentFileService.appendFileToFormData(formData, 'file', file);
 
-        await axios.post(
+        await axios.put(
             link.href,
             formData,
             {
