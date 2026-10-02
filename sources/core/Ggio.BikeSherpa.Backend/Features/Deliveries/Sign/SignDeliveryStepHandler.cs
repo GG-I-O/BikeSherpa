@@ -6,9 +6,9 @@ using Ggio.DddCore;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 
-namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
+namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Sign;
 
-public record AddDeliveryStepSignatureCommand(
+public record SignDeliveryStepCommand(
      Guid DeliveryId,
      Guid StepId,
      IFormFile Signature,
@@ -16,13 +16,13 @@ public record AddDeliveryStepSignatureCommand(
      string Receiver
 ) : ICommand<Result>;
 
-public class AddDeliveryStepSignatureHandler(
+public class SignDeliveryStepHandler(
      IReadRepository<Delivery> deliveryRepository,
      IDeliveryStepAttachmentSaveService attachmentSaveService,
      IApplicationTransaction transaction
-     ) : ICommandHandler<AddDeliveryStepSignatureCommand, Result>
+     ) : ICommandHandler<SignDeliveryStepCommand, Result>
 {
-     public async ValueTask<Result> Handle(AddDeliveryStepSignatureCommand command, CancellationToken cancellationToken)
+     public async ValueTask<Result> Handle(SignDeliveryStepCommand command, CancellationToken cancellationToken)
      {
           var delivery = await deliveryRepository.FirstOrDefaultAsync(new DeliveryByIdSpecification(command.DeliveryId), cancellationToken);
           if (delivery is null)
