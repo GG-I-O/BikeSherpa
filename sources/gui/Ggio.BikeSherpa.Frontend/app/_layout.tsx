@@ -9,6 +9,7 @@ import {Auth0Provider, useAuth0} from "react-native-auth0";
 import {PaperProvider} from "react-native-paper";
 import {fr, registerTranslation} from "react-native-paper-dates";
 import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
+import {KeyboardProvider} from "react-native-keyboard-controller";
 
 registerTranslation('fr', fr);
 
@@ -48,10 +49,12 @@ export default function RootLayout() {
 
     return (
         <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
-            <PaperProvider>
-                <AppStack/>
-                <AppSnackbarView/>
-            </PaperProvider>
+            <KeyboardProvider>
+                <PaperProvider>
+                    <AppStack/>
+                    <AppSnackbarView/>
+                </PaperProvider>
+            </KeyboardProvider>
         </Auth0Provider>
     );
 }
