@@ -102,20 +102,22 @@ export default function Signature(props: Props) {
                                 />
                             )}
                         </View>
-                        <SignatureCanvas
-                            ref={ref}
-                            onOK={handleSignature}
-                            onEmpty={handleEmpty}
-                            onError={handleError}
-                            autoClear={false}
-                            descriptionText="Sign here"
-                            penColor="#000000"
-                            backgroundColor="rgba(255,255,255,0)"
-                            webviewProps={{
-                                cacheEnabled: true,
-                                androidLayerType: "hardware",
-                            }}
-                        />
+                        <View style={styles.canvasContainer}>
+                            <SignatureCanvas
+                                ref={ref}
+                                onOK={handleSignature}
+                                onEmpty={handleEmpty}
+                                onError={handleError}
+                                autoClear={false}
+                                descriptionText="Sign here"
+                                penColor="#000000"
+                                backgroundColor="rgba(255,255,255,0)"
+                                webviewProps={{
+                                    cacheEnabled: true,
+                                    androidLayerType: "hardware",
+                                }}
+                            />
+                        </View>
 
                         <TextInput
                             value={signatureName}
@@ -181,7 +183,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     canvasContainer: {
-        flex: 1,
+        height: 220,
+        minHeight: 100,
+        flexShrink: 1,
         borderWidth: 1,
         borderRadius: 8,
         overflow: 'hidden',
