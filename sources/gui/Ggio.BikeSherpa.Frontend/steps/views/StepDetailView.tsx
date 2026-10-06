@@ -15,6 +15,7 @@ import {attachmentDomainTypes} from "@/models/AttachmentFile";
 import ThemedSignatureIcon from "@/components/themed/ThemedSignatureIcon";
 import ThemedPhotoIcon from "@/components/themed/ThemedPhotoIcon";
 import ThemedDocumentIcon from "@/components/themed/ThemedDocumentIcon";
+import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
 
 export default function StepDetailView() {
     const theme = useTheme();
@@ -31,7 +32,7 @@ export default function StepDetailView() {
         )
 
     return (
-        <ScrollView style={{backgroundColor: theme.colors.background, padding: 8, height: '100%'}}>
+        <KeyboardAwareScrollView style={{backgroundColor: theme.colors.background, padding: 8}}>
             <View style={{flexDirection: 'column', justifyContent: 'flex-start', gap: 8}}>
                 <View style={{gap: 8, flexDirection: 'row'}}>
                     <Signature
@@ -166,6 +167,6 @@ export default function StepDetailView() {
 
                 </View>
             </View>
-        </ScrollView>
+        </KeyboardAwareScrollView>
     );
 }
