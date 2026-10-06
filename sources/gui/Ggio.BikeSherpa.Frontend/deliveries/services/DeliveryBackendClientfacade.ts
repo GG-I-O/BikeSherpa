@@ -341,7 +341,7 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
             throw new Error(`Step link for '${hateoasRel.stepAttachment.signature}' not found`);
 
         const formData = new FormData();
-        await AttachmentFileService.appendFileToFormData(formData, 'file', file);
+        await AttachmentFileService.appendFileToFormData(formData, 'signature', file);
 
         await axios.put(
             link.href,
