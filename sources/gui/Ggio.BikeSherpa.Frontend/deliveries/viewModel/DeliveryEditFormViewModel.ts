@@ -49,6 +49,7 @@ export default class DeliveryEditFormViewModel extends AbstractFormViewModel {
                     distance: 0,
                     attachmentFiles: [],
                     realDeliveryDate: null,
+                    receiver: null,
                     estimatedDeliveryDate: delivery.startDate,
                     stepAddress: {
                         ...step.stepAddress,

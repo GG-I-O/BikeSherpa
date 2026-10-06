@@ -2,6 +2,7 @@ using FastEndpoints;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Add;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Delete;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Patch;
+using Ggio.BikeSherpa.Backend.Features.Deliveries.Sign;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 using Ggio.BikeSherpa.Backend.Model;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
@@ -90,6 +91,15 @@ public class DeliveryStepLinks(IHttpContextAccessor httpContextAccessor, IHateoa
                     Href = hateoasService.GenerateLink(IEndpoint.GetName<AddDeliveryStepAttachmentEndpoint>(), routeValues),
                     Rel = "postAttachment",
                     Method = "POST"
+               });
+          
+          // PUT /delivery{deliveryId}/step/{stepId}/signature
+          if (canWriteDelivery || canWriteStep)
+               links.Add(new Link
+               {
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<SignDeliveryStepEndpoint>(), routeValues),
+                    Rel = "putSignDeliveryStep",
+                    Method = "PUT"
                });
           
           return links;

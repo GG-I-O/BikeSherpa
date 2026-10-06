@@ -121,6 +121,18 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                            scopes.Contains("write:deliveries");
                });
           });
+          options.AddPolicy("CanSignStep", policy =>
+          {
+               policy.RequireAuthenticatedUser();
+               policy.RequireAssertion(context =>
+               {
+                    var scopes = context.User.FindAll("scope")
+                         .SelectMany(c => c.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+
+                    return scopes.Contains("write:myDeliveries") ||
+                           scopes.Contains("write:deliveries");
+               });
+          });
      });
 
      builder.Services.AddAuth0ApiAuthentication(options =>
