@@ -27,7 +27,7 @@ export default class DeliveryListViewModel {
         this.deliveryMapper = deliveryMapper;
     }
 
-    public getFilteredDeliveries = (dateFilter: Date | undefined): DeliveryToDisplay[] => {
+    public getFilteredDeliveries = (dateFilter: Date | undefined, sortNewestFirst: boolean = false): DeliveryToDisplay[] => {
         if (!this.deliveryServices)
             return [];
 
@@ -44,11 +44,20 @@ export default class DeliveryListViewModel {
             if (!deliveryA.steps || !deliveryB.steps)
                 return 0;
 
-            return (
-                new Date(deliveryA.steps[0].estimatedDeliveryDate).valueOf()
-                -
-                new Date(deliveryB.steps[0].estimatedDeliveryDate).valueOf()
-            );
+            if (sortNewestFirst) {
+                return (
+                    new Date(deliveryB.steps[0].estimatedDeliveryDate).valueOf()
+                    -
+                    new Date(deliveryA.steps[0].estimatedDeliveryDate).valueOf()
+                );
+            } else {
+                return (
+                    new Date(deliveryA.steps[0].estimatedDeliveryDate).valueOf()
+                    -
+                    new Date(deliveryB.steps[0].estimatedDeliveryDate).valueOf()
+                );
+            }
+
         });
 
         return sortedDeliveries.map((delivery) => {
@@ -89,7 +98,7 @@ export default class DeliveryListViewModel {
             // Unassigned comes last
             if (stepA.courierCode === unassignedCourierDisplay && stepB.courierCode !== unassignedCourierDisplay) return 1;
             if (stepA.courierCode !== unassignedCourierDisplay && stepB.courierCode === unassignedCourierDisplay) return -1;
-            
+
             // Normal sorting
             if (stepA.courierCode !== stepB.courierCode)
                 return stepA.courierCode.localeCompare(stepB.courierCode);
