@@ -81,6 +81,9 @@ export default function useReportViewModel() {
                 }
             });
         }
+        else {
+            setCourierReportPath(null);
+        }
     }, [courierStore$, setCourierOptions, setCourierReportPath, startDateFilter, endDateFilter, courierFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const exportCustomerReport = useCallback(() => {

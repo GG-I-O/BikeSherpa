@@ -21,7 +21,7 @@ export default function ReportView() {
                 style={{
                     flexDirection: 'row', flexGrow: 0, flexShrink: 0,
                     backgroundColor: theme.colors.background,
-                    padding: 8
+                    padding: 8,
                 }}
                 contentContainerStyle={{
                     alignItems: "center", gap: 8
@@ -74,56 +74,76 @@ export default function ReportView() {
                     onDismiss={() => setOpenDatePicker(false)}
                     onConfirm={({startDate, endDate}) => {
                         if (!startDate || !endDate) return;
+                        startDate.setHours(0, 0, 0);
                         viewModel.setStartDateFilter(startDate);
+                        endDate.setHours(23, 59, 59);
                         viewModel.setEndDateFilter(endDate);
                         setOpenDatePicker(false);
                     }}
                 />
             </ScrollView>
-            {viewModel.reportType === 'Coursier' && viewModel.courierReportPath && (
-                <View style={{alignItems: 'center', justifyContent: 'center', marginTop: 16}}>
-                    <Text style={{
-                        fontWeight: 'bold',
-                        marginBottom: 8,
-                        color: "orange"
-                    }}>{viewModel.courierReportPath?.Name}</Text>
-                    <Text style={{color: 'blue'}}
-                          onPress={() => Linking.openURL(viewModel.courierReportPath?.Path!)}>
-                        Télécharger le rapport du coursier
-                    </Text>
 
-                </View>
-            )}
 
-            {viewModel.reportType === 'Client' && viewModel.report && (
-                <View style={{ flexDirection: 'row', gap: 8, paddingLeft: 8, backgroundColor: theme.colors.background}}>
-                    <Button
-                        mode="outlined"
-                        onPress={() => viewModel.exportCustomerReport()}
-                    >
-                        Générer le rapport client
-                    </Button>
-                    {viewModel.customerReportExportUrl && (
-                        <Button
-                            mode="outlined"
-                            onPress={() => Linking.openURL(viewModel.customerReportExportUrl!)}
-                            icon="download"
-                        >
-                            Voir le rapport client
-                        </Button>
-                    )}
-                </View>
-            )}
+            <View style={{
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                minHeight: '100%',
+                paddingTop: 16,
+                backgroundColor: theme.colors.background
+            }}>
+                {viewModel.reportType === 'Coursier' && (
+                    <>
+                        {!viewModel.courierReportPath ? (
+                            <Text>Sélectionne une période et un coursier</Text>
+                        ) : (
+                            <>
+                                <Text style={{
+                                    fontWeight: 'bold',
+                                    marginBottom: 8,
+                                    color: "orange"
+                                }}>{viewModel.courierReportPath?.Name}</Text>
+                                <Text style={{color: 'blue'}}
+                                      onPress={() => Linking.openURL(viewModel.courierReportPath?.Path!)}>
+                                    Télécharger le rapport du coursier
+                                </Text>
+                            </>
+                        )}
+                    </>
+                )}
 
-            {!viewModel.customerFilter && !viewModel.courierReportPath ? (
-                <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                    <Text style={{color: "orange"}}>Sélectionne une période et un client pour voir le rapport</Text>
-                </View>
-            ) : (
-                <ReportDetail
-                    report={viewModel.report}
-                />
-            )}
+                {viewModel.reportType === 'Client' && (
+                    <>
+                        {viewModel.report ? (
+                            <View style={{alignContent: 'flex-start', width: '100%'}}>
+                                <View style={{width: '80%', flexDirection: 'row', paddingInline: 8, gap: 8}}>
+                                <Button
+                                    mode="outlined"
+                                    onPress={() => viewModel.exportCustomerReport()}
+                                >
+                                    Générer le rapport client
+                                </Button>
+                                {viewModel.customerReportExportUrl && (
+                                    <Button
+                                        mode="outlined"
+                                        onPress={() => Linking.openURL(viewModel.customerReportExportUrl!)}
+                                        icon="download"
+                                    >
+                                        Voir le rapport client
+                                    </Button>
+                                )}
+                                </View>
+                                <ReportDetail
+                                    report={viewModel.report}
+                                />
+                            </View>
+                        ) : (
+                            <View style={{alignItems: 'center', justifyContent: 'center'}}>
+                                <Text>Sélectionne une période et un client</Text>
+                            </View>
+                        )}
+                    </>
+                )}
+            </View>
         </>
     );
 }
