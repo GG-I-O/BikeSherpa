@@ -128,10 +128,25 @@ export default function StepDataTableRow(
             <DataTable.Cell style={[style.column, style.width60]}>{step.packing}</DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
                 <TextInput
-                    style={{width: '100%'}}
                     value={viewModel.comment}
                     onChangeText={viewModel.setComment}
                     mode="outlined"
+                    multiline
+                    numberOfLines={2}
+                    style={{
+                        width: '100%',
+                        height: 40,
+                        fontSize: 14,
+                        lineHeight: 20,
+                        backgroundColor: theme.colors.background
+                    }}
+                    contentStyle={{
+                        paddingTop: 4,
+                        paddingBottom: 4,
+                        paddingHorizontal: 8,
+                        textAlignVertical: 'top'
+                    }}
+                    outlineStyle={{borderRadius: 6}}
                 />
             </DataTable.Cell>
             <DataTable.Cell style={[style.column, style.minWidth150]}>
