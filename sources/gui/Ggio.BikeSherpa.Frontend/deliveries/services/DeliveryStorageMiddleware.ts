@@ -8,6 +8,8 @@ import {IBackendClient} from "@/spi/BackendClientSPI";
 import JsonPatchDocument from "@/models/JsonPatchDocument";
 import UploadableFile from "@/models/UploadableFile";
 import deliveryOperationAction from "@/deliveries/data/deliveryOperationAction";
+import {ILogger} from "@/spi/LogsSPI";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
 @injectable()
 export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddleware {
@@ -21,12 +23,16 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
     private attachmentUploadQueue: { stepId: string, file: UploadableFile }[] = [];
     private signatureUploadQueue: { stepId: string, signature: UploadableFile, receiver: string }[] = [];
 
+    private readonly logger: ILogger;
+    
     constructor(
         @inject(DeliveryServiceIdentifier.BackendClientFacade) backendClientFacade: IBackendClient<Delivery>,
-        @inject(DeliveryServiceIdentifier.CustomBackendClientFacade) customClientFacade: IDeliveryCustomBackendClientFacade
+        @inject(DeliveryServiceIdentifier.CustomBackendClientFacade) customClientFacade: IDeliveryCustomBackendClientFacade,
+        @inject(ServicesIdentifiers.Logger) logger: ILogger
     ) {
         this.backendClientFacade = backendClientFacade;
         this.customClientFacade = customClientFacade;
+        this.logger = logger.extend("DeliveryStorageMiddleware");
     }
 
     public setDateForGetAllMyDeliveries(date: string | null) {
@@ -68,115 +74,125 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
     public async update(delivery: Delivery): Promise<void> {
         let completeUpdate: boolean = true;
 
-        // Call an endpoint for every update to do on step in updateStepState
-        for (let i = 0; i < this.updateStepState.length; i++) {
-            if (this.updateStepState[i].deliveryId !== delivery.id)
-                continue;
+        try {
+            // Call an endpoint for every update to do on step in updateStepState
+            for (let i = 0; i < this.updateStepState.length; i++) {
+                if (this.updateStepState[i].deliveryId !== delivery.id)
+                    continue;
 
-            const step = delivery.steps.find(step => step.id === this.updateStepState[i].stepId)
-            if (!step)
-                throw new Error(`Step with ID ${this.updateStepState[i].stepId} not found in delivery ${delivery.id}`);
+                const step = delivery.steps.find(step => step.id === this.updateStepState[i].stepId)
+                if (!step) {
+                    this.logger.error(`Step with ID ${this.updateStepState[i].stepId} not found in delivery ${delivery.id}`);
+                    return;
+                }
 
-            completeUpdate = false;
-            switch (this.updateStepState[i].state) {
-                case deliveryStepOperationAction.patchTime:
-                    let patchTimeJson = new JsonPatchDocument();
-                    patchTimeJson.addOperation(
-                        "/estimatedDeliveryDate",
-                        "replace",
-                        new Date(step.estimatedDeliveryDate).toISOString()
-                    );
-                    await this.customClientFacade.PatchStepEndpoint(step, patchTimeJson);
-                    break;
-                case deliveryStepOperationAction.patchOrder:
-                    let patchOrderJson = new JsonPatchDocument();
-                    patchOrderJson.addOperation(
-                        "/order",
-                        "replace",
-                        step.order
-                    );
-                    await this.customClientFacade.PatchStepEndpoint(step, patchOrderJson);
-                    break;
-                case deliveryStepOperationAction.patchComment:
-                    let patchCommentJson = new JsonPatchDocument();
-                    patchCommentJson.addOperation(
-                        "/comment",
-                        "replace",
-                        step.comment
-                    );
-                    await this.customClientFacade.PatchStepEndpoint(step, patchCommentJson);
-                    break;
-                case deliveryStepOperationAction.patchCourierComment:
-                    let patchCourierCommentJson = new JsonPatchDocument();
-                    patchCourierCommentJson.addOperation(
-                        "/courierComment",
-                        "replace",
-                        step.courierComment
-                    );
-                    await this.customClientFacade.PatchStepEndpoint(step, patchCourierCommentJson);
-                    break;
-                case deliveryStepOperationAction.postCourier:
-                    await this.customClientFacade.PostStepCourierEndpoint(step);
-                    break;
-                case deliveryStepOperationAction.deleteCourier:
-                    await this.customClientFacade.DeleteStepCourierEndpoint(step);
-                    break;
-                case deliveryStepOperationAction.assignMyself:
-                    await this.customClientFacade.PutStepAssignMyself(step);
-                    break;
-                case deliveryStepOperationAction.putOrder:
-                    await this.customClientFacade.PutStepOrderEndpoint(step, step.order >= 0 ? 1 : -1);
-                    break;
-                case deliveryStepOperationAction.putTime:
-                    await this.customClientFacade.PutStepTimeEndpoint(step);
-                    break;
-                case deliveryStepOperationAction.putComplete:
-                    await this.customClientFacade.PutStepCompletionEndpoint(step);
-                    break;
-                case deliveryStepOperationAction.postAttachment:
-                    for (let i = 0; i < this.attachmentUploadQueue.length; i++) {
-                        if (this.attachmentUploadQueue[i].stepId === step.id)
-                            await this.customClientFacade.PostAttachmentEndpoint(step, this.attachmentUploadQueue[i].file);
-                    }
-                    this.attachmentUploadQueue = this.attachmentUploadQueue.filter(file => file.stepId !== step.id);
-                    break;
-                case deliveryStepOperationAction.putSignature:
-                    for (let i = 0; i < this.signatureUploadQueue.length; i++) {
-                        if (this.signatureUploadQueue[i].stepId === step.id)
-                            await this.customClientFacade.PutSignatureEndpoint(step, this.signatureUploadQueue[i].signature, this.signatureUploadQueue[i].receiver);
-                    }
-                    this.signatureUploadQueue = this.signatureUploadQueue.filter(file => file.stepId !== step.id);
-                    break;
-                default:
-                    throw new Error(`Unsupported update action: ${this.updateStepState[i].state}`);
+                completeUpdate = false;
+                switch (this.updateStepState[i].state) {
+                    case deliveryStepOperationAction.patchTime:
+                        let patchTimeJson = new JsonPatchDocument();
+                        patchTimeJson.addOperation(
+                            "/estimatedDeliveryDate",
+                            "replace",
+                            new Date(step.estimatedDeliveryDate).toISOString()
+                        );
+                        await this.customClientFacade.PatchStepEndpoint(step, patchTimeJson);
+                        break;
+                    case deliveryStepOperationAction.patchOrder:
+                        let patchOrderJson = new JsonPatchDocument();
+                        patchOrderJson.addOperation(
+                            "/order",
+                            "replace",
+                            step.order
+                        );
+                        await this.customClientFacade.PatchStepEndpoint(step, patchOrderJson);
+                        break;
+                    case deliveryStepOperationAction.patchComment:
+                        let patchCommentJson = new JsonPatchDocument();
+                        patchCommentJson.addOperation(
+                            "/comment",
+                            "replace",
+                            step.comment
+                        );
+                        await this.customClientFacade.PatchStepEndpoint(step, patchCommentJson);
+                        break;
+                    case deliveryStepOperationAction.patchCourierComment:
+                        let patchCourierCommentJson = new JsonPatchDocument();
+                        patchCourierCommentJson.addOperation(
+                            "/courierComment",
+                            "replace",
+                            step.courierComment
+                        );
+                        await this.customClientFacade.PatchStepEndpoint(step, patchCourierCommentJson);
+                        break;
+                    case deliveryStepOperationAction.postCourier:
+                        await this.customClientFacade.PostStepCourierEndpoint(step);
+                        break;
+                    case deliveryStepOperationAction.deleteCourier:
+                        await this.customClientFacade.DeleteStepCourierEndpoint(step);
+                        break;
+                    case deliveryStepOperationAction.assignMyself:
+                        await this.customClientFacade.PutStepAssignMyself(step);
+                        break;
+                    case deliveryStepOperationAction.putOrder:
+                        await this.customClientFacade.PutStepOrderEndpoint(step, step.order >= 0 ? 1 : -1);
+                        break;
+                    case deliveryStepOperationAction.putTime:
+                        await this.customClientFacade.PutStepTimeEndpoint(step);
+                        break;
+                    case deliveryStepOperationAction.putComplete:
+                        await this.customClientFacade.PutStepCompletionEndpoint(step);
+                        break;
+                    case deliveryStepOperationAction.postAttachment:
+                        for (let i = 0; i < this.attachmentUploadQueue.length; i++) {
+                            if (this.attachmentUploadQueue[i].stepId === step.id)
+                                await this.customClientFacade.PostAttachmentEndpoint(step, this.attachmentUploadQueue[i].file);
+                        }
+                        this.attachmentUploadQueue = this.attachmentUploadQueue.filter(file => file.stepId !== step.id);
+                        break;
+                    case deliveryStepOperationAction.putSignature:
+                        for (let i = 0; i < this.signatureUploadQueue.length; i++) {
+                            if (this.signatureUploadQueue[i].stepId === step.id)
+                                await this.customClientFacade.PutSignatureEndpoint(step, this.signatureUploadQueue[i].signature, this.signatureUploadQueue[i].receiver);
+                        }
+                        this.signatureUploadQueue = this.signatureUploadQueue.filter(file => file.stepId !== step.id);
+                        break;
+                    default:
+                        this.logger.error(`Unsupported update action: ${this.updateStepState[i].state}`);
+                        return;
+                }
             }
-        }
 
-        // Call an endpoint for every update to do on delivery in updateDeliveryState
-        for (let i = 0; i < this.updateDeliveryState.length; i++) {
-            if (this.updateDeliveryState[i].deliveryId !== delivery.id)
-                continue;
+            // Call an endpoint for every update to do on delivery in updateDeliveryState
+            for (let i = 0; i < this.updateDeliveryState.length; i++) {
+                if (this.updateDeliveryState[i].deliveryId !== delivery.id)
+                    continue;
 
-            completeUpdate = false;
-            switch (this.updateDeliveryState[i].state) {
-                case deliveryOperationAction.putPending:
-                    await this.customClientFacade.PutDeliveryPendingEndpoint(delivery);
-                    break;
-                case deliveryOperationAction.putRenew:
-                    await this.customClientFacade.PutDeliveryRenewEndpoint(delivery);
-                    break;
-                default:
-                    throw new Error(`Unsupported update action: ${this.updateStepState[i].state}`);
+                completeUpdate = false;
+                switch (this.updateDeliveryState[i].state) {
+                    case deliveryOperationAction.putWaiting:
+                        await this.customClientFacade.PutWaitingDeliveryEndpoint(delivery);
+                        break;
+                    case deliveryOperationAction.putValidate:
+                        await this.customClientFacade.PutValidateDeliveryEndpoint(delivery);
+                        break;
+                    default:
+                        this.logger.error(`Unsupported update action: ${this.updateStepState[i].state}`);
+                        return;
+                }
             }
+
+            // If no update found, it means we need a complete update
+            if (completeUpdate)
+                await this.backendClientFacade.UpdateEndpoint(delivery);
+
+        } catch (e) {
+            this.logger.error(e);
+            throw new Error(e as string);
+        } finally {
+            // Clear state already processed
+            this.updateStepState = this.updateStepState.filter(state => state.deliveryId !== delivery.id);
+            this.updateDeliveryState = this.updateDeliveryState.filter(state => state.deliveryId !== delivery.id);
         }
-
-        // If no update found, it means we need a complete update
-        if (completeUpdate)
-            await this.backendClientFacade.UpdateEndpoint(delivery);
-
-        // Clear state already processed
-        this.updateStepState = this.updateStepState.filter(state => state.deliveryId !== delivery.id);
-        this.updateDeliveryState = this.updateDeliveryState.filter(state => state.deliveryId !== delivery.id);
     }
 
 }

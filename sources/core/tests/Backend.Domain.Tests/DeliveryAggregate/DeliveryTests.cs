@@ -133,7 +133,6 @@ public class DeliveryTests
           var delivery = MakeSut();
           var step = CreateDropOffStep();
           delivery.Steps.Add(step);
-          delivery.Validate();
 
           // Act
           delivery.CompleteStep(step.Id, true);
@@ -150,7 +149,6 @@ public class DeliveryTests
           var delivery = MakeSut();
           var step = CreateDropOffStep(true);
           delivery.Steps.Add(step);
-          delivery.Validate();
 
           // Act
           delivery.CompleteStep(step.Id, false);
@@ -166,7 +164,6 @@ public class DeliveryTests
           var delivery = MakeSut();
           var pickup = CreatePickupStep();
           delivery.Steps.Add(pickup);
-          delivery.Validate();
 
           // Act
           delivery.CompleteStep(pickup.Id, true);
@@ -176,10 +173,11 @@ public class DeliveryTests
      }
 
      [Fact]
-     public void UpdateStepCompletion_WhenDeliveryHasStatusNew_ShouldThrowException()
+     public void UpdateStepCompletion_WhenDeliveryHasStatusPending_ShouldThrowException()
      {
           // Arrange
           var delivery = MakeSut();
+          delivery.Waiting();
           var pickup = CreatePickupStep();
           delivery.Steps.Add(pickup);
 
@@ -198,7 +196,6 @@ public class DeliveryTests
           var pickup = CreatePickupStep(true);
           var dropOff = CreateDropOffStep();
           delivery.Steps.AddRange([pickup, dropOff]);
-          delivery.Validate();
           delivery.CompleteStep(pickup.Id, true); // Starts delivery
 
           // Act
@@ -245,7 +242,7 @@ public class DeliveryTests
      {
           // Arrange
           var delivery = MakeSut();
-          delivery.Validate();
+          delivery.Waiting();
 
           // Act
           delivery.Cancel();
@@ -259,7 +256,6 @@ public class DeliveryTests
      {
           // Arrange
           var delivery = MakeSut();
-          delivery.Validate();
           var address = _fixture.Create<Address>();
           var mockZoneRepo = new Mock<IDeliveryZoneRepository>();
           var mockItineraryService = new Mock<IItinerarySpi>();
@@ -337,7 +333,6 @@ public class DeliveryTests
      {
           // Arrange
           var delivery = MakeSut();
-          delivery.Validate();
           var step = CreatePickupStep();
           delivery.Steps.Add(step);
           var mockItineraryService = new Mock<IItinerarySpi>();
@@ -554,73 +549,30 @@ public class DeliveryTests
      }
 
      [Fact]
-     public void ValidateDelivery_WhenHasStatusNew_ThenShouldForwardToPEndingStatus()
+     public void WaitingDelivery_WhenHasStatusNew_ThenShouldForwardToPendingStatus()
      {
           // Arrange
           var delivery = MakeSut();
 
           //Act
-          delivery.Validate();
+          delivery.Waiting();
 
           //Assert
           delivery.Status.Should().Be(DeliveryStatus.Pending);
      }
 
      [Fact]
-     public void ValidateDelivery_WhenHasStatusPending_ThenShouldThrowException()
+     public void ValidateDelivery_WhenHasStatusPending_ThenShouldForwardToNewStatus()
      {
           // Arrange
           var delivery = MakeSut();
           delivery.Status = DeliveryStatus.Pending;
 
           //Act
-          var test = delivery.Validate;
+          delivery.Validate();
 
           //Assert
-          test.Should().Throw<InvalidOperationException>();
-     }
-
-
-     [Fact]
-     public void Renew_WhenStatusIsCancelled_ShouldChangeStatusToPending()
-     {
-          // Arrange
-          var delivery = MakeSut();
-          delivery.Status = DeliveryStatus.Pending;
-
-          // Act
-          delivery.Renew();
-
-          // Assert
           delivery.Status.Should().Be(DeliveryStatus.New);
-     }
-
-     [Fact]
-     public void Renew_WhenStatusIsCancelled_ShouldRegisterDeliveryRenewedEvent()
-     {
-          // Arrange
-          var delivery = MakeSut();
-          delivery.Status = DeliveryStatus.Pending;
-
-          // Act
-          delivery.Renew();
-
-          // Assert
-          delivery.DomainEvents.Should().ContainSingle(e => e is DeliveryRenewedEvent);
-     }
-
-     [Fact]
-     public void Renew_WhenStatusIsNotCancelled_ShouldThrowInvalidOperationException()
-     {
-          // Arrange
-          var delivery = MakeSut();
-          delivery.Status = DeliveryStatus.Cancelled;
-
-          // Act
-          var act = delivery.Renew;
-
-          // Assert
-          act.Should().Throw<InvalidOperationException>();
      }
 
      [Fact]
@@ -629,6 +581,20 @@ public class DeliveryTests
           // Arrange
           var delivery = MakeSut();
           delivery.Status = DeliveryStatus.New;
+
+          // Act
+          delivery.Cancel();
+
+          // Assert
+          delivery.Status.Should().Be(DeliveryStatus.Cancelled);
+     }
+     
+     [Fact]
+     public void Cancel_WhenStatusIsPending_ShouldChangeStatusToCancelled()
+     {
+          // Arrange
+          var delivery = MakeSut();
+          delivery.Status = DeliveryStatus.Pending;
 
           // Act
           delivery.Cancel();
@@ -656,7 +622,7 @@ public class DeliveryTests
      {
           // Arrange
           var delivery = MakeSut();
-          delivery.Status = DeliveryStatus.New;
+          delivery.Status = DeliveryStatus.Pending;
 
           // Act
           delivery.Validate();
@@ -672,7 +638,6 @@ public class DeliveryTests
           var delivery = MakeSut();
           var pickup = CreatePickupStep();
           delivery.Steps.Add(pickup);
-          delivery.Validate();
 
           // Act
           delivery.CompleteStep(pickup.Id, true);

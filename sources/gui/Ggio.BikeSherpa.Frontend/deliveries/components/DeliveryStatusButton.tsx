@@ -19,7 +19,7 @@ export default function DeliveryStatusButton(props: Props) {
             break;
             
         case DeliveryStatusEnum.Pending:
-            iconButton = {icon: "clock", color: theme.colors.primary, onPress: viewModel.changeStatusToNew};
+            iconButton = {icon: "timer-sand-empty", color: theme.colors.primary, onPress: viewModel.changeStatusToNew};
             break;
 
         case DeliveryStatusEnum.Started:
@@ -39,7 +39,7 @@ export default function DeliveryStatusButton(props: Props) {
         icon={iconButton.icon}
         size={28}
         iconColor={iconButton.color}
-        contentStyle={{alignItems: 'flex-start'}}
+        contentStyle={{alignItems: 'center'}}
         onPress={() => iconButton.onPress(props.deliveryId)}
         disabled={props.isActive ?? false}
     />

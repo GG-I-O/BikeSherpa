@@ -32,24 +32,24 @@ export default class DeliveryBackendClientFacade implements IBackendClient<Deliv
         this.deliveryMapper = deliveryMapper;
     }
     
-    public async PutDeliveryPendingEndpoint(delivery: Delivery): Promise<void> {
+    public async PutWaitingDeliveryEndpoint(delivery: Delivery): Promise<void> {
         if (!delivery.links)
             throw new Error(`Delivery links empty`);
 
-        const link = delivery.links.find(link => link.rel === hateoasRel.delivery.put.pending);
+        const link = delivery.links.find(link => link.rel === hateoasRel.delivery.put.waiting);
         if (!link)
-            throw new Error(`Delivery link for '${hateoasRel.delivery.put.pending}' not found`);
+            throw new Error(`Delivery link for '${hateoasRel.delivery.put.waiting}' not found`);
 
         await axios.put(link.href);
     }
     
-    public async PutDeliveryRenewEndpoint(delivery: Delivery): Promise<void> {
+    public async PutValidateDeliveryEndpoint(delivery: Delivery): Promise<void> {
         if (!delivery.links)
             throw new Error(`Delivery links empty`);
 
-        const link = delivery.links.find(link => link.rel === hateoasRel.delivery.put.renew);
+        const link = delivery.links.find(link => link.rel === hateoasRel.delivery.put.validate);
         if (!link)
-            throw new Error(`Delivery link for '${hateoasRel.delivery.put.renew}' not found`);
+            throw new Error(`Delivery link for '${hateoasRel.delivery.put.validate}' not found`);
 
         await axios.put(link.href);
     }

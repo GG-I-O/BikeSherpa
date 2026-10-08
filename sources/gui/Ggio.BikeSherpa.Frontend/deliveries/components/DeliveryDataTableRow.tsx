@@ -47,7 +47,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                 }}
                 style={{ backgroundColor: getBackgroundColor() }}
             >
-                <DataTable.Cell style={[style.column, style.width50]}>
+                <DataTable.Cell style={[style.width50]}>
                     <DeliveryStatusButton deliveryId={delivery.id} status={delivery.status} />
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width180]}>

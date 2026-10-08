@@ -11,7 +11,7 @@ public class DeliveryStatusMachineTests
     private readonly static IFixture Fixture = new Fixture().Customize(new AutoMoqCustomization());
 
     private static Delivery CreateDelivery(
-        DeliveryStatus status = DeliveryStatus.Pending,
+        DeliveryStatus status = DeliveryStatus.New,
         List<DeliveryStep>? steps = null)
     {
         var delivery = Fixture.Build<Delivery>()
@@ -34,7 +34,7 @@ public class DeliveryStatusMachineTests
     }
 
     [Fact]
-    public void Fire_Start_WhenPendingAndPickupStepCompleted_TransitionsToStarted()
+    public void Fire_Start_WhenNewAndPickupStepCompleted_TransitionsToStarted()
     {
         // Arrange
         var delivery = CreateDelivery(steps: [CreateStep(StepType.Pickup, completed: true)]);
@@ -52,6 +52,7 @@ public class DeliveryStatusMachineTests
     {
         // Arrange
         var delivery = CreateDelivery(steps: [CreateStep(StepType.Pickup, completed: false)]);
+        delivery.Waiting();
         var sut = new DeliveryStatusMachine(delivery);
 
         // Act
@@ -62,7 +63,7 @@ public class DeliveryStatusMachineTests
     }
 
     [Fact]
-    public void Fire_Start_WhenPendingAndNoSteps_Throws()
+    public void Fire_Start_WhenNewAndNoSteps_Throws()
     {
         // Arrange
         var delivery = CreateDelivery(steps: []);
@@ -77,7 +78,7 @@ public class DeliveryStatusMachineTests
     }
 
     [Fact]
-    public void Fire_Cancel_WhenPending_TransitionsToCancelled()
+    public void Fire_Cancel_WhenNew_TransitionsToCancelled()
     {
         // Arrange
         var delivery = CreateDelivery();

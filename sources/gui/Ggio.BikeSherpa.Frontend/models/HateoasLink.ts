@@ -15,8 +15,8 @@ export const hateoasRel = {
     patch: "patch",
     delivery: {
         put: {
-            pending: "putDeliveryPending",
-            renew: "putDeliveryRenew",
+            waiting: "putWaitingDelivery",
+            validate: "putValidateDelivery",
         }  
     },
     stepCourier: {
