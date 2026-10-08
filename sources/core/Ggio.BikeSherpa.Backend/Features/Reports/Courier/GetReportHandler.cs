@@ -85,7 +85,7 @@ public class GetReportHandler(
                     worksheet.Cell(currentRow, 3).Value = detail.Description;
                     worksheet.Cell(currentRow, 4).Value = detail.Price;
                     worksheet.Cell(currentRow, 5).Value = detail.Quantity;
-                    worksheet.Cell(currentRow, 6).Value = detail.Address?.ToString() ?? string.Empty;
+                    worksheet.Cell(currentRow, 6).Value = detail.Address?.GetFullAddress() ?? string.Empty;;
                }
           }
 
