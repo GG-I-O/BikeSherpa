@@ -52,19 +52,17 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
      {
           switch (Status)
           {
-               case DeliveryStatus.Pending:
+               case DeliveryStatus.New:
                     if (Steps.Any(s => s is { StepType: StepType.Pickup, Completed: true }))
                     {
                          Start();
                     }
-
                     break;
                case DeliveryStatus.Started:
                     if (Steps.All(s => s.Completed))
                     {
                          Complete();
                     }
-
                     break;
                case DeliveryStatus.Completed:
                     throw new InvalidOperationException("Course déjà terminée.");
@@ -176,7 +174,7 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public void CompleteStep(Guid stepId, bool completed, DateTimeOffset? completionDate = null)
      {
-          CheckDeliveryHasBeenValidated();
+          CheckDeliveryIsNotPending();
 
           var existingStep = Steps.Single(s => s.Id == stepId);
           existingStep.Completed = completed;
@@ -349,17 +347,17 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
           return Steps.Sum(s => s.Distance);
      }
 
-     private void CheckDeliveryHasBeenValidated()
+     private void CheckDeliveryIsNotPending()
      {
-          if (Status == DeliveryStatus.New)
+          if (Status == DeliveryStatus.Pending)
           {
                throw new InvalidOperationException("La course doit avoir été validée avant de pouvoir être modifiée");
           }
      }
 
-     public void Renew()
+     public void Waiting()
      {
-          _statusMachine.Fire(DeliveryStatusTrigger.Renew);
-          RegisterDomainEvent(new DeliveryRenewedEvent(Id));
+          _statusMachine.Fire(DeliveryStatusTrigger.Waiting);
+          RegisterDomainEvent(new DeliveryWaitingEvent(Id));
      }
 }

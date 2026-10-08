@@ -29,7 +29,7 @@ public static class Bootstrap
                services.AddScoped<IValidator<UpdateDeliveryStepTimeCommand>, UpdateDeliveryStepTimeCommandValidator>();
                services.AddScoped<IValidator<ExportProofOfDeliveryCommand>, ExportProofOfDeliveryValidator>();
                services.AddTransient<IValidator<ValidateDeliveryCommand>, ValidateDeliveryCommandValidator>();
-               services.AddTransient<IValidator<RenewDeliveryCommand>, RenewDeliveryCommandValidator>();
+               services.AddTransient<IValidator<WaitingDeliveryCommand>, WaitingDeliveryCommandValidator>();
                services.AddTransient<IValidator<CalculateDeliveryPriceQuery>, CalculateDeliveryPriceQueryValidator>();
                services.AddTransient<IValidator<SendDeliveryCreationMailToCustomerCommand>, SendDeliveryCreationMailToCustomerCommandValidator>();
 

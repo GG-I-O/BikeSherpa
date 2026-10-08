@@ -26,21 +26,21 @@ public class DeliveryLinks(IHttpContextAccessor httpContextAccessor, IHateoasSer
                new { deliveryId = id }
           );
 
-          // PUT /delivery/{deliveryId}/pending
-          var putPendingDeliveryRouteValues = new { deliveryId = id};
+          // PUT /delivery/{deliveryId}/waiting
+          var putWaitingDeliveryRouteValues = new { deliveryId = id};
           if (canWrite)
                links.Add(new Link {
-                    Href = hateoasService.GenerateLink(IEndpoint.GetName<ValidateDeliveryEndpoint>(), putPendingDeliveryRouteValues),
-                    Rel = "putDeliveryPending",
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<WaitingDeliveryEndpoint>(), putWaitingDeliveryRouteValues),
+                    Rel = "putWaitingDelivery",
                     Method = "PUT" 
                });
           
-          // PUT /delivery/{deliveryId}/renew
-          var putRenewDeliveryRouteValues = new { deliveryId = id};
+          // PUT /delivery/{deliveryId}/validate
+          var putValidateDeliveryRouteValues = new { deliveryId = id};
           if (canWrite)
                links.Add(new Link {
-                    Href = hateoasService.GenerateLink(IEndpoint.GetName<RenewDeliveryEndpoint>(), putRenewDeliveryRouteValues),
-                    Rel = "putDeliveryRenew",
+                    Href = hateoasService.GenerateLink(IEndpoint.GetName<ValidateDeliveryEndpoint>(), putValidateDeliveryRouteValues),
+                    Rel = "putValidateDelivery",
                     Method = "PUT" 
                });
 

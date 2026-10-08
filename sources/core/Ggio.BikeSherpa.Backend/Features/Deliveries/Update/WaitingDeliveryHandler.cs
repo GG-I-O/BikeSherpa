@@ -7,19 +7,19 @@ using Mediator;
 
 namespace Ggio.BikeSherpa.Backend.Features.Deliveries.Update;
 
-public record RenewDeliveryCommand(Guid DeliveryId) : ICommand<Result>;
+public record WaitingDeliveryCommand(Guid DeliveryId) : ICommand<Result>;
 
-public class RenewDeliveryCommandValidator : AbstractValidator<RenewDeliveryCommand>
+public class WaitingDeliveryCommandValidator : AbstractValidator<WaitingDeliveryCommand>
 {
-     public RenewDeliveryCommandValidator()
+     public WaitingDeliveryCommandValidator()
      {
           RuleFor(x => x.DeliveryId).NotEmpty();
      }
 }
 
-public class RenewDeliveryHandler(IReadRepository<Delivery> readRepository, IValidator<RenewDeliveryCommand> validator, IApplicationTransaction applicationTransaction) : ICommandHandler<RenewDeliveryCommand, Result>
+public class WaitingDeliveryHandler(IReadRepository<Delivery> readRepository, IValidator<WaitingDeliveryCommand> validator, IApplicationTransaction applicationTransaction) : ICommandHandler<WaitingDeliveryCommand, Result>
 {
-     public async ValueTask<Result> Handle(RenewDeliveryCommand command, CancellationToken cancellationToken)
+     public async ValueTask<Result> Handle(WaitingDeliveryCommand command, CancellationToken cancellationToken)
      {
           await validator.ValidateAndThrowAsync(command, cancellationToken);
           var delivery = await readRepository.SingleOrDefaultAsync(new DeliveryByIdSpecification(command.DeliveryId), cancellationToken);
@@ -28,7 +28,7 @@ public class RenewDeliveryHandler(IReadRepository<Delivery> readRepository, IVal
                return Result.NotFound();
           }
 
-          delivery.Renew();
+          delivery.Waiting();
           await applicationTransaction.CommitAsync(cancellationToken);
           return Result.Success();
      }

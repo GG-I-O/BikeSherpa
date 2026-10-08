@@ -14,27 +14,27 @@ using Moq;
 
 namespace BackendTests.Features.Deliveries.Update;
 
-public class RenewDeliveryHandlerTests
+public class WaitingDeliveryHandlerTests
 {
-     private readonly RenewDeliveryCommand _command;
+     private readonly WaitingDeliveryCommand _command;
      private readonly Delivery _delivery;
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private readonly Mock<IReadRepository<Delivery>> _mockReadRepository = new();
-     private readonly Mock<IValidator<RenewDeliveryCommand>> _mockValidator = new();
+     private readonly Mock<IValidator<WaitingDeliveryCommand>> _mockValidator = new();
 
 
-     public RenewDeliveryHandlerTests()
+     public WaitingDeliveryHandlerTests()
      {
-          _command = _fixture.Create<RenewDeliveryCommand>();
+          _command = _fixture.Create<WaitingDeliveryCommand>();
 
           _delivery = _fixture.Build<Delivery>()
                .With(d => d.Steps, [])
-               .With(d => d.Status, DeliveryStatus.Pending)
+               .With(d => d.Status, DeliveryStatus.New)
                .Create();
 
           _mockValidator
                .Setup(x => x.ValidateAsync(
-                    It.IsAny<ValidationContext<RenewDeliveryCommand>>(),
+                    It.IsAny<ValidationContext<WaitingDeliveryCommand>>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ValidationResult());
 
@@ -45,16 +45,16 @@ public class RenewDeliveryHandlerTests
                .ReturnsAsync(_delivery);
      }
 
-     private static RenewDeliveryHandler MakeSut(
+     private static WaitingDeliveryHandler MakeSut(
           out Mock<IReadRepository<Delivery>> mockReadRepository,
-          out Mock<IValidator<RenewDeliveryCommand>> mockValidator,
+          out Mock<IValidator<WaitingDeliveryCommand>> mockValidator,
           out Mock<IApplicationTransaction> mockApplicationTransaction)
      {
           mockReadRepository = new Mock<IReadRepository<Delivery>>();
-          mockValidator = new Mock<IValidator<RenewDeliveryCommand>>();
+          mockValidator = new Mock<IValidator<WaitingDeliveryCommand>>();
           mockApplicationTransaction = new Mock<IApplicationTransaction>();
 
-          return new RenewDeliveryHandler(
+          return new WaitingDeliveryHandler(
                mockReadRepository.Object,
                mockValidator.Object,
                mockApplicationTransaction.Object);
@@ -71,7 +71,7 @@ public class RenewDeliveryHandlerTests
 
           mockValidator
                .Setup(x => x.ValidateAsync(
-                    It.IsAny<ValidationContext<RenewDeliveryCommand>>(),
+                    It.IsAny<ValidationContext<WaitingDeliveryCommand>>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ValidationResult());
 
@@ -99,7 +99,7 @@ public class RenewDeliveryHandlerTests
 
           mockValidator
                .Setup(x => x.ValidateAsync(
-                    It.IsAny<ValidationContext<RenewDeliveryCommand>>(),
+                    It.IsAny<ValidationContext<WaitingDeliveryCommand>>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ValidationResult());
 
@@ -118,7 +118,7 @@ public class RenewDeliveryHandlerTests
      }
 
      [Fact]
-     public async Task Handle_ShouldCallRenewOnDelivery_WhenDeliveryExists()
+     public async Task Handle_ShouldCallWaitingOnDelivery_WhenDeliveryExists()
      {
           // Arrange
           var sut = MakeSut(
@@ -127,13 +127,13 @@ public class RenewDeliveryHandlerTests
                out _);
 
           var mockDelivery = _fixture.Build<Delivery>()
-               .With(s => s.Status, DeliveryStatus.Pending)
+               .With(s => s.Status, DeliveryStatus.New)
                .Without(s => s.Steps)
                .Create();
 
           mockValidator
                .Setup(x => x.ValidateAsync(
-                    It.IsAny<ValidationContext<RenewDeliveryCommand>>(),
+                    It.IsAny<ValidationContext<WaitingDeliveryCommand>>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ValidationResult());
 
@@ -147,11 +147,11 @@ public class RenewDeliveryHandlerTests
           await sut.Handle(_command, CancellationToken.None);
 
           // Assert
-          mockDelivery.Status.Should().Be(DeliveryStatus.New);
+          mockDelivery.Status.Should().Be(DeliveryStatus.Pending);
      }
 
      [Fact]
-     public async Task Handle_ShouldCommitTransaction_WhenDeliveryIsRenewedSuccessfully()
+     public async Task Handle_ShouldCommitTransaction_WhenDeliveryIsWaitingSuccessfully()
      {
           // Arrange
           var sut = MakeSut(
@@ -160,13 +160,13 @@ public class RenewDeliveryHandlerTests
                out var mockApplicationTransaction);
 
           var mockDelivery = _fixture.Build<Delivery>()
-               .With(s => s.Status, DeliveryStatus.Pending)
+               .With(s => s.Status, DeliveryStatus.New)
                .Without(s => s.Steps)
                .Create();
 
           mockValidator
                .Setup(x => x.ValidateAsync(
-                    It.IsAny<ValidationContext<RenewDeliveryCommand>>(),
+                    It.IsAny<ValidationContext<WaitingDeliveryCommand>>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ValidationResult());
 
@@ -196,7 +196,7 @@ public class RenewDeliveryHandlerTests
 
           mockValidator
                .Setup(x => x.ValidateAsync(
-                    It.IsAny<ValidationContext<RenewDeliveryCommand>>(),
+                    It.IsAny<ValidationContext<WaitingDeliveryCommand>>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ValidationResult());
 
@@ -226,7 +226,7 @@ public class RenewDeliveryHandlerTests
 
           mockValidator
                .Setup(x => x.ValidateAsync(
-                    It.IsAny<ValidationContext<RenewDeliveryCommand>>(),
+                    It.IsAny<ValidationContext<WaitingDeliveryCommand>>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new ValidationResult());
 
