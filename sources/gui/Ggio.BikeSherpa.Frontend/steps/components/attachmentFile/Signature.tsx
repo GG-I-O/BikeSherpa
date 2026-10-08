@@ -7,6 +7,7 @@ import UploadableFile from "@/models/UploadableFile";
 import formStyle from "@/style/formStyle";
 import ThemedSignatureIcon from "@/components/themed/ThemedSignatureIcon";
 import {attachmentDomainTypes} from "@/models/AttachmentFile";
+import {KeyboardAvoidingView} from "react-native-keyboard-controller";
 
 type Props = {
     deliveryCode: string;
@@ -87,73 +88,80 @@ export default function Signature(props: Props) {
                 visible={show}
                 onRequestClose={handleClose}
             >
-                <View style={[styles.modalContent, {backgroundColor: theme.colors.background}]}>
-                    <View style={styles.preview}>
-                        {signature && (
-                            <Image
-                                resizeMode="contain"
-                                style={{width: '100%', height: 150}}
-                                source={{uri: signature}}
+                <KeyboardAvoidingView
+                    behavior="padding"
+                    style={{flex: 1, justifyContent: 'center'}}
+                >
+                    <View style={[styles.modalContent, {backgroundColor: theme.colors.background}]}>
+                        <View style={styles.preview}>
+                            {signature && (
+                                <Image
+                                    resizeMode="contain"
+                                    style={{width: '100%', height: 150}}
+                                    source={{uri: signature}}
+                                />
+                            )}
+                        </View>
+                        <View style={styles.canvasContainer}>
+                            <SignatureCanvas
+                                ref={ref}
+                                onOK={handleSignature}
+                                onEmpty={handleEmpty}
+                                onError={handleError}
+                                autoClear={false}
+                                descriptionText="Sign here"
+                                penColor="#000000"
+                                backgroundColor="rgba(255,255,255,0)"
+                                webviewProps={{
+                                    cacheEnabled: true,
+                                    androidLayerType: "hardware",
+                                }}
                             />
-                        )}
+                        </View>
+
+                        <TextInput
+                            value={signatureName}
+                            onChangeText={(value) => setSignatureName(value)}
+                            placeholder="Nom..."
+                            placeholderTextColor={'#3636367e'}
+                            mode='outlined'
+                            style={[formStyle.input,
+                                {
+                                    backgroundColor: theme.colors.background,
+                                    color: theme.colors.onBackground,
+                                }
+                            ]}
+                            contentStyle={{color: theme.colors.onBackground}}
+                        />
+
+                        <View style={styles.actions}>
+                            <Button
+                                mode="outlined"
+                                onPress={handleClose}
+                                disabled={isLoading}
+                            >
+                                Cancel
+                            </Button>
+
+                            <Button
+                                mode="outlined"
+                                onPress={handleClear}
+                                disabled={isLoading}
+                            >
+                                Clear
+                            </Button>
+
+                            <Button
+                                mode="outlined"
+                                onPress={handleConfirm}
+                                loading={isLoading}
+                                disabled={isLoading}
+                            >
+                                Confirm
+                            </Button>
+                        </View>
                     </View>
-                    <SignatureCanvas
-                        ref={ref}
-                        onOK={handleSignature}
-                        onEmpty={handleEmpty}
-                        onError={handleError}
-                        autoClear={false}
-                        descriptionText="Sign here"
-                        penColor="#000000"
-                        backgroundColor="rgba(255,255,255,0)"
-                        webviewProps={{
-                            cacheEnabled: true,
-                            androidLayerType: "hardware",
-                        }}
-                    />
-
-                    <TextInput
-                        value={signatureName}
-                        onChangeText={(value) => setSignatureName(value)}
-                        placeholder="Nom..."
-                        placeholderTextColor={'#3636367e'}
-                        mode='outlined'
-                        style={[formStyle.input,
-                            {
-                                backgroundColor: theme.colors.background,
-                                color: theme.colors.onBackground,
-                            }
-                        ]}
-                        contentStyle={{color: theme.colors.onBackground}}
-                    />
-
-                    <View style={styles.actions}>
-                        <Button
-                            mode="outlined"
-                            onPress={handleClose}
-                            disabled={isLoading}
-                        >
-                            Cancel
-                        </Button>
-
-                        <Button
-                            mode="outlined"
-                            onPress={handleClear}
-                            disabled={isLoading}
-                        >
-                            Clear
-                        </Button>
-
-                        <Button
-                            mode="outlined"
-                            onPress={handleConfirm}
-                            loading={isLoading}
-                            disabled={isLoading}
-                        >
-                            Confirm
-                        </Button>
-                    </View>
-                </View>
+                </KeyboardAvoidingView>
             </Modal>
         </>
     );
@@ -162,7 +170,7 @@ export default function Signature(props: Props) {
 const styles = StyleSheet.create({
     modalContent: {
         width: '80%',
-        height: '80%',
+        maxHeight: '80%',
         top: 0,
         borderRadius: 12,
         padding: 12,
@@ -175,7 +183,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     canvasContainer: {
-        flex: 1,
+        height: 220,
+        minHeight: 100,
+        flexShrink: 1,
         borderWidth: 1,
         borderRadius: 8,
         overflow: 'hidden',
