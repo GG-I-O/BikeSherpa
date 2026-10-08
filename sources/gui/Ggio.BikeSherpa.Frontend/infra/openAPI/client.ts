@@ -604,8 +604,8 @@ const endpoints = makeApi([
   },
   {
     method: "put",
-    path: "/deliveries/:deliveryId/renew",
-    alias: "RenewDeliveryEndpoint",
+    path: "/deliveries/:deliveryId/waiting",
+    alias: "WaitingDeliveryEndpoint",
     tags: ["delivery"],
     requestFormat: "json",
     parameters: [

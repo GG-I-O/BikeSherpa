@@ -27,7 +27,7 @@ export default class DeliveryServices implements IDeliveryServices {
         @inject(DeliveryServiceIdentifier.StorageMiddleware) deliveryStorageMiddleware: IDeliveryStorageMiddleware,
     ) {
         this.logger = logger;
-        this.logger = this.logger.extend("Delivery");
+        this.logger = this.logger.extend("DeliveryService");
         this.storageMiddleware = storageMiddleware;
         this.storage = deliveryStorage;
         this.deliveryStore$ = this.storage.getStore();
@@ -101,14 +101,14 @@ export default class DeliveryServices implements IDeliveryServices {
 
         // Test if the user got the rights to do this action
         const delivery = deliveryObservable.get();
-        if (!delivery.links || !delivery.links.some((link) => link.rel === hateoasRel.delivery.put.renew)) {
+        if (!delivery.links || !delivery.links.some((link) => link.rel === hateoasRel.delivery.put.validate)) {
             this.logger.error(`Cannot update status to New for delivery ${deliveryId}`);
             return
         }
 
         this.deliveryStorageMiddleware.addUpdateDeliveryState(
             deliveryId,
-            deliveryOperationAction.putRenew
+            deliveryOperationAction.putValidate
         );
 
         deliveryObservable.status.set(DeliveryStatusEnum.New);
@@ -119,14 +119,14 @@ export default class DeliveryServices implements IDeliveryServices {
 
         // Test if the user got the rights to do this action
         const delivery = deliveryObservable.get();
-        if (!delivery.links || !delivery.links.some((link) => link.rel === hateoasRel.delivery.put.pending)) {
+        if (!delivery.links || !delivery.links.some((link) => link.rel === hateoasRel.delivery.put.waiting)) {
             this.logger.error(`Cannot update status to Pending for delivery ${deliveryId}`);
             return
         }
 
         this.deliveryStorageMiddleware.addUpdateDeliveryState(
             deliveryId,
-            deliveryOperationAction.putPending
+            deliveryOperationAction.putWaiting
         );
 
         deliveryObservable.status.set(DeliveryStatusEnum.Pending);

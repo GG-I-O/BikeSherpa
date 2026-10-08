@@ -1,6 +1,6 @@
 const deliveryOperationAction = {
-    putPending: "putDeliveryPending",
-    putRenew: "putDeliveryRenew"
+    putValidate: "putValidateDelivery",
+    putWaiting: "putWaitingDelivery"
 };
 
 export default deliveryOperationAction;

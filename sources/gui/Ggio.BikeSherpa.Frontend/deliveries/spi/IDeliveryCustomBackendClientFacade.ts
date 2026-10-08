@@ -4,8 +4,8 @@ import Delivery from "@/deliveries/models/Delivery";
 import UploadableFile from "@/models/UploadableFile";
 
 export interface IDeliveryCustomBackendClientFacade {
-    PutDeliveryPendingEndpoint(delivery: Delivery): Promise<void>;
-    PutDeliveryRenewEndpoint(delivery: Delivery): Promise<void>;
+    PutWaitingDeliveryEndpoint(delivery: Delivery): Promise<void>;
+    PutValidateDeliveryEndpoint(delivery: Delivery): Promise<void>;
     
     GetAllMyDeliveriesEndpoint(date: string): Promise<Delivery[]>;
     GetAllUnassignedDeliveriesEndpoint(date: string): Promise<Delivery[]>;
