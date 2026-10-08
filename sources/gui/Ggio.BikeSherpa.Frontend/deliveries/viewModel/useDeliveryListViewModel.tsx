@@ -32,11 +32,11 @@ export default function useDeliveryListViewModel() {
     const [steps, setSteps] = useState<StepToDisplay[]>([]);
     const [couriers, setCouriers] = useState<{ label: string, value: string }[]>([]);
 
-    const [datePicker, setDatePicker] = useState<Date|undefined>(new Date());
+    const [datePicker, setDatePicker] = useState<Date | undefined>(new Date());
     const [dateFilter, setDateFilter] = useState<string>(dateFilterEnum.Date);
     const [courierFilter, setCourierFilter] = useState<string[]>([]);
-    
-    const { packingSizes } = useDropdown();
+
+    const {packingSizes} = useDropdown();
 
     function displayEditForm(id: string) {
         navigate({
@@ -52,7 +52,11 @@ export default function useDeliveryListViewModel() {
 
     useEffect(() => {
         return observe(() => {
-            setDeliveries(viewModel.getFilteredDeliveries(dateFilter === dateFilterEnum.Date ? datePicker : undefined));
+            if (dateFilter === dateFilterEnum.Date)
+                setDeliveries(viewModel.getFilteredDeliveries(datePicker));
+            else
+                setDeliveries(viewModel.getFilteredDeliveries(undefined, true));
+
             setSteps(viewModel.getFilteredStepList(dateFilter === dateFilterEnum.Date ? datePicker : undefined, courierFilter));
 
             let courierList: { label: string, value: string }[] = [];
