@@ -1495,6 +1495,33 @@ const endpoints = makeApi([
       },
     ],
   },
+  {
+    method: "get",
+    path: "/reports/delivery/:deliveryId",
+    alias: "GetDeliveryReport",
+    tags: ["report"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "deliveryId",
+        type: "Path",
+        schema: z.string(),
+      },
+    ],
+    response: Report,
+    errors: [
+      {
+        status: 401,
+        description: `Unauthorized`,
+        schema: z.void(),
+      },
+      {
+        status: 403,
+        description: `Forbidden`,
+        schema: z.void(),
+      },
+    ],
+  },
 ]);
 
 export const api = new Zodios(endpoints);

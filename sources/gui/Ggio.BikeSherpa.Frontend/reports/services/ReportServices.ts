@@ -1,18 +1,23 @@
 import { IReportServices } from "@/reports/spi/IReportServices";
-import { injectable } from "inversify";
+import {inject, injectable} from "inversify";
 import { createApiClient } from "@/infra/openAPI/client";
 import axios from "axios";
 import { Report } from "@/reports/models/Report";
-import DateToolbox from "@/services/DateToolbox";
+import IReportMapper from "@/reports/spi/IReportMapper";
+import {ReportServiceIdentifier} from "@/reports/bootstrapper/ReportServiceIdentifier";
 
 @injectable()
 export default class ReportServices implements IReportServices {
     private readonly apiClient;
+    private readonly reportMapper: IReportMapper;
 
-    public constructor() {
+    public constructor(
+        @inject(ReportServiceIdentifier.Mapper) reportMapper: IReportMapper
+    ) {
         this.apiClient = createApiClient(axios.defaults.baseURL || '', {
             axiosInstance: axios
         });
+        this.reportMapper = reportMapper;
     }
     public async getCourierReportUrl(courierId: string, startDate: string, endDate: string): Promise<string> {
        
@@ -51,31 +56,16 @@ export default class ReportServices implements IReportServices {
             }
         });
 
-        return {
-            customerName: data.customerName,
-            startDate: DateToolbox.getFormattedDateFromISO(new Date(data.startDate).toISOString()),
-            endDate: DateToolbox.getFormattedDateFromISO(new Date(data.endDate).toISOString()),
-            totalPrice: data.totalPrice,
-            totalPriceWithVat: data.totalPriceWithVat,
-            deliveries: data.deliveries.map(delivery => ({
-                deliveryLabel: delivery.deliveryLabel,
-                deliveryPrice: delivery.deliveryPrice,
-                deliveryPriceWithVat: delivery.deliveryPriceWithVat,
-                details: delivery.details.map(detail => ({
-                    ...detail,
-                    address: {
-                        ...detail.address,
-                        name: detail.address?.name ?? "",
-                        streetInfo: detail.address?.streetInfo ?? "",
-                        postcode: detail.address?.postcode ?? "",
-                        city: detail.address?.city ?? "",
-                        complement: detail.address?.complement ?? "",
-                        phone: detail.address?.phone ?? "",
-                        coordinates: detail.address?.coordinates ?? { longitude: 0, latitude: 0 },
-                        fullAddress: detail.address ? `${detail.address.name} - ${detail.address.streetInfo} ${detail.address.postcode} ${detail.address.city}` : ""
-                    }
-                }))
-            }))
-        };
+        return this.reportMapper.openAPIReportToReport(data);
+    }
+    
+    public async getDeliveryReport(deliveryId: string): Promise<Report> {
+        const data = await this.apiClient.GetDeliveryReport({
+            params: {
+                deliveryId: deliveryId
+            }
+        });
+        
+        return this.reportMapper.openAPIReportToReport(data);
     }
 }
