@@ -1,19 +1,22 @@
 using AutoFixture;
 using AwesomeAssertions;
 using BackendTests.Services;
+using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
-using Ggio.BikeSherpa.Backend.Features.Reports.Customer;
+using Ggio.BikeSherpa.Backend.Features.Reports.Delivery;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using CustomerEntity = Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer;
+using DeliveryEntity = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery;
 using PricingStrategyEnum = Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations.PricingStrategy;
 
-namespace BackendTests.Features.Reports.Customer;
+namespace BackendTests.Features.Reports.Delivery;
 
 [Collection("Database integration tests")]
 [TestSubject(typeof(GetReportEndpoint))]
@@ -55,15 +58,14 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
      }
 
      [Fact]
-     public async Task ShouldReturnReport_ForCustomerAndDateRange()
+     public async Task ShouldReturnReport_ForDelivery()
      {
           // Arrange
           await using var scope = _factory.Services.CreateAsyncScope();
           var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
           await ResetDatabaseAsync(dbContext);
 
-          var startDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
-          var endDate = new DateTimeOffset(2026, 1, 31, 23, 59, 59, TimeSpan.Zero);
+          var contractDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
           var urgency = new Urgency("Normal", 1, "Normal", 1.0, null, null, 12);
           var packingSize = new PackingSize("X", 1, "X", 0, 0);
@@ -73,7 +75,7 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
           await dbContext.DeliveryZones.AddAsync(zone, TestContext.Current.CancellationToken);
           await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-          var customer = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>()
+          var customer = _fixture.Build<CustomerEntity>()
                .With(c => c.Name, "Report Customer")
                .With(c => c.Code, "C01")
                .With(c => c.Address, _fixture.Build<Address>()
@@ -83,15 +85,15 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
                     .Create())
                .Create();
 
-          var delivery = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>()
+          var delivery = _fixture.Build<DeliveryEntity>()
                .With(d => d.CustomerId, customer.Id)
                .With(d => d.Steps, new List<DeliveryStep>())
                .With(d => d.PricingStrategy, PricingStrategyEnum.SimpleDeliveryStrategy)
                .With(d => d.Urgency, urgency)
                .With(d => d.Code, "D01")
                .With(d => d.TotalPrice, 42.50)
-               .With(d => d.ContractDate, startDate)
-               .With(d => d.StartDate, startDate.AddDays(1))
+               .With(d => d.ContractDate, contractDate)
+               .With(d => d.StartDate, contractDate.AddDays(1))
                .With(d => d.CreatedAt, DateTimeOffset.UtcNow)
                .With(d => d.UpdatedAt, DateTimeOffset.UtcNow)
                .Create();
@@ -120,13 +122,42 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
           {
                // Act
                var handler = scope.ServiceProvider.GetRequiredService<GetReportHandler>();
-               var query = new GetReportQuery(customer.Id, startDate, endDate);
+               var query = new GetReportQuery(delivery.Id);
                var report = await handler.Handle(query, CancellationToken.None);
 
                // Assert
+               report.CustomerName.Should().Be("Report Customer");
+               report.StartDate.Should().Be(delivery.StartDate);
+               report.EndDate.Should().Be(delivery.StartDate);
                report.Deliveries.Should().HaveCount(1);
                report.Deliveries[0].DeliveryLabel.Should().Be($"Livraison n° {delivery.Code} le {delivery.StartDate.Day:D2}/{delivery.StartDate.Month:D2}{(!string.IsNullOrEmpty(delivery.CustomerReference) ? $" - Ref client : {delivery.CustomerReference}" : "")}");
                report.Deliveries[0].DeliveryPrice.Should().Be(42.50);
+          }
+          finally
+          {
+               // Clean
+               await ResetDatabaseAsync(dbContext);
+          }
+     }
+
+     [Fact]
+     public async Task ShouldThrowValidationException_WhenDeliveryDoesNotExist()
+     {
+          // Arrange
+          await using var scope = _factory.Services.CreateAsyncScope();
+          var dbContext = scope.ServiceProvider.GetRequiredService<BackendDbContext>();
+          await ResetDatabaseAsync(dbContext);
+
+          try
+          {
+               // Act
+               var handler = scope.ServiceProvider.GetRequiredService<GetReportHandler>();
+               var query = new GetReportQuery(Guid.NewGuid());
+               var act = async () => await handler.Handle(query, CancellationToken.None);
+
+               // Assert
+               await act.Should().ThrowAsync<ValidationException>()
+                    .WithMessage("*Delivery does not exist*");
           }
           finally
           {

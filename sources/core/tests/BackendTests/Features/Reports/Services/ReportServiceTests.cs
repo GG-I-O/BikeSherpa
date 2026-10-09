@@ -37,7 +37,7 @@ public class ReportServiceTests
           _sut = new ReportService([_pricingStrategyMock.Object], _delayServiceMock.Object, _vatServiceMock.Object, _courierRepositoryMock.Object);
      }
 
-     private Delivery MakeDelivery(
+     private Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery MakeDelivery(
           PricingStrategyEnum pricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
           string? code = null,
           DateTimeOffset? startDate = null,
