@@ -17,7 +17,7 @@ public class ReportService(
      public async Task<Report> GenerateDeliveryReportAsync(string customerName,
           DateTimeOffset startDate,
           DateTimeOffset endDate,
-          List<Delivery> deliveries)
+          List<Domain.DeliveryAggregate.Delivery> deliveries)
      {
           var report = new Report
           {
@@ -48,7 +48,7 @@ public class ReportService(
                delivery.Steps = delivery.Steps.Where(s => !s.NotBilled).OrderBy(s => s.Order).ToList();
                foreach (var deliveryStep in delivery.Steps)
                {
-                    var description = "";
+                    string description;
 
                     if (pricingStrategy.ImplementedStrategy == PricingStrategy.SimpleDeliveryStrategy)
                     {
@@ -133,7 +133,7 @@ public class ReportService(
           return customer == null ? string.Empty : customer.GetFullName();
      }
 
-     private async Task<string> GetTourDeliveryStepDescription(DeliveryStep deliveryStep, Delivery delivery)
+     private async Task<string> GetTourDeliveryStepDescription(DeliveryStep deliveryStep, Domain.DeliveryAggregate.Delivery delivery)
      {
           var description = "";
 
@@ -153,7 +153,7 @@ public class ReportService(
           return description;
      }
 
-     private async Task<string> GetSimpleDeliveryStepDescription(DeliveryStep deliveryStep, Delivery delivery)
+     private async Task<string> GetSimpleDeliveryStepDescription(DeliveryStep deliveryStep, Domain.DeliveryAggregate.Delivery delivery)
      {
           var description = "";
           if (deliveryStep.StepType == StepType.Pickup)

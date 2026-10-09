@@ -1,30 +1,24 @@
-import {IDeliveryServices} from "@/deliveries/spi/IDeliveryServices";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import {inject} from "inversify";
-import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
-import Delivery from "@/deliveries/models/Delivery";
-import IDeliveryMapper from "@/deliveries/spi/IDeliveryMapper";
+import {Report} from "@/reports/models/Report";
 import {IProofOfDeliveryService} from "@/deliveries/spi/IProofOfDeliveryService";
+import {IReportServices} from "@/reports/spi/IReportServices";
+import {ReportServiceIdentifier} from "@/reports/bootstrapper/ReportServiceIdentifier";
 
 export default class DeliveryDetailViewModel {
-    private readonly deliveryServices: IDeliveryServices;
-    private readonly deliveryMapper: IDeliveryMapper;
+    private readonly reportService: IReportServices;
     private readonly proofOfDeliveryService: IProofOfDeliveryService;
 
     constructor(
-        @inject(DeliveryServiceIdentifier.Services) deliveryServices: IDeliveryServices,
-        @inject(DeliveryServiceIdentifier.Mapper) deliveryMapper: IDeliveryMapper,
+       @inject(ReportServiceIdentifier.Services) reportService: IReportServices,
         @inject(DeliveryServiceIdentifier.ProofOfDeliveryService) proofOfDeliveryService: IProofOfDeliveryService
     ) {
-        this.deliveryServices = deliveryServices;
-        this.deliveryMapper = deliveryMapper;
+        this.reportService = reportService;
         this.proofOfDeliveryService = proofOfDeliveryService;
     }
 
-    public getDelivery = (id: string): DeliveryToDisplay => {
-        const delivery: Delivery = this.deliveryServices.getDelivery$(id).get();
-
-        return this.deliveryMapper.DeliveryToDeliveryToDisplay(delivery);
+    public getDeliveryReport = async (id: string): Promise<Report> => {
+        return await this.reportService.getDeliveryReport(id);
     }
     
     public exportProofOfDelivery = async (deliveryId: string): Promise<string> => {

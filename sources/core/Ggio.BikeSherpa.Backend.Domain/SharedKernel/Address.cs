@@ -27,18 +27,14 @@ public class Address
      public string GetFullAddress()
      {
           var builder = new StringBuilder();
-          builder.Append(StreetInfo);
+          builder.AppendLine(StreetInfo);
           if (!string.IsNullOrEmpty(Complement))
           {
                builder.AppendLine(Complement);
           }
-          else
-          {
-               builder.AppendLine();
-          }
 
           builder.AppendLine(Postcode);
-          builder.AppendLine(City);
-          return builder.ToString();
+          builder.Append(City);
+          return builder.ToString().TrimEnd();
      }
 }
