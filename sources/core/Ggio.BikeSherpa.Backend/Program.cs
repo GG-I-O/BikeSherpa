@@ -22,10 +22,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using NJsonSchema.Generation;
-using Serilog;
+using QuestPDF;
 using QuestPDF.Infrastructure;
+using Serilog;
 
-QuestPDF.Settings.License = LicenseType.Community;
+Settings.License = LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,7 +109,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
           options.AddPolicy("read:myDeliveries", policy => policy.RequireClaim(scopeName, "read:myDeliveries"));
           options.AddPolicy("write:myDeliveries", policy => policy.RequireClaim(scopeName, "write:myDeliveries"));
           options.AddPolicy("read:reports", policy => policy.RequireClaim(scopeName, "read:reports"));
-          
+
           options.AddPolicy("CanValidateStep", policy =>
           {
                policy.RequireAuthenticatedUser();
@@ -121,6 +122,7 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                            scopes.Contains("write:deliveries");
                });
           });
+
           options.AddPolicy("CanSignStep", policy =>
           {
                policy.RequireAuthenticatedUser();
@@ -135,15 +137,15 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
           });
      });
 
-     builder.Services.AddAuth0ApiAuthentication(options =>
-     {
-          options.Domain = builder.Configuration["Auth0Domain"];
-          options.JwtBearerOptions = new JwtBearerOptions
+     builder.Services.AddAuth0ApiAuthentication(options => options.Domain = builder.Configuration["Auth0Domain"],
+          options =>
           {
-               Audience = builder.Configuration["Auth0Identifier"],
-               RequireHttpsMetadata = true,
-               MetadataAddress = $"{builder.Configuration["Auth0Metadata"]}",
-               TokenValidationParameters = new TokenValidationParameters
+
+
+               options.Audience = builder.Configuration["Auth0Identifier"];
+               options.RequireHttpsMetadata = true;
+               options.MetadataAddress = $"{builder.Configuration["Auth0Metadata"]}";
+               options.TokenValidationParameters = new TokenValidationParameters
                {
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -151,8 +153,9 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["Auth0Issuer"],
                     ValidAudience = builder.Configuration["Auth0Identifier"]
-               },
-               Events = new JwtBearerEvents
+               };
+
+               options.Events = new JwtBearerEvents
                {
                     OnTokenValidated = async context =>
                     {
@@ -168,9 +171,8 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
 
                          await Task.CompletedTask;
                     }
-               }
-          };
-     });
+               };
+          });
 
      // Logger
      builder.Host.UseSerilog((context, configuration) =>
@@ -183,18 +185,17 @@ if (!builder.Environment.IsEnvironment("IntegrationTest"))
           configuration.Enrich.WithProperty("machine", Environment.MachineName);
 
      });
+
      builder.Services.AddHttpLogging();
 }
 
 var app = builder.Build();
 app.MapHub<ResourceNotificationHub>("/hubs/notifications");
-
 app.UseCors();
 app.UseHttpsRedirection();
 app.UsePathBase("/api");
 app.UseAuthentication();
 app.UseAuthorization();
-
 if (!app.Environment.IsEnvironment("IntegrationTest") && !app.Environment.IsProduction())
 {
      app.UseFastEndpoints(config => { config.Endpoints.ShortNames = true; })

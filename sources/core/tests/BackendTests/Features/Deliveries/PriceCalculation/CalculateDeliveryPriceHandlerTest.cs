@@ -31,22 +31,33 @@ public class CalculateDeliveryPriceHandlerTest
                     new DeliveryStepDto
                     {
                          Data = _fixture.Build<DeliveryStepCrud>()
-                              .With(s => s.StepType, StepType.Pickup)
-                              .With(s => s.Order, 1)
-                              .With(s => s.PackingSize, packingSize.Name)
+                              .With(s => s.StepType,
+                                   StepType.Pickup)
+                              .With(s => s.Order,
+                                   1)
+                              .With(s => s.PackingSize,
+                                   packingSize.Name)
                               .Create()
                     },
 
                     new DeliveryStepDto
                     {
                          Data = _fixture.Build<DeliveryStepCrud>()
-                              .With(s => s.StepType, StepType.Dropoff)
-                              .With(s => s.Order, 2)
-                              .With(s => s.PackingSize, packingSize.Name)
+                              .With(s => s.StepType,
+                                   StepType.Dropoff)
+                              .With(s => s.Order,
+                                   2)
+                              .With(s => s.PackingSize,
+                                   packingSize.Name)
                               .Create()
                     }
                ],
-               Urgency = urgency.Name
+               Urgency = urgency.Name,
+               Code = string.Empty,
+               CustomerId = Guid.NewGuid(),
+               InsulatedBox = false,
+               StartDate = default,
+               ContractDate = default
           };
 
           var query = new CalculateDeliveryPriceQuery(deliveryCrud);
@@ -82,13 +93,20 @@ public class CalculateDeliveryPriceHandlerTest
                     new DeliveryStepDto
                     {
                          Data = _fixture.Build<DeliveryStepCrud>()
-                              .With(s => s.StepType, StepType.Pickup)
-                              .With(s => s.PackingSize, packingSize.Name)
+                              .With(s => s.StepType,
+                                   StepType.Pickup)
+                              .With(s => s.PackingSize,
+                                   packingSize.Name)
                               .Create()
 
                     }
                ],
-               Urgency = urgency.Name
+               Urgency = urgency.Name,
+               Code = string.Empty,
+               CustomerId = default,
+               InsulatedBox = false,
+               StartDate = default,
+               ContractDate = default
           };
 
           var query = new CalculateDeliveryPriceQuery(deliveryCrud);
@@ -121,30 +139,44 @@ public class CalculateDeliveryPriceHandlerTest
                     new DeliveryStepDto
                     {
                          Data = _fixture.Build<DeliveryStepCrud>()
-                              .With(s => s.StepType, StepType.Pickup)
-                              .With(s => s.Order, 1)
-                              .With(s => s.PackingSize, packingSize.Name)
+                              .With(s => s.StepType,
+                                   StepType.Pickup)
+                              .With(s => s.Order,
+                                   1)
+                              .With(s => s.PackingSize,
+                                   packingSize.Name)
                               .Create()
                     },
                     new DeliveryStepDto
                     {
                          Data = _fixture.Build<DeliveryStepCrud>()
-                              .With(s => s.StepType, StepType.Dropoff)
-                              .With(s => s.Order, 2)
-                              .With(s => s.PackingSize, packingSize.Name)
+                              .With(s => s.StepType,
+                                   StepType.Dropoff)
+                              .With(s => s.Order,
+                                   2)
+                              .With(s => s.PackingSize,
+                                   packingSize.Name)
                               .Create()
                     },
 
                     new DeliveryStepDto
                     {
                          Data = _fixture.Build<DeliveryStepCrud>()
-                              .With(s => s.StepType, StepType.Dropoff)
-                              .With(s => s.Order, 3)
-                              .With(s => s.PackingSize, packingSize.Name)
+                              .With(s => s.StepType,
+                                   StepType.Dropoff)
+                              .With(s => s.Order,
+                                   3)
+                              .With(s => s.PackingSize,
+                                   packingSize.Name)
                               .Create()
                     }
                ],
-               Urgency = urgency.Name
+               Urgency = urgency.Name,
+               Code = string.Empty,
+               CustomerId = Guid.Empty,
+               InsulatedBox = false,
+               StartDate = default,
+               ContractDate = default
           };
 
           var query = new CalculateDeliveryPriceQuery(deliveryCrud);
