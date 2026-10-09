@@ -60,7 +60,6 @@ public class GetReportEndpointTests(
           _mockMediator.Verify(
                m => m.Send(
                     It.Is<GetReportQuery>(q =>
-                         q.CourierId == courierId &&
                          q.From == startDate &&
                          q.To == endDate),
                     It.IsAny<CancellationToken>()),
@@ -97,7 +96,6 @@ public class GetReportEndpointTests(
           _mockMediator.Verify(
                m => m.Send(
                     It.Is<GetReportQuery>(q =>
-                         q.CourierId == courrierId &&
                          q.From == startDate &&
                          q.To == endDate),
                     It.IsAny<CancellationToken>()),

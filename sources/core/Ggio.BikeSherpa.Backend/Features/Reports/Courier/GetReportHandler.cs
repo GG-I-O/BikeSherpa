@@ -12,21 +12,14 @@ namespace Ggio.BikeSherpa.Backend.Features.Reports.Courier;
 public record ReportFile(byte[] Content, string FileName, string ContentType);
 
 public record GetReportQuery(
-     Guid CourierId,
      DateTimeOffset From,
      DateTimeOffset To
 ) : IQuery<ReportFile>;
 
 public class GetReportQueryValidator : AbstractValidator<GetReportQuery>
 {
-     public GetReportQueryValidator(IReadRepository<Domain.CourierAggregate.Courier> customerRepository)
+     public GetReportQueryValidator()
      {
-          RuleFor(x => x.CourierId)
-               .NotEmpty()
-               .MustAsync(async (customerId, cancellationToken) =>
-                    await customerRepository.FirstOrDefaultAsync(new CourierByIdSpecification(customerId), cancellationToken) is not null)
-               .WithMessage("Courier does not exist");
-
           RuleFor(x => x.From).NotEmpty();
           RuleFor(x => x.To).NotEmpty();
           RuleFor(x => x.From).LessThanOrEqualTo(x => x.To);
@@ -35,7 +28,6 @@ public class GetReportQueryValidator : AbstractValidator<GetReportQuery>
 
 public class GetReportHandler(
      IReadRepository<Delivery> repository,
-     IReadRepository<Domain.CourierAggregate.Courier> customerRepository,
      IValidator<GetReportQuery> validator,
      IReportService service
 ) : IQueryHandler<GetReportQuery, ReportFile>
@@ -44,12 +36,9 @@ public class GetReportHandler(
      {
           await validator.ValidateAndThrowAsync(query, cancellationToken);
 
-          var courier = await customerRepository.FirstOrDefaultAsync(new CourierByIdSpecification(query.CourierId), cancellationToken);
-
           var deliveries = await repository
                .ListAsync(
-                    new DeliveryByCourierAndDateRangeSpecification(
-                         query.CourierId,
+                    new DeliveryByDateRangeSpecification(
                          query.From,
                          query.To
                     )
@@ -57,7 +46,7 @@ public class GetReportHandler(
                );
 
           var report = await service.GenerateDeliveryReportAsync(
-               courier!.GetFullName(),
+               string.Empty,
                query.From,
                query.To,
                deliveries
@@ -67,7 +56,7 @@ public class GetReportHandler(
           var worksheet = workbook.Worksheets.Add("Rapport coursier");
 
           var currentRow = 1;
-          worksheet.Cell(currentRow, 1).Value = $"Rapport pour le coursier {courier.GetFullName()} du {query.From} au {query.To}";
+          worksheet.Cell(currentRow, 1).Value = $"Rapport pour les coursiers du {query.From} au {query.To}";
           worksheet.Cell(currentRow, 1).Value = "Nom du coursier";
           worksheet.Cell(currentRow, 2).Value = "Livraison";
           worksheet.Cell(currentRow, 3).Value = "Description";
@@ -97,7 +86,7 @@ public class GetReportHandler(
 
           return new ReportFile(
                content,
-               $"Report_{courier.LastName}_{query.From:yyyyMMdd}_{query.To:yyyyMMdd}.xlsx",
+               $"Report_Couriers_{query.From:yyyyMMdd}_{query.To:yyyyMMdd}.xlsx",
                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           );
      }
