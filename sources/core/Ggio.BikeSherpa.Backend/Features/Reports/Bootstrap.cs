@@ -12,9 +12,10 @@ public static class Bootstrap
           public IServiceCollection ConfigureReportFeature()
           {
                services.AddScoped<IReportService, ReportService>();
-               services.AddScoped<IValidator<GetReportQuery>, GetReportQueryValidator>();
                services.AddScoped<IValidator<ExportReportCommand>, ExportReportCommandValidator>();
+               services.AddScoped<IValidator<GetReportQuery>, GetReportQueryValidator>();
                services.AddScoped<IValidator<Courier.GetReportQuery>, Courier.GetReportQueryValidator>();
+               services.AddScoped<IValidator<Delivery.GetReportQuery>, Delivery.GetReportQueryValidator>();
                return services;
           }
      }

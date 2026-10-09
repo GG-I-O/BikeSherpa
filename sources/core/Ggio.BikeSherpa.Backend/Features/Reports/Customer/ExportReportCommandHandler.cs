@@ -1,6 +1,5 @@
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
-using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 using Ggio.BikeSherpa.Backend.Domain.Spi;
 using Ggio.BikeSherpa.Backend.Features.Reports.Services;
@@ -35,7 +34,7 @@ public class ExportReportCommandValidator : AbstractValidator<ExportReportComman
 }
 
 public class ExportReportCommandHandler(
-     IReadRepository<Delivery> repository,
+     IReadRepository<Domain.DeliveryAggregate.Delivery> repository,
      IReadRepository<Domain.CustomerAggregate.Customer> customerRepository,
      IValidator<ExportReportCommand> validator,
      IReportService service,
