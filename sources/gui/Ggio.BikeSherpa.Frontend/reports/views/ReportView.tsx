@@ -53,18 +53,7 @@ export default function ReportView() {
 
                     />
                 )}
-
-                {viewModel.reportType === 'Coursier' && (
-                    <Dropdown
-                        key={`courier-filter-${viewModel.courierFilter || 'empty'}`}
-                        label="Coursier"
-                        options={viewModel.couriersOptions.slice(1)}
-                        value={viewModel.courierFilter}
-                        onSelect={(value) => viewModel.setCourierFilter(value)}
-                        mode="outlined"
-
-                    />
-                )}
+                
                 <DatePickerModal
                     locale="fr"
                     mode="range"
@@ -84,12 +73,11 @@ export default function ReportView() {
                 <View style={{alignItems: 'center', justifyContent: 'center', marginTop: 16}}>
                     <Text style={{
                         fontWeight: 'bold',
-                        marginBottom: 8,
-                        color: "orange"
+                        marginBottom: 8
                     }}>{viewModel.courierReportPath?.Name}</Text>
                     <Text style={{color: 'blue'}}
                           onPress={() => Linking.openURL(viewModel.courierReportPath?.Path!)}>
-                        Télécharger le rapport du coursier
+                        Télécharger le rapport des coursiers
                     </Text>
 
                 </View>

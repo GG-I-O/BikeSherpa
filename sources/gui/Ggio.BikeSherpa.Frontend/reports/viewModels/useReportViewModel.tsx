@@ -33,8 +33,6 @@ export default function useReportViewModel() {
     const [customersOptions, setCustomersOptions] = useState<{ label: string, value: string }[]>([]);
 
     const [courierReportPath, setCourierReportPath] = useState<CourierReportResult | null>(null);
-    const [courierFilter, setCourierFilter] = useState<string | undefined>();
-    const [couriersOptions, setCourierOptions] = useState<{ label: string, value: string }[]>([]);
 
     const [customerReportExportUrl, setCustomerReportExportUrl] = useState<string | null>(null);
 
@@ -64,24 +62,17 @@ export default function useReportViewModel() {
     }, [customerStore$, setReport, setCustomersOptions, startDateFilter, endDateFilter, customerFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        // For courier management
-        setCourierOptions([...defaultDropdownOption, ...Object.values(courierStore$.peek()).map(courier => ({
-            label: courier.code + " - " + courier.firstName,
-            value: courier.id
-        }))]);
-
-        if (courierFilter) {
-            viewModel.getCourierReport(startDateFilter, endDateFilter, courierFilter).then(path => {
+        if (reportType === 'Coursier') {
+            viewModel.getCourierReport(startDateFilter, endDateFilter).then(path => {
                 if (path) {
                     // Handle the path to the downloaded report file
                     console.log("Courier report downloaded at:", path);
-                    const currentCourier = courierStore$.peek()[courierFilter];
-                    const reportName = "Rapport coursier " + currentCourier?.firstName + " " + currentCourier?.lastName + " du " + DateToolbox.getFormattedDateFromISO(startDateFilter.toISOString()) + " au " + DateToolbox.getFormattedDateFromISO(endDateFilter.toISOString());
+                    const reportName = "Rapport coursiers du " + DateToolbox.getFormattedDateFromISO(startDateFilter.toISOString()) + " au " + DateToolbox.getFormattedDateFromISO(endDateFilter.toISOString());
                     setCourierReportPath({ Name : reportName , Path : path });
                 }
             });
         }
-    }, [courierStore$, setCourierOptions, setCourierReportPath, startDateFilter, endDateFilter, courierFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [courierStore$, setCourierReportPath, startDateFilter, endDateFilter, reportType]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const exportCustomerReport = useCallback(() => {
         viewModel.getCustomerReportExportUrl(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
@@ -101,9 +92,6 @@ export default function useReportViewModel() {
         reportType,
         setReportType,
         reportTypeValues,
-        courierFilter,
-        setCourierFilter,
-        couriersOptions,
         courierReportPath,
         exportCustomerReport,
         customerReportExportUrl

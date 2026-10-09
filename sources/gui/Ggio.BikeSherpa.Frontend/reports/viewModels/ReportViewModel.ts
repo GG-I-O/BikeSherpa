@@ -18,10 +18,10 @@ export default class ReportViewModel {
         return await this.reportServices.getCustomerReport(customerFilter, startDateFilter.toISOString(), endDateFilter.toISOString());
     }
 
-    public getCourierReport = async (startDateFilter: Date, endDateFilter: Date, courierFilter?: string): Promise<string | null> => {
-        if (!this.reportServices || !courierFilter) return null;
+    public getCourierReport = async (startDateFilter: Date, endDateFilter: Date): Promise<string | null> => {
+        if (!this.reportServices) return null;
 
-        return await this.reportServices.getCourierReportUrl(courierFilter, startDateFilter.toISOString(), endDateFilter.toISOString());
+        return await this.reportServices.getCourierReportUrl(startDateFilter.toISOString(), endDateFilter.toISOString());
     }
 
     public getCustomerReportExportUrl = async (startDateFilter: Date, endDateFilter: Date, customerFilter?: string): Promise<string | null> => {

@@ -14,12 +14,9 @@ export default class ReportServices implements IReportServices {
             axiosInstance: axios
         });
     }
-    public async getCourierReportUrl(courierId: string, startDate: string, endDate: string): Promise<string> {
+    public async getCourierReportUrl(startDate: string, endDate: string): Promise<string> {
        
         return await this.apiClient.GetCourierReport({
-            params: {
-                courierId: courierId
-            },
             queries: {
                 startDate: startDate,
                 endDate: endDate
