@@ -26,7 +26,7 @@ public class GetReportQueryValidator : AbstractValidator<GetReportQuery>
 }
 
 public class GetReportHandler(
-     IReadRepository<Delivery> repository,
+     IReadRepository<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery> repository,
      IValidator<GetReportQuery> validator,
      IReportService service
 ) : IQueryHandler<GetReportQuery, ReportFile>
