@@ -1,6 +1,6 @@
 import AppStyle from "@/constants/AppStyle";
 import {useLocalSearchParams} from "expo-router";
-import {Linking, ScrollView, View} from "react-native";
+import {Linking, View} from "react-native";
 import {Button, Divider, Text, TextInput, useTheme} from "react-native-paper";
 import useStepDetailViewModel from "@/steps/viewModel/useStepDetailViewModel";
 import DeliveryTypeIcon from "@/deliveries/components/DeliveryTypeIcon";

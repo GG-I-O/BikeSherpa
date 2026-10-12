@@ -1,4 +1,4 @@
-import {Button, useTheme} from "react-native-paper";
+import {Button} from "react-native-paper";
 import React from "react";
 import * as ImagePicker from 'expo-image-picker';
 import UploadableFile from "@/models/UploadableFile";
@@ -10,9 +10,7 @@ type Props = {
     onPhoto: (file: UploadableFile) => void;
 }
 
-export default function Photo(props: Props) {
-    const theme = useTheme();
-    
+export default function Photo(props: Props) {    
     const photoQuality = parseFloat(process.env.EXPO_PUBLIC_PHOTO_QUALITY ?? '0.8');
 
     const takePhoto = () => {

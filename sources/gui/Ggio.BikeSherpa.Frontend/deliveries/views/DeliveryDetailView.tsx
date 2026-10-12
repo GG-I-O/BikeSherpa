@@ -16,7 +16,7 @@ export default function DeliveryDetailView() {
 
         if (!viewModel.deliveryReport)
             viewModel.loadDeliveryReport(deliveryId).then();
-    }, [deliveryId, viewModel]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [deliveryId, viewModel]);
 
     if (!viewModel.deliveryReport)
         return (

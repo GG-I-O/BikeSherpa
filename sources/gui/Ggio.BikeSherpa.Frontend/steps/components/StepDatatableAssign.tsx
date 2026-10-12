@@ -3,9 +3,6 @@ import datatableStyle from "@/style/datatableStyle";
 import StepDataTableRowAssign from "./StepDataTableRowAssign";
 import {ScrollView} from "react-native";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
-import {IOCContainer} from "@/bootstrapper/constants/IOCContainer";
-import {IColorServiceSpi} from "@/spi/ColorServiceSpi";
-import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 
 type Props = {
     steps: StepToDisplay[],
