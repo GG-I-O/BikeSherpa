@@ -55,7 +55,7 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
      }
 
      [Fact]
-     public async Task ShouldReturnReport_ForCustomerAndDateRange()
+     public async Task ShouldReturnReport_DateRange()
      {
           // Arrange
           await using var scope = _factory.Services.CreateAsyncScope();

@@ -29,8 +29,7 @@ public class GetReportEndpointTests(
      {
           // Arrange
           _mockMediator.Reset();
-
-          var courierId = Guid.NewGuid();
+          
           var startDate = new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
           var endDate = new DateTimeOffset(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
 
@@ -51,7 +50,7 @@ public class GetReportEndpointTests(
 
           // Act
           var response = await _client.GetAsync(
-               $"/api/reports/courier/{courierId}?startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
+               $"/api/reports/courier?startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
                _cancellationToken);
 
           // Assert
@@ -74,8 +73,7 @@ public class GetReportEndpointTests(
      {
           // Arrange
           _mockMediator.Reset();
-
-          var courrierId = Guid.NewGuid();
+          
           var startDate = new DateTimeOffset(2026, 2, 1, 8, 30, 0, TimeSpan.Zero);
           var endDate = new DateTimeOffset(2026, 2, 28, 18, 0, 0, TimeSpan.Zero);
 
@@ -87,7 +85,7 @@ public class GetReportEndpointTests(
 
           // Act
           var response = await _client.GetAsync(
-               $"/api/reports/courier/{courrierId}?startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
+               $"/api/reports/courier?startDate={Uri.EscapeDataString(startDate.ToString("O"))}&endDate={Uri.EscapeDataString(endDate.ToString("O"))}",
                _cancellationToken);
 
           // Assert
