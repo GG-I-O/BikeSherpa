@@ -83,7 +83,7 @@ public class GetReportIntegrationTests : IClassFixture<IntegrationTestWebApplica
                     .Create())
                .Create();
 
-          var delivery = _fixture.Build<Delivery>()
+          var delivery = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>()
                .With(d => d.CustomerId, customer.Id)
                .With(d => d.Steps, new List<DeliveryStep>())
                .With(d => d.PricingStrategy, PricingStrategyEnum.SimpleDeliveryStrategy)

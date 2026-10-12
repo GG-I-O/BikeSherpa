@@ -17,7 +17,7 @@ namespace BackendTests.Features.Reports.Customer;
 public class GetReportHandlerTests
 {
      private readonly Mock<IReadRepository<Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer>> _customerRepositoryMock = new();
-     private readonly Mock<IReadRepository<Delivery>> _deliveryRepositoryMock = new();
+     private readonly Mock<IReadRepository<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>> _deliveryRepositoryMock = new();
      private readonly DateTimeOffset _endDate = new(2026, 1, 31, 0, 0, 0, TimeSpan.Zero);
      private readonly IFixture _fixture = new Fixture().Customize(new AutoMoqCustomization());
      private readonly Mock<IReportService> _reportServiceMock = new();
@@ -35,7 +35,7 @@ public class GetReportHandlerTests
                .With(c => c.Name, "Customer Name")
                .Create();
 
-          var deliveries = _fixture.Build<Delivery>()
+          var deliveries = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>()
                .With(d => d.CustomerId, customerId)
                .With(d => d.Steps, [])
                .CreateMany(2)
@@ -108,7 +108,7 @@ public class GetReportHandlerTests
           // Assert
           _deliveryRepositoryMock.Verify(
                r => r.ListAsync(
-                    It.Is<ISpecification<Delivery>>(s => s is DeliveryByCustomerAndDateRangeSpecification),
+                    It.Is<ISpecification<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>>(s => s is DeliveryByCustomerAndDateRangeSpecification),
                     It.IsAny<CancellationToken>()),
                Times.Once);
      }
@@ -124,7 +124,7 @@ public class GetReportHandlerTests
                .With(c => c.Name, "Report Customer")
                .Create();
 
-          var deliveries = _fixture.Build<Delivery>()
+          var deliveries = _fixture.Build<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>()
                .With(d => d.CustomerId, customerId)
                .With(d => d.Steps, [])
                .CreateMany(3)
@@ -166,7 +166,7 @@ public class GetReportHandlerTests
 
           _deliveryRepositoryMock.Verify(
                r => r.ListAsync(
-                    It.IsAny<ISpecification<Delivery>>(),
+                    It.IsAny<ISpecification<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
 
@@ -175,7 +175,7 @@ public class GetReportHandlerTests
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<List<Delivery>>()),
+                    It.IsAny<List<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>>()),
                Times.Never);
      }
 
@@ -201,7 +201,7 @@ public class GetReportHandlerTests
 
           _deliveryRepositoryMock.Verify(
                r => r.ListAsync(
-                    It.IsAny<ISpecification<Delivery>>(),
+                    It.IsAny<ISpecification<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
 
@@ -210,7 +210,7 @@ public class GetReportHandlerTests
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<List<Delivery>>()),
+                    It.IsAny<List<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>>()),
                Times.Never);
      }
 
@@ -239,7 +239,7 @@ public class GetReportHandlerTests
 
           _deliveryRepositoryMock.Verify(
                r => r.ListAsync(
-                    It.IsAny<ISpecification<Delivery>>(),
+                    It.IsAny<ISpecification<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>>(),
                     It.IsAny<CancellationToken>()),
                Times.Never);
 
@@ -248,13 +248,13 @@ public class GetReportHandlerTests
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<List<Delivery>>()),
+                    It.IsAny<List<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>>()),
                Times.Never);
      }
 
      private GetReportHandler CreateSut(
           Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Customer? customer,
-          List<Delivery> deliveries,
+          List<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery> deliveries,
           Report report)
      {
           _customerRepositoryMock.Reset();
@@ -272,7 +272,7 @@ public class GetReportHandlerTests
 
           _deliveryRepositoryMock
                .Setup(r => r.ListAsync(
-                    It.IsAny<ISpecification<Delivery>>(),
+                    It.IsAny<ISpecification<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>>(),
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(deliveries);
 
@@ -281,7 +281,7 @@ public class GetReportHandlerTests
                     It.IsAny<string>(),
                     It.IsAny<DateTimeOffset>(),
                     It.IsAny<DateTimeOffset>(),
-                    It.IsAny<List<Delivery>>()))
+                    It.IsAny<List<Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery>>()))
                .ReturnsAsync(report);
 
           var validator = new GetReportQueryValidator(_customerRepositoryMock.Object);

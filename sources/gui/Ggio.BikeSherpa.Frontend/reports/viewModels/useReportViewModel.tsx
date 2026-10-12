@@ -72,7 +72,10 @@ export default function useReportViewModel() {
                 }
             });
         }
-    }, [courierStore$, setCourierReportPath, startDateFilter, endDateFilter, reportType]); // eslint-disable-line react-hooks/exhaustive-deps
+        else {
+            setCourierReportPath(null);
+        }
+    }, [courierStore$, setCourierOptions, setCourierReportPath, startDateFilter, endDateFilter, courierFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const exportCustomerReport = useCallback(() => {
         viewModel.getCustomerReportExportUrl(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
