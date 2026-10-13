@@ -1,5 +1,5 @@
 import {Button, Divider, IconButton, SegmentedButtons, Text, useTheme} from "react-native-paper";
-import React, {useCallback} from "react";
+import React, {Fragment, useCallback} from "react";
 import {Control, FieldError, FieldErrors, Path, useController, useFieldArray} from "react-hook-form";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";
@@ -54,29 +54,43 @@ export default function PublicDeliveryStepForm(props: Props) {
     return (
         <View style={{gap: 16, width: "100%"}}>
             {fields.map((step, index) => (
-                <>
-                    <View key={index} style={{flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center'}}>
-                        <View style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: 'center',
-                            minWidth: '50%'
-                        }}>
-                            <ThemedAddressInput
-                                name={`steps.${index}.stepAddress`}
-                                control={props.control}
-                                label={step.stepType === StepType.PickUp ? "Adresse/lieu d'enlèvement" : `Adresse/lieu de destination ${index}`}
-                                error={props.errors.steps ? (props.errors.steps as any)[index]?.stepAddress.fullAddress as FieldError | undefined : undefined}
-                                labelAsTitle
-                                required
-                            />
-                            {index >= 2 &&
-                                <IconButton
-                                    style={{margin: 0}}
-                                    contentStyle={{justifyContent: "flex-end"}}
-                                    icon="trash-can-outline"
-                                    onPress={() => remove(index)}/>
-                            }
+                <Fragment key={step.id}>
+                    <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center'}}>
+                        <View style={{flex: 1, gap: 16}}>
+                            <View style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: 'center',
+                                minWidth: '50%'
+                            }}>
+                                <ThemedAddressInput
+                                    name={`steps.${index}.stepAddress`}
+                                    control={props.control}
+                                    label={step.stepType === StepType.PickUp ? "Adresse/lieu d'enlèvement" : `Adresse/lieu de destination ${index}`}
+                                    error={props.errors.steps ? (props.errors.steps as any)[index]?.stepAddress.fullAddress as FieldError | undefined : undefined}
+                                    labelAsTitle
+                                    required
+                                />
+                                {index >= 2 &&
+                                    <IconButton
+                                        style={{margin: 0}}
+                                        contentStyle={{justifyContent: "flex-end"}}
+                                        icon="trash-can-outline"
+                                        onPress={() => remove(index)}/>
+                                }
+                            </View>
+                            {step.stepType === StepType.Drop && (
+                                <View style={{flex: 1, alignItems: 'center'}}>
+                                    <Text style={AppStyle.textStyle.h3}>Pois et Taille du colis</Text>
+                                    <ThemedSegmentedInput
+                                        name={`steps.${index}.packingSize`}
+                                        control={props.control}
+                                        label=""
+                                        buttons={props.packingSizes}
+                                        error={props.errors.steps ? (props.errors.steps as any)[index]?.packingSize as FieldError | undefined : undefined}
+                                    />
+                                </View>
+                            )}
                         </View>
                         <Divider style={{height: 150, width: 1}}/>
                         <View style={{flex: 1, minWidth: 280}}>
@@ -126,22 +140,8 @@ export default function PublicDeliveryStepForm(props: Props) {
                             </InputGroup>
                         </View>
                     </View>
-                    {step.stepType === StepType.Drop && (
-                        <View>
-                            <Divider/>
-                            <Text style={AppStyle.textStyle.h3}>Pois et Taille du colis</Text>
-                            <ThemedSegmentedInput
-                                name={`steps.${index}.packingSize`}
-                                control={props.control}
-                                label=""
-                                buttons={props.packingSizes}
-                                error={props.errors.steps ? (props.errors.steps as any)[index]?.packingSize as FieldError | undefined : undefined}
-                            />
-                        </View>
-                    )}
                     <Divider style={{height: 3}}/>
-
-                </>
+                </Fragment>
             ))}
             {props.canAddStep &&
                 <Button
