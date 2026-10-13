@@ -1,34 +1,19 @@
-import {View} from "react-native";
-import ThemedInput from "@/components/themed/ThemedInput";
-import {Button, Divider, Text, useTheme} from "react-native-paper";
-import formStyle from "@/style/formStyle";
 import React from "react";
-import usePublicDeliveryLoginViewModel from "@/deliveries/viewModel/usePublicDeliveryLoginViewModel";
+import {Button, Divider, Text} from "react-native-paper";
+import ThemedInput from "@/components/themed/ThemedInput";
 import LoadingModal from "@/components/general/LoadingModal";
+import BrandedCard from "@/components/general/BrandedCard";
+import formStyle from "@/style/formStyle";
+import usePublicDeliveryLoginViewModel from "@/deliveries/viewModel/usePublicDeliveryLoginViewModel";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 
 export default function PublicDeliveryLoginView() {
-    const theme = useTheme();
     const viewModel = usePublicDeliveryLoginViewModel();
-    
-    const { isLoadingModalVisible} = usePublicDeliveryModal();
+    const {isLoadingModalVisible} = usePublicDeliveryModal();
 
     return (
-        <View style={{
-            backgroundColor: theme.colors.background,
-            width: '100%',
-            height: '100%'
-        }}>
-            <LoadingModal visible={isLoadingModalVisible}/>
-
-            <View style={{
-                justifyContent: 'center',
-                gap: 16,
-                height: '100%',
-                width: '75%',
-                maxWidth: 500,
-                margin: 'auto'
-            }}>
+        <>
+            <BrandedCard>
                 <ThemedInput
                     name={"email"}
                     control={viewModel.control}
@@ -36,6 +21,7 @@ export default function PublicDeliveryLoginView() {
                     placeholder={""}
                     error={viewModel.errors.email}
                     required
+                    horizontal
                 />
                 <ThemedInput
                     name={"code"}
@@ -44,24 +30,28 @@ export default function PublicDeliveryLoginView() {
                     placeholder={""}
                     error={viewModel.errors.code}
                     required
+                    horizontal
                 />
                 <Button
                     testID="formButton"
                     mode="outlined"
                     onPress={() => viewModel.handleSubmit()}
-                    style={[formStyle.button, {width: '80%'}]}
+                    style={[formStyle.button, {width: "100%"}]}
                 >
                     <Text>Valider</Text>
                 </Button>
-                <Divider style={{width: '80%'}}/>
+                <Divider style={{width: "100%"}}/>
                 <Button
                     mode="outlined"
                     onPress={() => viewModel.proceedAsAnonymous()}
-                    style={[formStyle.button, {width: '80%'}]}
+                    style={[formStyle.button, {width: "100%"}]}
                 >
                     <Text>{"Je n'ai pas d'identifiant"}</Text>
                 </Button>
-            </View>
-        </View>
+            </BrandedCard>
+            {isLoadingModalVisible && (
+                <LoadingModal visible={isLoadingModalVisible}/>
+            )}
+        </>
     );
 }

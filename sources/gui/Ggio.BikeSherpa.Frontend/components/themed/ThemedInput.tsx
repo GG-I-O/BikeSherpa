@@ -3,11 +3,14 @@ import {Control, FieldError, FieldValues, Path, useController} from 'react-hook-
 import {Text, TextInput, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
 import {View} from 'react-native';
+import {Icon} from "react-native-paper/src";
 
 interface CustomTextInputProps<T extends FieldValues = FieldValues> {
     name: string;
     control: Control<T>;
     label: string;
+    labelIconCode?: string;
+    horizontal?: boolean;
     placeholder: string;
     error?: FieldError | undefined;
     secureTextEntry?: boolean;
@@ -24,6 +27,8 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
         name,
         control,
         label,
+        labelIconCode = undefined,
+        horizontal = false,
         placeholder,
         error,
         secureTextEntry,
@@ -64,11 +69,21 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
     }
 
     return (
-        <View style={formStyle.intputContainer}>
-            <Text
-                style={[formStyle.label, {color: theme.colors.onBackground}, theme.fonts.labelLarge]}>{label}{required &&
-                <Text style={{color: theme.colors.error}}> *</Text>}
-            </Text>
+        <View style={[formStyle.intputContainer,
+            horizontal ? {
+                flexDirection: 'row',
+                flex: 1,
+                gap: 8
+            } : {flexDirection: 'column'}
+        ]}>
+            <View style={{flexDirection: 'row', minWidth: 65}}>
+                <Text
+                    style={[formStyle.label, {color: theme.colors.onBackground}, theme.fonts.labelLarge]}>
+                    {labelIconCode && (<Icon size={12} source={labelIconCode}/>)}
+                    {label}{required &&
+                    <Text style={{color: theme.colors.error}}> *</Text>}
+                </Text>
+            </View>
             <TextInput
                 value={isAnArray ? field.value[0] : field.value}
                 onChangeText={(value) => onChange(value)}
@@ -80,7 +95,7 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
                     error && {borderColor: theme.colors.error},
                     {
                         backgroundColor: theme.colors.background,
-                        color: theme.colors.onBackground,
+                        color: theme.colors.onBackground
                     }
                 ]}
                 contentStyle={{color: theme.colors.onBackground}}
