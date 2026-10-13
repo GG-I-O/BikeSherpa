@@ -50,11 +50,6 @@ export default function PublicDeliveryAnonymousForm() {
                     <Divider/>
                 </>
             )}
-            <PublicDeliveryCustomerForm
-                control={viewModel.control}
-                errors={viewModel.errors}
-                customerType={viewModel.customerType}
-            />
             <Button
                 testID="formButton"
                 mode="outlined"
