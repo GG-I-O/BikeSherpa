@@ -6,6 +6,7 @@ import BrandedCard from "@/components/general/BrandedCard";
 import formStyle from "@/style/formStyle";
 import usePublicDeliveryLoginViewModel from "@/deliveries/viewModel/usePublicDeliveryLoginViewModel";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
+import {View} from "react-native";
 
 export default function PublicDeliveryLoginView() {
     const viewModel = usePublicDeliveryLoginViewModel();
@@ -13,42 +14,44 @@ export default function PublicDeliveryLoginView() {
 
     return (
         <>
-            <BrandedCard>
-                <ThemedInput
-                    name={"email"}
-                    control={viewModel.control}
-                    label={"Email"}
-                    placeholder={""}
-                    error={viewModel.errors.email}
-                    required
-                    horizontal
-                />
-                <ThemedInput
-                    name={"code"}
-                    control={viewModel.control}
-                    label={"Id Client"}
-                    placeholder={""}
-                    error={viewModel.errors.code}
-                    required
-                    horizontal
-                />
-                <Button
-                    testID="formButton"
-                    mode="outlined"
-                    onPress={() => viewModel.handleSubmit()}
-                    style={[formStyle.button, {width: "100%"}]}
-                >
-                    <Text>Valider</Text>
-                </Button>
-                <Divider style={{width: "100%"}}/>
-                <Button
-                    mode="outlined"
-                    onPress={() => viewModel.proceedAsAnonymous()}
-                    style={[formStyle.button, {width: "100%"}]}
-                >
-                    <Text>{"Je n'ai pas d'identifiant"}</Text>
-                </Button>
-            </BrandedCard>
+            <View style={{height: '100%'}}>
+                <BrandedCard>
+                    <ThemedInput
+                        name={"email"}
+                        control={viewModel.control}
+                        label={"Email"}
+                        placeholder={""}
+                        error={viewModel.errors.email}
+                        required
+                        horizontal
+                    />
+                    <ThemedInput
+                        name={"code"}
+                        control={viewModel.control}
+                        label={"Id Client"}
+                        placeholder={""}
+                        error={viewModel.errors.code}
+                        required
+                        horizontal
+                    />
+                    <Button
+                        testID="formButton"
+                        mode="outlined"
+                        onPress={() => viewModel.handleSubmit()}
+                        style={[formStyle.button, {width: "100%"}]}
+                    >
+                        <Text>Valider</Text>
+                    </Button>
+                    <Divider style={{width: "100%"}}/>
+                    <Button
+                        mode="outlined"
+                        onPress={() => viewModel.proceedAsAnonymous()}
+                        style={[formStyle.button, {width: "100%"}]}
+                    >
+                        <Text>{"Je n'ai pas d'identifiant"}</Text>
+                    </Button>
+                </BrandedCard>
+            </View>
             {isLoadingModalVisible && (
                 <LoadingModal visible={isLoadingModalVisible}/>
             )}
