@@ -17,16 +17,19 @@ import {useDebounce} from "@/hooks/useDebounce";
 import {useSelector} from "@legendapp/state/react";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 import useDropdown from "@/hooks/useDropdown";
+import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
+import {ILogger} from "@/spi/LogsSPI";
 
 export default function usePublicDeliveryFormViewModel(customer?: PublicDeliveryCustomer) {
     const publicDeliveryService = IOCContainer.get<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices);
+    const logger = IOCContainer.get<ILogger>(ServicesIdentifiers.Logger).extend("PublicDeliveryForm");
     const viewModel = new PublicDeliveryFormViewModel(publicDeliveryService);
 
     let {pricingStrategies, urgencies, packingSizes} = useDropdown();
 
     const [customerType, setCustomerType] = useState<PublicDeliveryCustomerTypeEnum>(PublicDeliveryCustomerTypeEnum.Sender);
 
-    const {setIsLoadingModalVisible, setIsErrorModalVisible} = usePublicDeliveryModal();
+    const {setIsLoadingModalVisible} = usePublicDeliveryModal();
 
     const emptyAddress = useMemo(() => ({
         name: '',
@@ -43,15 +46,6 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             pricingStrategy: customer?.deliveryType ?? 0,
             urgency: urgencies.length > 0 ? urgencies[0].value : 'Standard',
             totalPrice: 0,
-            customer: {
-                code: customer?.code ?? "xxx",
-                name: customer?.name ?? '',
-                email: customer?.email ?? '',
-                phoneNumber: customer ? null : '',
-                address: {
-                    ...customer?.address
-                }
-            },
             steps: [
                 {
                     stepType: 0,
@@ -76,7 +70,6 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             ],
             insulatedBox: false,
             startDate: new Date().toISOString(),
-            needEstimate: false,
         },
         resolver: zodResolver(publicDeliveryFormBaseSchema)
     });
@@ -123,14 +116,14 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         name: ["pricingStrategy", "urgency", "startDate"]
     });
     const cancelledRef = useRef(false);
-    
+
     // Trigger estimated price calculation with debounce
     const estimateKey = useMemo(() => JSON.stringify({
         coords: stepCoordinates.map(c => [c?.longitude, c?.latitude]),
         packings: stepPackings,
         trigger: triggerFields
     }), [stepCoordinates, stepPackings, triggerFields]);
-    
+
     const lastKeyRef = useRef<string | null>(null);
 
     useDebounce(() => {
@@ -141,7 +134,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 coord !== undefined && coord.longitude !== 0 && coord.latitude !== 0
             );
         if (!hasValidSteps) return;
-        
+
         if (lastKeyRef.current === estimateKey) return;
         lastKeyRef.current = estimateKey;
 
@@ -185,18 +178,15 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         handleSubmit: handleSubmit(
             (data) => {
                 setIsLoadingModalVisible(true);
-                viewModel.onSubmit(data)
-                    .then((isOk: boolean) => {
-                        if (isOk)
-                            navigate("/newDelivery/summary");
-                        else
-                            setIsErrorModalVisible(true);
-                    })
-                    .finally(() => setIsLoadingModalVisible(false));
+                
+                viewModel.onSubmit(data);
+                navigate("/newDelivery/summary");
+                
+                setIsLoadingModalVisible(false);
             },
             (errors) => {
-                console.error("Invalid delivery for creation");
-                console.error(errors);
+                logger.error("Invalid delivery for creation");
+                logger.error(errors);
             }
         ),
         errors,

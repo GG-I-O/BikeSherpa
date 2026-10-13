@@ -65,7 +65,7 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
                 onPress={() => viewModel.handleSubmit()}
                 style={formStyle.button}
             >
-                <Text testID="buttonName">Valider</Text>
+                <Text testID="buttonName">Suivant</Text>
             </Button>
         </ScrollView>
     );

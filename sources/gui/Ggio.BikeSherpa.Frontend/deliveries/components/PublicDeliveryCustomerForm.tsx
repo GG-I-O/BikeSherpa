@@ -7,11 +7,11 @@ import React from "react";
 import {
     PublicDeliveryCustomerTypeEnum
 } from "@/deliveries/data/PublicDeliveryCustomerType";
-import {PublicDeliveryFormValues} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
 import AppStyle from "@/constants/AppStyle";
+import {PublicDeliveryCustomerFormValues} from "@/deliveries/models/zod/publicDeliveryCustomerFormBaseSchema";
 
 type Props = {
-    control: Control<PublicDeliveryFormValues>;
+    control: Control<PublicDeliveryCustomerFormValues>;
     errors: FieldErrors;
     customerType: PublicDeliveryCustomerTypeEnum;
 }

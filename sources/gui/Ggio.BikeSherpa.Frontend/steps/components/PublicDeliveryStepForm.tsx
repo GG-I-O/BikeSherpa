@@ -1,6 +1,6 @@
-import {Button, Divider, IconButton, SegmentedButtons, Text, useTheme} from "react-native-paper";
+import {Button, Divider, IconButton, Text} from "react-native-paper";
 import React, {Fragment, useCallback} from "react";
-import {Control, FieldError, FieldErrors, Path, useController, useFieldArray} from "react-hook-form";
+import {Control, FieldError, FieldErrors, useFieldArray} from "react-hook-form";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";
 import {PublicDeliveryFormValues} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
@@ -8,10 +8,8 @@ import AppStyle from "@/constants/AppStyle";
 import {StepType} from "@/steps/models/StepType";
 import ThemedInput from "@/components/themed/ThemedInput";
 import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
-import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
 import {DropdownOptions} from "@/models/DropdownOptions";
 import InputGroup from "@/components/themed/InputGroup";
-import dateFilterDropdown from "@/deliveries/data/dateFilterDropdown";
 import ThemedSegmentedInput from "@/components/themed/ThemedSegmentedInput";
 
 type Props = {
@@ -24,7 +22,6 @@ type Props = {
 }
 
 export default function PublicDeliveryStepForm(props: Props) {
-    const theme = useTheme();
     const {fields, append, remove} = useFieldArray({
         name: "steps",
         control: props.control

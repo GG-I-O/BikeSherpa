@@ -2,7 +2,6 @@ import {Button, Divider, Text} from "react-native-paper";
 import PublicDeliveryStepForm from "@/steps/components/PublicDeliveryStepForm";
 import PublicDeliveryDetailsForm from "@/deliveries/components/PublicDeliveryDetailsForm";
 import PublicDeliveryPrice from "@/deliveries/components/PublicDeliveryPrice";
-import PublicDeliveryCustomerForm from "@/deliveries/components/PublicDeliveryCustomerForm";
 import usePublicDeliveryFormViewModel from "@/deliveries/viewModel/usePublicDeliveryFormViewModel";
 import {ScrollView} from "react-native";
 import formStyle from "@/style/formStyle";
@@ -56,7 +55,7 @@ export default function PublicDeliveryAnonymousForm() {
                 onPress={() => viewModel.handleSubmit()}
                 style={formStyle.button}
             >
-                <Text testID="buttonName">Valider</Text>
+                <Text testID="buttonName">Suivant</Text>
             </Button>
         </ScrollView>
     );
