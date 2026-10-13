@@ -182,6 +182,7 @@ const CustomerDto = z.object({
 const CheckCustomerResponse = z.object({
   defaultDeliveryType: DeliveryType.nullable(),
   customerName: z.string(),
+  customerAddress: Address,
 });
 const ProblemDetails = z.record(z.unknown().nullable());
 const CourierCrud = z.object({

@@ -40,7 +40,6 @@ export default class StepMapper implements IStepMapper {
             estimatedIsoDate: step.estimatedDeliveryDate,
             estimatedDate: DateToolbox.getFormattedDateFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
             estimatedTime: DateToolbox.getFormattedTimeFromISO(new Date(step.estimatedDeliveryDate).toISOString()),
-            realDeliveryTime: step.realDeliveryDate ? DateToolbox.getFormattedTimeFromISO(new Date(step.realDeliveryDate).toISOString()) : undefined,
             distance: Math.round(step.distance * 100) / 100,
             notBilled: step.notBilled,
             attachmentFiles: step.attachmentFiles ?? [],

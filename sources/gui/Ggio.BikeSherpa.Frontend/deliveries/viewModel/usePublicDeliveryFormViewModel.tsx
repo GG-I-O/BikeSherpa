@@ -49,8 +49,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 email: customer?.email ?? '',
                 phoneNumber: customer ? null : '',
                 address: {
-                    ...emptyAddress,
-                    name: customer?.name ?? ''
+                    ...customer?.address
                 }
             },
             steps: [
@@ -59,9 +58,9 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                     comment: '',
                     courierComment: '',
                     notBilled: false,
-                    contactName: '',
+                    contactName: customer?.name ?? '',
                     contactPhone: '',
-                    stepAddress: emptyAddress,
+                    stepAddress: customer?.address ?? emptyAddress,
                     packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
                 },
                 {
@@ -89,23 +88,6 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         setValue,
         getValues
     } = form;
-
-    // Hydrate infos depending on customer type
-    useEffect(() => {
-        const senderAddress = getValues("steps.0.stepAddress");
-        const customerName = getValues("customer.name");
-        const customerPhone = getValues("customer.phoneNumber") ?? "";
-
-        setValue("customer.address", senderAddress);
-
-        setValue("steps.0.stepAddress.name", customerName);
-        setValue("steps.0.contactName", "");
-        setValue("steps.0.contactPhone", customerPhone);
-
-        setValue("steps.1.stepAddress.name", "");
-        setValue("steps.1.contactName", "");
-        setValue("steps.1.contactPhone", "");
-    }, [emptyAddress, getValues, setValue]);
 
     // Keep Address fields populated when an address change
     useEffect(() => {

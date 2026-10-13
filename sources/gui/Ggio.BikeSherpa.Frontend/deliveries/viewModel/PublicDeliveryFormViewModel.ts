@@ -27,7 +27,8 @@ export default class PublicDeliveryFormViewModel {
                 code: '',
                 name: customerObject.name,
                 email: customerObject.email,
-                deliveryType: deliveryObject.pricingStrategy
+                deliveryType: deliveryObject.pricingStrategy,
+                address: customerObject.address
             });
         }
         return result;

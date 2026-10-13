@@ -33,7 +33,11 @@ export default class PublicDeliveryService implements IPublicDeliveryService {
 
             return {
                 name: result.customerName,
-                deliveryType: result.defaultDeliveryType ?? 0
+                deliveryType: result.defaultDeliveryType ?? 0,
+                address: {
+                    ...result.customerAddress,
+                    fullAddress: `${result.customerAddress.streetInfo} ${result.customerAddress.postcode} ${result.customerAddress.city}`,
+                }
             }
         } catch (error) {
             this.logger.error("Login public delivery customer error:", error);
