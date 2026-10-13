@@ -2,10 +2,9 @@ using Ardalis.Specification;
 
 namespace Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Specification;
 
-public class DeliveryByCourierAndDateRangeSpecification : Specification<Delivery>
+public class DeliveryByDateRangeSpecification : Specification<Delivery>
 {
-     public DeliveryByCourierAndDateRangeSpecification(
-          Guid courierId,
+     public DeliveryByDateRangeSpecification(
           DateTimeOffset startDate,
           DateTimeOffset endDate
      )
@@ -14,9 +13,9 @@ public class DeliveryByCourierAndDateRangeSpecification : Specification<Delivery
           var utcEnd = endDate.ToUniversalTime();
 
           Query
-               .Where(x => x.Steps.Any(s => s.CourierId == courierId) &&
-                           x.StartDate >= utcStart &&
-                           x.StartDate <= utcEnd)
+               .Where(x =>
+                    x.StartDate >= utcStart &&
+                    x.StartDate <= utcEnd)
                .OrderBy(x => x.StartDate);
      }
 }

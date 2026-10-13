@@ -7,7 +7,6 @@ import {Dropdown} from "react-native-paper-dropdown";
 import ReportDetail from "@/reports/components/ReportDetail";
 import useReportViewModel from "@/reports/viewModels/useReportViewModel";
 
-
 export default function ReportView() {
     const viewModel = useReportViewModel();
     const theme = useTheme();
@@ -54,17 +53,6 @@ export default function ReportView() {
                     />
                 )}
 
-                {viewModel.reportType === 'Coursier' && (
-                    <Dropdown
-                        key={`courier-filter-${viewModel.courierFilter || 'empty'}`}
-                        label="Coursier"
-                        options={viewModel.couriersOptions.slice(1)}
-                        value={viewModel.courierFilter}
-                        onSelect={(value) => viewModel.setCourierFilter(value)}
-                        mode="outlined"
-
-                    />
-                )}
                 <DatePickerModal
                     locale="fr"
                     mode="range"
@@ -85,52 +73,55 @@ export default function ReportView() {
 
 
             <View style={{
+                flex: 1,
                 alignItems: 'center',
                 justifyContent: 'flex-start',
-                minHeight: '100%',
                 paddingTop: 16,
                 backgroundColor: theme.colors.background
             }}>
                 {viewModel.reportType === 'Coursier' && (
                     <>
-                        {!viewModel.courierReportPath ? (
-                            <Text>Sélectionne une période et un coursier</Text>
-                        ) : (
-                            <>
-                                <Text style={{
-                                    fontWeight: 'bold',
-                                    marginBottom: 8,
-                                    color: "orange"
-                                }}>{viewModel.courierReportPath?.Name}</Text>
-                                <Text style={{color: 'blue'}}
-                                      onPress={() => Linking.openURL(viewModel.courierReportPath?.Path!)}>
-                                    Télécharger le rapport du coursier
-                                </Text>
-                            </>
-                        )}
+                        <View style={{alignItems: 'center', justifyContent: 'center', marginTop: 16}}>
+                            {!viewModel.courierReportPath ? (
+                                <Text>Chargement du rapport des coursiers</Text>
+                            ) : (
+                                <>
+                                    <Text style={{
+                                        fontWeight: 'bold',
+                                        marginBottom: 8
+                                    }}>
+                                        {viewModel.courierReportPath?.Name}
+                                    </Text>
+                                    <Text style={{color: 'blue'}}
+                                          onPress={() => Linking.openURL(viewModel.courierReportPath?.Path!)}>
+                                        Télécharger le rapport des coursiers
+                                    </Text>
+                                </>
+                            )}
+                        </View>
                     </>
                 )}
 
                 {viewModel.reportType === 'Client' && (
                     <>
                         {viewModel.report ? (
-                            <View style={{alignContent: 'flex-start', width: '100%'}}>
+                            <View style={{flex: 1, width: '100%'}}>
                                 <View style={{width: '80%', flexDirection: 'row', paddingInline: 8, gap: 8}}>
-                                <Button
-                                    mode="outlined"
-                                    onPress={() => viewModel.exportCustomerReport()}
-                                >
-                                    Générer le rapport client
-                                </Button>
-                                {viewModel.customerReportExportUrl && (
                                     <Button
                                         mode="outlined"
-                                        onPress={() => Linking.openURL(viewModel.customerReportExportUrl!)}
-                                        icon="download"
+                                        onPress={() => viewModel.exportCustomerReport()}
                                     >
-                                        Voir le rapport client
+                                        Générer le rapport client
                                     </Button>
-                                )}
+                                    {viewModel.customerReportExportUrl && (
+                                        <Button
+                                            mode="outlined"
+                                            onPress={() => Linking.openURL(viewModel.customerReportExportUrl!)}
+                                            icon="download"
+                                        >
+                                            Voir le rapport client
+                                        </Button>
+                                    )}
                                 </View>
                                 <ReportDetail
                                     report={viewModel.report}

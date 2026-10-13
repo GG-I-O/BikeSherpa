@@ -1386,16 +1386,11 @@ const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/reports/courier/:courierId",
+    path: "/reports/courier",
     alias: "GetCourierReport",
     tags: ["report"],
     requestFormat: "json",
     parameters: [
-      {
-        name: "courierId",
-        type: "Path",
-        schema: z.string(),
-      },
       {
         name: "startDate",
         type: "Query",
