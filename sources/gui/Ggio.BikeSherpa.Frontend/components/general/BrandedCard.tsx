@@ -84,8 +84,7 @@ const styles = StyleSheet.create({
         opacity: 0.7,
     },
     body: {
-        width: "100%",
-        gap: 16,
+        width: "100%"
     },
     footer: {
         position: "absolute",

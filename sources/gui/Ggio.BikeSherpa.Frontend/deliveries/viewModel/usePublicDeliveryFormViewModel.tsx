@@ -38,13 +38,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         coordinates: {longitude: 0, latitude: 0}
     }), []);
 
-    const {
-        control,
-        handleSubmit,
-        formState: {errors},
-        setValue,
-        getValues
-    } = useForm<PublicDeliveryFormValues>({
+    const form = useForm<PublicDeliveryFormValues>({
         defaultValues: {
             pricingStrategy: customer?.deliveryType ?? 0,
             urgency: urgencies.length > 0 ? urgencies[0].value : 'Standard',
@@ -69,7 +63,6 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                     contactPhone: '',
                     stepAddress: emptyAddress,
                     packingSize: packingSizes.length > 0 ? packingSizes[0].value : 'S',
-
                 },
                 {
                     stepType: 1,
@@ -89,78 +82,51 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         resolver: zodResolver(publicDeliveryFormBaseSchema)
     });
 
+    const {
+        control,
+        handleSubmit,
+        formState: {errors},
+        setValue,
+        getValues
+    } = form;
+
     // Hydrate infos depending on customer type
     useEffect(() => {
-        switch (customerType) {
-            case PublicDeliveryCustomerTypeEnum.Sender: {
-                const senderAddress = getValues("steps.0.stepAddress");
-                const customerName = getValues("customer.name");
-                const customerPhone = getValues("customer.phoneNumber") ?? "";
-                setValue("customer.address", senderAddress);
+        const senderAddress = getValues("steps.0.stepAddress");
+        const customerName = getValues("customer.name");
+        const customerPhone = getValues("customer.phoneNumber") ?? "";
 
-                setValue("steps.0.contactName", customerName);
-                setValue("steps.0.contactPhone", customerPhone);
+        setValue("customer.address", senderAddress);
 
-                setValue("steps.1.contactName", "");
-                setValue("steps.1.contactPhone", "");
-                break;
-            }
-            case PublicDeliveryCustomerTypeEnum.Receiver: {
-                const receiverAddress = getValues("steps.1.stepAddress");
-                const customerName = getValues("customer.name");
-                const customerPhone = getValues("customer.phoneNumber") ?? "";
-                setValue("customer.address", receiverAddress);
+        setValue("steps.0.stepAddress.name", customerName);
+        setValue("steps.0.contactName", "");
+        setValue("steps.0.contactPhone", customerPhone);
 
-                setValue("steps.0.contactName", "");
-                setValue("steps.0.contactPhone", "");
+        setValue("steps.1.stepAddress.name", "");
+        setValue("steps.1.contactName", "");
+        setValue("steps.1.contactPhone", "");
+    }, [emptyAddress, getValues, setValue]);
 
-                setValue("steps.1.contactName", customerName);
-                setValue("steps.1.contactPhone", customerPhone);
-                break;
-            }
-            case PublicDeliveryCustomerTypeEnum.None: {
-                setValue("customer.address", emptyAddress);
-
-                setValue("steps.0.contactName", "");
-                setValue("steps.0.contactPhone", "");
-
-                setValue("steps.1.contactName", "");
-                setValue("steps.1.contactPhone", "");
-                break;
-            }
-        }
-    }, [customerType, emptyAddress, getValues, setValue]);
-
-    // Keep infos updated for hided field depending on customer type
-    const customerField = useWatch({control, name: "customer"});
+    // Keep Address fields populated when an address change
     useEffect(() => {
-        switch (customerType) {
-            case PublicDeliveryCustomerTypeEnum.Sender:
-                setValue("steps.0.contactName", customerField.name);
-                setValue("steps.0.contactPhone", customerField.phoneNumber ?? "");
-                break;
-            case PublicDeliveryCustomerTypeEnum.Receiver:
-                setValue("steps.1.contactName", customerField.name);
-                setValue("steps.1.contactPhone", customerField.phoneNumber ?? "");
-                break;
-        }
-    }, [customerField.name, customerField.phoneNumber, customerType, setValue]);
+        const subscription = form.watch((values, {name, type}) => {
+            const match = name?.match(/^steps\.(\d+)\.stepAddress$/);
+            if (!match || type !== "change") return;
 
-    const senderStepAddress = useWatch({control, name: "steps.0.stepAddress"});
-    useEffect(() => {
-        if (customerType === PublicDeliveryCustomerTypeEnum.Sender) {
-            setValue("customer.address", senderStepAddress);
-        }
-    }, [senderStepAddress, customerType, setValue]);
+            const index = Number(match[1]);
+            const address = values.steps?.[index]?.stepAddress;
+            if (!address?.name) return;
 
-    const receiverStepAddress = useWatch({control, name: "steps.1.stepAddress"});
-    useEffect(() => {
-        if (customerType === PublicDeliveryCustomerTypeEnum.Receiver) {
-            setValue("customer.address", receiverStepAddress);
-        }
-    }, [receiverStepAddress, customerType, setValue]);
+            setValue(`steps.${index}.stepAddress.name`, address.name);
 
-    // Trigger estimated price calculation with debounce
+            if (!getValues(`steps.${index}.contactName`))
+                setValue(`steps.${index}.contactName`, address.name);
+        });
+
+        return () => subscription.unsubscribe();
+    }, [form, setValue, getValues]);
+
+    // Multiple useWatch to keep dynamically updated field
     const stepAddresses = useWatch({control, name: "steps"});
     const stepCoordinates = useWatch({
         control,
@@ -175,6 +141,15 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         name: ["pricingStrategy", "urgency", "startDate"]
     });
     const cancelledRef = useRef(false);
+    
+    // Trigger estimated price calculation with debounce
+    const estimateKey = useMemo(() => JSON.stringify({
+        coords: stepCoordinates.map(c => [c?.longitude, c?.latitude]),
+        packings: stepPackings,
+        trigger: triggerFields
+    }), [stepCoordinates, stepPackings, triggerFields]);
+    
+    const lastKeyRef = useRef<string | null>(null);
 
     useDebounce(() => {
         cancelledRef.current = false;
@@ -184,6 +159,9 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                 coord !== undefined && coord.longitude !== 0 && coord.latitude !== 0
             );
         if (!hasValidSteps) return;
+        
+        if (lastKeyRef.current === estimateKey) return;
+        lastKeyRef.current = estimateKey;
 
         setIsLoadingModalVisible(true);
 
@@ -193,12 +171,15 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
                     publicDeliveryStore$.estimatedValue.set(result);
                 }
             })
+            .catch(() => {
+                lastKeyRef.current = null;
+            })
             .finally(() => setIsLoadingModalVisible(false));
 
         return () => {
             cancelledRef.current = true;
         };
-    }, 400, [stepCoordinates, stepPackings, triggerFields]);
+    }, 400, [estimateKey]);
 
     // Keep estimated price and distance dynamical
     const estimatedDistance = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.totalDistance ?? 0);
@@ -208,19 +189,14 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
     // Slice first packingSize option if deliveryType === 1
     const deliveryTypes = pricingStrategies.slice(0, 2);
     const deliveryType = useWatch({control, name: "pricingStrategy"});
-    if (
-        deliveryTypes.length > 0 &&
-        deliveryType.toString() === deliveryTypes[1].value
-    ) {
-        // Limit dropdown
-        packingSizes = packingSizes.slice(1);
-
-        // Change step packing if the option is not available anymore
+    const isLimited = deliveryTypes.length > 0 && deliveryType.toString() === deliveryTypes[1].value;
+    useEffect(() => {
+        if (!isLimited) return;
         stepPackings.forEach((packing, index) => {
-            if (packingSizes.find(ps => ps.value === packing) === undefined)
+            if (!packingSizes.some(ps => ps.value === packing))
                 setValue(`steps.${index}.packingSize`, packingSizes[0].value);
-        })
-    }
+        });
+    }, [isLimited, packingSizes, stepPackings, setValue]);
 
     return {
         control,

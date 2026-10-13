@@ -7,6 +7,7 @@ import formStyle from "@/style/formStyle";
 import usePublicDeliveryLoginViewModel from "@/deliveries/viewModel/usePublicDeliveryLoginViewModel";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 import {View} from "react-native";
+import InputGroup from "@/components/themed/InputGroup";
 
 export default function PublicDeliveryLoginView() {
     const viewModel = usePublicDeliveryLoginViewModel();
@@ -16,24 +17,26 @@ export default function PublicDeliveryLoginView() {
         <>
             <View style={{height: '100%'}}>
                 <BrandedCard>
-                    <ThemedInput
-                        name={"email"}
-                        control={viewModel.control}
-                        label={"Email"}
-                        placeholder={""}
-                        error={viewModel.errors.email}
-                        required
-                        horizontal
-                    />
-                    <ThemedInput
-                        name={"code"}
-                        control={viewModel.control}
-                        label={"Id Client"}
-                        placeholder={""}
-                        error={viewModel.errors.code}
-                        required
-                        horizontal
-                    />
+                    <InputGroup>
+                        <ThemedInput
+                            name={"email"}
+                            control={viewModel.control}
+                            label={"Email"}
+                            placeholder={""}
+                            error={viewModel.errors.email}
+                            required
+                            horizontal
+                        />
+                        <ThemedInput
+                            name={"code"}
+                            control={viewModel.control}
+                            label={"Id Client"}
+                            placeholder={""}
+                            error={viewModel.errors.code}
+                            required
+                            horizontal
+                        />
+                    </InputGroup>
                     <Button
                         testID="formButton"
                         mode="outlined"
@@ -42,7 +45,7 @@ export default function PublicDeliveryLoginView() {
                     >
                         <Text>Valider</Text>
                     </Button>
-                    <Divider style={{width: "100%"}}/>
+                    <Divider style={{width: "100%", marginBlock: 8}}/>
                     <Button
                         mode="outlined"
                         onPress={() => viewModel.proceedAsAnonymous()}

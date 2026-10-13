@@ -7,7 +7,6 @@ import usePublicDeliveryFormViewModel from "@/deliveries/viewModel/usePublicDeli
 import {ScrollView} from "react-native";
 import formStyle from "@/style/formStyle";
 import React from "react";
-import PublicDeliveryCustomerType from "@/deliveries/components/PublicDeliveryCustomerType";
 import {useController} from "react-hook-form";
 
 export default function PublicDeliveryAnonymousForm() {
@@ -18,17 +17,13 @@ export default function PublicDeliveryAnonymousForm() {
         control: viewModel.control,
         name: "pricingStrategy",
     }).field;
-    
-    const isSimpleDelivery = 
+
+    const isSimpleDelivery =
         viewModel.deliveryTypes.length > 0 &&
         deliveryType.value.toString() === viewModel.deliveryTypes[0].value;
-    
+
     return (
         <ScrollView contentContainerStyle={{paddingInline: 16, paddingTop: 16, gap: 16, marginBottom: 64}}>
-            <PublicDeliveryCustomerType
-                customerType={viewModel.customerType}
-                setCustomerType={viewModel.setCustomerType}/>
-            <Divider/>
             <PublicDeliveryStepForm
                 control={viewModel.control}
                 errors={viewModel.errors}

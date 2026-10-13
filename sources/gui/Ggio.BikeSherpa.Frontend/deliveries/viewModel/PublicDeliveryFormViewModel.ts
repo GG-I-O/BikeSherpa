@@ -68,6 +68,7 @@ export default class PublicDeliveryFormViewModel {
                     attachmentFiles: [],
                     realDeliveryDate: null,
                     estimatedDeliveryDate: delivery.startDate,
+                    receiver: '',
                     stepAddress: {
                         ...step.stepAddress,
                         name: step.contactName ?? '',

@@ -121,6 +121,7 @@ export function ThemedSuggestiveInput<T, V>(
                         {
                             backgroundColor: theme.colors.background,
                             color: theme.colors.onBackground,
+                            marginTop: 4
                         }
                     ]}
                     onChangeText={(text) => {
