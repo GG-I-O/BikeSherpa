@@ -93,9 +93,6 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             if (!address?.name) return;
 
             setValue(`steps.${index}.stepAddress.name`, address.name);
-
-            if (!getValues(`steps.${index}.contactName`))
-                setValue(`steps.${index}.contactName`, address.name);
         });
 
         return () => subscription.unsubscribe();

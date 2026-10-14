@@ -49,16 +49,12 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
                 showUrgency={isSimpleDelivery}
             />
             <Divider/>
-            {isSimpleDelivery && (
-                <>
-                    <PublicDeliveryPrice
-                        control={viewModel.control}
-                        price={viewModel.estimatedPrice}
-                        priceWithTaxes={viewModel.estimatedPriceWithTaxes}
-                    />
-                    <Divider/>
-                </>
-            )}
+            <PublicDeliveryPrice
+                control={viewModel.control}
+                price={viewModel.estimatedPrice}
+                priceWithTaxes={viewModel.estimatedPriceWithTaxes}
+            />
+            <Divider/>
             <Button
                 testID="formButton"
                 mode="outlined"

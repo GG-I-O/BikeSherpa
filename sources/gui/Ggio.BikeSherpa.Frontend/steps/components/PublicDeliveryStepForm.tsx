@@ -64,6 +64,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     name={`steps.${index}.stepAddress`}
                                     control={props.control}
                                     label={step.stepType === StepType.PickUp ? "Adresse/lieu d'enlèvement" : `Adresse/lieu de destination ${index}`}
+                                    placeholder={"Adresse ou lieu Google Maps (ex: Hotel de ville de Grenoble)"}
                                     error={props.errors.steps ? (props.errors.steps as any)[index]?.stepAddress.fullAddress as FieldError | undefined : undefined}
                                     labelAsTitle
                                     required
@@ -129,7 +130,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     control={props.control}
                                     name={`steps.${index}.comment`}
                                     label="Consignes"
-                                    placeholder=""
+                                    placeholder="Instructions pour le coursier"
                                     error={props.errors.steps ? (props.errors.steps as any)[index]?.comment as FieldError | undefined : undefined}
                                     horizontal
                                     labelIconCode={'file-document-outline'}
