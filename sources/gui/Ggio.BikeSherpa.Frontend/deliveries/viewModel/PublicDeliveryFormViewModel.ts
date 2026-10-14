@@ -18,7 +18,6 @@ export default class PublicDeliveryFormViewModel {
 
     public onSubmit = (delivery: PublicDeliveryFormValues): void => {
         const deliveryObject = this.mapFormValuesToObject(delivery);
-    console.log(deliveryObject);
         publicDeliveryStore$.delivery.set(deliveryObject);
     }
 

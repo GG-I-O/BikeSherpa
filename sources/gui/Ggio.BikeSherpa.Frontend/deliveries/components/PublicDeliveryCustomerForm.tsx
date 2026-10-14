@@ -71,43 +71,45 @@ export default function PublicDeliveryCustomerForm(props: Props) {
                 </FormCell>
             </View>
 
-            <View style={styles.row}>
-                <FormCell grow={1} minWidth={220}>
-                    <ThemedInput
-                        testID="customerFormNameInput"
-                        control={props.control}
-                        name="name"
-                        error={props.errors?.name as FieldError | undefined}
-                        label="Entreprise"
-                        placeholder=""
-                        width={'100%'}
-                    />
-                </FormCell>
-                <FormCell grow={1} minWidth={220}>
-                    <ThemedInput
-                        testID="customerFormContactNameInput"
-                        control={props.control}
-                        name="address.name"
-                        error={(props.errors?.address as any)?.name as FieldError | undefined}
-                        label="Nom et Prénom"
-                        placeholder=""
-                        required
-                        width={'100%'}
-                    />
-                </FormCell>
-                <FormCell grow={1} minWidth={160}>
-                    <ThemedInput
-                        testID="customerFormPhoneInput"
-                        control={props.control}
-                        name="phoneNumber"
-                        error={props.errors?.phoneNumber as FieldError | undefined}
-                        label="Téléphone"
-                        placeholder="06 10 11 12 13"
-                        required
-                        width={'100%'}
-                    />
-                </FormCell>
-            </View>
+            {!props.knownCustomer && (
+                <View style={styles.row}>
+                    <FormCell grow={1} minWidth={220}>
+                        <ThemedInput
+                            testID="customerFormNameInput"
+                            control={props.control}
+                            name="name"
+                            error={props.errors?.name as FieldError | undefined}
+                            label="Entreprise"
+                            placeholder=""
+                            width={'100%'}
+                        />
+                    </FormCell>
+                    <FormCell grow={1} minWidth={220}>
+                        <ThemedInput
+                            testID="customerFormContactNameInput"
+                            control={props.control}
+                            name="address.name"
+                            error={(props.errors?.address as any)?.name as FieldError | undefined}
+                            label="Nom et Prénom"
+                            placeholder=""
+                            required
+                            width={'100%'}
+                        />
+                    </FormCell>
+                    <FormCell grow={1} minWidth={160}>
+                        <ThemedInput
+                            testID="customerFormPhoneInput"
+                            control={props.control}
+                            name="phoneNumber"
+                            error={props.errors?.phoneNumber as FieldError | undefined}
+                            label="Téléphone"
+                            placeholder="06 10 11 12 13"
+                            required
+                            width={'100%'}
+                        />
+                    </FormCell>
+                </View>
+            )}
         </View>
     );
 }
