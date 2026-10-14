@@ -1,10 +1,8 @@
-import {Text, useTheme} from "react-native-paper";
+import {Text} from "react-native-paper";
 import {View} from "react-native";
 import ThemedDateInput from "@/components/themed/ThemedDateInput";
 import {Control, FieldError, FieldErrors, useController} from "react-hook-form";
-import formStyle from "@/style/formStyle";
-import React, {useMemo} from "react";
-import {Dropdown} from "react-native-paper-dropdown";
+import React, {useEffect, useMemo} from "react";
 import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
 import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 import {PublicDeliveryFormValues} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
@@ -21,8 +19,6 @@ type Props = {
 }
 
 export default function PublicDeliveryDetailsForm(props: Props) {
-    const theme = useTheme();
-
     const startDate = useController({
         control: props.control,
         name: "startDate",
@@ -42,12 +38,64 @@ export default function PublicDeliveryDetailsForm(props: Props) {
     );
 
     // Stable data
+    const BOOKING_WINDOW_MONTHS = 6;
     const now = useMemo(() => new Date(), []);
     const yesterday = useMemo(() => {
         const d = new Date();
         d.setDate(d.getDate() - 1);
         return d;
     }, []);
+    
+    const isWeekend = (date: Date): boolean => {
+        const day = date.getDay(); // 0 = Sunday, 6 = Saturday
+        return day === 0 || day === 6;
+    };
+
+    const toNextWorkingDay = (date: Date): Date => {
+        const result = new Date(date);
+        while (isWeekend(result))
+            result.setDate(result.getDate() + 1);
+        return result;
+    };
+
+    const getWeekendDates = (from: Date, to: Date): Date[] => {
+        const weekends: Date[] = [];
+        const cursor = new Date(from);
+        cursor.setHours(0, 0, 0, 0);
+
+        while (cursor <= to) {
+            if (isWeekend(cursor))
+                weekends.push(new Date(cursor));
+            cursor.setDate(cursor.getDate() + 1);
+        }
+        return weekends;
+    };
+
+    const buildValidRange = (earliest: Date, today: Date) => {
+        const latest = new Date(today);
+        latest.setMonth(latest.getMonth() + BOOKING_WINDOW_MONTHS);
+
+        return {
+            startDate: earliest,
+            endDate: latest,
+            disabledDates: getWeekendDates(earliest, latest)
+        };
+    };
+
+    const validRange = useMemo(
+        () => buildValidRange(
+            now.getHours() < viewModel.lastHourToOrder ? yesterday : now,
+            now
+        ),
+        [now, yesterday, viewModel.lastHourToOrder]
+    );
+
+    // If the current value is a Saturday or Sunday, move it to the next Monday
+    useEffect(() => {
+        const current = new Date(startDate.value);
+        if (isWeekend(current))
+            startDate.onChange(toNextWorkingDay(current).toISOString());
+    }, [startDate.value]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <View style={{gap: 8}}>
@@ -66,11 +114,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                         name="startDate"
                         label=""
                         error={props.errors.startDate as FieldError | undefined}
-                        validRange={{
-                            startDate: now.getHours() < viewModel.lastHourToOrder ? yesterday : now,
-                            endDate: undefined,
-                            disabledDates: undefined
-                        }}
+                        validRange={validRange}
                     />
                     <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
                         <CompactDropdown
