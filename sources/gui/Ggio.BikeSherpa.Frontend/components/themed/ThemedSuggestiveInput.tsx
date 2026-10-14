@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {View, FlatList} from 'react-native';
+import {View, FlatList, DimensionValue} from 'react-native';
 import {TextInput, Text, Button, Portal, useTheme} from 'react-native-paper';
 import formStyle from "@/style/formStyle";
 import {FieldError} from "react-hook-form";
@@ -27,6 +27,8 @@ export interface SuggestiveInputProps<T, V> {
     minLength?: number;
 
     labelAsTitle?: boolean;
+    
+    width?: DimensionValue;
 }
 
 export function ThemedSuggestiveInput<T, V>(
@@ -43,6 +45,7 @@ export function ThemedSuggestiveInput<T, V>(
         getLabelFromValue,
         minLength = 3,
         labelAsTitle = false,
+        width = undefined
     }: SuggestiveInputProps<T, V>
 ) {
     const theme = useTheme();
@@ -94,7 +97,7 @@ export function ThemedSuggestiveInput<T, V>(
     };
 
     return (
-        <View style={formStyle.intputContainer}>
+        <View style={[formStyle.intputContainer, width ? {width: width} : {}]}>
             <Text
                 testID='themedSuggestiveInputLabel'
                 style={[formStyle.label, {color: theme.colors.onBackground}, theme.fonts.labelLarge, labelAsTitle ? AppStyle.textStyle.h3 : undefined]}

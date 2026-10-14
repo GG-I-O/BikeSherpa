@@ -71,30 +71,34 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                             disabledDates: undefined
                         }}
                     />
-                    <CompactDropdown
-                        value={fieldDate.getHours().toString()}
-                        options={viewModel.hoursOptions}
-                        onSelect={(hours) => {
-                            if (!hours) return;
-                            const newDate = new Date(startDate.value);
-                            newDate.setHours(parseInt(hours));
-                            startDate.onChange(newDate.toISOString());
-                        }}
-                    />
-                    <Text style={AppStyle.textStyle.h3}>h</Text>
-                    <CompactDropdown
-                        value={fieldDate.getMinutes().toString()}
-                        options={viewModel.minutesOptions}
-                        onSelect={(minutes) => {
-                            if (!minutes) return;
-                            const newDate = new Date(startDate.value);
-                            newDate.setMinutes(parseInt(minutes));
-                            startDate.onChange(newDate.toISOString());
-                        }}
-                    />
-                    <Text style={AppStyle.textStyle.h3}>min</Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+                        <CompactDropdown
+                            value={fieldDate.getHours().toString()}
+                            options={viewModel.hoursOptions}
+                            onSelect={(hours) => {
+                                if (!hours) return;
+                                const newDate = new Date(startDate.value);
+                                newDate.setHours(parseInt(hours));
+                                startDate.onChange(newDate.toISOString());
+                            }}
+                        />
+                        <Text style={AppStyle.textStyle.h3}>h</Text>
+                    </View>
+                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+                        <CompactDropdown
+                            value={fieldDate.getMinutes().toString()}
+                            options={viewModel.minutesOptions}
+                            onSelect={(minutes) => {
+                                if (!minutes) return;
+                                const newDate = new Date(startDate.value);
+                                newDate.setMinutes(parseInt(minutes));
+                                startDate.onChange(newDate.toISOString());
+                            }}
+                        />
+                        <Text style={AppStyle.textStyle.h3}>min</Text>
+                    </View>
                 </View>
-                
+
                 {props.showUrgency && (
                     <View style={{flexDirection: 'row', alignItems: 'flex-end', flexShrink: 0}}>
                         <View style={{width: 380}}>

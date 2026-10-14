@@ -2,9 +2,10 @@ import React from 'react';
 import {Control, FieldError, FieldValues, Path, useController} from 'react-hook-form';
 import {Text, TextInput, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
-import {View} from 'react-native';
+import {DimensionValue, View} from 'react-native';
 import {Icon} from "react-native-paper/src";
 import {useInputGroup} from "@/components/themed/InputGroup";
+import {parseDimensionValue} from "react-native-reanimated/lib/typescript/css/web";
 
 interface CustomTextInputProps<T extends FieldValues = FieldValues> {
     name: string;
@@ -21,6 +22,7 @@ interface CustomTextInputProps<T extends FieldValues = FieldValues> {
     disabled?: boolean;
     isAnArray?: boolean;
     isNumeric?: boolean;
+    width?: DimensionValue;
 }
 
 const ThemedInput = <T extends FieldValues = FieldValues>(
@@ -38,7 +40,8 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
         testID,
         disabled,
         isAnArray,
-        isNumeric
+        isNumeric,
+        width = undefined
     }: CustomTextInputProps<T>) => {
     const theme = useTheme();
     const group = useInputGroup();
@@ -76,7 +79,8 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
             formStyle.intputContainer,
             horizontal
                 ? {flexDirection: 'row', gap: 8, alignItems: 'center', width: '100%'}
-                : {flexDirection: 'column'}
+                : {flexDirection: 'column'},
+            width ? {width: width} : {}
         ]}>
             <View style={[
                 horizontal && {flexShrink: 0, minHeight: 40, justifyContent: 'center'},

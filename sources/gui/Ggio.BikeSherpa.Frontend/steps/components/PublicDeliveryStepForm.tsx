@@ -1,4 +1,4 @@
-import {Button, Divider, IconButton, Text} from "react-native-paper";
+import {Button, Divider, IconButton, Text, useTheme} from "react-native-paper";
 import React, {Fragment, useCallback} from "react";
 import {Control, FieldError, FieldErrors, useFieldArray} from "react-hook-form";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
@@ -22,6 +22,8 @@ type Props = {
 }
 
 export default function PublicDeliveryStepForm(props: Props) {
+    const theme = useTheme();
+
     const {fields, append, remove} = useFieldArray({
         name: "steps",
         control: props.control
@@ -63,23 +65,22 @@ export default function PublicDeliveryStepForm(props: Props) {
                                 <ThemedAddressInput
                                     name={`steps.${index}.stepAddress`}
                                     control={props.control}
-                                    label={step.stepType === StepType.PickUp ? "Adresse/lieu d'enlèvement" : `Adresse/lieu de destination ${index}`}
+                                    label={step.stepType === StepType.PickUp ? "Adresse d'enlèvement" : `Adresse de livraison ${index}`}
                                     placeholder={"Adresse ou lieu Google Maps (ex: Hotel de ville de Grenoble)"}
                                     error={props.errors.steps ? (props.errors.steps as any)[index]?.stepAddress.fullAddress as FieldError | undefined : undefined}
                                     labelAsTitle
                                     required
                                 />
                                 {index >= 2 &&
-                                    <IconButton
-                                        style={{margin: 0}}
-                                        contentStyle={{justifyContent: "flex-end"}}
-                                        icon="trash-can-outline"
-                                        onPress={() => remove(index)}/>
+                                        <IconButton
+                                            style={{margin: 0}}
+                                            icon="trash-can-outline"
+                                            onPress={() => remove(index)}/>
                                 }
                             </View>
                             {step.stepType === StepType.Drop && (
                                 <View style={{flex: 1, alignItems: 'center'}}>
-                                    <Text style={AppStyle.textStyle.h3}>Pois et Taille du colis</Text>
+                                    <Text style={AppStyle.textStyle.h3}>Poids & longueur max du colis</Text>
                                     <ThemedSegmentedInput
                                         name={`steps.${index}.packingSize`}
                                         control={props.control}
@@ -129,8 +130,8 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     testID="stepComment"
                                     control={props.control}
                                     name={`steps.${index}.comment`}
-                                    label="Consignes"
-                                    placeholder="Instructions pour le coursier"
+                                    label="Infos de livraison"
+                                    placeholder="nb colis, contrainte d'accès, horaires, ... etc"
                                     error={props.errors.steps ? (props.errors.steps as any)[index]?.comment as FieldError | undefined : undefined}
                                     horizontal
                                     labelIconCode={'file-document-outline'}
@@ -145,8 +146,9 @@ export default function PublicDeliveryStepForm(props: Props) {
                 <Button
                     onPress={() => addStep()}
                     mode="outlined"
+                    style={{backgroundColor: theme.colors.secondaryContainer}}
                 >
-                    <Text>Ajouter une étape</Text>
+                    <Text>Ajouter une adresse de livraison</Text>
                 </Button>
             }
             <Text style={AppStyle.textStyle.h3}>{`Kilométrage estimatif : ${props.totalDistance} km`}</Text>

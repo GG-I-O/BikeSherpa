@@ -5,6 +5,7 @@ import {IAddressService} from '@/spi/AddressSPI';
 import {ServicesIdentifiers} from '@/bootstrapper/constants/ServicesIdentifiers';
 import {ThemedRHFSuggestiveInput} from "@/components/themed/ThemedRHFSuggestiveInput";
 import {Address} from "@/models/Address";
+import {DimensionValue} from "react-native";
 
 interface ThemedAddressInputProps<T extends FieldValues = FieldValues> {
     name: string;
@@ -14,6 +15,7 @@ interface ThemedAddressInputProps<T extends FieldValues = FieldValues> {
     error?: FieldError | undefined
     required?: boolean;
     labelAsTitle?: boolean;
+    width?: DimensionValue;
 }
 
 const ThemedAddressInput = <T extends FieldValues = FieldValues>(
@@ -24,7 +26,8 @@ const ThemedAddressInput = <T extends FieldValues = FieldValues>(
         placeholder,
         error,
         required = false,
-        labelAsTitle = false
+        labelAsTitle = false,
+        width = undefined
     }: ThemedAddressInputProps<T>
 ) => {
     const addressService = IOCContainer.get<IAddressService>(ServicesIdentifiers.AddressService);
@@ -42,6 +45,7 @@ const ThemedAddressInput = <T extends FieldValues = FieldValues>(
             getOptionValue={(a) => a}
             getLabelFromValue={a => a.fullAddress}
             labelAsTitle={labelAsTitle}
+            width={width}
         />
     );
 };

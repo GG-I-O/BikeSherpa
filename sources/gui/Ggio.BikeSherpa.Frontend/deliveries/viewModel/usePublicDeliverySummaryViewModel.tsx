@@ -5,7 +5,7 @@ import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServi
 import PublicDeliverySummaryViewModel from "@/deliveries/viewModel/PublicDeliverySummaryViewModel";
 import {useForm} from "react-hook-form";
 import {PublicDeliveryCustomerFormValues} from "@/deliveries/models/zod/publicDeliveryCustomerFormBaseSchema";
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {ILogger} from "@/spi/LogsSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
@@ -21,7 +21,7 @@ export default function usePublicDeliverySummaryViewModel() {
     const customer = publicDeliveryStore$.customer.get();
     const estimatedValue = publicDeliveryStore$.estimatedValue.get();
 
-    let {urgencies} = useDropdown();
+    let {urgencies, packingSizes} = useDropdown();
     
     const {setIsLoadingModalVisible, setIsErrorModalVisible} = usePublicDeliveryModal();
     
@@ -40,10 +40,10 @@ export default function usePublicDeliverySummaryViewModel() {
     const form = useForm<PublicDeliveryCustomerFormValues>({
         defaultValues: {
             code: customer?.code ?? '',
-            name: customer?.name ?? '',
+            name: customer?.name ?? (customer?.address.name ?? ''),
             email: customer?.email ?? '',
             phoneNumber: '',
-            address: customer?.address ?? emptyAddress,
+            address: customer?.address ? {...customer.address, name: ''} : emptyAddress,
             needEstimate: false
         }
     });
@@ -51,14 +51,42 @@ export default function usePublicDeliverySummaryViewModel() {
     const {
         control,
         handleSubmit,
-        formState: {errors}
+        formState: {errors},
+        getValues,
+        setValue
     } = form;
+    
+    useEffect(() => {
+        if (customer)
+            return;
+        switch(customerType) {
+            case PublicDeliveryCustomerTypeEnum.Sender:
+                /*
+                const senderAddress = getValues("delivery.steps.0.stepAddress");
+                const customerName = getValues("customer.name");
+                const customerPhone = getValues("customer.phoneNumber") ?? "";
+                setValue("customer.address", senderAddress);
+
+                setValue("customer.phone", customerName);
+                setValue("steps.0.contactPhone", customerPhone);
+                
+                 */
+                break;
+            case PublicDeliveryCustomerTypeEnum.Receiver:
+                
+                break;
+            case PublicDeliveryCustomerTypeEnum.None: 
+                
+                break;
+        }
+    },[customer, customerType, emptyAddress, getValues, setValue])
 
     return {
         delivery,
         customer,
         estimatedValue,
         urgencyLabel: urgencies.find(urgency => urgency.value === delivery?.urgency),
+        getPackingSizeLabel: (packingSize: string) => packingSizes.find(packing => packing.value === packingSize),
         control,
         handleSubmit: handleSubmit(
             (data) => {
