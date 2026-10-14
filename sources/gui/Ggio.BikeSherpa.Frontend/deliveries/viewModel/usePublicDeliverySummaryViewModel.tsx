@@ -52,34 +52,30 @@ export default function usePublicDeliverySummaryViewModel() {
         control,
         handleSubmit,
         formState: {errors},
-        getValues,
         setValue
     } = form;
     
     useEffect(() => {
-        if (customer)
+        if (customer || !delivery)
             return;
         switch(customerType) {
             case PublicDeliveryCustomerTypeEnum.Sender:
-                /*
-                const senderAddress = getValues("delivery.steps.0.stepAddress");
-                const customerName = getValues("customer.name");
-                const customerPhone = getValues("customer.phoneNumber") ?? "";
-                setValue("customer.address", senderAddress);
-
-                setValue("customer.phone", customerName);
-                setValue("steps.0.contactPhone", customerPhone);
-                
-                 */
+                setValue("address", delivery.steps[0].stepAddress);
+                setValue("address.name", delivery.steps[0].stepAddress.name);
+                setValue("phoneNumber", delivery.steps[0].stepAddress.phone);
                 break;
             case PublicDeliveryCustomerTypeEnum.Receiver:
-                
+                setValue("address", delivery.steps[1].stepAddress);
+                setValue("address.name", delivery.steps[1].stepAddress.name);
+                setValue("phoneNumber", delivery.steps[1].stepAddress.phone);
                 break;
-            case PublicDeliveryCustomerTypeEnum.None: 
-                
+            case PublicDeliveryCustomerTypeEnum.None:
+                setValue("address", emptyAddress);
+                setValue("address.name", '');
+                setValue("phoneNumber", '');
                 break;
         }
-    },[customer, customerType, emptyAddress, getValues, setValue])
+    },[customer, delivery, customerType, emptyAddress, setValue])
 
     return {
         delivery,

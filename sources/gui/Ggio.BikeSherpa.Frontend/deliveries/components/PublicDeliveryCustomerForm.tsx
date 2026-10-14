@@ -29,16 +29,14 @@ export default function PublicDeliveryCustomerForm(props: Props) {
         </View>
     );
 
-    const customerErrors = (props.errors.customer as any);
-
     return (
         <View style={{gap: 16}}>
             <View style={styles.row}>
                 <FormCell grow={3} minWidth={300}>
                     <ThemedAddressInput
                         control={props.control}
-                        name="customer.address"
-                        error={customerErrors?.address?.fullAddress as FieldError | undefined}
+                        name="address"
+                        error={props.errors?.address as FieldError | undefined}
                         label="Adresse"
                         required
                         width={'100%'}
@@ -50,8 +48,8 @@ export default function PublicDeliveryCustomerForm(props: Props) {
                     <ThemedInput
                         testID="customerFormEmailInput"
                         control={props.control}
-                        name="customer.email"
-                        error={customerErrors?.email as FieldError | undefined}
+                        name="email"
+                        error={props.errors?.email as FieldError | undefined}
                         label="E-mail"
                         placeholder="votre-nom@societe.fr"
                         required
@@ -63,8 +61,8 @@ export default function PublicDeliveryCustomerForm(props: Props) {
                     <ThemedInput
                         testID="customerFormCodeInput"
                         control={props.control}
-                        name="customer.code"
-                        error={customerErrors?.code as FieldError | undefined}
+                        name="code"
+                        error={props.errors?.code as FieldError | undefined}
                         label="ID Client"
                         placeholder="XXX"
                         disabled
@@ -78,11 +76,10 @@ export default function PublicDeliveryCustomerForm(props: Props) {
                     <ThemedInput
                         testID="customerFormNameInput"
                         control={props.control}
-                        name="customer.name"
-                        error={customerErrors?.name as FieldError | undefined}
+                        name="name"
+                        error={props.errors?.name as FieldError | undefined}
                         label="Entreprise"
                         placeholder=""
-                        required
                         width={'100%'}
                     />
                 </FormCell>
@@ -90,8 +87,8 @@ export default function PublicDeliveryCustomerForm(props: Props) {
                     <ThemedInput
                         testID="customerFormContactNameInput"
                         control={props.control}
-                        name="customer.address.name"
-                        error={customerErrors?.address?.name as FieldError | undefined}
+                        name="address.name"
+                        error={(props.errors?.address as any)?.name as FieldError | undefined}
                         label="Nom et Prénom"
                         placeholder=""
                         required
@@ -102,8 +99,8 @@ export default function PublicDeliveryCustomerForm(props: Props) {
                     <ThemedInput
                         testID="customerFormPhoneInput"
                         control={props.control}
-                        name="customer.phoneNumber"
-                        error={customerErrors?.phoneNumber as FieldError | undefined}
+                        name="phoneNumber"
+                        error={props.errors?.phoneNumber as FieldError | undefined}
                         label="Téléphone"
                         placeholder="06 10 11 12 13"
                         required

@@ -9,8 +9,7 @@ const publicDeliveryCustomerFormBaseSchema = zod
             .min(1, "Code requis"),
         name: zod
             .string()
-            .trim()
-            .min(1, "Nom requis"),
+            .trim(),
         email: zod
             .string()
             .min(1, "Adresse e-mail requise")

@@ -23,13 +23,13 @@ export default class PublicDeliverySummaryViewModel {
         return {
             id: Crypto.randomUUID(),
             code: customer.code,
-            name: customer.name,
+            name: customer.name !== '' ? customer.name : customer.address.name,
             email: customer.email,
             phoneNumber: customer.phoneNumber ?? '06 00 00 00 00',
             defaultDeliveryType: 0,
             address: {
                 ...customer.address,
-                name: customer.name ?? '',
+                name: customer.address.name ?? '',
                 phone: customer.phoneNumber ?? '06 00 00 00 00'
             },
             siret: null,
