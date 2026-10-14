@@ -1,4 +1,4 @@
-import {Button, Divider, Text} from "react-native-paper";
+import {Button, Divider, Text, useTheme} from "react-native-paper";
 import PublicDeliveryStepForm from "@/steps/components/PublicDeliveryStepForm";
 import PublicDeliveryDetailsForm from "@/deliveries/components/PublicDeliveryDetailsForm";
 import PublicDeliveryPrice from "@/deliveries/components/PublicDeliveryPrice";
@@ -9,7 +9,7 @@ import React from "react";
 import {useController} from "react-hook-form";
 
 export default function PublicDeliveryAnonymousForm() {
-
+    const theme = useTheme();
     const viewModel = usePublicDeliveryFormViewModel();
 
     const deliveryType = useController({
@@ -49,9 +49,9 @@ export default function PublicDeliveryAnonymousForm() {
                 testID="formButton"
                 mode="outlined"
                 onPress={() => viewModel.handleSubmit()}
-                style={formStyle.button}
+                style={[formStyle.button, {backgroundColor: theme.colors.secondaryContainer}]}
             >
-                <Text testID="buttonName">Suivant</Text>
+                <Text testID="buttonName" style={{fontWeight: 'bold'}}>Passer à la facturation (1/2)</Text>
             </Button>
         </ScrollView>
     );

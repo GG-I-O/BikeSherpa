@@ -151,7 +151,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                     <Text>Ajouter une adresse de livraison</Text>
                 </Button>
             }
-            <Text style={AppStyle.textStyle.h3}>{`Kilométrage estimatif : ${props.totalDistance} km`}</Text>
+            <Text style={[AppStyle.textStyle.h3, {textAlign: 'right', color: theme.colors.primary}]}>{`Kilométrage estimatif : ${props.totalDistance} km`}</Text>
         </View>
     );
 }

@@ -51,11 +51,12 @@ export default function PublicDeliveryDetailsForm(props: Props) {
 
     return (
         <View style={{gap: 8}}>
-            <Text style={[formStyle.label, theme.fonts.labelLarge]}>
-                Date de livraison - Heure de mise à disposition par l'expéditeur
-                <Text style={{color: theme.colors.error}}> *</Text>
+            <Text style={AppStyle.textStyle.h3}>
+                Date de livraison et heure de mise à disposition par l'expéditeur
             </Text>
-
+            <Text style={{fontStyle: 'italic'}}>
+                L'enlèvement pourra avoir lieu A PARTIR de cet horaire
+            </Text>
             <View style={{flexDirection: 'row', flexWrap: 'wrap', columnGap: 24, rowGap: 16, alignItems: 'flex-end'}}>
                 <View style={{flexDirection: 'row', alignItems: 'flex-end', gap: 8, flexShrink: 0}}>
                     <ThemedDateInput
@@ -63,7 +64,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                         testID="deliveryFormStartDateInput"
                         control={props.control}
                         name="startDate"
-                        label="Date"
+                        label=""
                         error={props.errors.startDate as FieldError | undefined}
                         validRange={{
                             startDate: now.getHours() < viewModel.lastHourToOrder ? yesterday : now,
@@ -107,7 +108,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                                 control={props.control}
                                 name="urgency"
                                 error={props.errors.urgency as FieldError | undefined}
-                                label="Urgence"
+                                label="Créneau de livraison"
                                 options={viewModel.urgencies}
                                 required
                             />

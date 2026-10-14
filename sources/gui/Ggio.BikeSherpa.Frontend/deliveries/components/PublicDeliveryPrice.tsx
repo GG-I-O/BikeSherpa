@@ -21,8 +21,6 @@ export default function PublicDeliveryPrice(props: Props) {
             <View style={{flexDirection: 'row', gap: 8}}>
                 <View style={{
                     alignSelf: 'flex-start',
-                    borderBottomWidth: 1,
-                    borderBottomColor: theme.colors.onBackground,
                 }}>
                     <Text style={AppStyle.textStyle.h3}>
                         Montant HT:
