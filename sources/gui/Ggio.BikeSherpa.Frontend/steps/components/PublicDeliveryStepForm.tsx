@@ -50,6 +50,11 @@ export default function PublicDeliveryStepForm(props: Props) {
         });
     }, [append, props.packingSizes]);
 
+    const getStepError = (errors: FieldErrors, index: number, path: string): FieldError | undefined => {
+        const stepErrors = (errors.steps as any)?.[index];
+        return path.split('.').reduce((acc: any, key) => acc?.[key], stepErrors);
+    };
+
     return (
         <View style={{gap: 16, width: "100%"}}>
             {fields.map((step, index) => (
@@ -67,7 +72,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     control={props.control}
                                     label={step.stepType === StepType.PickUp ? "Adresse d'enlèvement" : `Adresse de livraison ${index}`}
                                     placeholder={"Adresse ou lieu Google Maps (ex: Hotel de ville de Grenoble)"}
-                                    error={props.errors.steps ? (props.errors.steps as any)[index]?.stepAddress.fullAddress as FieldError | undefined : undefined}
+                                    error={getStepError(props.errors, index, 'stepAddress.fullAddress')}
                                     labelAsTitle
                                     required
                                 />
@@ -86,7 +91,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                                         control={props.control}
                                         label=""
                                         buttons={props.packingSizes}
-                                        error={props.errors.steps ? (props.errors.steps as any)[index]?.packingSize as FieldError | undefined : undefined}
+                                        error={getStepError(props.errors, index, 'packingSize')}
                                     />
                                 </View>
                             )}
@@ -100,7 +105,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     name={`steps.${index}.stepAddress.name`}
                                     label="Société"
                                     placeholder=""
-                                    error={props.errors.steps ? (props.errors.steps as any)[index]?.stepAddress.name as FieldError | undefined : undefined}
+                                    error={getStepError(props.errors, index, 'stepAddress.name')}
                                     horizontal
                                     labelIconCode={'briefcase'}
                                     disabled
@@ -111,7 +116,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     name={`steps.${index}.contactName`}
                                     label="Contact"
                                     placeholder=""
-                                    error={props.errors.steps ? (props.errors.steps as any)[index]?.contactName as FieldError | undefined : undefined}
+                                    error={getStepError(props.errors, index, 'contactName')}
                                     required
                                     horizontal
                                     labelIconCode={'account'}
@@ -122,7 +127,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     name={`steps.${index}.contactPhone`}
                                     label="Téléphone"
                                     placeholder=""
-                                    error={props.errors.steps ? (props.errors.steps as any)[index]?.contactPhone as FieldError | undefined : undefined}
+                                    error={getStepError(props.errors, index, 'contactPhone')}
                                     horizontal
                                     labelIconCode={'phone'}
                                 />
@@ -132,7 +137,7 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     name={`steps.${index}.comment`}
                                     label="Infos de livraison"
                                     placeholder="nb colis, contrainte d'accès, horaires, ... etc"
-                                    error={props.errors.steps ? (props.errors.steps as any)[index]?.comment as FieldError | undefined : undefined}
+                                    error={getStepError(props.errors, index, 'comment')}
                                     horizontal
                                     labelIconCode={'file-document-outline'}
                                 />

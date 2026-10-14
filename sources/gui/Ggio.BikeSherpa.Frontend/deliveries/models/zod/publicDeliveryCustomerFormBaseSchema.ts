@@ -5,8 +5,7 @@ const publicDeliveryCustomerFormBaseSchema = zod
     .object({
         code: zod
             .string()
-            .trim()
-            .min(1, "Code requis"),
+            .trim(),
         name: zod
             .string()
             .trim(),

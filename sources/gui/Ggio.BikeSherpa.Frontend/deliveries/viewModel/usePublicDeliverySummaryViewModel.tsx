@@ -4,13 +4,18 @@ import IPublicDeliveryService from "@/deliveries/spi/IPublicDeliveryService";
 import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServiceIdentifier";
 import PublicDeliverySummaryViewModel from "@/deliveries/viewModel/PublicDeliverySummaryViewModel";
 import {useForm} from "react-hook-form";
-import {PublicDeliveryCustomerFormValues} from "@/deliveries/models/zod/publicDeliveryCustomerFormBaseSchema";
+import {
+    publicDeliveryCustomerFormBaseSchema,
+    PublicDeliveryCustomerFormValues
+} from "@/deliveries/models/zod/publicDeliveryCustomerFormBaseSchema";
 import {useEffect, useMemo, useState} from "react";
 import {ILogger} from "@/spi/LogsSPI";
 import {ServicesIdentifiers} from "@/bootstrapper/constants/ServicesIdentifiers";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 import useDropdown from "@/hooks/useDropdown";
 import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {publicDeliveryFormBaseSchema} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
 
 export default function usePublicDeliverySummaryViewModel() {
     const publicDeliveryService = IOCContainer.get<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices);
@@ -45,7 +50,9 @@ export default function usePublicDeliverySummaryViewModel() {
             phoneNumber: '',
             address: customer?.address ? {...customer.address, name: ''} : emptyAddress,
             needEstimate: false
-        }
+        },
+        resolver: zodResolver(publicDeliveryCustomerFormBaseSchema),
+        shouldFocusError: false
     });
 
     const {

@@ -71,7 +71,8 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
             insulatedBox: false,
             startDate: new Date().toISOString(),
         },
-        resolver: zodResolver(publicDeliveryFormBaseSchema)
+        resolver: zodResolver(publicDeliveryFormBaseSchema),
+        shouldFocusError: false
     });
 
     const {
