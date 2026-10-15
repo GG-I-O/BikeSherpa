@@ -17,7 +17,7 @@ export default function PublicDeliveryPrice(props: Props) {
     const viewModel = usePublicDeliveryPriceViewModel();
 
     return (
-        <View style={{gap: 16, flexDirection: 'row', justifyContent: 'space-evenly'}}>
+        <View style={{gap: 16, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly'}}>
             <View style={{flexDirection: 'row', gap: 8}}>
                 <View style={{
                     alignSelf: 'flex-start',

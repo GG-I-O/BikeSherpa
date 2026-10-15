@@ -1,6 +1,7 @@
 import React from "react";
 import {Image, StyleSheet, View, ViewStyle, StyleProp} from "react-native";
 import {Card, Text, useTheme} from "react-native-paper";
+import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
 
 type BrandedCardProps = {
     title?: string;
@@ -21,7 +22,9 @@ export default function BrandedCard(
     const theme = useTheme();
 
     return (
-        <View style={[styles.container, {backgroundColor: theme.colors.background}, style]}>
+        <KeyboardAwareScrollView
+            contentContainerStyle={[styles.container, {backgroundColor: theme.colors.background}, style]}
+        >
             <Card style={styles.card}>
                 <Card.Content style={styles.content}>
                     <View style={styles.logoContainer}>
@@ -41,7 +44,7 @@ export default function BrandedCard(
                 </Card.Content>
             </Card>
             {footer ? <Text style={styles.footer}>{footer}</Text> : null}
-        </View>
+        </KeyboardAwareScrollView>
     );
 }
 

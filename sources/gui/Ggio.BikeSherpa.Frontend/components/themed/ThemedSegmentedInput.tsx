@@ -1,5 +1,5 @@
-import React from "react";
-import {StyleSheet, View} from "react-native";
+import React, {useState} from "react";
+import {LayoutChangeEvent, StyleSheet, View} from "react-native";
 import {Control, FieldError, FieldValues, Path, useController} from "react-hook-form";
 import {Icon, Text, TouchableRipple, useTheme} from "react-native-paper";
 import formStyle from "@/style/formStyle";
@@ -21,10 +21,25 @@ interface Props<T extends FieldValues = FieldValues> {
     error?: FieldError | undefined;
 }
 
+const GAP = 8;
+const MIN_TILE_WIDTH = 170;
+
 const ThemedSegmentedInput = <T extends FieldValues = FieldValues>(
     {name, control, buttons, label, required = false, error}: Props<T>) => {
     const theme = useTheme();
     const {field} = useController({control, name: name as Path<T>});
+    const [containerWidth, setContainerWidth] = useState(0);
+
+    const columns = Math.min(
+        buttons.length,
+        Math.max(1, Math.floor((containerWidth + GAP) / (MIN_TILE_WIDTH + GAP)))
+    );
+    const tileWidth = `${100 / columns - 0.1}%` as const;
+
+    const onLayout = (e: LayoutChangeEvent) => {
+        const width = Math.round(e.nativeEvent.layout.width);
+        setContainerWidth((previous) => (previous === width ? previous : width));
+    };
 
     return (
         <View style={{gap: 8, width: "100%"}}>
@@ -35,49 +50,54 @@ const ThemedSegmentedInput = <T extends FieldValues = FieldValues>(
                 </Text>
             )}
 
-            <View
-                accessibilityRole="radiogroup"
-                style={[
-                    styles.group,
-                    {borderColor: error ? theme.colors.error : theme.colors.outline}
-                ]}
-            >
-                {buttons.map((button, i) => {
-                    const selected = field.value === button.value;
-                    const textColor = selected
-                        ? theme.colors.onSecondaryContainer
-                        : theme.colors.onSurface;
+            <View onLayout={onLayout} style={styles.measure}>
+                <View accessibilityRole="radiogroup" style={styles.group}>
+                    {buttons.map((button) => {
+                        const selected = field.value === button.value;
+                        const textColor = selected
+                            ? theme.colors.onSecondaryContainer
+                            : theme.colors.onSurface;
+                        const borderColor = error
+                            ? theme.colors.error
+                            : selected ? theme.colors.secondary : theme.colors.outline;
 
-                    return (
-                        <TouchableRipple
-                            key={button.value}
-                            testID={button.testID}
-                            disabled={button.disabled}
-                            onPress={() => field.onChange(button.value)}
-                            accessibilityRole="radio"
-                            accessibilityState={{selected, disabled: button.disabled}}
-                            style={[
-                                styles.item,
-                                i > 0 && {borderLeftWidth: StyleSheet.hairlineWidth * 2, borderLeftColor: theme.colors.outline},
-                                selected && {backgroundColor: theme.colors.secondaryContainer},
-                                button.disabled && {opacity: 0.4}
-                            ]}
-                        >
-                            <View style={styles.itemContent}>
-                                {button.icon && <Icon source={button.icon} size={18} color={textColor}/>}
-                                <Text
+                        return (
+                            <View key={button.value} style={[styles.cell, {width: tileWidth}]}>
+                                <TouchableRipple
+                                    testID={button.testID}
+                                    disabled={button.disabled}
+                                    onPress={() => field.onChange(button.value)}
+                                    accessibilityRole="radio"
+                                    accessibilityState={{selected, disabled: button.disabled}}
                                     style={[
-                                        theme.fonts.labelLarge,
-                                        styles.itemLabel,
-                                        {color: textColor, fontWeight: selected ? "700" : "500"}
+                                        styles.item,
+                                        {borderColor},
+                                        selected && {backgroundColor: theme.colors.secondaryContainer},
+                                        button.disabled && {opacity: 0.4}
                                     ]}
                                 >
-                                    {button.label}
-                                </Text>
+                                    <View style={styles.itemContent}>
+                                        <Icon
+                                            source={selected ? "radiobox-marked" : "radiobox-blank"}
+                                            size={20}
+                                            color={selected ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                                        />
+                                        {button.icon && <Icon source={button.icon} size={18} color={textColor}/>}
+                                        <Text
+                                            style={[
+                                                theme.fonts.labelLarge,
+                                                styles.itemLabel,
+                                                {color: textColor, fontWeight: selected ? "700" : "500"}
+                                            ]}
+                                        >
+                                            {button.label}
+                                        </Text>
+                                    </View>
+                                </TouchableRipple>
                             </View>
-                        </TouchableRipple>
-                    );
-                })}
+                        );
+                    })}
+                </View>
             </View>
 
             {error && <Text style={{color: theme.colors.error}}>{error.message}</Text>}
@@ -86,26 +106,34 @@ const ThemedSegmentedInput = <T extends FieldValues = FieldValues>(
 };
 
 const styles = StyleSheet.create({
+    measure: {
+        width: "100%",
+        minWidth: 0
+    },
     group: {
         flexDirection: "row",
-        borderWidth: 1,
-        borderRadius: 20,
-        overflow: "hidden"
+        flexWrap: "wrap",
+        margin: -GAP / 2
+    },
+    cell: {
+        padding: GAP / 2
     },
     item: {
         flex: 1,
-        minHeight: 52,
-        paddingVertical: 8,
-        paddingHorizontal: 6,
-        justifyContent: "center"
+        paddingVertical: 6,
+        paddingHorizontal: 10,
+        justifyContent: "center",
+        borderWidth: 1,
+        borderRadius: 12,
+        overflow: "hidden"
     },
     itemContent: {
+        flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center",
-        gap: 2
+        gap: 8
     },
     itemLabel: {
-        textAlign: "center",
+        flex: 1,
         flexShrink: 1
     },
 });

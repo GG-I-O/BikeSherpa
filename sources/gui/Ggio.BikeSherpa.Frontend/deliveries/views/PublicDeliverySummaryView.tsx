@@ -55,7 +55,7 @@ export default function PublicDeliverySummaryView() {
             <Text>Durée créneau de livraison: {viewModel.urgencyLabel?.label ?? ''}</Text>
 
             <Divider/>
-            <View style={{flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'flex-end'}}>
+            <View style={{flexDirection: 'row', gap: 8, flexWrap: 'wrap', justifyContent: 'space-evenly', alignItems: 'flex-end'}}>
                 <Text>Montant HT: {estimatedValue.price.toFixed(2)} €</Text>
                 <Text style={AppStyle.textStyle.h3}>Total TTC: {estimatedValue.priceWithVat.toFixed(2)} €</Text>
             </View>

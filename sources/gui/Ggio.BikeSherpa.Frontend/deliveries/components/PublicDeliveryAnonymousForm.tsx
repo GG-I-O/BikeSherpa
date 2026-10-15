@@ -7,6 +7,7 @@ import {ScrollView} from "react-native";
 import formStyle from "@/style/formStyle";
 import React from "react";
 import {useController} from "react-hook-form";
+import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
 
 export default function PublicDeliveryAnonymousForm() {
     const theme = useTheme();
@@ -22,7 +23,11 @@ export default function PublicDeliveryAnonymousForm() {
         deliveryType.value.toString() === viewModel.deliveryTypes[0].value;
 
     return (
-        <ScrollView contentContainerStyle={{paddingInline: 16, paddingTop: 16, gap: 16, marginBottom: 64}}>
+        <KeyboardAwareScrollView
+            bottomOffset={32}
+            keyboardShouldPersistTaps={'handled'}
+            contentContainerStyle={{paddingInline: 16, paddingTop: 16, paddingBottom: 64, gap: 16}}
+        >
             <PublicDeliveryStepForm
                 control={viewModel.control}
                 errors={viewModel.errors}
@@ -53,6 +58,6 @@ export default function PublicDeliveryAnonymousForm() {
             >
                 <Text testID="buttonName" style={{fontWeight: 'bold'}}>Passer à la facturation (1/2)</Text>
             </Button>
-        </ScrollView>
+        </KeyboardAwareScrollView>
     );
 }

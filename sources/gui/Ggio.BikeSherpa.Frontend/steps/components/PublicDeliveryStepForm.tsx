@@ -21,6 +21,8 @@ type Props = {
     canAddStep?: boolean
 }
 
+const column = {flexGrow: 1, flexShrink: 1, flexBasis: 280} as const;
+
 export default function PublicDeliveryStepForm(props: Props) {
     const theme = useTheme();
 
@@ -60,12 +62,11 @@ export default function PublicDeliveryStepForm(props: Props) {
             {fields.map((step, index) => (
                 <Fragment key={step.id}>
                     <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center'}}>
-                        <View style={{flex: 1, gap: 16}}>
+                        <View style={[column, {gap: 16}]}>
                             <View style={{
                                 flexDirection: "row",
                                 alignItems: "center",
-                                justifyContent: 'center',
-                                minWidth: '50%'
+                                justifyContent: 'center'
                             }}>
                                 <ThemedAddressInput
                                     name={`steps.${index}.stepAddress`}
@@ -77,15 +78,17 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     required
                                 />
                                 {index >= 2 &&
-                                        <IconButton
-                                            style={{margin: 0}}
-                                            icon="trash-can-outline"
-                                            onPress={() => remove(index)}/>
+                                    <IconButton
+                                        style={{margin: 0}}
+                                        icon="trash-can-outline"
+                                        onPress={() => remove(index)}/>
                                 }
                             </View>
                             {step.stepType === StepType.Drop && (
-                                <View style={{flex: 1, alignItems: 'center'}}>
-                                    <Text style={AppStyle.textStyle.h3}>Poids & longueur max du colis</Text>
+                                <View style={{alignItems: 'center'}}>
+                                    <Text style={[AppStyle.textStyle.h3, {textAlign: 'center'}]}>
+                                        Poids & longueur max du colis
+                                    </Text>
                                     <ThemedSegmentedInput
                                         name={`steps.${index}.packingSize`}
                                         control={props.control}
@@ -96,8 +99,8 @@ export default function PublicDeliveryStepForm(props: Props) {
                                 </View>
                             )}
                         </View>
-                        <Divider style={{height: 150, width: 1}}/>
-                        <View style={{flex: 1, minWidth: 280}}>
+                        <Divider style={{width: 1, alignSelf: 'stretch'}}/>
+                        <View style={column}>
                             <InputGroup>
                                 <ThemedInput
                                     testID="StepAddressName"
@@ -156,7 +159,12 @@ export default function PublicDeliveryStepForm(props: Props) {
                     <Text>Ajouter une adresse de livraison</Text>
                 </Button>
             }
-            <Text style={[AppStyle.textStyle.h3, {textAlign: 'right', color: theme.colors.primary}]}>{`Kilométrage estimatif : ${props.totalDistance} km`}</Text>
+            <Text style={[AppStyle.textStyle.h3, {
+                textAlign: 'right',
+                color: theme.colors.primary
+            }]}>
+                {`Kilométrage estimatif : ${props.totalDistance} km`}
+            </Text>
         </View>
     );
 }

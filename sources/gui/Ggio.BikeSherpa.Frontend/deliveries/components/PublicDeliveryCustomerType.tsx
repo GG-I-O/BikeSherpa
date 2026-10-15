@@ -14,15 +14,13 @@ type Props = {
 
 export default function PublicDeliveryCustomerType(props: Props) {
     return (
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 8, rowGap: 8}}>
             <Text style={AppStyle.textStyle.h3}>Je suis </Text>
             <SegmentedButtons
+                style={{flexGrow: 1, flexShrink: 1, flexBasis: 240, maxWidth: 450}}
                 value={props.customerType.toString()}
                 onValueChange={(value) => props.setCustomerType(parseInt(value))}
-                buttons={PublicDeliveryCustomerTypeOptions.map(b => ({
-                    ...b,
-                    style: {width: 150}
-                }))}
+                buttons={PublicDeliveryCustomerTypeOptions}
             />
         </View>
     );

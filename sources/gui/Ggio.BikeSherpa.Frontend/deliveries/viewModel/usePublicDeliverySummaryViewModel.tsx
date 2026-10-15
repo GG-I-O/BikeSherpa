@@ -46,7 +46,7 @@ export default function usePublicDeliverySummaryViewModel() {
             code: customer?.code ?? '',
             name: customer?.name ?? (customer?.address.name ?? ''),
             email: customer?.email ?? '',
-            phoneNumber: '',
+            phoneNumber: '06 00 00 00 00',
             address: customer?.address ? {...customer.address, name: ''} : emptyAddress,
             needEstimate: false
         },

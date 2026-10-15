@@ -45,7 +45,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
         d.setDate(d.getDate() - 1);
         return d;
     }, []);
-    
+
     const isWeekend = (date: Date): boolean => {
         const day = date.getDay(); // 0 = Sunday, 6 = Saturday
         return day === 0 || day === 6;
@@ -106,9 +106,16 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                 L'enlèvement pourra avoir lieu A PARTIR de cet horaire
             </Text>
             <View style={{flexDirection: 'row', flexWrap: 'wrap', columnGap: 24, rowGap: 16, alignItems: 'flex-end'}}>
-                <View style={{flexDirection: 'row', alignItems: 'flex-end', gap: 8, flexShrink: 0}}>
+                <View style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    alignItems: 'flex-end',
+                    columnGap: 8,
+                    rowGap: 8,
+                    maxWidth: '100%'
+                }}>
                     <ThemedDateInput
-                        style={{width: 300}}
+                        style={{width: 300, minWidth: 250, maxWidth: '100%'}}
                         testID="deliveryFormStartDateInput"
                         control={props.control}
                         name="startDate"
@@ -116,37 +123,46 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                         error={props.errors.startDate as FieldError | undefined}
                         validRange={validRange}
                     />
-                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
-                        <CompactDropdown
-                            value={fieldDate.getHours().toString()}
-                            options={viewModel.hoursOptions}
-                            onSelect={(hours) => {
-                                if (!hours) return;
-                                const newDate = new Date(startDate.value);
-                                newDate.setHours(parseInt(hours));
-                                startDate.onChange(newDate.toISOString());
-                            }}
-                        />
-                        <Text style={AppStyle.textStyle.h3}>h</Text>
-                    </View>
-                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
-                        <CompactDropdown
-                            value={fieldDate.getMinutes().toString()}
-                            options={viewModel.minutesOptions}
-                            onSelect={(minutes) => {
-                                if (!minutes) return;
-                                const newDate = new Date(startDate.value);
-                                newDate.setMinutes(parseInt(minutes));
-                                startDate.onChange(newDate.toISOString());
-                            }}
-                        />
-                        <Text style={AppStyle.textStyle.h3}>min</Text>
+                    <View style={{flexDirection: 'row', alignItems: 'flex-end', gap: 8}}>
+                        <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+                            <CompactDropdown
+                                value={fieldDate.getHours().toString()}
+                                options={viewModel.hoursOptions}
+                                onSelect={(hours) => {
+                                    if (!hours) return;
+                                    const newDate = new Date(startDate.value);
+                                    newDate.setHours(parseInt(hours));
+                                    startDate.onChange(newDate.toISOString());
+                                }}
+                            />
+                            <Text style={AppStyle.textStyle.h3}>h</Text>
+                        </View>
+                        <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
+                            <CompactDropdown
+                                value={fieldDate.getMinutes().toString()}
+                                options={viewModel.minutesOptions}
+                                onSelect={(minutes) => {
+                                    if (!minutes) return;
+                                    const newDate = new Date(startDate.value);
+                                    newDate.setMinutes(parseInt(minutes));
+                                    startDate.onChange(newDate.toISOString());
+                                }}
+                            />
+                            <Text style={AppStyle.textStyle.h3}>min</Text>
+                        </View>
                     </View>
                 </View>
 
                 {props.showUrgency && (
-                    <View style={{flexDirection: 'row', alignItems: 'flex-end', flexShrink: 0}}>
-                        <View style={{width: 380}}>
+                    <View style={{
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        alignItems: 'flex-end',
+                        columnGap: 8,
+                        flexShrink: 1,
+                        maxWidth: '100%'
+                    }}>
+                        <View style={{width: 380, maxWidth: '100%', flexShrink: 1}}>
                             <ThemedDropdownInput
                                 testID="deliveryFormUrgencyInput"
                                 control={props.control}
@@ -157,13 +173,15 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                                 required
                             />
                         </View>
-                        <ThemedCheckboxInput
-                            testID="deliveryFormInsulatedInput"
-                            control={props.control}
-                            name="insulatedBox"
-                            error={props.errors.insulatedBox as FieldError | undefined}
-                            label="Caisson isotherme"
-                        />
+                        <View style={{flexShrink: 0}}>
+                            <ThemedCheckboxInput
+                                testID="deliveryFormInsulatedInput"
+                                control={props.control}
+                                name="insulatedBox"
+                                error={props.errors.insulatedBox as FieldError | undefined}
+                                label="Caisson isotherme"
+                            />
+                        </View>
                     </View>
                 )}
             </View>
