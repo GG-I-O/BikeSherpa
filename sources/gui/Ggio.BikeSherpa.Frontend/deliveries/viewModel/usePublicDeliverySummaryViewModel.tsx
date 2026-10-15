@@ -15,7 +15,6 @@ import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 import useDropdown from "@/hooks/useDropdown";
 import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {publicDeliveryFormBaseSchema} from "@/deliveries/models/zod/publicDeliveryFormBaseSchema";
 
 export default function usePublicDeliverySummaryViewModel() {
     const publicDeliveryService = IOCContainer.get<IPublicDeliveryService>(DeliveryServiceIdentifier.PublicServices);

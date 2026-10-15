@@ -103,7 +103,6 @@ export default class PublicDeliveryService implements IPublicDeliveryService {
             contractDate: new Date(delivery.contractDate).toISOString(),
             startDate: new Date(delivery.startDate).toISOString(),
             limitDate: null,
-            needEstimate: false,
             steps: steps,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()

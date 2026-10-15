@@ -9,6 +9,7 @@ import {
 } from "@/deliveries/data/PublicDeliveryCustomerType";
 import AppStyle from "@/constants/AppStyle";
 import {PublicDeliveryCustomerFormValues} from "@/deliveries/models/zod/publicDeliveryCustomerFormBaseSchema";
+import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 
 type Props = {
     control: Control<PublicDeliveryCustomerFormValues>;
@@ -110,6 +111,11 @@ export default function PublicDeliveryCustomerForm(props: Props) {
                     </FormCell>
                 </View>
             )}
+            <ThemedCheckboxInput
+                name="needEstimate"
+                control={props.control}
+                label="Demander un devis"
+            />
         </View>
     );
 }

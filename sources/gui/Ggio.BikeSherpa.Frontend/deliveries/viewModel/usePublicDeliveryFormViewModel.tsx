@@ -100,14 +100,14 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
     }, [form, setValue, getValues]);
 
     // Multiple useWatch to keep dynamically updated field
-    const stepAddresses = useWatch({control, name: "steps"});
+    const steps = useWatch({control, name: "steps"});
     const stepCoordinates = useWatch({
         control,
-        name: stepAddresses.map((_, index) => `steps.${index}.stepAddress.coordinates` as const)
+        name: steps.map((_, index) => `steps.${index}.stepAddress.coordinates` as const)
     });
     const stepPackings = useWatch({
         control,
-        name: stepAddresses.map((_, index) => `steps.${index}.packingSize` as const)
+        name: steps.map((_, index) => `steps.${index}.packingSize` as const)
     });
     const triggerFields = useWatch({
         control,

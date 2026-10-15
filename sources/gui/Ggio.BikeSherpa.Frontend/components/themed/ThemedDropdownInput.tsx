@@ -35,6 +35,16 @@ const ThemedDropdownInput = <T extends FieldValues = FieldValues>(
         name: name as Path<T>,
     });
 
+    const handleSelect = (selected?: string) => {
+        const next = selected ?? (required ? options[0]?.value : undefined);
+
+        if (next === undefined) {
+            field.onChange(isNumber ? 0 : "");
+            return;
+        }
+        field.onChange(isNumber ? parseInt(next) : next);
+    };
+
     return (
         <View style={formStyle.intputContainer}>
             <Text
@@ -43,7 +53,7 @@ const ThemedDropdownInput = <T extends FieldValues = FieldValues>(
             </Text>
             <Dropdown
                 value={isNumber ? (field.value ?? "").toString() : field.value ?? ""}
-                onSelect={(value) => isNumber ? field.onChange(parseInt(value ?? "0")) : field.onChange(value)}
+                onSelect={handleSelect}
                 mode='outlined'
                 error={error !== undefined}
                 testID={testID}

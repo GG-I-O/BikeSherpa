@@ -39,6 +39,7 @@ export default class PublicDeliveryFormViewModel {
             discountReason: '',
             extraCost: 0,
             extraCostReason: '',
+            needEstimate: false,
             status: 0,
             id: Crypto.randomUUID(),
             operationId: Crypto.randomUUID(),

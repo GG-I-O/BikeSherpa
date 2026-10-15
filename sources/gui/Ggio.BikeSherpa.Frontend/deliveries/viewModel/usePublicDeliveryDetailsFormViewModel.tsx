@@ -87,7 +87,7 @@ export default function usePublicDeliveryDetailsFormViewModel(
     }, [allUrgencies, isFieldToday, startDate]);
 
     // Correct form values when they fall outside possible ranges
-    useEffect(() => {
+    useEffect(() => {        
         if (!isFieldToday) return;
 
         const corrected = new Date(startDate);

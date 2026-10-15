@@ -1,6 +1,5 @@
 import * as zod from "zod";
 import {stepFormBaseSchema} from "@/steps/models/zod/stepFormBaseSchema";
-import {addressSchema} from "@/models/Address";
 
 const publicDeliveryFormBaseSchema = zod
     .object({
