@@ -1,13 +1,11 @@
 import {Control, FieldError, FieldErrors} from "react-hook-form";
 import {StyleSheet, View} from "react-native";
-import {Text} from "react-native-paper";
 import ThemedInput from "@/components/themed/ThemedInput";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import React from "react";
 import {
     PublicDeliveryCustomerTypeEnum
 } from "@/deliveries/data/PublicDeliveryCustomerType";
-import AppStyle from "@/constants/AppStyle";
 import {PublicDeliveryCustomerFormValues} from "@/deliveries/models/zod/publicDeliveryCustomerFormBaseSchema";
 import ThemedCheckboxInput from "@/components/themed/ThemedCheckboxInput";
 

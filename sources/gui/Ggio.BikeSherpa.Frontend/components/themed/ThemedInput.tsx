@@ -5,7 +5,6 @@ import formStyle from '@/style/formStyle';
 import {DimensionValue, View} from 'react-native';
 import {Icon} from "react-native-paper/src";
 import {useInputGroup} from "@/components/themed/InputGroup";
-import {parseDimensionValue} from "react-native-reanimated/lib/typescript/css/web";
 
 interface CustomTextInputProps<T extends FieldValues = FieldValues> {
     name: string;

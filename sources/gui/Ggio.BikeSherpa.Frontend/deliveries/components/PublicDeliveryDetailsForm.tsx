@@ -87,7 +87,7 @@ export default function PublicDeliveryDetailsForm(props: Props) {
             now.getHours() < viewModel.lastHourToOrder ? yesterday : now,
             now
         ),
-        [now, yesterday, viewModel.lastHourToOrder]
+        [now, yesterday, viewModel.lastHourToOrder] // eslint-disable-line react-hooks/exhaustive-deps
     );
 
     // If the current value is a Saturday or Sunday, move it to the next Monday
@@ -100,10 +100,10 @@ export default function PublicDeliveryDetailsForm(props: Props) {
     return (
         <View style={{gap: 8}}>
             <Text style={AppStyle.textStyle.h3}>
-                Date de livraison et heure de mise à disposition par l'expéditeur
+                {"Date de livraison et heure de mise à disposition par l'expéditeur"}
             </Text>
             <Text style={{fontStyle: 'italic'}}>
-                L'enlèvement pourra avoir lieu A PARTIR de cet horaire
+                {"L'enlèvement pourra avoir lieu A PARTIR de cet horaire"}
             </Text>
             <View style={{flexDirection: 'row', flexWrap: 'wrap', columnGap: 24, rowGap: 16, alignItems: 'flex-end'}}>
                 <View style={{

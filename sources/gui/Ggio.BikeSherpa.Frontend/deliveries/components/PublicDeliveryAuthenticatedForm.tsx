@@ -6,7 +6,6 @@ import PublicDeliveryPrice from "@/deliveries/components/PublicDeliveryPrice";
 import usePublicDeliveryFormViewModel from "@/deliveries/viewModel/usePublicDeliveryFormViewModel";
 import React from "react";
 import {useController} from "react-hook-form";
-import {ScrollView} from "react-native";
 import formStyle from "@/style/formStyle";
 import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
 

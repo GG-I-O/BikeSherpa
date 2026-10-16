@@ -89,7 +89,7 @@ export default function useReportViewModel() {
     const exportCustomerReport = useCallback(() => {
         viewModel.getCustomerReportExportUrl(startDateFilter, endDateFilter, customerFilter !== defaultDropdownOption[0].value ? customerFilter : undefined)
             .then(url => setCustomerReportExportUrl(url));
-    }, [setCustomerReportExportUrl, startDateFilter, endDateFilter, customerFilter])
+    }, [setCustomerReportExportUrl, startDateFilter, endDateFilter, customerFilter]); // eslint-disable-line react-hooks/exhaustive-deps
     
     return {
         report,

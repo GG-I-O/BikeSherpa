@@ -1,4 +1,4 @@
-import {Button, useTheme} from "react-native-paper";
+import {Button} from "react-native-paper";
 import * as DocumentPicker from "expo-document-picker";
 import React from "react";
 import UploadableFile from "@/models/UploadableFile";
@@ -11,8 +11,6 @@ type Props = {
 }
 
 export default function Document(props: Props) {
-    const theme = useTheme();
-
     const selectFile = () => {
         DocumentPicker.getDocumentAsync({
             type: "*/*",

@@ -3,7 +3,6 @@ import PublicDeliveryStepForm from "@/steps/components/PublicDeliveryStepForm";
 import PublicDeliveryDetailsForm from "@/deliveries/components/PublicDeliveryDetailsForm";
 import PublicDeliveryPrice from "@/deliveries/components/PublicDeliveryPrice";
 import usePublicDeliveryFormViewModel from "@/deliveries/viewModel/usePublicDeliveryFormViewModel";
-import {ScrollView} from "react-native";
 import formStyle from "@/style/formStyle";
 import React from "react";
 import {useController} from "react-hook-form";
