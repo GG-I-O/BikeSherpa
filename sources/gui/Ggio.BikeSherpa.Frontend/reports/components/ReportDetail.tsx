@@ -19,7 +19,7 @@ export default function ReportDetail({report} : Props) {
         );
 
     return (
-        <View style={{ backgroundColor: theme.colors.background, padding: 8, height: '100%' }}>
+        <View style={{ flex: 1,backgroundColor: theme.colors.background, padding: 8}}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 8 }}>
                 <Text style={AppStyle.textStyle.h3}>
                     {report.customerName}

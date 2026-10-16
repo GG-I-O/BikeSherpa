@@ -15,7 +15,7 @@ public class GetReportEndpoint(
 {
      public override void Configure()
      {
-          Get("/reports/courier/{courierId:guid}");
+          Get("/reports/courier");
           Policies("read:reports");
           Description(x => x.WithTags("report")
                .WithName("GetCourierReport")
@@ -25,7 +25,6 @@ public class GetReportEndpoint(
      public override async Task HandleAsync(GetReportRequest req, CancellationToken ct)
      {
           var query = new GetReportQuery(
-               req.CourierId,
                req.StartDate,
                req.EndDate
           );
