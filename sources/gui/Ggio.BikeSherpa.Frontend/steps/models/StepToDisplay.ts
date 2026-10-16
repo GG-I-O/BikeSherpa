@@ -19,7 +19,7 @@ export interface StepToDisplay {
     estimatedIsoDate: string;
     estimatedDate: string;
     estimatedTime: string;
-    realDeliveryTime: string;
+    realDeliveryTime?: string;
     distance: number;
     notBilled: boolean;
     attachmentFiles: AttachmentFile[];

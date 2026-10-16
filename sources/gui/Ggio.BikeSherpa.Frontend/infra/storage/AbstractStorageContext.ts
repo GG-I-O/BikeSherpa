@@ -14,7 +14,9 @@ import {EventRegister} from 'react-native-event-listeners';
 import {Platform} from 'react-native';
 import StorageMode from "@/infra/storage/StorageMode";
 
-export default abstract class AbstractStorageContext<T extends { id: string } & HateoasLinks & Storable> implements IStorageContext<T> {
+export default abstract class AbstractStorageContext<T extends {
+    id: string
+} & HateoasLinks & Storable> implements IStorageContext<T> {
     protected logger: ILogger;
     protected store: Observable<Record<T extends {
         id: number;
@@ -25,6 +27,8 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
     private readonly notificationService: INotificationService;
     private readonly resourceName: string;
+    private notificationsStarted: boolean = false;
+    private notificationsStarting: Promise<void> | null = null;
 
     private readonly onErrorEventType: string;
     private networkStateInitialized: boolean = false;
@@ -40,7 +44,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         this.canSync$ = observable(false);
 
         this.store = this.initStore(storeName);
-        
+
         this.resourceName = storeName.toLocaleLowerCase();
         this.notificationService = notificationService;
         this.onErrorEventType = `${this.resourceName}StorageError`;
@@ -62,6 +66,28 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         }
     }
 
+    private startNotifications(): Promise<void> {
+        if (this.notificationsStarted || !this.notificationService) {
+            return Promise.resolve();
+        }
+
+        if (!this.notificationsStarting) {
+            this.notificationsStarting = this.notificationService.start(this.resourceName)
+                .then(() => {
+                    this.notificationsStarted = true;
+                    this.logger.info('NotificationService started, enabling sync');
+                })
+                .catch((error) => {
+                    this.logger.error('Failed to start NotificationService', error);
+                })
+                .finally(() => {
+                    this.notificationsStarting = null;
+                });
+        }
+
+        return this.notificationsStarting;
+    }
+
     private async initNetworkState() {
         if (this.networkStateInitialized) {
             return;
@@ -71,24 +97,24 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
 
         const networkState = await Network.getNetworkStateAsync();
         if (networkState.isInternetReachable) {
-            if (this.notificationService) {
-                try {
-                    await this.notificationService.start(this.resourceName);
-                    this.logger.info('NotificationService started, enabling sync');
-                } catch (error) {
-                    this.logger.error('Failed to start NotificationService', error);
-                }
-            }
+            await this.startNotifications();
             this.canSync$.set(true);
             this.initialLoad = false;
         }
 
         // Subscribe to network state changes
-        Network.addNetworkStateListener(async ({ isInternetReachable }) => {
+        Network.addNetworkStateListener(async ({isInternetReachable}) => {
             this.logger.debug("Is Internet Reachable?", isInternetReachable);
-            if (isInternetReachable !== undefined) {
-                this.canSync$.set(isInternetReachable);
+            if (isInternetReachable === undefined) {
+                return;
             }
+
+            if (isInternetReachable) {
+                // Start (or retry) notifications BEFORE enabling sync,
+                // so subscribe() finds a connection
+                await this.startNotifications();
+            }
+            this.canSync$.set(isInternetReachable);
         });
     }
 
@@ -115,7 +141,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
         const link = item.links?.find((link: Link) => link.rel === rel);
         return link?.href;
     }
-    
+
     public async forceRefresh(): Promise<void> {
         this.initialLoad = true;
         // double cast because LegendApp has a weird type for this method
@@ -185,62 +211,73 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
             waitForSet: () => this.canSync$,
 
             // Subscribe to NotificationService
-            subscribe: ({ update, refresh }) => {
+            subscribe: ({update, refresh}) => {
                 this.logger.info(`Setting up NotificationService subscription for ${storeName}`);
 
                 const connection = this.notificationService.getConnection();
 
                 if (!connection) {
                     this.logger.warn('NotificationService connection not available yet');
-                    return () => { };
+                    return () => {
+                    };
                 }
 
                 const onNotification = async (notification: ResourceNotification) => {
                     let localRecord: Record<string, T>;
-                    switch (notification.operation) {
-                        case ResourceOperation.POST:
-                            this.logger.debug(`${this.resourceName} created via NotificationService`, notification.id);
+                    try {
+                        switch (notification.operation) {
+                            case ResourceOperation.POST:
+                                this.logger.debug(`${this.resourceName} created via NotificationService`, notification.id);
 
-                            if (notification.operationId) {
+                                if (notification.operationId) {
+                                    localRecord = this.store.peek();
+                                    let localArray = Object.values(localRecord);
+                                    const createdItem = localArray.find((item: T) => item.operationId === notification.operationId);
+                                    if (createdItem) {
+                                        const backendItem = await this.getItem(notification.id);
+                                        if (backendItem) {
+                                            const index = localArray.findIndex((item: T) => item.id === createdItem.id);
+                                            if (index !== -1) {
+                                                localArray.splice(index, 1);
+                                            }
+                                            localArray.push(backendItem);
+                                            update({value: localArray, mode: 'set'});
+                                        }
+                                        break;
+                                    }
+                                }
+
+                                const postItem = await this.getItem(notification.id);
+                                if (postItem) {
+                                    update({value: [postItem]});
+                                }
+                                break;
+                            case ResourceOperation.PUT:
+                                this.logger.debug(`${this.resourceName} updated via NotificationService`, notification.id);
+                                refresh();
+                                break;
+                            case ResourceOperation.DELETE:
+                                this.logger.debug(`${this.resourceName} deleted via NotificationService`, notification.id);
+
+                                // Filter the deleted item out of the local data
                                 localRecord = this.store.peek();
                                 let localArray = Object.values(localRecord);
-                                const createdItem = localArray.find((item: T) => item.operationId === notification.operationId);
-                                if (createdItem) {
-                                    const backendItem = await this.getItem(notification.id);
-                                    if (backendItem) {
-                                        const index = localArray.findIndex((item: T) => item.id === createdItem.id);
-                                        if (index !== -1) {
-                                            localArray.splice(index, 1);
-                                        }
-                                        localArray.push(backendItem);
-                                        update({ value: localArray, mode: 'set' });
-                                    }
-                                    break;
-                                }
-                            }
+                                localArray = localArray.filter((item: T) => item.id !== notification.id);
+                                update({value: localArray, mode: 'set'})// Use mode: 'set' to replace instead of merge
 
-                            const postItem = await this.getItem(notification.id);
-                            if (postItem) {
-                                update({ value: [postItem] });
-                            }
-                            break;
-                        case ResourceOperation.PUT:
-                            this.logger.debug(`${this.resourceName} updated via NotificationService`, notification.id);
-                            refresh();
-                            break;
-                        case ResourceOperation.DELETE:
-                            this.logger.debug(`${this.resourceName} deleted via NotificationService`, notification.id);
-
-                            // Filter the deleted item out of the local data
-                            localRecord = this.store.peek();
-                            let localArray = Object.values(localRecord);
-                            localArray = localArray.filter((item: T) => item.id !== notification.id);
-                            update({ value: localArray, mode: 'set' })// Use mode: 'set' to replace instead of merge
-
-                            break;
-                        default:
-                            this.logger.error("Received a notification with unknown operation :", notification)
-                            throw new Error("Subscribe error");
+                                break;
+                            default:
+                                this.logger.error("Received a notification with unknown operation :", notification)
+                                throw new Error("Subscribe error");
+                        }
+                    } catch (error) {
+                        const status = (error as any)?.response?.status;
+                        if (status === 403 || status === 404) {
+                            // This user can't read this resource (e.g. courier + unassigned delivery): nothing to sync
+                            this.logger.debug(`${this.resourceName} ${notification.id} not accessible (${status}), ignored`);
+                            return;
+                        }
+                        this.logger.error(`${this.resourceName} notification handling failed`, error);
                     }
                 }
 
@@ -251,7 +288,7 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
                 this.notificationService.onReconnected(async () => {
                     this.logger.info(`NotificationService reconnected, refreshing ${storeName}`);
                     const updatedStore = await this.getList();
-                    update({ value: updatedStore, mode: 'set' });
+                    update({value: updatedStore, mode: 'set'});
                 });
 
                 // Return cleanup function
@@ -280,8 +317,12 @@ export default abstract class AbstractStorageContext<T extends { id: string } & 
     }
 
     protected abstract getList(lastSync?: string): Promise<T[]>;
+
     protected abstract getItem(id: string): Promise<T | null>;
+
     protected abstract create(item: T): Promise<string>;
+
     protected abstract update(item: T): Promise<void>;
+
     protected abstract delete(item: T): Promise<void>;
 }

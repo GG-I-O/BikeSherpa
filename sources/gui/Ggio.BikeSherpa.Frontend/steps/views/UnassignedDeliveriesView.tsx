@@ -7,6 +7,7 @@ import {DatePickerInput} from "react-native-paper-dates";
 import useUnassignedDeliveriesViewModel from "@/steps/viewModel/useUnassignedDeliveriesViewModel";
 import {stepDatePickerStore$} from "@/steps/store/StepDatePickerStore";
 import { useValue } from "@legendapp/state/react";
+import {useMarkUnassignedAsSeenOnFocus} from "@/steps/hooks/useUnassignedBadgeSync";
 
 export function UnassignedDeliveriesView() {
     const theme = useTheme();
@@ -14,6 +15,8 @@ export function UnassignedDeliveriesView() {
     const viewModel = useUnassignedDeliveriesViewModel();
 
     const selectedDate = useValue(stepDatePickerStore$.date);
+
+    useMarkUnassignedAsSeenOnFocus();
 
     return (
         <>

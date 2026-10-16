@@ -5,6 +5,7 @@ import {useAuth0} from "react-native-auth0";
 import {BottomNavBar} from "@/components/general/BottomNavBar";
 import {Stack} from "expo-router";
 import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
+import {useUnassignedBadgeSync, useUnseenUnassignedCount} from "@/steps/hooks/useUnassignedBadgeSync";
 
 export default function TabLayout() {
     const [userIsDispatcher, setUserIsDispatcher] = useState<boolean | null>(null);
@@ -41,6 +42,9 @@ export default function TabLayout() {
         logout().then();
     }, [authError, clearSession]);
 
+    const unseenUnassignedCount = useUnseenUnassignedCount();
+    useUnassignedBadgeSync(userIsDispatcher === false);
+    
     if (userIsDispatcher === null)
         return <></>;
 
@@ -54,7 +58,7 @@ export default function TabLayout() {
 
     const courierItems = [
         {href: '/(tabs)/myDeliveries', title: 'Mes courses', icon: 'bicycle-cargo'},
-        {href: '/(tabs)/unassignedDeliveries', title: 'Non assignées', icon: 'account-question'},
+        {href: '/(tabs)/unassignedDeliveries', title: 'Non assignées', icon: 'account-question', badge: unseenUnassignedCount},
         {href: '/(tabs)/profile', title: 'Profil', icon: 'account'},
     ];
 

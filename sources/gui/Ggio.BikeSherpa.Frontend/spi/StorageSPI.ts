@@ -1,5 +1,6 @@
 import { Observable } from "@legendapp/state";
 import { HubConnection } from "@microsoft/signalr";
+import {ResourceNotification} from "@/infra/notification/Notification";
 
 export interface IStorageContext<T> {
     getStore(): Observable<Record<T extends { id: number } ? number : string, T>>;
@@ -14,6 +15,6 @@ export interface INotificationService {
     getConnection(): HubConnection | null;
     isConnected(): boolean;
     subscribeToDataType(dataType: string): Promise<void>;
-    unsubscribeFromDataType(dataType: string): Promise<void>;
-    onReconnected(callback: () => Promise<void>): void;
+    onNotification(handler: (notification: ResourceNotification) => void): () => void;
+    onReconnected(callback: () => Promise<void>): () => void;
 }
