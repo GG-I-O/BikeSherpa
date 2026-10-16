@@ -64,7 +64,8 @@ export default function usePublicDeliveryLoginViewModel() {
                                     email: data.email,
                                     code: data.code,
                                     name: customer.name,
-                                    deliveryType: customer.deliveryType
+                                    deliveryType: customer.deliveryType,
+                                    address: customer.address
                                 });
                             }
                         }

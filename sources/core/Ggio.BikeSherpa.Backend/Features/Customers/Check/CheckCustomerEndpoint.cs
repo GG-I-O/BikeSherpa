@@ -2,6 +2,7 @@ using FastEndpoints;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate;
 using Ggio.BikeSherpa.Backend.Domain.CustomerAggregate.Specifications;
+using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.DddCore;
 using Microsoft.AspNetCore.Http;
 
@@ -21,6 +22,8 @@ public record CheckCustomerResponse
      public DeliveryType? DefaultDeliveryType { get; init; }
      
      public required string CustomerName { get; init; }
+     
+     public required Address CustomerAddress { get; init; }
 }
 
 public class CheckCustomerQueryValidator : AbstractValidator<CheckCustomerQuery>
@@ -60,6 +63,7 @@ public class CheckCustomerEndpoint(IReadRepository<Customer> repository , IValid
           await Send.OkAsync(new CheckCustomerResponse
           {
                CustomerName = customer.Name,
+               CustomerAddress = customer.Address,
                DefaultDeliveryType = customer.DefaultDeliveryType
           }, ct);
      }

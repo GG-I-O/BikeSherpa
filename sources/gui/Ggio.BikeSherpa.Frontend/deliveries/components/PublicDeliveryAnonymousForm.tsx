@@ -1,34 +1,32 @@
-import {Button, Divider, Text} from "react-native-paper";
+import {Button, Divider, Text, useTheme} from "react-native-paper";
 import PublicDeliveryStepForm from "@/steps/components/PublicDeliveryStepForm";
 import PublicDeliveryDetailsForm from "@/deliveries/components/PublicDeliveryDetailsForm";
 import PublicDeliveryPrice from "@/deliveries/components/PublicDeliveryPrice";
-import PublicDeliveryCustomerForm from "@/deliveries/components/PublicDeliveryCustomerForm";
 import usePublicDeliveryFormViewModel from "@/deliveries/viewModel/usePublicDeliveryFormViewModel";
-import {ScrollView} from "react-native";
 import formStyle from "@/style/formStyle";
 import React from "react";
-import PublicDeliveryCustomerType from "@/deliveries/components/PublicDeliveryCustomerType";
 import {useController} from "react-hook-form";
+import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
 
 export default function PublicDeliveryAnonymousForm() {
-
+    const theme = useTheme();
     const viewModel = usePublicDeliveryFormViewModel();
 
     const deliveryType = useController({
         control: viewModel.control,
         name: "pricingStrategy",
     }).field;
-    
-    const isSimpleDelivery = 
+
+    const isSimpleDelivery =
         viewModel.deliveryTypes.length > 0 &&
         deliveryType.value.toString() === viewModel.deliveryTypes[0].value;
-    
+
     return (
-        <ScrollView contentContainerStyle={{paddingInline: 16, paddingTop: 16, gap: 16, marginBottom: 64}}>
-            <PublicDeliveryCustomerType
-                customerType={viewModel.customerType}
-                setCustomerType={viewModel.setCustomerType}/>
-            <Divider/>
+        <KeyboardAwareScrollView
+            bottomOffset={32}
+            keyboardShouldPersistTaps={'handled'}
+            contentContainerStyle={{paddingInline: 16, paddingTop: 16, paddingBottom: 64, gap: 16}}
+        >
             <PublicDeliveryStepForm
                 control={viewModel.control}
                 errors={viewModel.errors}
@@ -45,29 +43,20 @@ export default function PublicDeliveryAnonymousForm() {
                 showUrgency={isSimpleDelivery}
             />
             <Divider/>
-            {isSimpleDelivery && (
-                <>
-                    <PublicDeliveryPrice
-                        control={viewModel.control}
-                        price={viewModel.estimatedPrice}
-                        priceWithTaxes={viewModel.estimatedPriceWithTaxes}
-                    />
-                    <Divider/>
-                </>
-            )}
-            <PublicDeliveryCustomerForm
+            <PublicDeliveryPrice
                 control={viewModel.control}
-                errors={viewModel.errors}
-                customerType={viewModel.customerType}
+                price={viewModel.estimatedPrice}
+                priceWithTaxes={viewModel.estimatedPriceWithTaxes}
             />
+            <Divider/>
             <Button
                 testID="formButton"
                 mode="outlined"
                 onPress={() => viewModel.handleSubmit()}
-                style={formStyle.button}
+                style={[formStyle.button, {backgroundColor: theme.colors.secondaryContainer}]}
             >
-                <Text testID="buttonName">Valider</Text>
+                <Text testID="buttonName" style={{fontWeight: 'bold'}}>Passer à la facturation (1/2)</Text>
             </Button>
-        </ScrollView>
+        </KeyboardAwareScrollView>
     );
 }

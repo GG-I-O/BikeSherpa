@@ -15,7 +15,7 @@ export default function PublicDeliveryLayout() {
                 name="form"
                 options={{
                     headerShown: true,
-                    title: 'Nouvelle course'
+                    title: 'Demande de livraison'
                 }}
             />
             <Stack.Screen

@@ -2,12 +2,16 @@ import React from 'react';
 import {Control, FieldError, FieldValues, Path, useController} from 'react-hook-form';
 import {Text, TextInput, useTheme} from 'react-native-paper';
 import formStyle from '@/style/formStyle';
-import {View} from 'react-native';
+import {DimensionValue, View} from 'react-native';
+import {Icon} from "react-native-paper/src";
+import {useInputGroup} from "@/components/themed/InputGroup";
 
 interface CustomTextInputProps<T extends FieldValues = FieldValues> {
     name: string;
     control: Control<T>;
     label: string;
+    labelIconCode?: string;
+    horizontal?: boolean;
     placeholder: string;
     error?: FieldError | undefined;
     secureTextEntry?: boolean;
@@ -17,6 +21,7 @@ interface CustomTextInputProps<T extends FieldValues = FieldValues> {
     disabled?: boolean;
     isAnArray?: boolean;
     isNumeric?: boolean;
+    width?: DimensionValue;
 }
 
 const ThemedInput = <T extends FieldValues = FieldValues>(
@@ -24,6 +29,8 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
         name,
         control,
         label,
+        labelIconCode = undefined,
+        horizontal = false,
         placeholder,
         error,
         secureTextEntry,
@@ -32,9 +39,12 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
         testID,
         disabled,
         isAnArray,
-        isNumeric
+        isNumeric,
+        width = undefined
     }: CustomTextInputProps<T>) => {
     const theme = useTheme();
+    const group = useInputGroup();
+    const alignLabel = horizontal && !!group;
 
     const {field} = useController({
         control,
@@ -64,31 +74,58 @@ const ThemedInput = <T extends FieldValues = FieldValues>(
     }
 
     return (
-        <View style={formStyle.intputContainer}>
-            <Text
-                style={[formStyle.label, {color: theme.colors.onBackground}, theme.fonts.labelLarge]}>{label}{required &&
-                <Text style={{color: theme.colors.error}}> *</Text>}
-            </Text>
-            <TextInput
-                value={isAnArray ? field.value[0] : field.value}
-                onChangeText={(value) => onChange(value)}
-                placeholder={placeholder}
-                placeholderTextColor={placeholderTextColor || theme.colors.outline}
-                secureTextEntry={secureTextEntry}
-                mode='outlined'
-                style={[formStyle.input,
-                    error && {borderColor: theme.colors.error},
-                    {
-                        backgroundColor: theme.colors.background,
-                        color: theme.colors.onBackground,
-                    }
-                ]}
-                contentStyle={{color: theme.colors.onBackground}}
-                testID={testID}
-                disabled={disabled}
-                keyboardType={isNumeric ? "numeric" : "default"}
-            />
-            {error && (<Text style={{color: theme.colors.error}}>{error.message}</Text>)}
+        <View style={[
+            formStyle.intputContainer,
+            horizontal
+                ? {flexDirection: 'row', gap: 8, alignItems: 'center', width: '100%'}
+                : {flexDirection: 'column'},
+            width ? {width: width} : {}
+        ]}>
+            <View style={[
+                horizontal && {flexShrink: 0, minHeight: 40, justifyContent: 'center'},
+                alignLabel && group.labelWidth > 0 ? {width: group.labelWidth} : null
+            ]}>
+                <View
+                    style={{alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 4}}
+                    onLayout={alignLabel ? (e) => group.reportLabelWidth(e.nativeEvent.layout.width) : undefined}
+                >
+                    {labelIconCode && (
+                        <Icon size={16} source={labelIconCode} color={theme.colors.primary}/>
+                    )}
+                    <Text
+                        style={[
+                            formStyle.label,
+                            {color: theme.colors.onBackground, flexShrink: 1},
+                            theme.fonts.labelLarge
+                        ]}
+                    >
+                        {label}
+                        {required && <Text style={{color: theme.colors.error}}> *</Text>}
+                    </Text>
+                </View>
+            </View>
+            <View style={horizontal ? {flex: 1, minWidth: 0} : undefined}>
+                <TextInput
+                    value={(isAnArray ? field.value?.[0] : field.value) ?? ''}
+                    onChangeText={(value) => onChange(value)}
+                    placeholder={placeholder}
+                    placeholderTextColor={placeholderTextColor || theme.colors.outline}
+                    secureTextEntry={secureTextEntry}
+                    mode='outlined'
+                    style={[formStyle.input,
+                        error && {borderColor: theme.colors.error},
+                        {
+                            backgroundColor: theme.colors.background,
+                            color: theme.colors.onBackground
+                        }
+                    ]}
+                    contentStyle={{color: theme.colors.onBackground}}
+                    testID={testID}
+                    disabled={disabled}
+                    keyboardType={isNumeric ? "numeric" : "default"}
+                />
+                {error && (<Text style={{color: theme.colors.error}}>{error.message}</Text>)}
+            </View>
         </View>
     );
 };

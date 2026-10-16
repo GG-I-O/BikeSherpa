@@ -13,4 +13,5 @@ export interface DeliveryToDisplay {
     startDate: string;
     startTime: string;
     limitTime: string;
+    needEstimate: boolean;
 }

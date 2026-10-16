@@ -1,43 +1,102 @@
-import {publicDeliveryStore$} from "@/deliveries/store/publicDeliveryStore";
 import {View} from "react-native";
-import {Divider, Text, useTheme} from "react-native-paper";
+import {Button, Divider, Text, useTheme} from "react-native-paper";
 import AppStyle from "@/constants/AppStyle";
 import DateToolbox from "@/services/DateToolbox";
+import usePublicDeliverySummaryViewModel from "@/deliveries/viewModel/usePublicDeliverySummaryViewModel";
+import PublicDeliveryCustomerForm from "@/deliveries/components/PublicDeliveryCustomerForm";
+import PublicDeliveryCustomerType from "@/deliveries/components/PublicDeliveryCustomerType";
+import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
+import formStyle from "@/style/formStyle";
+import React from "react";
+import {StepType} from "@/steps/models/StepType";
+import PublicDeliveryConfirmModal from "@/deliveries/components/PublicDeliveryConfirmModal";
+import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 
 export default function PublicDeliverySummaryView() {
     const theme = useTheme();
-    
-    const delivery = publicDeliveryStore$.delivery.get();
-    const customer = publicDeliveryStore$.customer.get();
-    const estimatedValue = publicDeliveryStore$.estimatedValue.get();
-    
-    if (!delivery || !customer || !estimatedValue)
+
+    const viewModel = usePublicDeliverySummaryViewModel();
+    const {delivery, customer, estimatedValue} = viewModel;
+
+    const {isConfirmModalVisible, setIsConfirmModalVisible, onConfirmModalDismiss} = usePublicDeliveryModal();
+
+    if (!delivery || !estimatedValue)
         return (
             <View style={{backgroundColor: theme.colors.background, alignItems: 'center', justifyContent: 'center'}}>
-                <Text>Erreur lors du chargement du résumé de la commande</Text>
-                <Text>Vérifiez vos emails pour obtenir la confirmation de votre commande</Text>
+                <Text>Erreur lors du chargement de la commande</Text>
             </View>
         );
-    
+
     return (
-        <View style={{gap: 16, paddingInline: 32, backgroundColor: theme.colors.background}}>
-            <Text style={AppStyle.textStyle.h1}>{`Commande pour ${customer.name} `}</Text>
-            <Text>Vous allez recevoir un mail de confirmation</Text>
+        <KeyboardAwareScrollView
+            style={{flex: 1, backgroundColor: theme.colors.background}}
+            contentContainerStyle={{flexGrow: 1, gap: 16, paddingHorizontal: 32, paddingVertical: 16}}
+            keyboardShouldPersistTaps="handled"
+        >
+            <PublicDeliveryConfirmModal
+                visible={isConfirmModalVisible}
+                setVisible={setIsConfirmModalVisible}
+                onDismiss={onConfirmModalDismiss}/>
+            <Text style={[AppStyle.textStyle.h1, {textAlign: 'center'}]}>Récapitulatif de la demande de livraison</Text>
+
             {delivery.steps.map((step, index) => (
                 <View key={index} style={{gap: 8}}>
-                    <Text style={AppStyle.textStyle.h2}>{step.stepType === 0 ? 'Adresse de ramasse' : 'Adresse de livraison'}</Text>
-                    <Text style={{marginBottom: 8}}>{`${step.stepAddress.streetInfo} ${step.stepAddress.postcode} ${step.stepAddress.city}`}</Text>
-                    <Text style={{marginBottom: 8}}>Colisage : {step.packingSize}</Text>
+                    <Text
+                        style={AppStyle.textStyle.h3}>
+                        {step.stepType === 0 ? "Adresse d'enlèvement" : `Adresse de livraison ${index}`}
+                    </Text>
+                    <Text
+                        style={{marginBottom: 8}}>
+                        {`${step.stepAddress.streetInfo} ${step.stepAddress.postcode} ${step.stepAddress.city}`}
+                    </Text>
+                    {step.stepType === StepType.Drop && (
+                        <Text>Colisage
+                            : {viewModel.getPackingSizeLabel(step.packingSize)?.label ?? step.packingSize}</Text>
+                    )}
                 </View>
             ))}
-            <Divider />
-            <Text style={AppStyle.textStyle.h2}>Détails de la livraison</Text>
-            <Text>Date de la livraison: {DateToolbox.getFormattedDateFromISO(delivery.startDate)}</Text>
-            <Text>Heure de ramasse: {DateToolbox.getFormattedTimeFromISO(delivery.startDate)}</Text>
-            <Divider />
-            <Text>Distance total: {estimatedValue.totalDistance} km</Text>
-            <Text>Prix HT: {estimatedValue.price} km</Text>
-            <Text style={AppStyle.textStyle.h3}>Prix TTC: {estimatedValue.totalDistance} €</Text>
-        </View>
+
+            <Divider/>
+            <Text style={AppStyle.textStyle.h2}>Créneau de livraison</Text>
+            <Text>Date de la livraison: {DateToolbox.getFormattedDateFromISO(delivery.startDate)} à partir
+                de {DateToolbox.getFormattedTimeFromISO(delivery.startDate)}</Text>
+            <Text>Durée créneau de livraison: {viewModel.urgencyLabel?.label ?? ''}</Text>
+
+            <Divider/>
+            <View style={{
+                flexDirection: 'row',
+                gap: 8,
+                flexWrap: 'wrap',
+                justifyContent: 'space-evenly',
+                alignItems: 'flex-end'
+            }}>
+                <Text>Montant HT: {estimatedValue.price.toFixed(2)} €</Text>
+                <Text style={AppStyle.textStyle.h3}>Total TTC: {estimatedValue.priceWithVat.toFixed(2)} €</Text>
+            </View>
+
+            <Divider/>
+            <Text style={[AppStyle.textStyle.h1, {textAlign: 'center'}]}>Coordonnées de facturation</Text>
+            {!customer && (
+                <PublicDeliveryCustomerType
+                    customerType={viewModel.customerType}
+                    setCustomerType={viewModel.setCustomerType}
+                />
+            )}
+            <PublicDeliveryCustomerForm
+                control={viewModel.control}
+                errors={viewModel.errors}
+                customerType={viewModel.customerType}
+                knownCustomer={customer !== null}
+            />
+            <Divider/>
+            <Button
+                testID="formButton"
+                mode="outlined"
+                onPress={() => viewModel.handleSubmit()}
+                style={[formStyle.button, {backgroundColor: theme.colors.secondaryContainer}]}
+            >
+                <Text testID="buttonName" style={{fontWeight: 'bold'}}>Valider ma demande de livraison (2/2)</Text>
+            </Button>
+        </KeyboardAwareScrollView>
     );
 }

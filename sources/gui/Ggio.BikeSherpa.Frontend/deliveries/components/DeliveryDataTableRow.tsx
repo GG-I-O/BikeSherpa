@@ -1,7 +1,7 @@
 import {DataTable, IconButton, Text, useTheme} from "react-native-paper";
 import datatableStyle from "@/style/datatableStyle";
-import { View } from "react-native";
-import { useState } from "react";
+import {View} from "react-native";
+import {useState} from "react";
 import StepDataTable from "@/steps/components/StepDataTable";
 import {DeliveryToDisplay} from "@/deliveries/models/DeliveryToDisplay";
 import {StepToDisplay} from "@/steps/models/StepToDisplay";
@@ -24,7 +24,17 @@ type Props = {
     onDelete?: (delivery: DeliveryToDisplay) => void
 }
 
-export default function DeliveryDataTableRow({ delivery, isSelected = false, isStepSelected, onPress, onStepPress, onDetails, onEdit, onCopy, onDelete }: Props) {
+export default function DeliveryDataTableRow({
+                                                 delivery,
+                                                 isSelected = false,
+                                                 isStepSelected,
+                                                 onPress,
+                                                 onStepPress,
+                                                 onDetails,
+                                                 onEdit,
+                                                 onCopy,
+                                                 onDelete
+                                             }: Props) {
     const theme = useTheme();
     const style = datatableStyle;
     const [showSteps, setShowSteps] = useState<boolean>(false);
@@ -33,7 +43,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
     const getBackgroundColor = () => {
         if (isSelected) return theme.colors.primary;
         if (!delivery.code) return theme.colors.background;
-        
+
         const color = colorService.stringToColor(delivery.code);
         return theme.dark ? color.dark : color.light;
     };
@@ -45,13 +55,18 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     if (onPress) return onPress(delivery);
                     setShowSteps(!showSteps);
                 }}
-                style={{ backgroundColor: getBackgroundColor() }}
+                style={{backgroundColor: getBackgroundColor()}}
             >
                 <DataTable.Cell style={[style.width50]}>
-                    <DeliveryStatusButton deliveryId={delivery.id} status={delivery.status} />
+                    <DeliveryStatusButton deliveryId={delivery.id} status={delivery.status}/>
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width180]}>
                     {delivery.code}
+                </DataTable.Cell>
+                <DataTable.Cell style={[style.width50]}>
+                    {delivery.needEstimate && (
+                        <Icon size={24} source={'file-document-outline'}/>
+                    )}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column]}>
                     <Text numberOfLines={2}>
@@ -61,7 +76,7 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                 <DataTable.Cell style={[style.column, style.width60]}>
                     {
                         delivery.steps.find((step) => step.courierCode === unassignedCourierDisplay) ? unassignedCourierDisplay :
-                        [...new Set(delivery.steps.map((step) => step.courierCode))].toString()
+                            [...new Set(delivery.steps.map((step) => step.courierCode))].toString()
                     }
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width60]}>
@@ -85,14 +100,16 @@ export default function DeliveryDataTableRow({ delivery, isSelected = false, isS
                     {delivery.limitTime}
                 </DataTable.Cell>
                 <DataTable.Cell style={[style.column, style.width180]}>
-                    <IconButton style={{ margin: 0 }} icon="magnify" onPress={() => onDetails ? onDetails(delivery) : {}} />
-                    <IconButton style={{ margin: 0 }} icon="pencil" onPress={() => onEdit ? onEdit(delivery) : {}} />
-                    <IconButton style={{ margin: 0 }} icon="content-copy" onPress={() => onCopy ? onCopy(delivery) : {}} />
-                    <IconButton style={{ margin: 0 }} icon="trash-can-outline" onPress={() => onDelete ? onDelete(delivery) : {}} />
+                    <IconButton style={{margin: 0}} icon="magnify"
+                                onPress={() => onDetails ? onDetails(delivery) : {}}/>
+                    <IconButton style={{margin: 0}} icon="pencil" onPress={() => onEdit ? onEdit(delivery) : {}}/>
+                    <IconButton style={{margin: 0}} icon="content-copy" onPress={() => onCopy ? onCopy(delivery) : {}}/>
+                    <IconButton style={{margin: 0}} icon="trash-can-outline"
+                                onPress={() => onDelete ? onDelete(delivery) : {}}/>
                 </DataTable.Cell>
             </DataTable.Row>
             {showSteps ? (
-                <View style={{ marginInline: 16, borderWidth: 1, borderColor: theme.colors.surfaceVariant }}>
+                <View style={{marginInline: 16, borderWidth: 1, borderColor: theme.colors.surfaceVariant}}>
                     <StepDataTable
                         steps={delivery.steps ?? []}
                         isStepSelected={isStepSelected}
