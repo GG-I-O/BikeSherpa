@@ -97,33 +97,44 @@ export default function PublicDeliveryDetailsForm(props: Props) {
             startDate.onChange(toNextWorkingDay(current).toISOString());
     }, [startDate.value]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const cell = {
+        flexBasis: '48%',
+        flexGrow: 0,
+        flexShrink: 1,
+        minWidth: 300,
+        maxWidth: '100%',
+        alignItems: 'center',
+    } as const;
+
     return (
         <View style={{gap: 8}}>
-            <Text style={AppStyle.textStyle.h3}>
-                {"Date de livraison et heure de mise à disposition par l'expéditeur"}
+            <Text style={[AppStyle.textStyle.h2, {textAlign: 'center'}]}>
+                Créneau de livraison
             </Text>
-            <Text style={{fontStyle: 'italic'}}>
-                {"L'enlèvement pourra avoir lieu A PARTIR de cet horaire"}
-            </Text>
-            <View style={{flexDirection: 'row', flexWrap: 'wrap', columnGap: 24, rowGap: 16, alignItems: 'flex-end'}}>
-                <View style={{
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    alignItems: 'flex-end',
-                    columnGap: 8,
-                    rowGap: 8,
-                    maxWidth: '100%'
-                }}>
+            <View style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                columnGap: 8,
+                rowGap: 16,
+                width: '100%',
+            }}>
+                <View style={cell}>
                     <ThemedDateInput
                         style={{width: 300, minWidth: 250, maxWidth: '100%'}}
                         testID="deliveryFormStartDateInput"
                         control={props.control}
                         name="startDate"
-                        label=""
+                        label="Date de livraison"
                         error={props.errors.startDate as FieldError | undefined}
                         validRange={validRange}
                     />
-                    <View style={{flexDirection: 'row', alignItems: 'flex-end', gap: 8}}>
+                </View>
+                <View style={cell}>
+                    <Text>
+                        Heure de mise à disposition
+                    </Text>
+                    <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
                         <View style={{flexDirection: 'row', alignItems: 'center', gap: 4}}>
                             <CompactDropdown
                                 value={fieldDate.getHours().toString()}
@@ -151,38 +162,38 @@ export default function PublicDeliveryDetailsForm(props: Props) {
                             <Text style={AppStyle.textStyle.h3}>min</Text>
                         </View>
                     </View>
+                    <Text style={{fontStyle: 'italic'}}>
+                        {"L'enlèvement pourra avoir lieu A PARTIR de cet horaire"}
+                    </Text>
                 </View>
 
                 {props.showUrgency && (
-                    <View style={{
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        alignItems: 'flex-end',
-                        columnGap: 8,
-                        flexShrink: 1,
-                        maxWidth: '100%'
-                    }}>
-                        <View style={{width: 380, maxWidth: '100%', flexShrink: 1}}>
-                            <ThemedDropdownInput
-                                testID="deliveryFormUrgencyInput"
-                                control={props.control}
-                                name="urgency"
-                                error={props.errors.urgency as FieldError | undefined}
-                                label="Créneau de livraison"
-                                options={viewModel.urgencies}
-                                required
-                            />
+                    <>
+                        <View style={cell}>
+                            <View style={{width: 380, maxWidth: '100%'}}>
+                                <ThemedDropdownInput
+                                    testID="deliveryFormUrgencyInput"
+                                    control={props.control}
+                                    name="urgency"
+                                    error={props.errors.urgency as FieldError | undefined}
+                                    label="Durée du créneau"
+                                    options={viewModel.urgencies}
+                                    required
+                                    style={{width: '100%'}}
+                                />
+                            </View>
                         </View>
-                        <View style={{flexShrink: 0}}>
+                        <View style={cell}>
                             <ThemedCheckboxInput
                                 testID="deliveryFormInsulatedInput"
                                 control={props.control}
                                 name="insulatedBox"
                                 error={props.errors.insulatedBox as FieldError | undefined}
                                 label="Caisson isotherme"
+                                style={{width: '100%', alignItems: 'center'}}
                             />
                         </View>
-                    </View>
+                    </>
                 )}
             </View>
         </View>
