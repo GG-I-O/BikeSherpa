@@ -30,18 +30,20 @@ export default function PublicDeliveryCustomerForm(props: Props) {
 
     return (
         <View style={{gap: 16}}>
-            <View style={styles.row}>
-                <FormCell grow={3} minWidth={300}>
-                    <ThemedAddressInput
-                        control={props.control}
-                        name="address"
-                        error={props.errors?.address as FieldError | undefined}
-                        label="Adresse"
-                        required
-                        width={'100%'}
-                    />
-                </FormCell>
-            </View>
+            {!props.knownCustomer && (
+                <View style={styles.row}>
+                    <FormCell grow={3} minWidth={300}>
+                        <ThemedAddressInput
+                            control={props.control}
+                            name="address"
+                            error={props.errors?.address as FieldError | undefined}
+                            label="Adresse"
+                            required
+                            width={'100%'}
+                        />
+                    </FormCell>
+                </View>
+            )}
             <View style={styles.row}>
                 <FormCell grow={3} minWidth={260}>
                     <ThemedInput
