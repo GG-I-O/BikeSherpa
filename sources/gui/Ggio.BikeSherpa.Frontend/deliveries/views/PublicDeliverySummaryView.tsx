@@ -9,12 +9,16 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
 import formStyle from "@/style/formStyle";
 import React from "react";
 import {StepType} from "@/steps/models/StepType";
+import PublicDeliveryConfirmModal from "@/deliveries/components/PublicDeliveryConfirmModal";
+import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
 
 export default function PublicDeliverySummaryView() {
     const theme = useTheme();
 
     const viewModel = usePublicDeliverySummaryViewModel();
     const {delivery, customer, estimatedValue} = viewModel;
+
+    const {isConfirmModalVisible, setIsConfirmModalVisible, onConfirmModalDismiss} = usePublicDeliveryModal();
 
     if (!delivery || !estimatedValue)
         return (
@@ -29,6 +33,10 @@ export default function PublicDeliverySummaryView() {
             contentContainerStyle={{flexGrow: 1, gap: 16, paddingHorizontal: 32, paddingVertical: 16}}
             keyboardShouldPersistTaps="handled"
         >
+            <PublicDeliveryConfirmModal
+                visible={isConfirmModalVisible}
+                setVisible={setIsConfirmModalVisible}
+                onDismiss={onConfirmModalDismiss}/>
             <Text style={[AppStyle.textStyle.h1, {textAlign: 'center'}]}>Récapitulatif de la demande de livraison</Text>
 
             {delivery.steps.map((step, index) => (
@@ -55,7 +63,13 @@ export default function PublicDeliverySummaryView() {
             <Text>Durée créneau de livraison: {viewModel.urgencyLabel?.label ?? ''}</Text>
 
             <Divider/>
-            <View style={{flexDirection: 'row', gap: 8, flexWrap: 'wrap', justifyContent: 'space-evenly', alignItems: 'flex-end'}}>
+            <View style={{
+                flexDirection: 'row',
+                gap: 8,
+                flexWrap: 'wrap',
+                justifyContent: 'space-evenly',
+                alignItems: 'flex-end'
+            }}>
                 <Text>Montant HT: {estimatedValue.price.toFixed(2)} €</Text>
                 <Text style={AppStyle.textStyle.h3}>Total TTC: {estimatedValue.priceWithVat.toFixed(2)} €</Text>
             </View>

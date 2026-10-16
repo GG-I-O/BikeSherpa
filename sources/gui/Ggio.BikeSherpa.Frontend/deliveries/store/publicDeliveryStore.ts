@@ -10,6 +10,7 @@ type PublicDeliveryState = {
     estimatedValue: PublicDeliveryEstimatedValue | null;
     isLoadingModalVisible: boolean;
     isErrorModalVisible: boolean;
+    isConfirmModalVisible: boolean;
 };
 
 export const publicDeliveryStore$ = observable<PublicDeliveryState>({
@@ -19,4 +20,5 @@ export const publicDeliveryStore$ = observable<PublicDeliveryState>({
     estimatedValue: null,
     isLoadingModalVisible: false,
     isErrorModalVisible: false,
+    isConfirmModalVisible: false
 });

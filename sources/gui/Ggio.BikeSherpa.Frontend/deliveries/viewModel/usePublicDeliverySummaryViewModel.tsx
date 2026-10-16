@@ -26,9 +26,9 @@ export default function usePublicDeliverySummaryViewModel() {
     const estimatedValue = publicDeliveryStore$.estimatedValue.get();
 
     let {urgencies, packingSizes} = useDropdown();
-    
-    const {setIsLoadingModalVisible, setIsErrorModalVisible} = usePublicDeliveryModal();
-    
+
+    const {setIsLoadingModalVisible, setIsErrorModalVisible, setIsConfirmModalVisible} = usePublicDeliveryModal();
+
     const [customerType, setCustomerType] = useState<PublicDeliveryCustomerTypeEnum>(PublicDeliveryCustomerTypeEnum.Sender);
 
     const emptyAddress = useMemo(() => ({
@@ -60,11 +60,11 @@ export default function usePublicDeliverySummaryViewModel() {
         formState: {errors},
         setValue
     } = form;
-    
+
     useEffect(() => {
         if (customer || !delivery)
             return;
-        switch(customerType) {
+        switch (customerType) {
             case PublicDeliveryCustomerTypeEnum.Sender:
                 setValue("address", delivery.steps[0].stepAddress);
                 setValue("address.name", delivery.steps[0].stepAddress.name);
@@ -81,7 +81,7 @@ export default function usePublicDeliverySummaryViewModel() {
                 setValue("phoneNumber", '');
                 break;
         }
-    },[customer, delivery, customerType, emptyAddress, setValue])
+    }, [customer, delivery, customerType, emptyAddress, setValue])
 
     return {
         delivery,
@@ -97,7 +97,9 @@ export default function usePublicDeliverySummaryViewModel() {
                 const customerObject = viewModel.mapFormValuesToObject(data);
                 viewModel.createDelivery(deliveryObject, customerObject)
                     .then((isOk: boolean) =>
-                        isOk ? {} : setIsErrorModalVisible(true)
+                        isOk ?
+                            setIsConfirmModalVisible(true) :
+                            setIsErrorModalVisible(true)
                     )
                     .finally(() => setIsLoadingModalVisible(false));
             },
