@@ -42,6 +42,7 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
                 packingSizes={viewModel.packingSizes}
                 customerType={viewModel.customerType}
                 totalDistance={viewModel.estimatedDistance}
+                isInZone={viewModel.isInZone}
                 canAddStep={viewModel.deliveryTypes.length > 0 && field.value.toString() === viewModel.deliveryTypes[1].value}
             />
             <Divider/>

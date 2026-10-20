@@ -13,12 +13,13 @@ import InputGroup from "@/components/themed/InputGroup";
 import ThemedSegmentedInput from "@/components/themed/ThemedSegmentedInput";
 
 type Props = {
-    control: Control<PublicDeliveryFormValues>,
-    errors: FieldErrors,
-    packingSizes: DropdownOptions[],
-    totalDistance: number,
-    customerType: PublicDeliveryCustomerTypeEnum,
-    canAddStep?: boolean
+    control: Control<PublicDeliveryFormValues>;
+    errors: FieldErrors;
+    packingSizes: DropdownOptions[];
+    totalDistance: number;
+    customerType: PublicDeliveryCustomerTypeEnum;
+    canAddStep?: boolean;
+    isInZone?: boolean;
 }
 
 const column = {flexGrow: 1, flexShrink: 1, flexBasis: 280} as const;
@@ -165,6 +166,14 @@ export default function PublicDeliveryStepForm(props: Props) {
             }]}>
                 {`Kilométrage estimatif : ${props.totalDistance} km`}
             </Text>
+            {!props.isInZone && (
+                <Text style={[AppStyle.textStyle.h2, {
+                    textAlign: 'right',
+                    color: theme.colors.error
+                }]}>
+                    ATTENTION ! Une adresse est hors zone : La course est obligatoirement soumise à devis et validation.
+                </Text>
+            )}
         </View>
     );
 }
