@@ -4,11 +4,11 @@ import {DeliveryServiceIdentifier} from "@/deliveries/bootstrapper/DeliveryServi
 import {ILogger} from "@/spi/LogsSPI";
 import {INotificationService} from "@/spi/StorageSPI";
 import {ResourceNotification} from "@/infra/notification/Notification";
-import {seenUnassignedIds$, unassignedIds$} from "@/steps/store/UnassignedBadgeStore";
+import {unassignedStepCount$} from "@/steps/store/UnassignedBadgeStore";
 import {IDeliveryCustomBackendClientFacade} from "@/deliveries/spi/IDeliveryCustomBackendClientFacade";
 import {IUnassignedBadgeService} from "@/steps/spi/IUnassignedBadgeService";
 
-/** Must match the delivery store's resource name, i.e. storeName.toLocaleLowerCase(). */
+/** SignalR group to subscribe to: same as the delivery store (storeName.toLocaleLowerCase()). */
 const DELIVERY_DATA_TYPE = "delivery";
 const REFRESH_DEBOUNCE_MS = 500;
 const NOTIFICATION_RETRY_MS = 30000;
@@ -18,8 +18,8 @@ function toUtcDayIso(date: Date): string {
 }
 
 /**
- * Keeps the "unassigned deliveries" badge up to date, completely independently
- * from the synced delivery store (which only holds the list of the active view).
+ * Keeps the "unassigned steps" count up to date, completely independently
+ * from the synced delivery store
  */
 @injectable()
 export class UnassignedBadgeService implements IUnassignedBadgeService {
@@ -43,7 +43,6 @@ export class UnassignedBadgeService implements IUnassignedBadgeService {
         this.logger = logger.extend('UnassignedBadgeService');
     }
 
-    /** Idempotent. */
     public start(): void {
         if (this.started) return;
         this.started = true;
@@ -66,7 +65,7 @@ export class UnassignedBadgeService implements IUnassignedBadgeService {
         if (this.retryTimer) clearTimeout(this.retryTimer);
         this.refreshTimer = null;
         this.retryTimer = null;
-        unassignedIds$.set([]);
+        unassignedStepCount$.set(0);
     }
 
     public async refreshNow(): Promise<void> {
@@ -77,25 +76,16 @@ export class UnassignedBadgeService implements IUnassignedBadgeService {
             // A newer refresh (or stop()) superseded this one: ignore the stale response
             if (seq !== this.requestSeq) return;
 
-            const ids = deliveries.map((delivery) => delivery.id);
-            const idSet = new Set(ids);
-            unassignedIds$.set(ids);
-
-            // Prune seen ids that no longer exist (assigned / deleted) so the list doesn't grow forever
-            const seen = seenUnassignedIds$.peek();
-            const pruned = seen.filter((id) => idSet.has(id));
-            if (pruned.length !== seen.length) {
-                seenUnassignedIds$.set(pruned);
-            }
+            unassignedStepCount$.set(
+                deliveries.reduce((total, delivery) => total + (delivery.steps?.length ?? 0), 0)
+            );
         } catch (error) {
-            // Best effort: a failed badge refresh must never break the app
-            this.logger.warn('Failed to refresh unassigned deliveries badge', error);
+            this.logger.warn('Failed to refresh unassigned steps count', error);
         }
     }
 
     private readonly handleNotification = (notification: ResourceNotification): void => {
-        if (notification.dataType?.toLowerCase() !== DELIVERY_DATA_TYPE.toLowerCase()) return;
-        // Any operation can change the unassigned list (a PUT can assign/unassign, a DELETE removes)
+        if (notification.dataType?.toLowerCase() !== DELIVERY_DATA_TYPE) return;
         this.scheduleRefresh();
     };
 
@@ -111,7 +101,6 @@ export class UnassignedBadgeService implements IUnassignedBadgeService {
         try {
             await this.notificationService.start(DELIVERY_DATA_TYPE);
             if (!this.started) return;
-            // Catch anything that happened before the subscription was active
             this.scheduleRefresh();
         } catch (error) {
             if (!this.started) return;
