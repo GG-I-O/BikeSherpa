@@ -11,6 +11,7 @@ import React from "react";
 import {StepType} from "@/steps/models/StepType";
 import PublicDeliveryConfirmModal from "@/deliveries/components/PublicDeliveryConfirmModal";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
+import PublicDeliveryComment from "@/deliveries/components/PublicDeliveryComment";
 
 export default function PublicDeliverySummaryView() {
     const theme = useTheme();
@@ -73,7 +74,11 @@ export default function PublicDeliverySummaryView() {
                 <Text>Montant HT: {estimatedValue.price.toFixed(2)} €</Text>
                 <Text style={AppStyle.textStyle.h3}>Total TTC: {estimatedValue.priceWithVat.toFixed(2)} €</Text>
             </View>
-
+            <Divider />
+            <PublicDeliveryComment
+                control={viewModel.control}
+                errors={viewModel.errors}
+            />
             <Divider/>
             <Text style={[AppStyle.textStyle.h1, {textAlign: 'center'}]}>Coordonnées de facturation</Text>
             {!customer && (
