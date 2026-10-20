@@ -16,6 +16,7 @@ const WorkHourDto = z.object({
   endDate: z.string().datetime({ offset: true }),
 });
 const PackingSizeDto = z.object({ label: z.string(), value: z.string() });
+const CheckDeliveryZoneCityResponse = z.object({ isInZone: z.boolean() });
 const GeoPoint = z.object({ longitude: z.number(), latitude: z.number() });
 const Address = z.object({
   name: z.string(),
@@ -132,6 +133,7 @@ const CalculateDeliveryPriceResult = z.object({
   price: z.number(),
   priceWithVat: z.number(),
   totalDistance: z.number(),
+  isInZone: z.boolean(),
 });
 const OperationBase = z.object({
   path: z.string(),
@@ -207,6 +209,7 @@ export const schemas = {
   PricingStrategyDto,
   WorkHourDto,
   PackingSizeDto,
+  CheckDeliveryZoneCityResponse,
   GeoPoint,
   Address,
   DeliveryReportDetail,
@@ -1336,6 +1339,21 @@ const endpoints = makeApi([
         schema: z.void(),
       },
     ],
+  },
+  {
+    method: "post",
+    path: "/deliveryZoneCities/check",
+    alias: "CheckDeliveryZoneCityEndpoint",
+    tags: ["deliveryZoneCities"],
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "city",
+        type: "Query",
+        schema: z.string(),
+      },
+    ],
+    response: z.object({ isInZone: z.boolean() }),
   },
   {
     method: "get",

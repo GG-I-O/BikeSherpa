@@ -23,4 +23,11 @@ public class DeliveryZoneRepository(BackendDbContext context) : IDeliveryZoneRep
                )
           ) ?? context.DeliveryZones.First(zone => zone.Name == FallbackZoneForUnknownCity);
      }
+
+     public bool IsInZone(string city)
+     {
+          Guard.Against.NullOrEmpty(city);
+
+          return GetByAddress(city).Name != FallbackZoneForUnknownCity;
+     }
 }
