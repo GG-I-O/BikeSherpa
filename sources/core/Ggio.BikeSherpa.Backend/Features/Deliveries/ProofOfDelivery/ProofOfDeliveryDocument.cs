@@ -54,7 +54,7 @@ public class ProofOfDeliveryDocument(Model.ProofOfDelivery delivery, StackHolder
                               {
                                    if (step.Address != null)
                                    {
-                                        c.Item().PaddingLeft(10).PaddingTop(10).Text(step.Address.GetFullAddress()).FontSize(10).Italic();
+                                        c.Item().PaddingHorizontal(8).PaddingTop(8).Text($"{step.Address.Name} - {step.Address.GetFullAddressOnOneLine()}").ClampLines(1).FontSize(10).Italic();
                                    }
 
                                    if (!string.IsNullOrEmpty(step.Receiver))
@@ -71,6 +71,10 @@ public class ProofOfDeliveryDocument(Model.ProofOfDelivery delivery, StackHolder
                               if (step.DeliveryDate != null)
                               {
                                    table.Cell().Text($"Heure de passage {step.DeliveryDate.Value.LocalDateTime.Hour:00}:{step.DeliveryDate.Value.LocalDateTime.Minute:00}").FontSize(10);
+                              }
+                              else
+                              {
+                                   table.Cell().Text(string.Empty);
                               }
                          }
                     });

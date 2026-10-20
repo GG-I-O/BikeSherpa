@@ -66,12 +66,12 @@ public class CustomerReportDocument(Report report, StackHolderInfo stackHolderIn
 
                               foreach (var detail in delivery.Details)
                               {
-                                   table.Cell().Column(c =>
+                                   table.Cell().PaddingBottom(8).Column(c =>
                                    {
                                         c.Item().Text($"{detail.Description}").FontSize(9);
                                         if (detail.Address != null)
                                         {
-                                             c.Item().PaddingLeft(10).Text(detail.Address.GetFullAddress()).FontSize(8).Italic();
+                                             c.Item().PaddingHorizontal(8).Text($"{detail.Address.Name} - {detail.Address.GetFullAddressOnOneLine()}").ClampLines(1).FontSize(8).Italic();
                                         }
                                    });
                                    table.Cell().AlignRight().Text($"{detail.Price:N2} €").FontSize(9);
