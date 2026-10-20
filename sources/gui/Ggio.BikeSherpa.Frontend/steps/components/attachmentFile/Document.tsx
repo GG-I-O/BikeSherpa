@@ -11,7 +11,6 @@ type Props = {
 }
 
 export default function Document(props: Props) {
-    
     const selectFile = () => {
         DocumentPicker.getDocumentAsync({
             type: "*/*",

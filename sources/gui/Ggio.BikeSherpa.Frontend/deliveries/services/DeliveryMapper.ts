@@ -59,6 +59,7 @@ export default class DeliveryMapper implements IDeliveryMapper {
             urgency: delivery.urgency,
             totalPrice: delivery.totalPrice ?? 0,
             deliveryInfo: delivery.details[0],
+            needEstimate: delivery.needEstimate ?? false,
             startDate: DateToolbox.getFormattedDateFromISO(new Date(delivery.startDate).toISOString()),
             startTime: DateToolbox.getFormattedTimeFromISO(new Date(delivery.startDate).toISOString()),
             limitTime: !delivery.limitDate ? unknownConst : DateToolbox.getFormattedTimeFromISO(new Date(delivery.limitDate).toISOString()),

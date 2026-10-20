@@ -1,5 +1,5 @@
-import {Button, IconButton, Text} from "react-native-paper";
-import React, {useCallback} from "react";
+import {Button, Divider, IconButton, Text, useTheme} from "react-native-paper";
+import React, {Fragment, useCallback} from "react";
 import {Control, FieldError, FieldErrors, useFieldArray} from "react-hook-form";
 import ThemedAddressInput from "@/components/themed/ThemedAddressInput";
 import {View} from "react-native";
@@ -8,8 +8,9 @@ import AppStyle from "@/constants/AppStyle";
 import {StepType} from "@/steps/models/StepType";
 import ThemedInput from "@/components/themed/ThemedInput";
 import {PublicDeliveryCustomerTypeEnum} from "@/deliveries/data/PublicDeliveryCustomerType";
-import ThemedDropdownInput from "@/components/themed/ThemedDropdownInput";
 import {DropdownOptions} from "@/models/DropdownOptions";
+import InputGroup from "@/components/themed/InputGroup";
+import ThemedSegmentedInput from "@/components/themed/ThemedSegmentedInput";
 
 type Props = {
     control: Control<PublicDeliveryFormValues>,
@@ -20,7 +21,10 @@ type Props = {
     canAddStep?: boolean
 }
 
+const column = {flexGrow: 1, flexShrink: 1, flexBasis: 280} as const;
+
 export default function PublicDeliveryStepForm(props: Props) {
+    const theme = useTheme();
 
     const {fields, append, remove} = useFieldArray({
         name: "steps",
@@ -48,43 +52,77 @@ export default function PublicDeliveryStepForm(props: Props) {
         });
     }, [append, props.packingSizes]);
 
+    const getStepError = (errors: FieldErrors, index: number, path: string): FieldError | undefined => {
+        const stepErrors = (errors.steps as any)?.[index];
+        return path.split('.').reduce((acc: any, key) => acc?.[key], stepErrors);
+    };
+
     return (
         <View style={{gap: 16, width: "100%"}}>
-            <Text style={AppStyle.textStyle.h2}>Adresses de livraison</Text>
             {fields.map((step, index) => (
-                <View key={index} style={{marginBottom: 16}}>
-                    <View style={{flexDirection: "row", alignItems: "flex-end"}}>
-                        <ThemedAddressInput
-                            name={`steps.${index}.stepAddress`}
-                            control={props.control}
-                            label={step.stepType === StepType.PickUp ? "Adresse/lieu d'enlèvement" : `Adresse/lieu de destination ${index}`}
-                            error={props.errors.steps ? (props.errors.steps as any)[index]?.stepAddress.fullAddress as FieldError | undefined : undefined}
-                            labelAsTitle
-                            required
-                        />
-                        {index >= 2 &&
-                            <IconButton
-                                style={{margin: 0}}
-                                contentStyle={{justifyContent: "flex-end"}}
-                                icon="trash-can-outline"
-                                onPress={() => remove(index)}/>
-                        }
-                    </View>
-                    {
-                        (props.customerType === PublicDeliveryCustomerTypeEnum.None ||
-                            (props.customerType === PublicDeliveryCustomerTypeEnum.Receiver && index !== 1) ||
-                            (props.customerType === PublicDeliveryCustomerTypeEnum.Sender && index !== 0))
-                        && (
-                            <View style={{flexDirection: "row", gap: 8, width: "30%"}}>
-
+                <Fragment key={step.id}>
+                    <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center'}}>
+                        <View style={[column, {gap: 16}]}>
+                            <View style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: 'center'
+                            }}>
+                                <ThemedAddressInput
+                                    name={`steps.${index}.stepAddress`}
+                                    control={props.control}
+                                    label={step.stepType === StepType.PickUp ? "Adresse d'enlèvement" : `Adresse de livraison ${index}`}
+                                    placeholder={"Adresse ou lieu Google Maps (ex: Hotel de ville de Grenoble)"}
+                                    error={getStepError(props.errors, index, 'stepAddress.fullAddress')}
+                                    labelAsTitle
+                                    required
+                                />
+                                {index >= 2 &&
+                                    <IconButton
+                                        style={{margin: 0}}
+                                        icon="trash-can-outline"
+                                        onPress={() => remove(index)}/>
+                                }
+                            </View>
+                            {step.stepType === StepType.Drop && (
+                                <View style={{alignItems: 'center'}}>
+                                    <Text style={[AppStyle.textStyle.h3, {textAlign: 'center'}]}>
+                                        Poids & longueur max du colis
+                                    </Text>
+                                    <ThemedSegmentedInput
+                                        name={`steps.${index}.packingSize`}
+                                        control={props.control}
+                                        label=""
+                                        buttons={props.packingSizes}
+                                        error={getStepError(props.errors, index, 'packingSize')}
+                                    />
+                                </View>
+                            )}
+                        </View>
+                        <Divider style={{width: 1, alignSelf: 'stretch'}}/>
+                        <View style={column}>
+                            <InputGroup>
                                 <ThemedInput
                                     testID="StepAddressName"
                                     control={props.control}
-                                    name={`steps.${index}.contactName`}
-                                    label="Nom"
+                                    name={`steps.${index}.stepAddress.name`}
+                                    label="Société"
                                     placeholder=""
-                                    error={props.errors.steps ? (props.errors.steps as any)[index]?.contactName as FieldError | undefined : undefined}
+                                    error={getStepError(props.errors, index, 'stepAddress.name')}
+                                    horizontal
+                                    labelIconCode={'briefcase'}
+                                    disabled
+                                />
+                                <ThemedInput
+                                    testID="StepAddressContact"
+                                    control={props.control}
+                                    name={`steps.${index}.contactName`}
+                                    label="Contact"
+                                    placeholder=""
+                                    error={getStepError(props.errors, index, 'contactName')}
                                     required
+                                    horizontal
+                                    labelIconCode={'account'}
                                 />
                                 <ThemedInput
                                     testID="StepAddressPhone"
@@ -92,40 +130,41 @@ export default function PublicDeliveryStepForm(props: Props) {
                                     name={`steps.${index}.contactPhone`}
                                     label="Téléphone"
                                     placeholder=""
-                                    error={props.errors.steps ? (props.errors.steps as any)[index]?.contactPhone as FieldError | undefined : undefined}
+                                    error={getStepError(props.errors, index, 'contactPhone')}
+                                    horizontal
+                                    labelIconCode={'phone'}
                                 />
-                            </View>
-                        )}
-                    <ThemedDropdownInput
-                        testID="deliveryFormPackingSizeInput"
-                        control={props.control}
-                        name="packingSize"
-                        error={props.errors.packingSize as FieldError | undefined}
-                        label="Tranche - selon poids ET plus grande dimension du colis"
-                        options={props.packingSizes}
-                        required
-                    />
-                    <View>
-                        <ThemedInput
-                            testID="stepComment"
-                            control={props.control}
-                            name={`steps.${index}.comment`}
-                            label="Infos de livraison"
-                            placeholder=""
-                            error={props.errors.steps ? (props.errors.steps as any)[index]?.comment as FieldError | undefined : undefined}
-                        />
+                                <ThemedInput
+                                    testID="stepComment"
+                                    control={props.control}
+                                    name={`steps.${index}.comment`}
+                                    label="Infos de livraison"
+                                    placeholder="nb colis, contrainte d'accès, horaires, ... etc"
+                                    error={getStepError(props.errors, index, 'comment')}
+                                    horizontal
+                                    labelIconCode={'file-document-outline'}
+                                />
+                            </InputGroup>
+                        </View>
                     </View>
-                </View>
+                    <Divider style={{height: 3}}/>
+                </Fragment>
             ))}
             {props.canAddStep &&
                 <Button
                     onPress={() => addStep()}
                     mode="outlined"
+                    style={{backgroundColor: theme.colors.secondaryContainer}}
                 >
-                    <Text>Ajouter une étape</Text>
+                    <Text>Ajouter une adresse de livraison</Text>
                 </Button>
             }
-            <Text style={AppStyle.textStyle.h3}>{`Kilométrage estimatif : ${props.totalDistance} km`}</Text>
+            <Text style={[AppStyle.textStyle.h3, {
+                textAlign: 'right',
+                color: theme.colors.primary
+            }]}>
+                {`Kilométrage estimatif : ${props.totalDistance} km`}
+            </Text>
         </View>
     );
 }

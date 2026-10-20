@@ -1,9 +1,10 @@
 import Customer from "@/customers/models/Customer";
 import Delivery from "@/deliveries/models/Delivery";
 import PublicDeliveryEstimatedValue from "@/deliveries/models/PublicDeliveryEstimatedValue";
+import {Address} from "@/models/Address";
 
 export default interface IPublicDeliveryService {
-    loginPublicDeliveryCustomer: (email: string, code: string) => Promise<{name: string, deliveryType: number} | null>;
+    loginPublicDeliveryCustomer: (email: string, code: string) => Promise<{name: string, deliveryType: number, address: Address} | null>;
     
     getEstimatedValue: (delivery: Delivery) => Promise<PublicDeliveryEstimatedValue>;
     

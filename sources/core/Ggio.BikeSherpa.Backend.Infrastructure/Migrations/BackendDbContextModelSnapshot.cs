@@ -376,7 +376,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         new
                         {
                             Name = "S",
-                            Label = "S = jusqu'à 3kg / 45cm",
+                            Label = "S = 0kg à 2.9kg & L max 45cm",
                             Order = 1,
                             SimplePrice = 3.0,
                             TourPrice = 0.0
@@ -384,7 +384,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         new
                         {
                             Name = "M",
-                            Label = "M = jusqu'à 10kg / 100cm",
+                            Label = "M = 3kg à 9.9kg & L max 100cm",
                             Order = 2,
                             SimplePrice = 5.0,
                             TourPrice = 2.0
@@ -392,7 +392,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         new
                         {
                             Name = "L",
-                            Label = "L = jusqu'à 20kg / 120cm",
+                            Label = "L = 10kg à 19.9kg & L max 120cm",
                             Order = 3,
                             SimplePrice = 7.0,
                             TourPrice = 4.0
@@ -400,7 +400,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         new
                         {
                             Name = "XL",
-                            Label = "XL = jusqu'à 30kg / 120cm",
+                            Label = "XL = 20kg à 29.9kg & L max 120cm",
                             Order = 4,
                             SimplePrice = 9.0,
                             TourPrice = 6.0
@@ -408,7 +408,7 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         new
                         {
                             Name = "XXL",
-                            Label = "XXL = jusqu'à 40kg (sur devis)",
+                            Label = "XXL = 30kg à 39.9kg & L max 120cm",
                             Order = 5,
                             SimplePrice = 11.0,
                             TourPrice = 8.0
@@ -416,18 +416,10 @@ namespace Ggio.BikeSherpa.Backend.Infrastructure.Migrations
                         new
                         {
                             Name = "XXXL",
-                            Label = "XXXL = jusqu'à 50kg (sur devis)",
+                            Label = "XXXL = supérieur à 40kg (sur devis)",
                             Order = 6,
                             SimplePrice = 13.0,
                             TourPrice = 10.0
-                        },
-                        new
-                        {
-                            Name = "XXXXL",
-                            Label = "XXXXL = jusqu'à 60kg (sur devis)",
-                            Order = 7,
-                            SimplePrice = 15.0,
-                            TourPrice = 12.0
                         });
                 });
 

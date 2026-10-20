@@ -65,7 +65,7 @@ export default function usePublicDeliveryDetailsFormViewModel(
         const endHours = workHours?.end.getHours() ?? 17;
         const options: DropdownOptions[] = [];
         for (let i = startHours; i < endHours; i++) {
-            options.push({label: i.toString(), value: i.toString()});
+            options.push({label: i.toString().padStart(2, '0'), value: i.toString()});
         }
         return options;
     }, [isFieldToday, now, workHours]);
@@ -75,7 +75,7 @@ export default function usePublicDeliveryDetailsFormViewModel(
         const options: DropdownOptions[] = [];
         const step = parseInt(process.env.EXPO_PUBLIC_DELIVERY_MINUTES_STEP ?? "15");
         for (let i = 0; i < 60; i += step) {
-            options.push({label: i.toString(), value: i.toString()});
+            options.push({label: i.toString().padStart(2, '0'), value: i.toString()});
         }
         return options;
     }, []);
@@ -87,7 +87,7 @@ export default function usePublicDeliveryDetailsFormViewModel(
     }, [allUrgencies, isFieldToday, startDate]);
 
     // Correct form values when they fall outside possible ranges
-    useEffect(() => {
+    useEffect(() => {        
         if (!isFieldToday) return;
 
         const corrected = new Date(startDate);
