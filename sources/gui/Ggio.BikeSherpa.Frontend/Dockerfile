@@ -18,9 +18,10 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/assets/images /opt/default-custom/assets/images
 COPY --from=builder /app/assets/colors /opt/default-custom/assets/colors
 
-COPY docker-entrypoint.sh /docker-entrypoint.d/40-seed-custom.sh
-RUN chmod +x /docker-entrypoint.d/40-seed-custom.sh && \
-    mkdir -p /usr/share/nginx/html/custom \
+RUN mkdir -p /usr/share/nginx/html/custom && \
+    printf '#!/bin/sh\nset -e\ncp -rn /opt/default-custom/. /usr/share/nginx/html/custom/\n' \
+      > /docker-entrypoint.d/40-seed-custom.sh && \
+    chmod +x /docker-entrypoint.d/40-seed-custom.sh
     
 VOLUME /usr/share/nginx/html/custom
 
