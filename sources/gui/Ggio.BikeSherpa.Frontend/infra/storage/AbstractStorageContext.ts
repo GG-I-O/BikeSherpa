@@ -47,7 +47,7 @@ export default abstract class AbstractStorageContext<T extends {
 
         this.resourceName = storeName.toLocaleLowerCase();
         this.notificationService = notificationService;
-        this.onErrorEventType = `${this.resourceName}StorageError`;
+        this.onErrorEventType = `${this.resourceName} StorageError`;
 
         // Defer network initialization to avoid accessing platform APIs during construction
         // This prevents "window is not defined" errors on web platform during SSR/initial load
@@ -206,9 +206,11 @@ export default abstract class AbstractStorageContext<T extends {
             // Merge mode on incoming changes
             mode: this.storageMode,
 
-            // Wait for authentication before syncing
-            waitFor: () => this.canSync$,
-            waitForSet: () => this.canSync$,
+            retry: {
+                infinite: true,      // Réessaie indéfiniment tant que la connexion échoue
+                delay: 5000,         // Attend 5 secondes entre chaque tentative
+                backoff: 'exponential' // Augmente progressivement le délai (ex: 2s, 4s, 8s...)
+            },
 
             // Subscribe to NotificationService
             subscribe: ({update, refresh}) => {
