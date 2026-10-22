@@ -28,6 +28,7 @@ export function MyDeliveriesView() {
                     inputMode={"start"}
                     onChange={(date: Date | undefined): void => stepDatePickerStore$.date.set(date)}
                     value={selectedDate}
+                    mode="outlined"
                 />
             </View>
             <StepCardList
