@@ -53,7 +53,9 @@ export default function useReportViewModel() {
             let customerList: { label: string, value: string }[] = [];
             customerList.push(...defaultDropdownOption);
 
-            Object.values(customerStore$.peek()).forEach(customer => 
+            Object.values(customerStore$.peek())
+                .sort((cA, cB) => cA.code.localeCompare(cB.code))
+                .forEach(customer => 
                 customer ? customerList.push({ label: customer.code + " - " + customer.name, value: customer.id }) : {}
             );
             setCustomersOptions(customerList);

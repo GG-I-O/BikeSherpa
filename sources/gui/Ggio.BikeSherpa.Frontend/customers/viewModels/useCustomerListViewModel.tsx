@@ -28,7 +28,11 @@ export default function useCustomerListViewModel() {
     useEffect(() => {
         return observe(() => {
             const record = customerStore$.get() ?? {};
-            setCustomerList(Object.values(record).filter((item) => item !== undefined));
+            setCustomerList(
+                Object.values(record)
+                    .filter((item) => item !== undefined)
+                    .sort((cA, cB) => cA.code.localeCompare(cB.code))
+            );
         });
     }, [customerStore$]);
 

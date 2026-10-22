@@ -55,8 +55,8 @@ describe("useCustomerListViewModel", () => {
 
     it("updates customerList when observable state changes", async () => {
         mockCustomerStore$.set({
-            "1": { id: "1", name: "Customer 1" },
-            "2": { id: "2", name: "Customer 2" }
+            "1": { id: "1", name: "Customer 1", code: "C01" },
+            "2": { id: "2", name: "Customer 2", code: "C02" }
         });
 
         const { result } = renderHook(() => useCustomerListViewModel());
@@ -67,8 +67,8 @@ describe("useCustomerListViewModel", () => {
 
         expect(result.current.customerList).toHaveLength(2);
         expect(result.current.customerList).toEqual([
-            { id: "1", name: "Customer 1" },
-            { id: "2", name: "Customer 2" }
+            { id: "1", name: "Customer 1", code: "C01" },
+            { id: "2", name: "Customer 2", code: "C02" }
         ]);
     });
 
