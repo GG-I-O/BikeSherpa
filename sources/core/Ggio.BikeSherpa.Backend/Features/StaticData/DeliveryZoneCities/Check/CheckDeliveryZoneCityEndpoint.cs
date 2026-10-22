@@ -33,7 +33,7 @@ public class CheckDeliveryZoneCityEndpoint
      public override void Configure()
      {
           AllowAnonymous();
-          Post("/deliveryZoneCities/check");
+          Get("/deliveryZoneCities/check");
           Description(x => x.WithTags("deliveryZoneCities")
                .WithDescription("Check if a city exists in possible zones")
                .Produces<CheckDeliveryZoneCityResponse>()
