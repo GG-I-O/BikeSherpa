@@ -33,7 +33,7 @@ export default function BrandedCard(
                             style={styles.logo}
                         />
                     </View>
-                    <Text variant="headlineMedium" style={styles.title}>
+                    <Text variant="headlineMedium" style={[styles.title, {color: theme.colors.primary}]}>
                         {title}
                     </Text>
                     <Text variant="bodyLarge" style={styles.subtitle}>
@@ -66,20 +66,21 @@ const styles = StyleSheet.create({
         paddingVertical: 30,
     },
     logoContainer: {
-        marginBottom: 20,
+        width: 110,
+        height: 110,
+        borderRadius: 55,
+        overflow: "hidden",
         backgroundColor: "#f0f0f0",
-        padding: 15,
-        borderRadius: 50,
+        marginBottom: 20,
     },
     logo: {
-        width: 80,
-        height: 80,
-        resizeMode: "contain",
+        width: "100%",
+        height: "100%",
+        resizeMode: "cover",
     },
     title: {
         fontWeight: "bold",
         marginBottom: 5,
-        color: "#2e7d32",
     },
     subtitle: {
         textAlign: "center",

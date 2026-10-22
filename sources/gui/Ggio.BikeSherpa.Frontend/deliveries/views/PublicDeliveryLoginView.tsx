@@ -1,22 +1,36 @@
 import React from "react";
-import {Button, Divider, Text} from "react-native-paper";
+import {ActivityIndicator, Button, Divider, Text} from "react-native-paper";
 import ThemedInput from "@/components/themed/ThemedInput";
 import LoadingModal from "@/components/general/LoadingModal";
 import BrandedCard from "@/components/general/BrandedCard";
 import formStyle from "@/style/formStyle";
 import usePublicDeliveryLoginViewModel from "@/deliveries/viewModel/usePublicDeliveryLoginViewModel";
 import usePublicDeliveryModal from "@/deliveries/hooks/usePublicDeliveryModal";
-import {View} from "react-native";
+import {StyleSheet, View} from "react-native";
 import InputGroup from "@/components/themed/InputGroup";
+import useCompanyInfo from "@/hooks/useCompanyInfo";
 
 export default function PublicDeliveryLoginView() {
     const viewModel = usePublicDeliveryLoginViewModel();
     const {isLoadingModalVisible} = usePublicDeliveryModal();
 
+    const companyInfo = useCompanyInfo();
+
+    if (!companyInfo.label) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator animating={true} size="large"/>
+                <Text style={styles.loadingText}>Chargement en cours...</Text>
+            </View>
+        );
+    }
+
     return (
         <>
             <View style={{height: '100%'}}>
-                <BrandedCard>
+                <BrandedCard
+                    title={companyInfo.label}
+                >
                     <InputGroup>
                         <ThemedInput
                             name={"email"}
@@ -61,3 +75,14 @@ export default function PublicDeliveryLoginView() {
         </>
     );
 }
+
+const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    loadingText: {
+        marginTop: 10,
+    }
+});

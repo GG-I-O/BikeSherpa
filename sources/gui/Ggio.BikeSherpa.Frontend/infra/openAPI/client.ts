@@ -1347,6 +1347,14 @@ const endpoints = makeApi([
   },
   {
     method: "get",
+    path: "/general/parameters/companyLabel",
+    alias: "GetCompanyLabelEndpoint",
+    tags: ["general"],
+    requestFormat: "json",
+    response: z.string(),
+  },
+  {
+    method: "get",
     path: "/general/parameters/lastHourToOrder",
     alias: "GetParameterLastHourToOrderEndpoint",
     tags: ["general"],
