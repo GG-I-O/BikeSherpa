@@ -48,7 +48,8 @@ export default function usePublicDeliverySummaryViewModel() {
             email: customer?.email ?? '',
             phoneNumber: '06 00 00 00 00',
             address: customer?.address ? {...customer.address, name: ''} : emptyAddress,
-            needEstimate: false
+            needEstimate: false,
+            deliveryComment: ''
         },
         resolver: zodResolver(publicDeliveryCustomerFormBaseSchema),
         shouldFocusError: false
@@ -93,7 +94,7 @@ export default function usePublicDeliverySummaryViewModel() {
         handleSubmit: handleSubmit(
             (data) => {
                 setIsLoadingModalVisible(true);
-                const deliveryObject = {...delivery!, needEstimate: data.needEstimate};
+                const deliveryObject = {...delivery!, needEstimate: data.needEstimate, details: [data.deliveryComment]};
                 const customerObject = viewModel.mapFormValuesToObject(data);
                 viewModel.createDelivery(deliveryObject, customerObject)
                     .then((isOk: boolean) =>

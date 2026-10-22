@@ -21,6 +21,9 @@ const publicDeliveryCustomerFormBaseSchema = zod
             .nullable(),
         needEstimate: zod
             .boolean(),
+        deliveryComment: zod
+            .string()
+            .trim(),
         address: addressSchema
     });
 
