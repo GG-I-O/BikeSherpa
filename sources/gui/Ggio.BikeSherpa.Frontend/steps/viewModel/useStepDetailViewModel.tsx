@@ -10,6 +10,7 @@ import {IStepServices} from "@/steps/spi/IStepServices";
 import {useDebounce} from "@/hooks/useDebounce";
 import UploadableFile from "@/models/UploadableFile";
 import {StepDisplayForCourier} from "@/steps/models/StepDisplayForCourier";
+import {router} from "expo-router";
 
 export default function useStepDetailViewModel(stepId: string) {
     const deliveryServices = IOCContainer.get<IDeliveryServices>(DeliveryServiceIdentifier.Services);
@@ -45,7 +46,10 @@ export default function useStepDetailViewModel(stepId: string) {
         step,
         courierComment,
         setCourierComment,
-        completeStep: () => viewModel.stepComplete(stepId, true),
+        completeStep: () => {
+            viewModel.stepComplete(stepId, true);
+            router.back();
+        },
         cancelStep: () => viewModel.stepComplete(stepId, false),
         addAttachment: (file: UploadableFile) => viewModel.addAttachment(stepId, file),
         addSignature: (signature: UploadableFile, receiver: string) => viewModel.addSignature(stepId, signature, receiver)
