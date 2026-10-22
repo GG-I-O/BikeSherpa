@@ -37,4 +37,9 @@ public class Address
           builder.Append(City);
           return builder.ToString().TrimEnd();
      }
+
+     public string GetFullAddressOnOneLine()
+     {
+          return $"{StreetInfo} {Postcode} {City}";
+     }
 }
