@@ -31,6 +31,10 @@ describe("CourierListView", () => {
     let userAction: UserEventInstance;
     const mockCourier1: Courier = createRandomCourier(true, linkType.updateAndDelete);
     const mockCourier2: Courier = createRandomCourier(true, linkType.update);
+    if (mockCourier1.firstName === mockCourier2.firstName)
+        mockCourier2.firstName += '123';
+    if (mockCourier2.lastName === mockCourier1.lastName)
+        mockCourier1.lastName += '123';
 
     let mockDisplayEditForm: jest.Mock;
     let mockDeleteCourier: jest.Mock;
@@ -138,7 +142,9 @@ describe("CourierListView", () => {
                 streetInfo: undefined as any,
                 complement: null,
                 postcode: undefined as any,
-                city: undefined as any
+                city: undefined as any,
+                phone: undefined as any,
+                coordinates: undefined as any,
             }
         };
 

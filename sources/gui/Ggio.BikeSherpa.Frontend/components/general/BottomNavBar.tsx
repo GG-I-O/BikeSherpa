@@ -1,12 +1,13 @@
 import { Link, usePathname } from 'expo-router';
 import { View, StyleSheet } from 'react-native';
-import { Icon, Text, useTheme } from 'react-native-paper';
+import {Badge, Icon, Text, useTheme} from 'react-native-paper';
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 
 type NavItem = {
     href: string;
     title: string;
     icon: string;
+    badge?: number;
 };
 
 type Props = {
@@ -32,11 +33,16 @@ export function BottomNavBar({ items }: Props) {
                     >
                         <Link href={item.href as any} style={styles.link}>
                             <View style={styles.tabInner}>
-                                <Icon
-                                    source={item.icon}
-                                    size={28}
-                                    color={isActive ? theme.colors.background : theme.colors.onSurface}
-                                />
+                                <View>
+                                    <Icon
+                                        source={item.icon}
+                                        size={28}
+                                        color={isActive ? theme.colors.background : theme.colors.onSurface}
+                                    />
+                                    {!!item.badge && item.badge > 0 && (
+                                        <Badge size={18} style={styles.badge}>{item.badge}</Badge>
+                                    )}
+                                </View>
                                 <Text
                                     style={[
                                         { fontWeight: "bold"},
@@ -67,6 +73,11 @@ const styles = StyleSheet.create({
     tab: {
         flex: 1,
         borderRadius: 0,
+    },
+    badge: {
+        position: 'absolute',
+        top: -4,
+        right: -10,
     },
     link: {
         display: 'flex',
