@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Math;
 using FluentValidation;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
@@ -12,7 +13,7 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.PriceCalculation;
 
 public record CalculateDeliveryPriceQuery(DeliveryCrud Delivery) : IQuery<CalculateDeliveryPriceResult>;
 
-public record CalculateDeliveryPriceResult(double Price, double PriceWithVat, double TotalDistance);
+public record CalculateDeliveryPriceResult(double Price, double PriceWithVat, double TotalDistance, bool IsInZone);
 
 public class CalculateDeliveryPriceQueryValidator : AbstractValidator<CalculateDeliveryPriceQuery>
 {
@@ -65,7 +66,16 @@ public class CalculateDeliveryPriceHandler(
           var price = await pricingStrategyService.CalculateDeliveryPriceWithoutVat(delivery);
           var priceWithVat = await vatService.GetPriceWithVatAsync(price);
           var totalDistance = delivery.GetTotalDistance();
+          
+          var isInZone = true;
+          var deliverySteps = delivery.Steps.ToList();
+          var index = 0;
+          while (isInZone && index < deliverySteps.Count)
+          {
+               isInZone = deliveryZoneRepository.IsInZone(deliverySteps[index].StepAddress.City);
+               index++;
+          }
 
-          return new CalculateDeliveryPriceResult(price, priceWithVat, totalDistance);
+          return new CalculateDeliveryPriceResult(price, priceWithVat, totalDistance, isInZone);
      }
 }

@@ -158,6 +158,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
     const estimatedDistance = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.totalDistance ?? 0);
     const estimatedPrice = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.price ?? 0);
     const estimatedPriceWithTaxes = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.priceWithVat ?? 0);
+    const isInZone = useSelector(() => publicDeliveryStore$.estimatedValue.get()?.isInZone ?? true);
 
     // Slice first packingSize option if deliveryType === 1
     const deliveryTypes = pricingStrategies.slice(0, 2);
@@ -195,6 +196,7 @@ export default function usePublicDeliveryFormViewModel(customer?: PublicDelivery
         estimatedDistance: estimatedDistance,
         estimatedPrice: estimatedPrice,
         estimatedPriceWithTaxes: estimatedPriceWithTaxes,
+        isInZone: isInZone,
         setUrgency: (urgency: string) => setValue("urgency", urgency),
         setStartDate: (startDate: string) => setValue("startDate", startDate)
     };

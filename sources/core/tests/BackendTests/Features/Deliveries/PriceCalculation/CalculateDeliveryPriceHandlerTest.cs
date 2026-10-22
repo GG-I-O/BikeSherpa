@@ -161,12 +161,178 @@ public class CalculateDeliveryPriceHandlerTest
           result.PriceWithVat.Should().Be(180.0);
      }
 
-     private CalculateDeliveryPriceHandler MakeSut(out Mock<IPricingStrategyService> pricingStrategyServiceMock, PackingSize packingSize, Urgency urgency)
+     [Fact]
+     public async Task Handle_ShouldReturnIsInZoneTrue_WhenAllStepsAreInZone()
+     {
+          // Arrange
+          var packingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
+          var urgency = new Urgency("High", 1, "Label High", 0, null, null, 12);
+          var zoneMock = CreateZoneRepositoryMock(inZone: true);
+          var sut = MakeSut(out var pricingStrategyServiceMock, packingSize, urgency, zoneMock);
+          pricingStrategyServiceMock
+               .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
+               .ReturnsAsync(100.0);
+
+          var deliveryCrud = new DeliveryCrud
+          {
+               PricingStrategy = PricingStrategy.SimpleDeliveryStrategy,
+               Steps =
+               [
+                    CreateStepDto(StepType.Pickup, 1, packingSize),
+                    CreateStepDto(StepType.Dropoff, 2, packingSize)
+               ],
+               Urgency = urgency.Name
+          };
+
+          // Act
+          var result = await sut.Handle(new CalculateDeliveryPriceQuery(deliveryCrud), CancellationToken.None);
+
+          // Assert
+          result.IsInZone.Should().BeTrue();
+          zoneMock.Verify(x => x.IsInZone(It.IsAny<string>()), Times.Exactly(2));
+     }
+
+     [Fact]
+     public async Task Handle_ShouldReturnIsInZoneFalse_WhenAllStepsAreOutOfZone()
+     {
+          // Arrange
+          var packingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
+          var urgency = new Urgency("High", 1, "Label High", 0, null, null, 12);
+          var zoneMock = CreateZoneRepositoryMock(inZone: false);
+          var sut = MakeSut(out var pricingStrategyServiceMock, packingSize, urgency, zoneMock);
+          pricingStrategyServiceMock
+               .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
+               .ReturnsAsync(100.0);
+
+          var deliveryCrud = new DeliveryCrud
+          {
+               PricingStrategy = PricingStrategy.SimpleDeliveryStrategy,
+               Steps =
+               [
+                    CreateStepDto(StepType.Pickup, 1, packingSize),
+                    CreateStepDto(StepType.Dropoff, 2, packingSize)
+               ],
+               Urgency = urgency.Name
+          };
+
+          // Act
+          var result = await sut.Handle(new CalculateDeliveryPriceQuery(deliveryCrud), CancellationToken.None);
+
+          // Assert
+          result.IsInZone.Should().BeFalse();
+     }
+
+     [Fact]
+     public async Task Handle_ShouldReturnIsInZoneFalse_WhenOneStepIsOutOfZone()
+     {
+          // Arrange
+          var packingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
+          var urgency = new Urgency("High", 1, "Label High", 0, null, null, 12);
+
+          var pickup = CreateStepDto(StepType.Pickup, 1, packingSize);
+          var dropoff1 = CreateStepDto(StepType.Dropoff, 2, packingSize);
+          var dropoff2 = CreateStepDto(StepType.Dropoff, 3, packingSize);
+
+          var zoneMock = new Mock<IDeliveryZoneRepository>();
+          zoneMock.Setup(x => x.IsInZone(pickup.Data.StepAddress.City)).Returns(true);
+          zoneMock.Setup(x => x.IsInZone(dropoff1.Data.StepAddress.City)).Returns(false);
+          zoneMock.Setup(x => x.IsInZone(dropoff2.Data.StepAddress.City)).Returns(true);
+
+          var sut = MakeSut(out var pricingStrategyServiceMock, packingSize, urgency, zoneMock);
+          pricingStrategyServiceMock
+               .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
+               .ReturnsAsync(100.0);
+
+          var deliveryCrud = new DeliveryCrud
+          {
+               PricingStrategy = PricingStrategy.TourDeliveryStrategy,
+               Steps = [pickup, dropoff1, dropoff2],
+               Urgency = urgency.Name
+          };
+
+          // Act
+          var result = await sut.Handle(new CalculateDeliveryPriceQuery(deliveryCrud), CancellationToken.None);
+
+          // Assert
+          result.IsInZone.Should().BeFalse();
+     }
+
+     [Fact]
+     public async Task Handle_ShouldStopCheckingZones_AfterFirstStepOutOfZone()
+     {
+          // Arrange
+          var packingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
+          var urgency = new Urgency("High", 1, "Label High", 0, null, null, 12);
+
+          var pickup = CreateStepDto(StepType.Pickup, 1, packingSize);
+          var dropoff1 = CreateStepDto(StepType.Dropoff, 2, packingSize);
+          var dropoff2 = CreateStepDto(StepType.Dropoff, 3, packingSize);
+
+          var zoneMock = new Mock<IDeliveryZoneRepository>();
+          zoneMock.Setup(x => x.IsInZone(pickup.Data.StepAddress.City)).Returns(true);
+          zoneMock.Setup(x => x.IsInZone(dropoff1.Data.StepAddress.City)).Returns(false);
+          zoneMock.Setup(x => x.IsInZone(dropoff2.Data.StepAddress.City)).Returns(true);
+
+          var sut = MakeSut(out var pricingStrategyServiceMock, packingSize, urgency, zoneMock);
+          pricingStrategyServiceMock
+               .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
+               .ReturnsAsync(100.0);
+
+          var deliveryCrud = new DeliveryCrud
+          {
+               PricingStrategy = PricingStrategy.TourDeliveryStrategy,
+               Steps = [pickup, dropoff1, dropoff2],
+               Urgency = urgency.Name
+          };
+
+          // Act
+          await sut.Handle(new CalculateDeliveryPriceQuery(deliveryCrud), CancellationToken.None);
+
+          // Assert: the loop short-circuits, so the third step is never checked
+          zoneMock.Verify(x => x.IsInZone(pickup.Data.StepAddress.City), Times.Once);
+          zoneMock.Verify(x => x.IsInZone(dropoff1.Data.StepAddress.City), Times.Once);
+          zoneMock.Verify(x => x.IsInZone(dropoff2.Data.StepAddress.City), Times.Never);
+     }
+
+     [Theory]
+     [InlineData(true)]
+     [InlineData(false)]
+     public async Task Handle_ShouldReturnZoneResultOfSingleStep_WhenOnlyOneStepProvided(bool inZone)
+     {
+          // Arrange
+          var packingSize = new PackingSize("Xl", 1, "Label Xl", 0, 0);
+          var urgency = new Urgency("High", 1, "Label High", 0, null, null, 16);
+          var zoneMock = CreateZoneRepositoryMock(inZone);
+          var sut = MakeSut(out var pricingStrategyServiceMock, packingSize, urgency, zoneMock);
+          pricingStrategyServiceMock
+               .Setup(x => x.CalculateDeliveryPriceWithoutVat(It.IsAny<Delivery>()))
+               .ReturnsAsync(50.0);
+
+          var deliveryCrud = new DeliveryCrud
+          {
+               PricingStrategy = PricingStrategy.TourDeliveryStrategy,
+               Steps = [CreateStepDto(StepType.Pickup, 1, packingSize)],
+               Urgency = urgency.Name
+          };
+
+          // Act
+          var result = await sut.Handle(new CalculateDeliveryPriceQuery(deliveryCrud), CancellationToken.None);
+
+          // Assert
+          result.IsInZone.Should().Be(inZone);
+          zoneMock.Verify(x => x.IsInZone(It.IsAny<string>()), Times.Once);
+     }
+
+     private CalculateDeliveryPriceHandler MakeSut(
+          out Mock<IPricingStrategyService> pricingStrategyServiceMock,
+          PackingSize packingSize,
+          Urgency urgency,
+          Mock<IDeliveryZoneRepository>? deliveryZoneRepositoryMock = null)
      {
           pricingStrategyServiceMock = new Mock<IPricingStrategyService>();
           var urgencyMock = new Mock<IUrgencyRepository>();
           var packingSizeMock = new Mock<IPackingSizeRepository>();
-          var deliveryZoneRepositoryMock = new Mock<IDeliveryZoneRepository>();
+          deliveryZoneRepositoryMock ??= CreateZoneRepositoryMock(inZone: true);
           var vatServiceMock = new Mock<IVatService>();
           var itineraryService = new Mock<IItinerarySpi>();
           itineraryService.Setup(x => x.GetItineraryInfoAsync(It.IsAny<GeoPoint>(), It.IsAny<GeoPoint>(), It.IsAny<CancellationToken>()))
@@ -182,5 +348,24 @@ public class CalculateDeliveryPriceHandlerTest
                new CalculateDeliveryPriceQueryValidator(urgencyMock.Object),
                itineraryService.Object,
                vatServiceMock.Object);
+     }
+
+     private static Mock<IDeliveryZoneRepository> CreateZoneRepositoryMock(bool inZone)
+     {
+          var mock = new Mock<IDeliveryZoneRepository>();
+          mock.Setup(x => x.IsInZone(It.IsAny<string>())).Returns(inZone);
+          return mock;
+     }
+
+     private DeliveryStepDto CreateStepDto(StepType stepType, int order, PackingSize packingSize)
+     {
+          return new()
+          {
+               Data = _fixture.Build<DeliveryStepCrud>()
+                    .With(s => s.StepType, stepType)
+                    .With(s => s.Order, order)
+                    .With(s => s.PackingSize, packingSize.Name)
+                    .Create()
+          };
      }
 }

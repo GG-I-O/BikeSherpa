@@ -7,6 +7,7 @@ import formStyle from "@/style/formStyle";
 import React from "react";
 import {useController} from "react-hook-form";
 import {KeyboardAwareScrollView} from "react-native-keyboard-controller";
+import {View} from "react-native";
 
 export default function PublicDeliveryAnonymousForm() {
     const theme = useTheme();
@@ -33,6 +34,7 @@ export default function PublicDeliveryAnonymousForm() {
                 packingSizes={viewModel.packingSizes}
                 customerType={viewModel.customerType}
                 totalDistance={viewModel.estimatedDistance}
+                isInZone={viewModel.isInZone}
             />
             <Divider/>
             <PublicDeliveryDetailsForm

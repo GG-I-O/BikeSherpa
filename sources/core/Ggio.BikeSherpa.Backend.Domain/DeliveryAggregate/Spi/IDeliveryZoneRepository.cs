@@ -4,4 +4,5 @@ public interface IDeliveryZoneRepository
 {
      IReadOnlyList<DeliveryZone> GetAll();
      DeliveryZone GetByAddress(string city);
+     bool IsInZone(string city);
 }

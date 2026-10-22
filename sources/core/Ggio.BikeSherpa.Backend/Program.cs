@@ -8,6 +8,7 @@ using Ggio.BikeSherpa.Backend.Features.Customers;
 using Ggio.BikeSherpa.Backend.Features.Deliveries;
 using Ggio.BikeSherpa.Backend.Features.Deliveries.Get;
 using Ggio.BikeSherpa.Backend.Features.Reports;
+using Ggio.BikeSherpa.Backend.Features.StaticData.DeliveryZoneCities;
 using Ggio.BikeSherpa.Backend.Infrastructure;
 using Ggio.BikeSherpa.Backend.Services.Hateoas;
 using Ggio.BikeSherpa.Backend.Services.Middleware;
@@ -56,6 +57,7 @@ builder.Services.ConfigureDeliveryFeature();
 builder.Services.ConfigureCustomerFeature();
 builder.Services.ConfigureCourierFeature();
 builder.Services.ConfigureReportFeature();
+builder.Services.ConfigureDeliveryZoneCitiesFeature();
 builder.Services.AddBackendDomain();
 
 // Notification
