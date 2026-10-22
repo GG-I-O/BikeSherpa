@@ -11,5 +11,6 @@ export const ServicesIdentifiers = {
     AppSnackbarService: Symbol.for('AppSnackbarService'),
     CustomerBackendClientFacade: Symbol.for('CustomerBackendClientFacade'),
     CourierBackendClientFacade: Symbol.for('CourierBackendClientFacade'),
-    ColorService: Symbol.for('ColorService')
+    ColorService: Symbol.for('ColorService'),
+    CompanyInfoService: Symbol.for('CompanyInfoService')
 };
