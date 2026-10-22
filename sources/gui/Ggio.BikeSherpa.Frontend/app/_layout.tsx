@@ -10,6 +10,7 @@ import {PaperProvider} from "react-native-paper";
 import {fr, registerTranslation} from "react-native-paper-dates";
 import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
 import {KeyboardProvider} from "react-native-keyboard-controller";
+import {useRuntimeTheme} from "@/hooks/useRuntimeTheme";
 
 registerTranslation('fr', fr);
 
@@ -41,6 +42,10 @@ function AppStack() {
 }
 
 export default function RootLayout() {
+    const theme = useRuntimeTheme();
+    if (!theme)
+        return null;
+    
     const authDomain = process.env.EXPO_PUBLIC_AUTH_DOMAIN;
 
     let authClient = Platform.OS === "android" ?
@@ -50,7 +55,7 @@ export default function RootLayout() {
     return (
         <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
             <KeyboardProvider>
-                <PaperProvider>
+                <PaperProvider theme={theme}>
                     <AppStack/>
                     <AppSnackbarView/>
                 </PaperProvider>

@@ -3,12 +3,15 @@ import {StyleSheet, View} from "react-native";
 import {useAuth0} from "react-native-auth0";
 import {Button, Text, ActivityIndicator, useTheme} from "react-native-paper";
 import BrandedCard from "@/components/general/BrandedCard";
+import useCompanyInfo from "@/hooks/useCompanyInfo";
 
 export default function Login() {
     const {authorize, error, isLoading} = useAuth0();
     const audience = process.env.EXPO_PUBLIC_AUTH_AUDIENCE;
     const scope = process.env.EXPO_PUBLIC_AUTH_SCOPE;
     const theme = useTheme();
+
+    const companyInfo = useCompanyInfo();
 
     const onLogin = useCallback(async () => {
         try {
@@ -19,7 +22,7 @@ export default function Login() {
         }
     }, [authorize, audience, scope]);
 
-    if (isLoading) {
+    if (isLoading || !companyInfo.label) {
         return (
             <View style={styles.loadingContainer}>
                 <ActivityIndicator animating={true} size="large"/>
@@ -29,7 +32,9 @@ export default function Login() {
     }
 
     return (
-        <BrandedCard>
+        <BrandedCard
+            title={companyInfo.label}
+        >
             <Button
                 mode="contained"
                 onPress={onLogin}

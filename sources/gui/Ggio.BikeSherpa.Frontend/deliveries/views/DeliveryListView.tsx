@@ -29,7 +29,7 @@ export function DeliveryListView() {
         toggleDeliverySelection,
         clearSelection
     } = useDeliverySelection();
-
+console.log(theme.colors.elevation)
     return (
         <>
             <ScrollView
@@ -57,6 +57,7 @@ export function DeliveryListView() {
                                 onChange={(date: Date | undefined): void => viewModel.setDatePicker(date)}
                                 value={viewModel.datePicker}
                                 disabled={viewModel.dateFilter !== dateFilterEnum.Date}
+                                mode="outlined"
                             />
                         </View>
                         <MultiSelectDropdown
