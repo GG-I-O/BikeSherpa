@@ -38,10 +38,6 @@ const ThemedDateInput = <T extends FieldValues = FieldValues>(
 
     return (
         <View style={style ? style : formStyle.intputContainer}>
-            <Text
-                style={[formStyle.label, {color: theme.colors.onBackground}, theme.fonts.labelLarge]}>{label}{required &&
-                <Text style={{color: theme.colors.error}}> *</Text>}
-            </Text>
             <DatePickerInput
                 locale={"fr"}
                 inputMode={"start"}
@@ -60,8 +56,9 @@ const ThemedDateInput = <T extends FieldValues = FieldValues>(
                 }}
                 value={field.value ? new Date(field.value) : undefined}
                 disabled={disabled}
-                label="Sélectionner une date"
+                label={label}
                 saveLabel="Confirmer"
+                mode="outlined"
             />
             {error && (<Text style={{color: theme.colors.error}}>{error.message}</Text>)}
         </View>

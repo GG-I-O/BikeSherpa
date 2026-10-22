@@ -95,7 +95,12 @@ export default function PublicDeliverySummaryView() {
                 onPress={() => viewModel.handleSubmit()}
                 style={[formStyle.button, {backgroundColor: theme.colors.secondaryContainer}]}
             >
-                <Text testID="buttonName" style={{fontWeight: 'bold'}}>Valider ma demande de livraison (2/2)</Text>
+                <Text
+                    testID="buttonName"
+                    style={{fontWeight: 'bold', color: theme.colors.onSecondaryContainer}}
+                >
+                    Valider ma demande de livraison (2/2)
+                </Text>
             </Button>
         </KeyboardAwareScrollView>
     );

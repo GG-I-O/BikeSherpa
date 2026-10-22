@@ -65,7 +65,12 @@ export default function PublicDeliveryAuthenticatedForm(props: Props) {
                 onPress={() => viewModel.handleSubmit()}
                 style={[formStyle.button, {backgroundColor: theme.colors.secondaryContainer}]}
             >
-                <Text testID="buttonName" style={{fontWeight: 'bold'}}>Passer à la facturation (1/2)</Text>
+                <Text
+                    testID="buttonName"
+                    style={{fontWeight: 'bold', color: theme.colors.onSecondaryContainer}}
+                >
+                    Passer à la facturation (1/2)
+                </Text>
             </Button>
         </KeyboardAwareScrollView>
     );
