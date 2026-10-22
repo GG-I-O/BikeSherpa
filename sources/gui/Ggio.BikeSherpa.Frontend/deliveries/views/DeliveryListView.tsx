@@ -29,7 +29,7 @@ export function DeliveryListView() {
         toggleDeliverySelection,
         clearSelection
     } = useDeliverySelection();
-console.log(theme.colors.elevation)
+    
     return (
         <>
             <ScrollView
