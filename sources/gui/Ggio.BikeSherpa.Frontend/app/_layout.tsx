@@ -11,6 +11,7 @@ import {fr, registerTranslation} from "react-native-paper-dates";
 import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
 import {KeyboardProvider} from "react-native-keyboard-controller";
 import {useRuntimeTheme} from "@/hooks/useRuntimeTheme";
+import NavigationThemeBridge from "@/components/themed/NavigationThemeBridge";
 
 registerTranslation('fr', fr);
 
@@ -45,7 +46,7 @@ export default function RootLayout() {
     const theme = useRuntimeTheme();
     if (!theme)
         return null;
-    
+
     const authDomain = process.env.EXPO_PUBLIC_AUTH_DOMAIN;
 
     let authClient = Platform.OS === "android" ?
@@ -56,8 +57,10 @@ export default function RootLayout() {
         <Auth0Provider domain={authDomain ?? ''} clientId={authClient ?? ''}>
             <KeyboardProvider>
                 <PaperProvider theme={theme}>
-                    <AppStack/>
-                    <AppSnackbarView/>
+                    <NavigationThemeBridge>
+                        <AppStack/>
+                        <AppSnackbarView/>
+                    </NavigationThemeBridge>
                 </PaperProvider>
             </KeyboardProvider>
         </Auth0Provider>
