@@ -23,6 +23,7 @@ public class MailSender(IOptions<PostmarkOptions> options) : IMailSender
                Subject = subject,
                HtmlBody = message,
                TextBody = message,
+               MessageStream = _options.MessageStream
           };
 
           await client.SendMessageAsync(postmarkMessage);
