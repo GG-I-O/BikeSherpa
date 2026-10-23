@@ -1,5 +1,7 @@
 import { transportFunctionType } from "react-native-logs";
 import { ConsoleTransportOptions } from "react-native-logs/dist/transports/consoleTransport";
+import {MMKV} from "react-native-mmkv";
+import {createClient} from "react-native-fetch-client";
 
 // Type for Loki transport options
 export type LokiTransportOptions = {
@@ -18,6 +20,23 @@ type LogBatchEntry = {
     line: string;
     level: string;
 };
+
+const storage = new MMKV({id: 'logger-http-cache'});
+const api = createClient({
+    headers: {
+        "Content-Type": "application/json",
+    },
+    timeout: 10000,
+    cache: {
+        enabled: true,
+        storage: {
+            getItem: (key) => storage.getString(key) ?? null,
+            setItem: (key, val) => storage.set(key, val),
+            removeItem: (key) => storage.delete(key),
+        },
+        defaultTtl: 300_000, // 5 minutes
+    }
+});
 
 // Loki custom transport factory
 export const createLokiTransport = (
@@ -64,6 +83,7 @@ export const createLokiTransport = (
             };
 
             // Post logs to loki
+            /*
             const response = await fetch(`${lokiOptions.host}/loki/api/v1/push`, {
                 method: "POST",
                 headers: {
@@ -71,12 +91,16 @@ export const createLokiTransport = (
                 },
                 body: JSON.stringify(payload),
             });
+            
+             */
+            const response = await api.post(`${lokiOptions.host}/loki/api/v1/push`, JSON.stringify(payload))
+            
 
-            if (!response.ok) {
+            if (response.status != 204) {
                 console.error(
                     `Failed to send logs to Loki: ${response.status} ${response.statusText}`
                 );
-                const errorText = await response.text();
+                const errorText = response.data;
                 console.error("Loki error response:", errorText);
             }
         } catch (error) {
