@@ -27,15 +27,7 @@ const api = createClient({
         "Content-Type": "application/json",
     },
     timeout: 10000,
-    cache: {
-        enabled: true,
-        storage: {
-            getItem: (key) => storage.getString(key) ?? null,
-            setItem: (key, val) => storage.set(key, val),
-            removeItem: (key) => storage.delete(key),
-        },
-        defaultTtl: 300_000, // 5 minutes
-    }
+    retry: {attempts: 100, backoff: "exponential"},
 });
 
 // Loki custom transport factory
