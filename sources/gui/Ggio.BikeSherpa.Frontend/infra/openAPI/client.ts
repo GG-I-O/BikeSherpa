@@ -172,6 +172,7 @@ const AddDeliveryByCustomerRequest = z.object({
   customer: CustomerCrud,
   delivery: DeliveryCrud,
 });
+const AddDeliveryByCustomerResponse = z.object({ id: z.string() });
 const AddResultOfGuid = z.object({ id: z.string() });
 const AttachmentRequest = z.object({
   file: z.instanceof(File),
@@ -237,6 +238,7 @@ export const schemas = {
   DeliveryType,
   CustomerCrud,
   AddDeliveryByCustomerRequest,
+  AddDeliveryByCustomerResponse,
   AddResultOfGuid,
   AttachmentRequest,
   CustomerDto,
@@ -668,7 +670,7 @@ const endpoints = makeApi([
         schema: AddDeliveryByCustomerRequest,
       },
     ],
-    response: z.void(),
+    response: z.object({ id: z.string() }),
   },
   {
     method: "get",
@@ -1341,7 +1343,7 @@ const endpoints = makeApi([
     ],
   },
   {
-    method: "post",
+    method: "get",
     path: "/deliveryZoneCities/check",
     alias: "CheckDeliveryZoneCityEndpoint",
     tags: ["deliveryZoneCities"],
@@ -1367,6 +1369,14 @@ const endpoints = makeApi([
     method: "get",
     path: "/general/parameters/companyLabel",
     alias: "GetCompanyLabelEndpoint",
+    tags: ["general"],
+    requestFormat: "json",
+    response: z.string(),
+  },
+  {
+    method: "get",
+    path: "/general/parameters/companyPhone",
+    alias: "GetCompanyPhoneEndpoint",
     tags: ["general"],
     requestFormat: "json",
     response: z.string(),

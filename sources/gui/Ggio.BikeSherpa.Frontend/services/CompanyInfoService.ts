@@ -19,14 +19,22 @@ export default class CompanyInfoService implements ICompanyInfoService {
             axiosInstance: axios
         });
     }
-    
+
     public async getCompanyLabel(): Promise<string> {
         try {
             return await this.apiClient.GetCompanyLabelEndpoint();
-        }
-        catch(e) {
+        } catch (e) {
             this.logger.error("Could not fetch company label :", e);
             return "Bike Sherpa";
+        }
+    }
+
+    public async getCompanyPhone(): Promise<string | undefined> {
+        try {
+            return await this.apiClient.GetCompanyPhoneEndpoint();
+        } catch (e) {
+            this.logger.error("Could not fetch company phone :", e);
+            return undefined;
         }
     }
 }
