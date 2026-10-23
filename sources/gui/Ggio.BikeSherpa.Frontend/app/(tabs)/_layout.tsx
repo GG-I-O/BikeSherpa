@@ -42,7 +42,7 @@ export default function TabLayout() {
         logout().then();
     }, [authError, clearSession]);
 
-    useUnassignedBadgeSync();
+    useUnassignedBadgeSync(!userIsDispatcher);
     const unassignedStepCount = useUnassignedStepCount();
     
     if (userIsDispatcher === null)

@@ -24,7 +24,7 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
     private signatureUploadQueue: { stepId: string, signature: UploadableFile, receiver: string }[] = [];
 
     private readonly logger: ILogger;
-    
+
     constructor(
         @inject(DeliveryServiceIdentifier.BackendClientFacade) backendClientFacade: IBackendClient<Delivery>,
         @inject(DeliveryServiceIdentifier.CustomBackendClientFacade) customClientFacade: IDeliveryCustomBackendClientFacade,
@@ -73,10 +73,16 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
 
     public async update(delivery: Delivery): Promise<void> {
         let completeUpdate: boolean = true;
+        
+        this.logger.info(`Update Delivery ${delivery.code}`);
+        this.logger.info(`UpdateStepState currently has ${this.updateStepState.length} request`);
+        this.logger.info(`UpdateDeliveryState currently has ${this.updateDeliveryState.length} request`);
 
         try {
             // Call an endpoint for every update to do on step in updateStepState
             for (let i = 0; i < this.updateStepState.length; i++) {
+                this.logger.info(`UpdateStepState on ${delivery.id} exists : ${this.updateStepState[i].deliveryId !== delivery.id}`);
+                
                 if (this.updateStepState[i].deliveryId !== delivery.id)
                     continue;
 
@@ -194,5 +200,4 @@ export default class DeliveryStorageMiddleware implements IDeliveryStorageMiddle
             this.updateDeliveryState = this.updateDeliveryState.filter(state => state.deliveryId !== delivery.id);
         }
     }
-
 }

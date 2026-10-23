@@ -5,6 +5,7 @@ import { ILogger } from '@/spi/LogsSPI';
 import AuthInterceptor from '@/infra/auth/AuthInterceptor';
 import { IAuthService } from '@/spi/AuthSPI';
 import {AuthServiceIdentifier} from "@/infra/auth/bootstrapper/AuthServiceIdentifier";
+import axiosRetry from "axios-retry";
 
 export default class InterceptorBootstrap {
 
@@ -29,6 +30,7 @@ export default class InterceptorBootstrap {
                 return Promise.reject(error);
             }
         );
+        axiosRetry(axios, {retryDelay: axiosRetry.exponentialDelay, retries: 100})
 
         // Authentification interceptor
         const authService = IOCContainer.get<IAuthService>(AuthServiceIdentifier.AuthService);

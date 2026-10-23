@@ -1,5 +1,6 @@
 import { transportFunctionType } from "react-native-logs";
 import { ConsoleTransportOptions } from "react-native-logs/dist/transports/consoleTransport";
+import axios from "axios";
 
 // Type for Loki transport options
 export type LokiTransportOptions = {
@@ -64,19 +65,13 @@ export const createLokiTransport = (
             };
 
             // Post logs to loki
-            const response = await fetch(`${lokiOptions.host}/loki/api/v1/push`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (!response.ok) {
+            const response = await axios.post(`${lokiOptions.host}/loki/api/v1/push`, JSON.stringify(payload))
+            
+            if (response.status != 204) {
                 console.error(
                     `Failed to send logs to Loki: ${response.status} ${response.statusText}`
                 );
-                const errorText = await response.text();
+                const errorText = response.data;
                 console.error("Loki error response:", errorText);
             }
         } catch (error) {

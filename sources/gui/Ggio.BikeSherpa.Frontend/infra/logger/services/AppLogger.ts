@@ -41,7 +41,7 @@ export default class AppLogger implements ILogger {
             },
             // Use multiple transports: console for debugging + Loki for storage
             transport: __DEV__ ? [consoleTransport, lokiTransport] : lokiTransport,
-            severity: __DEV__ ? "debug" : "error",
+            severity: "info",
             transportOptions: {
                 colors: {
                     info: "blueBright",
