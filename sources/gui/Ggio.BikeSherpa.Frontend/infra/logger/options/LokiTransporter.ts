@@ -1,6 +1,6 @@
 import { transportFunctionType } from "react-native-logs";
 import { ConsoleTransportOptions } from "react-native-logs/dist/transports/consoleTransport";
-import {createClient} from "react-native-fetch-client";
+import axios from "axios";
 
 // Type for Loki transport options
 export type LokiTransportOptions = {
@@ -19,14 +19,6 @@ type LogBatchEntry = {
     line: string;
     level: string;
 };
-
-const api = createClient({
-    headers: {
-        "Content-Type": "application/json",
-    },
-    timeout: 10000,
-    retry: {attempts: 100, backoff: "exponential"},
-});
 
 // Loki custom transport factory
 export const createLokiTransport = (
@@ -73,17 +65,7 @@ export const createLokiTransport = (
             };
 
             // Post logs to loki
-            /*
-            const response = await fetch(`${lokiOptions.host}/loki/api/v1/push`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
-            
-             */
-            const response = await api.post(`${lokiOptions.host}/loki/api/v1/push`, JSON.stringify(payload))
+            const response = await axios.post(`${lokiOptions.host}/loki/api/v1/push`, JSON.stringify(payload))
             
             if (response.status != 204) {
                 console.error(
