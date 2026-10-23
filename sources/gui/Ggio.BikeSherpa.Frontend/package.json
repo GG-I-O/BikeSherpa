@@ -27,6 +27,7 @@
     "@react-navigation/native": "^7.1.8",
     "@zodios/core": "^10.9.6",
     "axios": "1.13.2",
+    "axios-retry": "^4.5.0",
     "babel-preset-expo": "^54.0.10",
     "expo": "~54.0.25",
     "expo-auth-session": "~7.0.9",

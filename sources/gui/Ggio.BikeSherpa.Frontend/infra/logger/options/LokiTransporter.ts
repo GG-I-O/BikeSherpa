@@ -1,6 +1,5 @@
 import { transportFunctionType } from "react-native-logs";
 import { ConsoleTransportOptions } from "react-native-logs/dist/transports/consoleTransport";
-import {MMKV} from "react-native-mmkv";
 import {createClient} from "react-native-fetch-client";
 
 // Type for Loki transport options
@@ -21,7 +20,6 @@ type LogBatchEntry = {
     level: string;
 };
 
-const storage = new MMKV({id: 'logger-http-cache'});
 const api = createClient({
     headers: {
         "Content-Type": "application/json",
@@ -87,7 +85,6 @@ export const createLokiTransport = (
              */
             const response = await api.post(`${lokiOptions.host}/loki/api/v1/push`, JSON.stringify(payload))
             
-
             if (response.status != 204) {
                 console.error(
                     `Failed to send logs to Loki: ${response.status} ${response.statusText}`
