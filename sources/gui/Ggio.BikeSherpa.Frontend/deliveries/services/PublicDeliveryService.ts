@@ -72,6 +72,7 @@ export default class PublicDeliveryService implements IPublicDeliveryService {
             const deliveryCrud = this.mapDeliveryToDeliveryCrud(delivery);
             const customerCrud = this.mapCustomerToCustomerCrud(customer);
             await this.apiClient.AddDeliveryByCustomerEndpoint({delivery: deliveryCrud, customer: customerCrud});
+            this.logger.info("Delivery created by client");
             return true;
         } catch (error) {
             this.logger.error("Create delivery by customer error:", error);

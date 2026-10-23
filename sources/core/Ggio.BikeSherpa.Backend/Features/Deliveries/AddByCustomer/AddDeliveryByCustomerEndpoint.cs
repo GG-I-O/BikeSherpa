@@ -22,6 +22,8 @@ namespace Ggio.BikeSherpa.Backend.Features.Deliveries.AddByCustomer;
 
 public record AddDeliveryByCustomerRequest(CustomerCrud Customer, DeliveryCrud Delivery);
 
+public record AddDeliveryByCustomerResponse(Guid Id);
+
 /// <summary>
 ///      This endpoint is implemented as composition of handlers to be able to mutualize at use-case level functionnalities
 ///      and so avoid code duplication and
@@ -40,6 +42,7 @@ public class AddDeliveryByCustomerEndpoint(
           AllowAnonymous();
           Description(x => x.WithTags("delivery")
                .WithDescription("Add a delivery by a customer")
+               .Produces<AddDeliveryByCustomerResponse>()
           );
      }
 
