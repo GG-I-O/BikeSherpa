@@ -80,7 +80,8 @@ ACR_NAME="bikeherpa"
 IMAGE_NAME="bikesherpa/backend"
 ACR_IMAGE_PREFIX="$ACR_NAME.azurecr.io"
 
-docker build -t "$IMAGE_NAME:latest" \
+docker build --pull \
+             -t "$IMAGE_NAME:latest" \
              -t "$IMAGE_NAME:$DOCKER_TAG_VERSION" \
              -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:latest" \
              -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$DOCKER_TAG_VERSION" \
@@ -92,7 +93,8 @@ docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$DOCKER_TAG_VERSION"
              
 IMAGE_NAME="bikesherpa/front-web"
 
-docker build -t "$IMAGE_NAME:latest" \
+docker build --pull \ 
+            -t "$IMAGE_NAME:latest" \
             -t "$IMAGE_NAME:$DOCKER_TAG_VERSION" \
             -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:latest" \
             -t "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$DOCKER_TAG_VERSION" \
@@ -103,5 +105,6 @@ echo "Pushing Docker image of frontend to ACR..."
 docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:latest"
 docker push "$ACR_IMAGE_PREFIX/$IMAGE_NAME:$DOCKER_TAG_VERSION"
 
+docker image prune
 
 echo "Build and push completed successfully!"

@@ -7,10 +7,10 @@ using Moq;
 
 namespace Backend.Infrastructure.Tests;
 
-public class ItineraryServiceTests
+public class IgnItineraryServiceTests
 {
      private readonly Mock<IItineraryApi> _sut = new();
-     private readonly Mock<ILogger<ItineraryService>> _logger = new();
+     private readonly Mock<ILogger<IgnItineraryService>> _logger = new();
      private readonly CancellationTokenSource _cts = new();
 
      [Fact]
@@ -29,7 +29,7 @@ public class ItineraryServiceTests
                     Duration = expectedDuration
                });
 
-          var service = new ItineraryService(_sut.Object, _logger.Object);
+          var service = new IgnItineraryService(_sut.Object, _logger.Object);
 
           // Act
           var result = await service.GetItineraryInfoAsync(new GeoPoint(2.35, 48.85), new GeoPoint(2.45, 48.95), CancellationToken.None);
@@ -48,7 +48,7 @@ public class ItineraryServiceTests
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new Itineraire { Distance = 10f, Duration = 15f });
 
-          var service = new ItineraryService(_sut.Object, _logger.Object);
+          var service = new IgnItineraryService(_sut.Object, _logger.Object);
 
           // Act
           await service.GetItineraryInfoAsync(new GeoPoint(2.35, 48.85), new GeoPoint(2.45, 48.95), CancellationToken.None);
@@ -76,7 +76,7 @@ public class ItineraryServiceTests
                     It.IsAny<CancellationToken>()))
                .ReturnsAsync(new Itineraire { Distance = 10f, Duration = 15f });
 
-          var service = new ItineraryService(_sut.Object, _logger.Object);
+          var service = new IgnItineraryService(_sut.Object, _logger.Object);
 
           // Act
           await service.GetItineraryInfoAsync(new GeoPoint(2.35, 48.85), new GeoPoint(2.45, 48.95), _cts.Token);
@@ -92,7 +92,7 @@ public class ItineraryServiceTests
      public async Task GetItineraryInfoAsync_ThrowsItineraryServiceException_WhenCoordinatesAreIdentical()
      {
           // Arrange
-          var service = new ItineraryService(_sut.Object, _logger.Object);
+          var service = new IgnItineraryService(_sut.Object, _logger.Object);
 
           // Act & Assert
           var ex = await Assert.ThrowsAsync<ItineraryServiceException>(() =>
@@ -110,7 +110,7 @@ public class ItineraryServiceTests
           _sut.Setup(x => x.RouteItinerairePost(It.IsAny<RouteBody>(), It.IsAny<CancellationToken>()))!
                .ReturnsAsync(null as Itineraire);
 
-          var service = new ItineraryService(_sut.Object, _logger.Object);
+          var service = new IgnItineraryService(_sut.Object, _logger.Object);
 
           // Act & Assert
           var ex = await Assert.ThrowsAsync<ItineraryServiceException>(() =>

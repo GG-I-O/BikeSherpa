@@ -8,8 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Backend.Infrastructure.Tests;
 
-[Trait("Category", "E2E")]
-public class ItineraryServiceE2ETest
+[Trait("Category", "Integration")]
+public class IgnItineraryServiceE2ETest
 {
      private static IItinerarySpi MakeSut()
      {
