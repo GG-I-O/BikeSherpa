@@ -130,6 +130,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      public async Task RecalculateStepDistancesAsync(IItinerarySpi itineraryService)
      {
+          if (PricingStrategy != PricingStrategy.SimpleDeliveryStrategy)
+               return;
+          
           foreach (var step in Steps.Where(s => s.StepType == StepType.Dropoff))
           {
                if (step.Order == 1)
@@ -145,6 +148,9 @@ public class Delivery : EntityBase<Guid>, IAggregateRoot, IAuditEntity
 
      private async Task<double> GetDistanceAsync(DeliveryStep step, IItinerarySpi itineraryService)
      {
+          if (PricingStrategy != PricingStrategy.SimpleDeliveryStrategy)
+               return 0;
+          
           if (step.Order == 1 || step.StepType == StepType.Pickup)
           {
                return 0;
