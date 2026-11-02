@@ -2,10 +2,11 @@
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Spi;
 using Ggio.BikeSherpa.Backend.Infrastructure.GeoService.Contracts;
 using Microsoft.Extensions.Logging;
+using Refit;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure.GeoService;
 
-public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryService> logger) : IItinerarySpi
+public class IgnItineraryService(IItineraryApi itineraryApi, ILogger<IgnItineraryService> logger) : IItinerarySpi
 {
      public async Task<ItineraryResult> GetItineraryInfoAsync(
           GeoPoint startStepCoordinates,
@@ -25,7 +26,12 @@ public class ItineraryService(IItineraryApi itineraryApi, ILogger<ItineraryServi
                     result.Duration
                );
           }
+          catch(ApiException apiException)
+          {
+               logger.LogError(apiException, "Error calling the itinerary API, {Content}", apiException.Content);
 
+               throw new ItineraryServiceException("Erreur lors de l’appel à l’API d’itinéraire", apiException);
+          }
           catch (Exception exception) when (exception is not ItineraryServiceException)
           {
                logger.LogError(exception, "Error calling the itinerary API");

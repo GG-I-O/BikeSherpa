@@ -16,6 +16,7 @@ using Newtonsoft.Json.Serialization;
 using Refit;
 using Google.Api.Gax.Grpc.Rest;
 using Google.Maps.Places.V1;
+using Google.Maps.Routing.V2;
 
 namespace Ggio.BikeSherpa.Backend.Infrastructure;
 
@@ -42,10 +43,23 @@ public static class Bootstrap
                     )
                };
 
-               services.AddRefitClient<IItineraryApi>(settings)
-                    .ConfigureHttpClient(c => { c.BaseAddress = new Uri(configuration["ItineraryService:BaseUrl"]!); });
+               Enum.TryParse(configuration["ItineraryService:Provider"], true, out ItineraryProvider itineraryProvider);
 
-               services.AddScoped<IItinerarySpi, ItineraryService>();
+               if (itineraryProvider == ItineraryProvider.Google)
+               {
+                    services.AddSingleton<RoutesClient>(_ => new RoutesClientBuilder
+                    {
+                         ApiKey = configuration["GoogleAPIKey"] ?? "",
+                         GrpcAdapter = RestGrpcAdapter.Default
+                    }.Build());
+                    services.AddScoped<IItinerarySpi, GoogleItineraryService>();
+               }
+               else
+               {
+                    services.AddRefitClient<IItineraryApi>(settings)
+                         .ConfigureHttpClient(c => { c.BaseAddress = new Uri(configuration["ItineraryService:BaseUrl"]!); });
+                    services.AddScoped<IItinerarySpi, IgnItineraryService>();
+               }
                services.AddScoped<IDeliveryZoneRepository, DeliveryZoneRepository>();
                services.AddScoped<IPackingSizeRepository, PackingSizeRepository>();
                services.AddScoped<IUrgencyRepository, UrgencyRepository>();
