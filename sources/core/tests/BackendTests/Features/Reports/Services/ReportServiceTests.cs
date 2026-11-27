@@ -2,6 +2,7 @@ using Ardalis.Specification;
 using AutoFixture;
 using AwesomeAssertions;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate;
+using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Enumerations;
 using Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.PricingStrategies;
 using Ggio.BikeSherpa.Backend.Domain.SharedKernel;
 using Ggio.BikeSherpa.Backend.Features.Reports.Services;
