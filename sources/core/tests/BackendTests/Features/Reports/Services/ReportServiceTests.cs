@@ -38,28 +38,50 @@ public class ReportServiceTests
      }
 
      private Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery MakeDelivery(
-          PricingStrategyEnum pricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
-          string? code = null,
-          DateTimeOffset? startDate = null,
-          DateTimeOffset? contractDate = null,
-          double? totalPrice = null,
-          double? discount = null,
-          double? extraCost = null,
-          List<DeliveryStep>? steps = null,
-          Urgency? urgency = null) => new()
+     PricingStrategyEnum pricingStrategy = PricingStrategyEnum.SimpleDeliveryStrategy,
+     string? code = null,
+     DateTimeOffset? startDate = null,
+     DateTimeOffset? contractDate = null,
+     double? totalPrice = null,
+     double? discount = null,
+     double? extraCost = null,
+     List<DeliveryStep>? steps = null,
+     Urgency? urgency = null)
      {
-          PricingStrategy = pricingStrategy,
-          Code = code ?? _fixture.Create<string>(),
-          CustomerId = _fixture.Create<Guid>(),
-          Urgency = urgency ?? Urgency,
-          InsulatedBox = false,
-          ContractDate = contractDate ?? _contractDate,
-          StartDate = startDate ?? _startDate,
-          Steps = steps ?? [],
-          TotalPrice = totalPrice,
-          Discount = discount,
-          ExtraCost = extraCost
-     };
+          var delivery = new Ggio.BikeSherpa.Backend.Domain.DeliveryAggregate.Delivery
+          {
+               PricingStrategy = pricingStrategy,
+               Code = code ?? _fixture.Create<string>(),
+               CustomerId = _fixture.Create<Guid>(),
+               Urgency = urgency ?? Urgency,
+               InsulatedBox = false,
+               ContractDate = contractDate ?? _contractDate,
+               StartDate = startDate ?? _startDate,
+               Steps = steps ?? [],
+               TotalPrice = totalPrice,
+               Discount = discount,
+               ExtraCost = extraCost
+          };
+     
+          if (steps is null)
+          {
+               delivery.Steps.AddRange(
+               [
+                    _fixture.Build<DeliveryStep>()
+                         .With(s => s.ParentDelivery, delivery)
+                         .With(s => s.StepType, StepType.Pickup)
+                         .With(s => s.NotBilled, false)
+                         .Create(),
+                    _fixture.Build<DeliveryStep>()
+                         .With(s => s.ParentDelivery, delivery)
+                         .With(s => s.StepType, StepType.Dropoff)
+                         .With(s => s.NotBilled, false)
+                         .Create()
+               ]);
+          }
+     
+          return delivery;
+     }
 
      [Fact]
      public async Task GenerateReport_MapsReportHeader()
@@ -86,18 +108,6 @@ public class ReportServiceTests
           // Arrange
           var firstDelivery = MakeDelivery(code: "DEL-001", totalPrice: 12.50);
           var secondDelivery = MakeDelivery(code: "DEL-002", totalPrice: 27.25);
-
-          var steps1 = _fixture.Build<DeliveryStep>()
-               .With(s => s.ParentDelivery, firstDelivery)
-               .CreateMany(2)
-               .ToList();
-          firstDelivery.Steps.AddRange(steps1);
-
-          var steps2 = _fixture.Build<DeliveryStep>()
-               .With(s => s.ParentDelivery, secondDelivery)
-               .CreateMany(2)
-               .ToList();
-          secondDelivery.Steps.AddRange(steps2);
 
           // Act
           var report = await _sut.GenerateDeliveryReportAsync(
@@ -131,5 +141,28 @@ public class ReportServiceTests
           // Assert
           report.TotalPrice.Should().Be(0);
           report.Deliveries.Single().DeliveryPrice.Should().Be(0);
+     }
+
+     [Fact]
+     public async Task GenerateReport_IgnoreEmptyDelivery()
+     {
+          // Arrange
+          var firstDelivery = MakeDelivery(code: "DEL-001", totalPrice: 12.50);
+          var secondDelivery = MakeDelivery(code: "DEL-002", totalPrice: 27.25, steps: []);
+
+          // Act
+          var report = await _sut.GenerateDeliveryReportAsync(
+               "Customer",
+               _startDate,
+               _startDate.AddDays(1),
+               [firstDelivery, secondDelivery]);
+
+          // Assert
+          report.TotalPrice.Should().Be(12.50);
+          report.Deliveries.Should().HaveCount(1);
+
+          report.Deliveries[0].DeliveryLabel.Should().Contain(firstDelivery.Code);
+          report.Deliveries[0].DeliveryLabel.Should().Contain($"{firstDelivery.StartDate.Day:D2}/{firstDelivery.StartDate.Month:D2}");
+          report.Deliveries[0].DeliveryPrice.Should().Be(12.50);
      }
 }
