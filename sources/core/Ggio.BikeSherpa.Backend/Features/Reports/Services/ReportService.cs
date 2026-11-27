@@ -31,6 +31,10 @@ public class ReportService(
 
           foreach (var delivery in deliveries)
           {
+               if (delivery.Steps.Count < 1)
+               {
+                    continue;
+               }
                var deliveryReport = new DeliveryReport
                {
                     DeliveryLabel = delivery.DeliveryLabel,
