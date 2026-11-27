@@ -84,8 +84,12 @@ public class ReportServiceTests
      public async Task GenerateReport_MapsDeliverySummaryAndTotals()
      {
           // Arrange
-          var firstDelivery = MakeDelivery(code: "DEL-001", totalPrice: 12.50);
-          var secondDelivery = MakeDelivery(code: "DEL-002", totalPrice: 27.25);
+          var steps = _fixture.Build<DeliveryStep>()
+               .With(s => s.ParentDelivery, delivery)
+               .CreateMany(3)
+               .ToList();
+          var firstDelivery = MakeDelivery(code: "DEL-001", totalPrice: 12.50, steps: steps);
+          var secondDelivery = MakeDelivery(code: "DEL-002", totalPrice: 27.25, steps: steps);
 
           // Act
           var report = await _sut.GenerateDeliveryReportAsync(
