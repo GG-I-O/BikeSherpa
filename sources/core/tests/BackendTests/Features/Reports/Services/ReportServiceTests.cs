@@ -31,6 +31,10 @@ public class ReportServiceTests
                .Setup(s => s.ImplementedStrategy)
                .Returns(PricingStrategyEnum.SimpleDeliveryStrategy);
 
+          _delayServiceMock
+               .Setup(s => s.CalculateDelay(It.IsAny<DateTimeOffset>(), It.IsAny<DateTimeOffset>()))
+               .ReturnsAsync(_fixture.Create<Delay>());
+
           _courierRepositoryMock
                .Setup(s=>s.SingleOrDefaultAsync(It.IsAny<SingleResultSpecification<Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier>>(), It.IsAny<CancellationToken>()))
                .ReturnsAsync(_fixture.Create<Ggio.BikeSherpa.Backend.Domain.CourierAggregate.Courier>());
