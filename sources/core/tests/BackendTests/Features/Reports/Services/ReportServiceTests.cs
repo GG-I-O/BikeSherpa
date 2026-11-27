@@ -91,13 +91,13 @@ public class ReportServiceTests
                .With(s => s.ParentDelivery, firstDelivery)
                .CreateMany(2)
                .ToList();
-          firstDelivery.steps = steps1;
+          firstDelivery.Steps.AddRange(steps1);
 
           var steps2 = _fixture.Build<DeliveryStep>()
                .With(s => s.ParentDelivery, secondDelivery)
                .CreateMany(2)
                .ToList();
-          secondDelivery.steps = steps2;
+          secondDelivery.Steps.AddRange(steps2);
 
           // Act
           var report = await _sut.GenerateDeliveryReportAsync(
